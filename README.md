@@ -2,9 +2,11 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-![](http://www.globalbioticinteractions.org/assets/globi.svg)
+ A commandline tool for [GloBI](https://globalbioticinteraction.org)
 
-> A commandline tool for [GloBI](https://globalbioticinteraction
+<a href="http://globalbioticinteractions.org/">
+  <img src="http://www.globalbioticinteractions.org/assets/globi.svg" height="144">
+</a>
 
 ## Table of Contents
 
@@ -95,15 +97,6 @@ Usage: <main class> [command] [command options]
     version      Show Version
       Usage: version
 ```
-
-## Dependencies
-
-Current versions of dependencies are included in the `./lib` directory.
-
-* [multibase](https://github.com/multiformats/java-multibase)
-* [multiaddr](https://github.com/multiformats/java-multiaddr)
-* [multihash](https://github.com/multiformats/java-multihash)
-* [cid](https://github.com/ipld/java-cid)
 
 ## Contribute
 

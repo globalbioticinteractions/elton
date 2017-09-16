@@ -1,11 +1,11 @@
 # elton
 
-[![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![Build Status](https://travis-ci.org/globalbioticinteractions/elton.svg?branch=master)](https://travis-ci.org/globalbioticinteractions/elton) [![Release](https://jitpack.io/v/org.globalbioticinteractions/elton.svg)](https://jitpack.io/#org.globalbioticinteractions/elton) [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
  A commandline tool for [GloBI](https://globalbioticinteraction.org)
 
 <a href="http://globalbioticinteractions.org/">
-  <img src="http://www.globalbioticinteractions.org/assets/globi.svg" height="144">
+  <img src="http://www.globalbioticinteractions.org/assets/globi.svg" height="120">
 </a>
 
 ## Table of Contents
@@ -20,7 +20,7 @@
 
 ### Official releases
 
-You can use this project by including `elton.jar` from one of the [releases](https://github.com/globalbioticinteractions/elton/releases).
+You can use this project by including `elton.jar` from one of the [releases](https://github.com/org.globalbioticinteractions/elton/releases).
 
 ### Maven, Gradle, SBT
 

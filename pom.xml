@@ -4,7 +4,7 @@
 
     <groupId>org.globalbioticinteractions</groupId>
     <artifactId>elton</artifactId>
-    <version>0.3.4-SNAPSHOT</version>
+    <version>0.3.4</version>
     <name>GloBI commandline tool</name>
     <description>Discover, cache and check species interaction data</description>
 
@@ -12,7 +12,7 @@
         <dependency>
             <groupId>com.github.jhpoelen.eol-globi-data</groupId>
             <artifactId>eol-globi-data-sources</artifactId>
-            <version>f08e6f9a417fc98dc7fd9adbb9779568e30612f5</version>
+            <version>v0.9.1</version>
         </dependency>
 
         <dependency>

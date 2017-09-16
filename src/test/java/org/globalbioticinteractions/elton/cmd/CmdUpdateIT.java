@@ -41,6 +41,18 @@ public class CmdUpdateIT {
         CmdLine.run(actual);
     }
 
+    @Test
+    public void runUpdateHafner() {
+        JCommander jc = new CmdLine().buildCommander();
+        jc.parse("update", "--cache-dir=./target/tmp-dataset", "globalbioticinteractions/hafner");
+
+        JCommander actual = jc.getCommands().get(jc.getParsedCommand());
+        Assert.assertEquals(actual.getObjects().size(), 1);
+        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdUpdate.class);
+
+        CmdLine.run(actual);
+    }
+
     private void assertUpdateCmd(JCommander jc) {
         Assert.assertEquals(jc.getParsedCommand(), "update");
 

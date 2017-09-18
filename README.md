@@ -104,4 +104,4 @@ Feel free to join in. All welcome. Open an [issue](https://github.com/globalbiot
 
 ## License
 
-[GLP](LICENSE)
+[GPL](LICENSE)

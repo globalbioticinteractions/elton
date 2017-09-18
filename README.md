@@ -20,7 +20,7 @@
 
 ### Official releases
 
-You can use this project by including `elton.jar` from one of the [releases](https://github.com/org.globalbioticinteractions/elton/releases).
+You can use this project by including `elton.jar` from one of the [releases](https://github.com/globalbioticinteractions/elton/releases).
 
 ### Maven, Gradle, SBT
 

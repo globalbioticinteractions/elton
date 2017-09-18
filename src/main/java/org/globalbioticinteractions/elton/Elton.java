@@ -6,8 +6,15 @@ package org.globalbioticinteractions.elton;
 
 import org.globalbioticinteractions.elton.cmd.CmdLine;
 
+import static java.lang.System.exit;
+
 public class Elton {
     public static void main(String[] args) {
-        CmdLine.run(args);
+        try {
+            CmdLine.run(args);
+            exit(0);
+        } catch (Throwable t) {
+            exit(1);
+        }
     }
 }

@@ -15,18 +15,17 @@ public class CmdLine {
         }
     }
 
-    public static void run(String[] args) {
+    public static void run(String[] args) throws Throwable {
         JCommander jc = new CmdLine().buildCommander();
         try {
             jc.parse(args);
             CmdLine.run(jc.getCommands().get(jc.getParsedCommand()));
-            exit(0);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             LOG.error("unexpected exception", ex);
             StringBuilder out = new StringBuilder();
             jc.usage(out);
             System.err.append(out.toString());
-            exit(1);
+            throw ex;
         }
     }
 

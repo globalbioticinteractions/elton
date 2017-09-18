@@ -39,7 +39,7 @@ for Maven, add the following sections to your pom.xml:
     <dependency>
       <groupId>org.globalbioticinteractions</groupId>
       <artifactId>elton</artifactId>
-      <version>v0.3.2</version>
+      <version>0.3.2</version>
     </dependency>
   </dependencies>
 ```

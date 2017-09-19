@@ -14,6 +14,8 @@ import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +25,11 @@ public class CmdNames extends CmdDefaultParams {
 
     @Override
     public void run() {
+        run(System.out);
+
+    }
+
+    void run(PrintStream out) {
         DatasetFinderLocal finder = new DatasetFinderLocal(getCacheDir());
 
         NodeFactoryNull nodeFactory = new NodeFactoryNull() {
@@ -36,11 +43,11 @@ public class CmdNames extends CmdDefaultParams {
 
             @Override
             public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-                logTaxon(taxon);
+                logTaxon(taxon, out);
                 return super.createSpecimen(interaction, taxon);
             }
 
-            private void logTaxon(Taxon taxon) {
+            private void logTaxon(Taxon taxon, PrintStream out) {
                 Stream<String> taxonInfo = Stream.of(taxon.getName(),
                         taxon.getRank(),
                         taxon.getExternalId(),
@@ -55,12 +62,12 @@ public class CmdNames extends CmdDefaultParams {
                         .map(term -> null == term ? "" : term)
                         .map(term -> term.replaceAll("[\\t\\n\\r]", " "))
                         .collect(Collectors.joining("\t"));
-                System.out.println(row);
+                out.println(row);
             }
 
             @Override
             public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-                logTaxon(taxon);
+                logTaxon(taxon, out);
                 return super.createSpecimen(study, taxon);
             }
         };
@@ -79,7 +86,6 @@ public class CmdNames extends CmdDefaultParams {
         } catch (DatasetFinderException e) {
             throw new RuntimeException("failed to complete name scan", e);
         }
-
     }
 }
 

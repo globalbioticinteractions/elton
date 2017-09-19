@@ -87,8 +87,8 @@
     <repositories>
         <repository>
             <id>globi-release-http</id>
-            <name>AWS Release Repository</name>
-            <url>http://depot.globalbioticinteractions.org</url>
+            <name>Release Repository</name>
+            <url>http://depot.globalbioticinteractions.org/release</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -100,7 +100,7 @@
         <repository>
             <id>globi-datasets</id>
             <name>GloBI Thirdparty Datasets</name>
-            <url>https://s3.amazonaws.com/globi/datasets</url>
+            <url>http://depot.globalbioticinteractions.org/datasets</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>

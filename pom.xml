@@ -88,7 +88,7 @@
         <repository>
             <id>globi-release-http</id>
             <name>AWS Release Repository</name>
-            <url>https://s3.amazonaws.com/globi/release</url>
+            <url>http://depot.globalbioticinteractions.org</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>

@@ -13,9 +13,12 @@ import org.eol.globi.service.DatasetFinderProxy;
 import org.eol.globi.service.DatasetFinderZenodo;
 import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.cache.Cache;
+import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
 import org.globalbioticinteractions.cache.CachePullThrough;
+import org.globalbioticinteractions.dataset.DatasetFinderLogger;
+import org.globalbioticinteractions.dataset.DatasetFinderWithCache;
 
 import java.util.Arrays;
 

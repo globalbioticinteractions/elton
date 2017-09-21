@@ -1,4 +1,4 @@
-package org.globalbioticinteractions.elton.cmd;
+package org.globalbioticinteractions.dataset;
 
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFinder;

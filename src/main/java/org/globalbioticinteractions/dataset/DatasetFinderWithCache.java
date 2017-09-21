@@ -1,8 +1,9 @@
-package org.globalbioticinteractions.elton.cmd;
+package org.globalbioticinteractions.dataset;
 
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
+import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
 
 import java.util.Collection;

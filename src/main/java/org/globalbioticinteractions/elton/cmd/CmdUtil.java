@@ -2,10 +2,19 @@ package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
+import org.globalbioticinteractions.cache.Cache;
+import org.globalbioticinteractions.cache.CacheFactory;
+import org.globalbioticinteractions.cache.CacheLocalReadonly;
+import org.globalbioticinteractions.cache.CacheProxy;
+import org.globalbioticinteractions.cache.CachePullThrough;
+import org.globalbioticinteractions.dataset.DatasetFinderLogger;
+import org.globalbioticinteractions.dataset.DatasetFinderWithCache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class CmdUtil {
@@ -24,5 +33,16 @@ class CmdUtil {
                 LOG.error("failed to handle namespace [" + namespace + "]", e);
             }
         }
+    }
+
+    static DatasetFinderWithCache createDataFinderLoggingCaching(DatasetFinder finder, String namespace, String cacheDir) {
+        return new DatasetFinderWithCache(new DatasetFinderLogger(finder, cacheDir), new CacheFactory() {
+            @Override
+            public Cache cacheFor(Dataset dataset) {
+                Cache pullThroughCache = new CachePullThrough(namespace, cacheDir);
+                CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir);
+                return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
+            }
+        });
     }
 }

@@ -3,7 +3,6 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.Parameters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eol.globi.Version;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.data.ParserFactoryLocal;
@@ -18,7 +17,6 @@ import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderGitHubArchiveMaster;
 import org.eol.globi.service.DatasetFinderProxy;
-import org.globalbioticinteractions.dataset.DatasetFinderCaching;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 
 import java.util.Collections;
@@ -49,7 +47,7 @@ public class CmdCheck extends CmdOfflineParams {
 
         DatasetFinder finder = isOffline()
                 ? new DatasetFinderLocal(getCacheDir())
-                : getDatasetFinderGithub(repoName, cacheDir);
+                : createDataFinderForGitHub(repoName, cacheDir);
 
         ParserFactoryLocal parserFactory = new ParserFactoryLocal();
         StudyImporterForGitHubData studyImporterForGitHubData = new StudyImporterForGitHubData(parserFactory, new NodeFactoryLogging(), finder);
@@ -94,9 +92,10 @@ public class CmdCheck extends CmdOfflineParams {
         }
     }
 
-    private DatasetFinderCaching getDatasetFinderGithub(String repoName, String cacheDir) {
-        List<DatasetFinder> finders = Collections.singletonList(new DatasetFinderGitHubArchiveMaster(Collections.singletonList(repoName)));
-        return new DatasetFinderCaching(new DatasetFinderProxy(finders), cacheDir);
+    private DatasetFinder createDataFinderForGitHub(String namespace, String cacheDir) {
+        List<DatasetFinder> finders = Collections.singletonList(new DatasetFinderGitHubArchiveMaster(Collections.singletonList(namespace)));
+        DatasetFinderProxy finder = new DatasetFinderProxy(finders);
+        return CmdUtil.createDataFinderLoggingCaching(finder, namespace, cacheDir);
     }
 
     private static String getResultMsg(String repoName, Set<String> warnings, Set<String> errors) {

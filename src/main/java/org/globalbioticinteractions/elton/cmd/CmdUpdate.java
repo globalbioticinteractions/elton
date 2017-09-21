@@ -12,13 +12,6 @@ import org.eol.globi.service.DatasetFinderGitHubArchive;
 import org.eol.globi.service.DatasetFinderProxy;
 import org.eol.globi.service.DatasetFinderZenodo;
 import org.eol.globi.service.GitHubImporterFactory;
-import org.globalbioticinteractions.cache.Cache;
-import org.globalbioticinteractions.cache.CacheFactory;
-import org.globalbioticinteractions.cache.CacheLocalReadonly;
-import org.globalbioticinteractions.cache.CacheProxy;
-import org.globalbioticinteractions.cache.CachePullThrough;
-import org.globalbioticinteractions.dataset.DatasetFinderLogger;
-import org.globalbioticinteractions.dataset.DatasetFinderWithCache;
 
 import java.util.Arrays;
 
@@ -36,14 +29,7 @@ public class CmdUpdate extends CmdDefaultParams {
 
                 Dataset dataset =
                         DatasetFactory.datasetFor(namespace,
-                                new DatasetFinderWithCache(new DatasetFinderLogger(finder, getCacheDir()), new CacheFactory() {
-                                    @Override
-                                    public Cache cacheFor(Dataset dataset) {
-                                        Cache pullThroughCache = new CachePullThrough(namespace, getCacheDir());
-                                        CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, getCacheDir());
-                                        return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
-                                    }
-                                }));
+                                CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir()));
                 NodeFactoryNull nodeFactoryNull = new NodeFactoryNull();
                 nodeFactoryNull.getOrCreateDataset(dataset);
                 try {

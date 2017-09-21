@@ -19,6 +19,7 @@ import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderGitHubArchiveMaster;
 import org.eol.globi.service.DatasetFinderProxy;
 import org.globalbioticinteractions.dataset.DatasetFinderCaching;
+import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,31 +28,31 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Parameters(separators = "= ", commandDescription = "Check Dataset Accessibility")
-public class CmdCheck extends CmdDefaultParams {
+public class CmdCheck extends CmdOfflineParams {
     private final static Log LOG = LogFactory.getLog(CmdCheck.class);
 
     @Override
     public void run() {
         try {
-            LOG.info(Version.getVersionInfo(CmdCheck.class));
             for (String namespace : getNamespaces()) {
-                check(namespace);
+                check(namespace, getCacheDir());
             }
         } catch (StudyImporterException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void check(String repoName) throws StudyImporterException {
+    private void check(String repoName, String cacheDir) throws StudyImporterException {
         final Set<String> infos = Collections.synchronizedSortedSet(new TreeSet<String>());
         final Set<String> warnings = Collections.synchronizedSortedSet(new TreeSet<String>());
         final Set<String> errors = Collections.synchronizedSortedSet(new TreeSet<String>());
 
-        NodeFactoryLogging nodeFactory = new NodeFactoryLogging();
-        List<DatasetFinder> finders = Collections.singletonList(new DatasetFinderGitHubArchiveMaster(Collections.singletonList(repoName)));
-        DatasetFinderCaching finder = new DatasetFinderCaching(new DatasetFinderProxy(finders));
+        DatasetFinder finder = isOffline()
+                ? new DatasetFinderLocal(getCacheDir())
+                : getDatasetFinderGithub(repoName, cacheDir);
+
         ParserFactoryLocal parserFactory = new ParserFactoryLocal();
-        StudyImporterForGitHubData studyImporterForGitHubData = new StudyImporterForGitHubData(parserFactory, nodeFactory, finder);
+        StudyImporterForGitHubData studyImporterForGitHubData = new StudyImporterForGitHubData(parserFactory, new NodeFactoryLogging(), finder);
         studyImporterForGitHubData.setLogger(new ImportLogger() {
             @Override
             public void info(LogContext study, String message) {
@@ -93,7 +94,12 @@ public class CmdCheck extends CmdDefaultParams {
         }
     }
 
-    public static String getResultMsg(String repoName, Set<String> warnings, Set<String> errors) {
+    private DatasetFinderCaching getDatasetFinderGithub(String repoName, String cacheDir) {
+        List<DatasetFinder> finders = Collections.singletonList(new DatasetFinderGitHubArchiveMaster(Collections.singletonList(repoName)));
+        return new DatasetFinderCaching(new DatasetFinderProxy(finders), cacheDir);
+    }
+
+    private static String getResultMsg(String repoName, Set<String> warnings, Set<String> errors) {
         return "found [" + NodeFactoryLogging.counter.get() + "] interactions in [" + repoName + "]"
                 + " and encountered [" + warnings.size() + "] warnings and [" + errors.size() + "] errors";
     }

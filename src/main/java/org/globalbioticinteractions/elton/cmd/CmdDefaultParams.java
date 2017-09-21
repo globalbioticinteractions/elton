@@ -5,19 +5,19 @@ import com.beust.jcommander.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class CmdDefaultParams implements Runnable {
+abstract class CmdDefaultParams implements Runnable {
     @Parameter(names = {"--cache-dir", "-c"}, description = "cache directory")
     private String cacheDir = "./datasets";
 
-    public String getCacheDir() {
+    String getCacheDir() {
         return cacheDir;
     }
 
-    @Parameter(description = "namespace1, namespace2, ...")
+    @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();
 
 
-    public List<String> getNamespaces() {
+    List<String> getNamespaces() {
         return namespaces;
     }
 }

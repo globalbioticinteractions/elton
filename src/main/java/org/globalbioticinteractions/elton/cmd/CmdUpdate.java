@@ -12,7 +12,10 @@ import org.eol.globi.service.DatasetFinderGitHubArchive;
 import org.eol.globi.service.DatasetFinderProxy;
 import org.eol.globi.service.DatasetFinderZenodo;
 import org.eol.globi.service.GitHubImporterFactory;
-import org.globalbioticinteractions.dataset.DatasetFinderCaching;
+import org.globalbioticinteractions.cache.Cache;
+import org.globalbioticinteractions.cache.CacheLocalReadonly;
+import org.globalbioticinteractions.cache.CacheProxy;
+import org.globalbioticinteractions.cache.CachePullThrough;
 
 import java.util.Arrays;
 
@@ -27,8 +30,17 @@ public class CmdUpdate extends CmdDefaultParams {
         try {
             NamespaceHandler handler = namespace -> {
                 LOG.info("update of [" + namespace + "] starting...");
+
                 Dataset dataset =
-                        DatasetFactory.datasetFor(namespace, new DatasetFinderCaching(finder, getCacheDir()));
+                        DatasetFactory.datasetFor(namespace,
+                                new DatasetFinderWithCache(new DatasetFinderLogger(finder, getCacheDir()), new CacheFactory() {
+                                    @Override
+                                    public Cache cacheFor(Dataset dataset) {
+                                        Cache pullThroughCache = new CachePullThrough(namespace, getCacheDir());
+                                        CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, getCacheDir());
+                                        return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
+                                    }
+                                }));
                 NodeFactoryNull nodeFactoryNull = new NodeFactoryNull();
                 nodeFactoryNull.getOrCreateDataset(dataset);
                 try {

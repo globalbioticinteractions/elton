@@ -11,7 +11,7 @@ import java.io.File;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class CmdLineIT {
+public class CmdCheckIT {
 
     @Before
     public void emptyCache() {

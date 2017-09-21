@@ -19,8 +19,7 @@ public class CmdNamesTest {
     @Test
     public void names() throws URISyntaxException {
         JCommander jc = new CmdLine().buildCommander();
-        String cacheDir = CmdTestUtil.cacheDirTest();
-        jc.parse("names", "--cache-dir=" + cacheDir, "globalbioticinteractions/template-dataset");
+        jc.parse("names", "--cache-dir=" + CmdTestUtil.cacheDirTest(), "globalbioticinteractions/template-dataset");
 
         Assert.assertEquals(jc.getParsedCommand(), "names");
 

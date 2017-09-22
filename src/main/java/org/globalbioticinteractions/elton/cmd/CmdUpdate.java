@@ -37,7 +37,7 @@ public class CmdUpdate extends CmdDefaultParams {
                             .createImporter(dataset, nodeFactoryNull)
                             .importStudy();
                 } catch (StudyImporterException ex) {
-                    LOG.error("update of [" + namespace + "] failed.");
+                    LOG.error("update of [" + namespace + "] failed.", ex);
                 } finally {
                     LOG.info("update of [" + namespace + "] done.");
                 }

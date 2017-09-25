@@ -1,6 +1,6 @@
 # elton
 
-[![Build Status](https://travis-ci.org/globalbioticinteractions/elton.svg?branch=master)](https://travis-ci.org/globalbioticinteractions/elton) [![Release](https://jitpack.io/v/org.globalbioticinteractions/elton.svg)](https://jitpack.io/#org.globalbioticinteractions/elton) [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![Build Status](https://travis-ci.org/globalbioticinteractions/elton.svg?branch=master)](https://travis-ci.org/globalbioticinteractions/elton) [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
  A commandline tool for [GloBI](https://globalbioticinteraction.org)
 
@@ -30,8 +30,8 @@ for Maven, add the following sections to your pom.xml:
 ```
   <repositories>
     <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
+        <id>depot.globalbioticinteractions.org</id>
+        <url>https://depot.globalbioticinteractions.org/release</url>
     </repository>
   </repositories>
 

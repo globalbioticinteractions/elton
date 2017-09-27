@@ -23,7 +23,7 @@ public class CmdList extends CmdOfflineParams {
     }
 
     public void run(PrintStream out) {
-        DatasetFinderLocal finderLocal = new DatasetFinderLocal(getCacheDir());
+        DatasetFinderLocal finderLocal = CmdUtil.getDatasetFinderLocal(getCacheDir());
         DatasetFinder finder = isOffline()
                 ? finderLocal
                 : new DatasetFinderProxy(Arrays.asList(new DatasetFinderZenodo(), new DatasetFinderGitHubArchive(), finderLocal));
@@ -39,4 +39,6 @@ public class CmdList extends CmdOfflineParams {
             throw new RuntimeException(e);
         }
     }
+
+
 }

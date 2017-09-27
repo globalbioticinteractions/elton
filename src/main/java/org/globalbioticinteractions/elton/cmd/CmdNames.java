@@ -15,7 +15,6 @@ import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,7 +29,7 @@ public class CmdNames extends CmdDefaultParams {
     }
 
     void run(PrintStream out) {
-        DatasetFinderLocal finder = new DatasetFinderLocal(getCacheDir());
+        DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
 
         NodeFactoryNull nodeFactory = new NodeFactoryNull() {
             Dataset dataset;

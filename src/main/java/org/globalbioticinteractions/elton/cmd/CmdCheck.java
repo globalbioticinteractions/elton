@@ -17,7 +17,6 @@ import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderGitHubArchiveMaster;
 import org.eol.globi.service.DatasetFinderProxy;
-import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +45,7 @@ public class CmdCheck extends CmdOfflineParams {
         final Set<String> errors = Collections.synchronizedSortedSet(new TreeSet<String>());
 
         DatasetFinder finder = isOffline()
-                ? new DatasetFinderLocal(getCacheDir())
+                ? CmdUtil.getDatasetFinderLocal(getCacheDir())
                 : createDataFinderForGitHub(repoName, cacheDir);
 
         ParserFactoryLocal parserFactory = new ParserFactoryLocal();

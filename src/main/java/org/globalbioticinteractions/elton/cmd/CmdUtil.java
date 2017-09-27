@@ -10,6 +10,7 @@ import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
 import org.globalbioticinteractions.cache.CachePullThrough;
+import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 import org.globalbioticinteractions.dataset.DatasetFinderLogger;
 import org.globalbioticinteractions.dataset.DatasetFinderWithCache;
 
@@ -44,5 +45,13 @@ class CmdUtil {
                 return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
             }
         });
+    }
+
+    static CacheFactory getCacheFactoryLocal(String cacheDir) {
+        return dataset -> new CacheLocalReadonly(dataset.getNamespace(), cacheDir);
+    }
+
+    static DatasetFinderLocal getDatasetFinderLocal(String cacheDir) {
+        return new DatasetFinderLocal(cacheDir, getCacheFactoryLocal(cacheDir));
     }
 }

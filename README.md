@@ -1,6 +1,7 @@
 # elton
 
 [![Build Status](https://travis-ci.org/globalbioticinteractions/elton.svg?branch=master)](https://travis-ci.org/globalbioticinteractions/elton) [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![DOI](https://zenodo.org/badge/103732996.svg)](https://zenodo.org/badge/latestdoi/103732996)
 
  A commandline tool for [GloBI](https://globalbioticinteraction.org)
 

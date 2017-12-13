@@ -45,10 +45,9 @@ public class CmdInteractions extends CmdDefaultParams {
 
                 Stream<String> rowStream = Stream.of(
                         StreamUtil.streamOf(taxon),
-                        interactStream,
+                        interactStream  ,
                         StreamUtil.streamOf(((SpecimenTaxonOnly) target).taxon),
-                        StreamUtil.streamOf(dataset),
-                        Stream.of(Version.getVersion())).flatMap(x -> x);
+                        StreamUtil.streamOf(dataset)).flatMap(x -> x);
                 String row = StreamUtil.tsvRowOf(rowStream);
                 out.println(row);
             }

@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.eol.globi.Version;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
 
@@ -12,7 +13,8 @@ public class StreamUtil {
                 dataset.getNamespace(),
                 dataset.getArchiveURI().toString(),
                 dataset.getOrDefault("accessedAt", ""),
-                dataset.getOrDefault("contentHash", ""));
+                dataset.getOrDefault("contentHash", ""),
+                Version.getVersion());
     }
 
     static Stream<String> streamOf(Taxon taxon) {

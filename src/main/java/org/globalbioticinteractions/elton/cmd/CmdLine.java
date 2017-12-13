@@ -43,6 +43,7 @@ public class CmdLine {
                 .addCommand("list", new CmdList())
                 .addCommand("update", new CmdUpdate())
                 .addCommand("names", new CmdNames())
+                .addCommand("interactions", new CmdInteractions())
                 .addCommand("check", new CmdCheck())
                 .addCommand("version", new CmdVersion())
                 .build();

@@ -23,4 +23,9 @@ public class CmdLineTest {
     public void invalidCommand() throws Throwable {
         CmdLine.run(new String[]{"bla", "globalbioticinteractions/template-dataset"});
     }
+
+    @Test(expected = MissingCommandException.class)
+    public void noCommand() throws Throwable {
+        CmdLine.run(new String[]{});
+    }
 }

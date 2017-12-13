@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.MissingCommandException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -10,7 +11,11 @@ public class CmdLine {
     private final static Log LOG = LogFactory.getLog(CmdLine.class);
 
     public static void run(JCommander actual) {
-        if (null != actual && actual.getObjects().get(0) instanceof Runnable) {
+        if (actual == null) {
+            throw new MissingCommandException("no command provided");
+        } else if (!(actual.getObjects().get(0) instanceof Runnable)) {
+            throw new MissingCommandException("invalid command provided");
+        } else {
             ((Runnable) actual.getObjects().get(0)).run();
         }
     }

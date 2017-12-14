@@ -58,7 +58,7 @@ public class CmdNanopubs extends CmdInteractions {
                     "@prefix sio: <http://semanticscience.org/resource/> ." +
                     "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." +
                     "@prefix obo: <http://purl.obolibrary.org/obo/> ." +
-                    "@prefix : <http://np.globalbioticinteractions.org/> ." +
+                    "@prefix : <http://purl.org/nanopub/temp/> ." +
                     "\n" +
                     ":NanoPub_1_Head {" +
                     "  : a nanopub:Nanopublication ;" +

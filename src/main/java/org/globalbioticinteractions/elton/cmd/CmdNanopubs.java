@@ -83,7 +83,11 @@ public class CmdNanopubs extends CmdInteractions {
             appendOrganismForTaxon(builder, "1", source.taxon);
             appendOrganismForTaxon(builder, "2", target.taxon);
 
-            String eltonURI = "https://github.com/globalbioticinteractions/elton/releases/tag/" + Version.getVersion();
+            String eltonURI = "https://github.com/globalbioticinteractions/elton";
+            String version = Version.getVersion();
+            if (version.matches("[0-9]+\\.[0-9]+\\.[0-9]+")) {
+                eltonURI += "/releases/tag/" + version;
+            }
 
             builder.append("}" +
                     " " +

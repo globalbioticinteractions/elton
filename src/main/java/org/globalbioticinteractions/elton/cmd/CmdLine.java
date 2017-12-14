@@ -16,9 +16,6 @@ public class CmdLine {
             throw new MissingCommandException("invalid command provided");
         } else {
             Object cmdObject = actual.getObjects().get(0);
-            if (cmdObject instanceof CmdDefaultParams && ((CmdDefaultParams)cmdObject).isVerbose()) {
-                org.apache.log4j.Logger.getRootLogger().setLevel(Level.INFO);
-            }
             ((Runnable) cmdObject).run();
         }
     }

@@ -14,6 +14,10 @@ import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.globalbioticinteractions.elton.util.InteractionWriter;
+import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
+import org.globalbioticinteractions.elton.util.StreamUtil;
 
 import java.io.PrintStream;
 import java.util.stream.Stream;
@@ -22,15 +26,15 @@ import java.util.stream.Stream;
 public class CmdInteractions extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdInteractions.class);
 
-    public class InteractionSerializer implements InteractionSerializerInterface {
+    public class TsvWriter implements InteractionWriter {
         private final PrintStream out;
 
-        InteractionSerializer(PrintStream out) {
+        TsvWriter(PrintStream out) {
             this.out = out;
         }
 
         @Override
-        public void serialize(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset) {
+        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset) {
             Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
 
             Stream<String> rowStream = Stream.of(
@@ -48,14 +52,14 @@ public class CmdInteractions extends CmdDefaultParams {
         run(System.out);
     }
 
-    InteractionSerializerInterface createSerializer(PrintStream out) {
-        return new InteractionSerializer(out);
+    InteractionWriter createSerializer(PrintStream out) {
+        return new TsvWriter(out);
     }
 
     void run(PrintStream out) {
         DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
 
-        InteractionSerializerInterface serializer = createSerializer(out);
+        InteractionWriter serializer = createSerializer(out);
 
         NodeFactoryNull nodeFactory = new NodeFactoryNull() {
             Dataset dataset;

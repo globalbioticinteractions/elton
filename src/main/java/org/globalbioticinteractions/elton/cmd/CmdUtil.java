@@ -13,6 +13,7 @@ import org.globalbioticinteractions.cache.CachePullThrough;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 import org.globalbioticinteractions.dataset.DatasetFinderLogger;
 import org.globalbioticinteractions.dataset.DatasetFinderWithCache;
+import org.globalbioticinteractions.elton.util.NamespaceHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;

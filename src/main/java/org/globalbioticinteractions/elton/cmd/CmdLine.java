@@ -4,8 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static java.lang.System.exit;
+import org.apache.log4j.Level;
 
 public class CmdLine {
     private final static Log LOG = LogFactory.getLog(CmdLine.class);
@@ -16,7 +15,11 @@ public class CmdLine {
         } else if (!(actual.getObjects().get(0) instanceof Runnable)) {
             throw new MissingCommandException("invalid command provided");
         } else {
-            ((Runnable) actual.getObjects().get(0)).run();
+            Object cmdObject = actual.getObjects().get(0);
+            if (cmdObject instanceof CmdDefaultParams && ((CmdDefaultParams)cmdObject).isVerbose()) {
+                org.apache.log4j.Logger.getRootLogger().setLevel(Level.INFO);
+            }
+            ((Runnable) cmdObject).run();
         }
     }
 
@@ -49,7 +52,7 @@ public class CmdLine {
                 .addCommand("update", new CmdUpdate())
                 .addCommand("names", new CmdNames())
                 .addCommand("interactions", new CmdInteractions())
-                .addCommand("nanopubs", new CmdNanopubs())
+                .addCommand("nanopubs", new CmdNanoPubs())
                 .addCommand("check", new CmdCheck())
                 .addCommand("version", new CmdVersion())
                 .build();

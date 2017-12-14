@@ -12,6 +12,8 @@ import org.eol.globi.service.DatasetFinderGitHubArchive;
 import org.eol.globi.service.DatasetFinderProxy;
 import org.eol.globi.service.DatasetFinderZenodo;
 import org.eol.globi.service.GitHubImporterFactory;
+import org.globalbioticinteractions.elton.util.NamespaceHandler;
+import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 
 import java.util.Arrays;
 

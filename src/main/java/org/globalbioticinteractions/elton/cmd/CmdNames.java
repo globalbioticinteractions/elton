@@ -13,6 +13,8 @@ import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.StreamUtil;
 
 import java.io.PrintStream;
 import java.util.stream.Stream;

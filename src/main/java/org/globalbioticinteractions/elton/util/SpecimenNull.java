@@ -1,4 +1,4 @@
-package org.globalbioticinteractions.elton.cmd;
+package org.globalbioticinteractions.elton.util;
 
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Location;

@@ -17,6 +17,8 @@ import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderGitHubArchiveMaster;
 import org.eol.globi.service.DatasetFinderProxy;
+import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.SpecimenNull;
 
 import java.util.Collections;
 import java.util.List;

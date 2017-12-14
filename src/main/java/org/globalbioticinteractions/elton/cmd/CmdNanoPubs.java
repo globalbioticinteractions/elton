@@ -18,38 +18,37 @@ import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.GitHubImporterFactory;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.globalbioticinteractions.elton.util.InteractionWriter;
+import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimePrinter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.PrintStream;
 import java.util.Date;
-import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions in Local Datasets")
-public class CmdNanopubs extends CmdInteractions {
-    private final static Log LOG = LogFactory.getLog(CmdNanopubs.class);
+public class CmdNanoPubs extends CmdInteractions {
+    private final static Log LOG = LogFactory.getLog(CmdNanoPubs.class);
     private Date date = null;
 
-    public void setDate(Date date) {
+    void setDate(Date date) {
         this.date = date;
     }
 
-    Date getDate() {
+    private Date getDate() {
         return date == null ? new Date() : date;
     }
 
-    public class InteractionNanopubs implements InteractionSerializerInterface {
+    public class NanoPubWriter implements InteractionWriter {
         private final PrintStream out;
 
-        InteractionNanopubs(PrintStream out) {
+        NanoPubWriter(PrintStream out) {
             this.out = out;
         }
 
         @Override
-        public void serialize(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset) {
+        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset) {
             String pubHeader = "@prefix nanopub: <http://www.nanopub.org/nschema#> ." +
                     "@prefix dcterms: <http://purl.org/dc/terms/> ." +
                     "@prefix opm: <http://purl.org/net/opmv/ns#> ." +
@@ -122,14 +121,14 @@ public class CmdNanopubs extends CmdInteractions {
         run(System.out);
     }
 
-    InteractionSerializerInterface createSerializer(PrintStream out) {
-        return new InteractionNanopubs(out);
+    InteractionWriter createSerializer(PrintStream out) {
+        return new NanoPubWriter(out);
     }
 
     void run(PrintStream out) {
         DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
 
-        InteractionSerializerInterface serializer = createSerializer(out);
+        InteractionWriter serializer = createSerializer(out);
 
         NodeFactoryNull nodeFactory = new NodeFactoryNull() {
             Dataset dataset;

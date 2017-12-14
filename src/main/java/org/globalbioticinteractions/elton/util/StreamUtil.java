@@ -1,4 +1,4 @@
-package org.globalbioticinteractions.elton.cmd;
+package org.globalbioticinteractions.elton.util;
 
 import org.eol.globi.Version;
 import org.eol.globi.domain.Taxon;
@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StreamUtil {
-    static Stream<String> streamOf(Dataset dataset) {
+    public static Stream<String> streamOf(Dataset dataset) {
         return Stream.of(
                 dataset.getNamespace(),
                 dataset.getArchiveURI().toString(),
@@ -17,7 +17,7 @@ public class StreamUtil {
                 Version.getVersion());
     }
 
-    static Stream<String> streamOf(Taxon taxon) {
+    public static Stream<String> streamOf(Taxon taxon) {
         return Stream.of(taxon.getName(),
                 taxon.getRank(),
                 taxon.getExternalId(),
@@ -26,7 +26,7 @@ public class StreamUtil {
                 taxon.getPathNames());
     }
 
-    static String tsvRowOf(Stream<String> rowStream) {
+    public static String tsvRowOf(Stream<String> rowStream) {
         return rowStream
                 .map(term -> null == term ? "" : term)
                 .map(term -> term.replaceAll("[\\t\\n\\r]", " "))

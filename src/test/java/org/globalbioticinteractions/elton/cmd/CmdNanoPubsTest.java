@@ -1,16 +1,9 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFReader;
-import org.apache.commons.io.IOUtils;
-import org.eol.globi.data.CharsetConstant;
-import org.eol.globi.data.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
@@ -21,7 +14,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class CmdNanopubsTest {
+public class CmdNanoPubsTest {
 
     @Test
     public void interactions() throws URISyntaxException {
@@ -33,8 +26,8 @@ public class CmdNanopubsTest {
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
         Object cmd = actual.getObjects().get(0);
-        Assert.assertEquals(cmd.getClass(), CmdNanopubs.class);
-        CmdNanopubs cmdNames = (CmdNanopubs) actual.getObjects().get(0);
+        Assert.assertEquals(cmd.getClass(), CmdNanoPubs.class);
+        CmdNanoPubs cmdNames = (CmdNanoPubs) actual.getObjects().get(0);
         assertThat(cmdNames.getNamespaces().size(), is(1));
         assertThat(cmdNames.getNamespaces(), hasItem("globalbioticinteractions/template-dataset"));
 

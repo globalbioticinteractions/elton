@@ -3,11 +3,9 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.Parameters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eol.globi.Version;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Interaction;
-import org.eol.globi.domain.Location;
 import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
@@ -18,51 +16,47 @@ import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 
 import java.io.PrintStream;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "List Interacting Taxon Pairs For Local Datasets")
 public class CmdInteractions extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdInteractions.class);
 
-    private class SpecimenTaxonOnly extends SpecimenNull {
-        private final Dataset dataset;
+    public class InteractionSerializer implements InteractionSerializerInterface {
         private final PrintStream out;
-        private final Taxon taxon;
 
-
-        public SpecimenTaxonOnly(Dataset dataset, PrintStream out, Taxon taxon) {
-            this.dataset = dataset;
+        InteractionSerializer(PrintStream out) {
             this.out = out;
-            this.taxon = taxon;
         }
 
         @Override
-        public void interactsWith(Specimen target, InteractType type, Location centroid) {
-            if (target instanceof SpecimenTaxonOnly) {
-                Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
+        public void serialize(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset) {
+            Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
 
-                Stream<String> rowStream = Stream.of(
-                        StreamUtil.streamOf(taxon),
-                        interactStream  ,
-                        StreamUtil.streamOf(((SpecimenTaxonOnly) target).taxon),
-                        StreamUtil.streamOf(dataset)).flatMap(x -> x);
-                String row = StreamUtil.tsvRowOf(rowStream);
-                out.println(row);
-            }
+            Stream<String> rowStream = Stream.of(
+                    StreamUtil.streamOf(source.taxon),
+                    interactStream,
+                    StreamUtil.streamOf(target.taxon),
+                    StreamUtil.streamOf(dataset)).flatMap(x -> x);
+            String row = StreamUtil.tsvRowOf(rowStream);
+            out.println(row);
         }
     }
 
     @Override
     public void run() {
         run(System.out);
+    }
 
+    InteractionSerializerInterface createSerializer(PrintStream out) {
+        return new InteractionSerializer(out);
     }
 
     void run(PrintStream out) {
         DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
-        
+
+        InteractionSerializerInterface serializer = createSerializer(out);
+
         NodeFactoryNull nodeFactory = new NodeFactoryNull() {
             Dataset dataset;
 
@@ -74,18 +68,18 @@ public class CmdInteractions extends CmdDefaultParams {
 
             @Override
             public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, out, taxon);
+                return new SpecimenTaxonOnly(dataset, serializer, taxon);
             }
 
             @Override
             public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, out, taxon);
+                return new SpecimenTaxonOnly(dataset, serializer, taxon);
             }
         };
 
         try {
             CmdUtil.handleNamespaces(finder, namespace -> {
-                String msg = "scanning for names in [" + namespace + "]...";
+                String msg = "scanning for interactions in [" + namespace + "]...";
                 LOG.info(msg);
                 Dataset dataset = DatasetFactory.datasetFor(namespace, finder);
                 nodeFactory.getOrCreateDataset(dataset);

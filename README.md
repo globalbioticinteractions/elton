@@ -24,10 +24,9 @@
 You can use this project by including `elton.jar` from one of the [releases](https://github.com/globalbioticinteractions/elton/releases).
 
 ### Maven, Gradle, SBT
+Elton is made available through a [maven](https://maven.apache.org) repository.
 
-Package managers are supported through [JitPack](https://jitpack.io/#globalbioticinteractions/elton/) which supports Maven, Gradle, SBT, etc.
-
-for Maven, add the following sections to your pom.xml:
+To include elton in your project, add the following sections to your pom.xml (or equivalent for sbt, gradle etc):
 ```
   <repositories>
     <repository>

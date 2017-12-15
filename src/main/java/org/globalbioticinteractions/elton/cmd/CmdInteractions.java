@@ -34,13 +34,14 @@ public class CmdInteractions extends CmdDefaultParams {
         }
 
         @Override
-        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset) {
+        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset, Study study) {
             Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
 
             Stream<String> rowStream = Stream.of(
                     StreamUtil.streamOf(source.taxon),
                     interactStream,
                     StreamUtil.streamOf(target.taxon),
+                    StreamUtil.streamOf(study),
                     StreamUtil.streamOf(dataset)).flatMap(x -> x);
             String row = StreamUtil.tsvRowOf(rowStream);
             out.println(row);
@@ -72,12 +73,12 @@ public class CmdInteractions extends CmdDefaultParams {
 
             @Override
             public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, serializer, taxon);
+                return new SpecimenTaxonOnly(dataset, interaction.getStudy(), serializer, taxon);
             }
 
             @Override
             public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, serializer, taxon);
+                return new SpecimenTaxonOnly(dataset, study, serializer, taxon);
             }
         };
 

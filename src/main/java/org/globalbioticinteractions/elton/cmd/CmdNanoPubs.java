@@ -48,7 +48,7 @@ public class CmdNanoPubs extends CmdInteractions {
         }
 
         @Override
-        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset) {
+        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset, Study study) {
             String pubHeader = "@prefix nanopub: <http://www.nanopub.org/nschema#> ." +
                     "@prefix dcterms: <http://purl.org/dc/terms/> ." +
                     "@prefix opm: <http://purl.org/net/opmv/ns#> ." +
@@ -141,12 +141,12 @@ public class CmdNanoPubs extends CmdInteractions {
 
             @Override
             public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, serializer, taxon);
+                return new SpecimenTaxonOnly(dataset, interaction.getStudy(), serializer, taxon);
             }
 
             @Override
             public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, serializer, taxon);
+                return new SpecimenTaxonOnly(dataset, study, serializer, taxon);
             }
         };
 

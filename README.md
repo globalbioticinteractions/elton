@@ -65,7 +65,7 @@ with
 Usage: <main class> [command] [command options]
   Commands:
     list      List Available Datasets
-      Usage: list [options] namespace1, namespace2, ...
+      Usage: list [options] [namespace1] [namespace2] ...
         Options:
           --cache-dir, -c
             cache directory
@@ -75,25 +75,42 @@ Usage: <main class> [command] [command options]
             Default: false
 
     update      Update Datasets with Local Repository
-      Usage: update [options] namespace1, namespace2, ...
+      Usage: update [options] [namespace1] [namespace2] ...
         Options:
           --cache-dir, -c
             cache directory
             Default: ./datasets
 
     names      List Dataset (Taxon) Names For Local Datasets
-      Usage: names [options] namespace1, namespace2, ...
+      Usage: names [options] [namespace1] [namespace2] ...
+        Options:
+          --cache-dir, -c
+            cache directory
+            Default: ./datasets
+
+    interactions      List Interacting Taxon Pairs For Local Datasets
+      Usage: interactions [options] [namespace1] [namespace2] ...
+        Options:
+          --cache-dir, -c
+            cache directory
+            Default: ./datasets
+
+    nanopubs      Generate Nanopubs Describing Interactions in Local Datasets
+      Usage: nanopubs [options] [namespace1] [namespace2] ...
         Options:
           --cache-dir, -c
             cache directory
             Default: ./datasets
 
     check      Check Dataset Accessibility
-      Usage: check [options] namespace1, namespace2, ...
+      Usage: check [options] [namespace1] [namespace2] ...
         Options:
           --cache-dir, -c
             cache directory
             Default: ./datasets
+          --offline, -o
+            offline
+            Default: false
 
     version      Show Version
       Usage: version

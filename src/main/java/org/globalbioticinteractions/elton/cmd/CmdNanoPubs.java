@@ -18,6 +18,7 @@ import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.GitHubImporterFactory;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
@@ -26,11 +27,13 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.PrintStream;
 import java.util.Date;
+import java.util.UUID;
 
 @Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions in Local Datasets")
 public class CmdNanoPubs extends CmdInteractions {
     private final static Log LOG = LogFactory.getLog(CmdNanoPubs.class);
     private Date date = null;
+    private IdGenerator idGenerator = () -> UUID.randomUUID().toString().replaceAll("-", "");
 
     void setDate(Date date) {
         this.date = date;
@@ -38,6 +41,10 @@ public class CmdNanoPubs extends CmdInteractions {
 
     private Date getDate() {
         return date == null ? new Date() : date;
+    }
+
+    void setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
     }
 
     public class NanoPubWriter implements InteractionWriter {
@@ -49,6 +56,7 @@ public class CmdNanoPubs extends CmdInteractions {
 
         @Override
         public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset, Study study) {
+            String nanoPubId = idGenerator.generate();
             String pubHeader = "@prefix nanopub: <http://www.nanopub.org/nschema#> ." +
                     "@prefix dcterms: <http://purl.org/dc/terms/> ." +
                     "@prefix opm: <http://purl.org/net/opmv/ns#> ." +
@@ -59,28 +67,29 @@ public class CmdNanoPubs extends CmdInteractions {
                     "@prefix obo: <http://purl.obolibrary.org/obo/> ." +
                     "@prefix : <http://purl.org/nanopub/temp/> ." +
                     "\n" +
-                    ":NanoPub_1_Head {" +
+                    ":NanoPub_" + nanoPubId + "_Head {" +
                     "  : a nanopub:Nanopublication ;" +
-                    "    nanopub:hasAssertion :NanoPub_1_Assertion ;" +
-                    "    nanopub:hasProvenance :NanoPub_1_Provenance ;" +
-                    "    nanopub:hasPublicationInfo :NanoPub_1_Pubinfo ." +
+                    "    nanopub:hasAssertion :NanoPub_" + nanoPubId + "_Assertion ;" +
+                    "    nanopub:hasProvenance :NanoPub_" + nanoPubId + "_Provenance ;" +
+                    "    nanopub:hasPublicationInfo :NanoPub_" + nanoPubId + "_Pubinfo ." +
                     "}\n";
 
             StringBuilder builder = new StringBuilder();
 
             String pubBody =
                     " \n" +
-                            ":NanoPub_1_Assertion {" +
-                            "  :Interaction_1 a obo:GO_0044419 ;" +
-                            "    obo:RO_0000057 :Organism_1 ;" +
-                            "    obo:RO_0000057 :Organism_2 .";
+                            ":NanoPub_" + nanoPubId + "_Assertion {" +
+                            "  :Interaction_" + nanoPubId + " a obo:GO_0044419 ;" +
+                            "    obo:RO_0000057 :Organism_" + nanoPubId + "_1 ;" +
+                            "    obo:RO_0000057 :Organism_" + nanoPubId + "_2 .";
             builder.append(pubHeader);
             builder.append(pubBody);
 
-            builder.append("  :Organism_1 <").append(type.getIRI()).append("> :Organism_2 .\n");
+            builder.append("  :Organism_" + nanoPubId + "_1 <").append(type.getIRI())
+                    .append("> :Organism_" + nanoPubId + "_2 .\n");
 
-            appendOrganismForTaxon(builder, "1", source.taxon);
-            appendOrganismForTaxon(builder, "2", target.taxon);
+            appendOrganismForTaxon(builder, nanoPubId + "_1", source.taxon);
+            appendOrganismForTaxon(builder, nanoPubId + "_2", target.taxon);
 
             String eltonURI = "https://github.com/globalbioticinteractions/elton";
             String version = Version.getVersion();
@@ -90,12 +99,12 @@ public class CmdNanoPubs extends CmdInteractions {
 
             builder.append("}" +
                     " " +
-                    ":NanoPub_1_Provenance {" +
-                    "  :NanoPub_1_Assertion opm:wasDerivedFrom <" + dataset.getArchiveURI() + "> ;" +
+                    ":NanoPub_" + nanoPubId + "_Provenance {" +
+                    "  :NanoPub_" + nanoPubId + "_Assertion opm:wasDerivedFrom <" + dataset.getArchiveURI() + "> ;" +
                     "    opm:wasGeneratedBy <" + eltonURI + "> ." +
                     "}" +
                     " " +
-                    ":NanoPub_1_Pubinfo {" +
+                    ":NanoPub_" + nanoPubId + "_Pubinfo {" +
                     "  : pav:authoredBy <https://orcid.org/0000-0003-3138-4118> ." +
                     "  : pav:createdBy <" + eltonURI + "> ;" +
                     "    dcterms:created \"" + ISODateTimeFormat.dateTimeNoMillis().withZone(DateTimeZone.UTC).print(getDate().getTime()) + "\"^^xsd:dateTime ." +

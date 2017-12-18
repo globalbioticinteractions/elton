@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/globalbioticinteractions/elton.svg?branch=master)](https://travis-ci.org/globalbioticinteractions/elton) [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![DOI](https://zenodo.org/badge/103732996.svg)](https://zenodo.org/badge/latestdoi/103732996)
 
- A commandline tool for [GloBI](https://globalbioticinteraction.org)
+ A commandline tool for [GloBI](https://globalbioticinteraction.org) named after ecologist [Charles S. Elton](https://en.wikipedia.org/wiki/Charles_Sutherland_Elton), author of [Animal Ecology](http://dx.doi.org/10.5962/bhl.title.7435). Can be used in combination with [elton-archive](https://github.com/globalbioticinteraction/elton-archive).
 
 <a href="http://globalbioticinteractions.org/">
   <img src="http://www.globalbioticinteractions.org/assets/globi.svg" height="120">
@@ -13,6 +13,7 @@
 
 - [Install](#install)
 - [Usage](#usage)
+- [Examples](#examples)
 - [Building](#building)
 - [Contribute](#contribute)
 - [License](#license)
@@ -114,6 +115,26 @@ Usage: <main class> [command] [command options]
     version      Show Version
       Usage: version
 ```
+
+## Examples 
+
+List all datasets 
+
+```java -jar elton.jar list```
+
+Update / download single dataset and cache locally in ./dataset folder
+
+```java -jar elton.jar update globalbioticinteractions/template-dataset```
+
+Update / download all datasets (might take a while)
+
+```java -jar elton.jar update```
+
+List interactions of all locally cached datasets
+
+```java -jar elton.jar interactions```
+
+Note that you can retrieve an archived (and versioned) copy of existing species interaction datasets using [Elton's archive](https://github.com/globalbiotincinteractions/elton-archive) .
 
 ## Contribute
 

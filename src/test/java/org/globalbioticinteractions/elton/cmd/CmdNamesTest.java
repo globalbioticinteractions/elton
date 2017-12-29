@@ -35,7 +35,7 @@ public class CmdNamesTest {
             ByteArrayOutputStream out1 = new ByteArrayOutputStream();
             PrintStream out = new PrintStream(out1);
             ((CmdNames) actual.getObjects().get(0)).run(out);
-            assertThat(out1.toString(), startsWith("Leptoconchus incycloseris"));
+            assertThat(out1.toString(), startsWith("\tLeptoconchus incycloseris"));
         }
     }
 

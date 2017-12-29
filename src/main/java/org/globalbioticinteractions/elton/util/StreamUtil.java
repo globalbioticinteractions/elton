@@ -23,9 +23,9 @@ public class StreamUtil {
     }
 
     public static Stream<String> streamOf(Taxon taxon) {
-        return Stream.of(taxon.getName(),
+        return Stream.of(taxon.getExternalId(),
+                taxon.getName(),
                 taxon.getRank(),
-                taxon.getExternalId(),
                 taxon.getPath(),
                 taxon.getPathIds(),
                 taxon.getPathNames());

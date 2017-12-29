@@ -89,7 +89,7 @@ public class CmdCheck extends CmdOfflineParams {
             infos.forEach(LOG::info);
             warnings.forEach(LOG::warn);
             errors.forEach(LOG::error);
-            LOG.info(getResultMsg(repoName, warnings, errors));
+            System.out.println("\n" + getResultMsg(repoName, warnings, errors));
         }
     }
 

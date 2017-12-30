@@ -9,8 +9,14 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 public class CmdUpdateIT {
@@ -41,6 +47,14 @@ public class CmdUpdateIT {
         Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdUpdate.class);
 
         CmdLine.run(actual);
+        
+        File file = new File("./target/tmp-dataset/globalbioticinteractions/template-dataset/access.tsv");
+        assertThat(file.exists(), is(true));
+        String[] jarUrls = FileUtils.readFileToString(file).split("jar:file:");
+        assertTrue(jarUrls.length > 1);
+        String localJarUrl = jarUrls[1].split("\t")[0];
+        assertThat(localJarUrl, not(startsWith("/")));
+        assertNotNull(new URL("jar:file:" + localJarUrl).openStream());
 
         int numberOfLogEntries = getNumberOfLogEntries();
         assertThat(getNumberOfLogEntries() > 3, is(true));

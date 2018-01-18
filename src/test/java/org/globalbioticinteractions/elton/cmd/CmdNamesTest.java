@@ -36,6 +36,7 @@ public class CmdNamesTest {
             PrintStream out = new PrintStream(out1);
             ((CmdNames) actual.getObjects().get(0)).run(out);
             assertThat(out1.toString(), startsWith("\tLeptoconchus incycloseris"));
+            assertThat(out1.toString().split("\n").length, is(22));
         }
     }
 

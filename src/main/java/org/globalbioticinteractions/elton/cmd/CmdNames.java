@@ -26,7 +26,6 @@ public class CmdNames extends CmdDefaultParams {
     @Override
     public void run() {
         run(System.out);
-
     }
 
     void run(PrintStream out) {
@@ -55,7 +54,6 @@ public class CmdNames extends CmdDefaultParams {
 
             @Override
             public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-                logTaxon(taxon, out);
                 return super.createSpecimen(study, taxon);
             }
         };

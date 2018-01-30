@@ -8,19 +8,26 @@
     <name>GloBI commandline tool</name>
     <description>Discover, cache and check species interaction data</description>
 
+    <properties>
+        <globi.version>0.9.7</globi.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.eol</groupId>
             <artifactId>eol-globi-data-sources</artifactId>
-            <version>0.9.7</version>
+            <version>${globi.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.eol</groupId>
+            <artifactId>eol-globi-cache</artifactId>
+            <version>${globi.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -28,8 +35,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
     <build>
         <extensions>
             <extension>

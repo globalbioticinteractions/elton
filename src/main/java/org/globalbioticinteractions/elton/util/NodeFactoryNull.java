@@ -10,6 +10,7 @@ import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.domain.Term;
+import org.eol.globi.domain.TermImpl;
 import org.eol.globi.geo.Ecoregion;
 import org.eol.globi.geo.EcoregionFinder;
 import org.eol.globi.geo.EcoregionFinderException;
@@ -76,19 +77,19 @@ public class NodeFactoryNull implements NodeFactory {
     }
 
     public Term getOrCreateBodyPart(String externalId, String name) throws NodeFactoryException {
-        return new Term(externalId, name);
+        return new TermImpl(externalId, name);
     }
 
     public Term getOrCreatePhysiologicalState(String externalId, String name) throws NodeFactoryException {
-        return new Term(externalId, name);
+        return new TermImpl(externalId, name);
     }
 
     public Term getOrCreateLifeStage(String externalId, String name) throws NodeFactoryException {
-        return new Term(externalId, name);
+        return new TermImpl(externalId, name);
     }
 
     public TermLookupService getTermLookupService() {
-        return name -> Collections.singletonList(new Term(name, (String) null));
+        return name -> Collections.singletonList(new TermImpl(name, (String) null));
     }
 
     public EcoregionFinder getEcoregionFinder() {
@@ -107,7 +108,7 @@ public class NodeFactoryNull implements NodeFactory {
     }
 
     public Term getOrCreateBasisOfRecord(String externalId, String name) throws NodeFactoryException {
-        return new Term(externalId, name);
+        return new TermImpl(externalId, name);
     }
 
     public Dataset getOrCreateDataset(Dataset dataset) {

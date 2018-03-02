@@ -7,6 +7,7 @@ import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
+import org.globalbioticinteractions.elton.Elton;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,7 +20,7 @@ public class StreamUtil {
                 dataset.getArchiveURI().toString(),
                 dataset.getOrDefault("accessedAt", ""),
                 dataset.getOrDefault("contentHash", ""),
-                Version.getVersion());
+                Elton.getVersion());
     }
 
     public static Stream<String> streamOf(Taxon taxon) {

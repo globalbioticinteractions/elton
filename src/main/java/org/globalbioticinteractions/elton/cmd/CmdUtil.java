@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eol.globi.service.Dataset;
@@ -10,14 +11,22 @@ import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
 import org.globalbioticinteractions.cache.CachePullThrough;
+import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 import org.globalbioticinteractions.dataset.DatasetFinderLogger;
 import org.globalbioticinteractions.dataset.DatasetFinderWithCache;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
+import org.globalbioticinteractions.elton.util.StreamUtil;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class CmdUtil {
     private static final Log LOG = LogFactory.getLog(CmdUtil.class);
@@ -54,5 +63,15 @@ class CmdUtil {
 
     static DatasetFinderLocal getDatasetFinderLocal(String cacheDir) {
         return new DatasetFinderLocal(cacheDir, getCacheFactoryLocal(cacheDir));
+    }
+
+    static Writer getBufferedStdout() {
+        return new BufferedWriter(new OutputStreamWriter(new
+                FileOutputStream(java.io.FileDescriptor.out), Charsets.UTF_8));
+    }
+
+    public static List<String> datasetInfo(Dataset dataset) {
+        String citation = CitationUtil.citationOrDefaultFor(dataset, "");
+        return StreamUtil.streamOf(dataset, citation).collect(Collectors.toList());
     }
 }

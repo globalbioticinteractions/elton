@@ -4,6 +4,8 @@ import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
 
+import java.util.stream.Stream;
+
 public interface InteractionWriter {
-    void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset, Study study);
+    void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset, Stream<String> datasetInfo);
 }

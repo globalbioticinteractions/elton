@@ -27,7 +27,9 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.PrintStream;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions in Local Datasets")
 public class CmdNanoPubs extends CmdInteractions {
@@ -55,7 +57,7 @@ public class CmdNanoPubs extends CmdInteractions {
         }
 
         @Override
-        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Dataset dataset, Study study) {
+        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset, Stream<String> datasetInfo) {
             String nanoPubId = idGenerator.generate();
             String pubHeader = "@prefix nanopub: <http://www.nanopub.org/nschema#> ." +
                     "@prefix dcterms: <http://purl.org/dc/terms/> ." +
@@ -141,21 +143,23 @@ public class CmdNanoPubs extends CmdInteractions {
 
         NodeFactoryNull nodeFactory = new NodeFactoryNull() {
             Dataset dataset;
+            List<String> datasetInfo;
 
             @Override
             public Dataset getOrCreateDataset(Dataset dataset) {
                 this.dataset = dataset;
+                this.datasetInfo = CmdUtil.datasetInfo(dataset);
                 return super.getOrCreateDataset(dataset);
             }
 
             @Override
             public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, interaction.getStudy(), serializer, taxon);
+                return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), interaction.getStudy(), serializer, taxon);
             }
 
             @Override
             public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, study, serializer, taxon);
+                return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), study, serializer, taxon);
             }
         };
 

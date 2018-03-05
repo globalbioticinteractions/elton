@@ -13,14 +13,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StreamUtil {
-    public static Stream<String> streamOf(Dataset dataset) {
+    private static String version = Elton.getVersion();
+
+    public static Stream<String> streamOf(Dataset dataset, String citation) {
         return Stream.of(
                 dataset.getNamespace(),
-                CitationUtil.citationOrDefaultFor(dataset, ""),
+                citation,
                 dataset.getArchiveURI().toString(),
                 dataset.getOrDefault("accessedAt", ""),
                 dataset.getOrDefault("contentHash", ""),
-                Elton.getVersion());
+                version);
     }
 
     public static Stream<String> streamOf(Taxon taxon) {

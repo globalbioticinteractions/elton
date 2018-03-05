@@ -71,10 +71,11 @@ public class CmdCheck extends CmdOfflineParams {
             private void addUntilFull(String message, Set<String> msgs) {
                 if (msgs.size() == 500) {
                     msgs.add(">= 500 unique messages, turning off logging.");
-                } else if (msgs.size() < 500){
+                } else if (msgs.size() < 500) {
                     msgs.add(msgForRepo(message));
                 }
             }
+
             String msgForRepo(String message) {
                 return "[" + repoName + "]: [" + message + "]";
             }
@@ -106,21 +107,22 @@ public class CmdCheck extends CmdOfflineParams {
 
     private static class NodeFactoryLogging extends NodeFactoryNull {
         final static AtomicInteger counter = new AtomicInteger(0);
+        final static Specimen specimen = new SpecimenNull() {
+            @Override
+            public void interactsWith(Specimen target, InteractType type, Location centroid) {
+                if (counter.get() > 0 && counter.get() % 1000 == 0) {
+                    System.out.println();
+                }
+                if (counter.get() % 10 == 0) {
+                    System.out.print(".");
+                }
+                counter.getAndIncrement();
+            }
+        };
 
         @Override
         public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-            return new SpecimenNull() {
-                @Override
-                public void interactsWith(Specimen target, InteractType type, Location centroid) {
-                    if (counter.get() > 0 && counter.get() % 1000 == 0) {
-                        System.out.println();
-                    }
-                    if (counter.get() % 10 == 0) {
-                        System.out.print(".");
-                    }
-                    counter.getAndIncrement();
-                }
-            };
+            return specimen;
         }
     }
 }

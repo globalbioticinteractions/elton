@@ -17,6 +17,7 @@ import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "List Dataset (Taxon) Names For Local Datasets")
@@ -32,11 +33,13 @@ public class CmdNames extends CmdDefaultParams {
         DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
 
         NodeFactoryNull nodeFactory = new NodeFactoryNull() {
+            List<String> datasetValues;
             Dataset dataset;
 
             @Override
             public Dataset getOrCreateDataset(Dataset dataset) {
                 this.dataset = dataset;
+                this.datasetValues = CmdUtil.datasetInfo(dataset);
                 return super.getOrCreateDataset(dataset);
             }
 
@@ -47,7 +50,7 @@ public class CmdNames extends CmdDefaultParams {
             }
 
             private void logTaxon(Taxon taxon, PrintStream out) {
-                Stream<String> rowStream = Stream.concat(StreamUtil.streamOf(taxon), StreamUtil.streamOf(dataset));
+                Stream<String> rowStream = Stream.concat(StreamUtil.streamOf(taxon), datasetValues.stream());
                 String row = StreamUtil.tsvRowOf(rowStream);
                 out.println(row);
             }

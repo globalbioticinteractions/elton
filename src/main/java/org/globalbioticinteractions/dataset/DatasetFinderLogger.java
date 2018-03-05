@@ -7,6 +7,7 @@ import org.globalbioticinteractions.cache.CacheLog;
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.cache.CachedURI;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 import java.net.URI;
@@ -31,7 +32,8 @@ public class DatasetFinderLogger implements DatasetFinder {
         Dataset dataset = this.getFinder().datasetFor(namespace);
 
         try {
-            CachedURI meta = new CachedURI(namespace, dataset.getArchiveURI(), null, null, new Date());
+            String accessedAt = ISODateTimeFormat.dateTime().withZoneUTC().print(new Date().getTime());
+            CachedURI meta = new CachedURI(namespace, dataset.getArchiveURI(), null, null, accessedAt);
             meta.setType("application/globi");
             CacheLog.appendAccessLog(meta, CacheLog.getAccessFile(CacheUtil.getCacheDirForNamespace(this.getCacheDir(), namespace)));
         } catch (IOException var4) {

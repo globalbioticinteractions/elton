@@ -9,7 +9,7 @@
     <description>Discover, cache and check species interaction data</description>
 
     <properties>
-        <globi.version>0.9.10</globi.version>
+        <globi.version>0.9.11</globi.version>
     </properties>
 
     <dependencies>

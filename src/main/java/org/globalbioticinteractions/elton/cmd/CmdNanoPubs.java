@@ -5,7 +5,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eol.globi.Version;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Interaction;
@@ -22,8 +21,6 @@ import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.PrintStream;
 import java.util.Date;
@@ -34,16 +31,7 @@ import java.util.stream.Stream;
 @Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions in Local Datasets")
 public class CmdNanoPubs extends CmdInteractions {
     private final static Log LOG = LogFactory.getLog(CmdNanoPubs.class);
-    private Date date = null;
     private IdGenerator idGenerator = () -> UUID.randomUUID().toString().replaceAll("-", "");
-
-    void setDate(Date date) {
-        this.date = date;
-    }
-
-    private Date getDate() {
-        return date == null ? new Date() : date;
-    }
 
     void setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
@@ -93,23 +81,20 @@ public class CmdNanoPubs extends CmdInteractions {
             appendOrganismForTaxon(builder, "1", source.taxon);
             appendOrganismForTaxon(builder, "2", target.taxon);
 
-            String eltonURI = "https://github.com/globalbioticinteractions/elton";
-            String version = Version.getVersion();
-            if (version.matches("[0-9]+\\.[0-9]+\\.[0-9]+")) {
-                eltonURI += "/releases/tag/" + version;
-            }
+            String eltonURI = "https://doi.org/10.5281/zenodo.998263";
+
+            String datasetURI = StringUtils.isNotBlank(dataset.getDOI()) ? dataset.getDOI() : dataset.getArchiveURI().toString();
 
             builder.append("}" +
                     " " +
                     ":Provenance {" +
-                    "  :Assertion opm:wasDerivedFrom <" + dataset.getArchiveURI() + "> ;" +
+                    "  :Assertion opm:wasDerivedFrom <" + datasetURI + "> ;" +
                     "    opm:wasGeneratedBy <" + eltonURI + "> ." +
                     "}" +
                     " " +
                     ":Pubinfo {" +
                     "  : pav:authoredBy <https://orcid.org/0000-0003-3138-4118> ." +
-                    "  : pav:createdBy <" + eltonURI + "> ;" +
-                    "    dcterms:created \"" + ISODateTimeFormat.dateTimeNoMillis().withZone(DateTimeZone.UTC).print(getDate().getTime()) + "\"^^xsd:dateTime ." +
+                    "  : pav:createdBy <" + eltonURI + "> ." +
                     "}");
             out.println(builder.toString().replace("\n", " "));
         }

@@ -28,4 +28,5 @@ public class Elton {
         String version = Elton.class.getPackage().getImplementationVersion();
         return StringUtils.isBlank(version) ? "dev" : version;
     }
+
 }

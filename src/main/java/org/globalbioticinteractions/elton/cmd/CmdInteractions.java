@@ -117,7 +117,7 @@ public class CmdInteractions extends CmdDefaultParams {
 
                     @Override
                     public String getDOI() {
-                        return null;
+                        return dataset.getDOI();
                     }
 
                     @Override

@@ -65,11 +65,6 @@ class CmdUtil {
         return new DatasetFinderLocal(cacheDir, getCacheFactoryLocal(cacheDir));
     }
 
-    static Writer getBufferedStdout() {
-        return new BufferedWriter(new OutputStreamWriter(new
-                FileOutputStream(java.io.FileDescriptor.out), Charsets.UTF_8));
-    }
-
     public static List<String> datasetInfo(Dataset dataset) {
         String citation = CitationUtil.citationOrDefaultFor(dataset, "");
         return StreamUtil.streamOf(dataset, citation).collect(Collectors.toList());

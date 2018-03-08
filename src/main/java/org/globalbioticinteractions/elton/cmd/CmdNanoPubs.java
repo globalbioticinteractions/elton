@@ -59,7 +59,7 @@ public class CmdNanoPubs extends CmdInteractions {
         @Override
         public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset, Stream<String> datasetInfo) {
             String nanoPubId = idGenerator.generate();
-            String pubHeader = "@prefix nanopub: <http://www.nanopub.org/nschema#> ." +
+            String pubHeader = "@prefix np: <http://www.nanopub.org/nschema#> ." +
                     "@prefix dcterms: <http://purl.org/dc/terms/> ." +
                     "@prefix opm: <http://purl.org/net/opmv/ns#> ." +
                     "@prefix pav: <http://swan.mindinformatics.org/ontologies/1.2/pav/> ." +
@@ -67,31 +67,31 @@ public class CmdNanoPubs extends CmdInteractions {
                     "@prefix sio: <http://semanticscience.org/resource/> ." +
                     "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." +
                     "@prefix obo: <http://purl.obolibrary.org/obo/> ." +
-                    "@prefix : <http://purl.org/nanopub/temp/> ." +
+                    "@prefix : <http://purl.org/nanopub/temp/NanoPub_" + nanoPubId + "#> ." +
                     "\n" +
-                    ":NanoPub_" + nanoPubId + "_Head {" +
-                    "  : a nanopub:Nanopublication ;" +
-                    "    nanopub:hasAssertion :NanoPub_" + nanoPubId + "_Assertion ;" +
-                    "    nanopub:hasProvenance :NanoPub_" + nanoPubId + "_Provenance ;" +
-                    "    nanopub:hasPublicationInfo :NanoPub_" + nanoPubId + "_Pubinfo ." +
+                    ":Head {" +
+                    "  : a np:Nanopublication ;" +
+                    "    np:hasAssertion :Assertion ;" +
+                    "    np:hasProvenance :Provenance ;" +
+                    "    np:hasPublicationInfo :Pubinfo ." +
                     "}\n";
 
             StringBuilder builder = new StringBuilder();
 
             String pubBody =
                     " \n" +
-                            ":NanoPub_" + nanoPubId + "_Assertion {" +
-                            "  :Interaction_" + nanoPubId + " a obo:GO_0044419 ;" +
-                            "    obo:RO_0000057 :Organism_" + nanoPubId + "_1 ;" +
-                            "    obo:RO_0000057 :Organism_" + nanoPubId + "_2 .";
+                            ":Assertion {" +
+                            "  :Interaction a obo:GO_0044419 ;" +
+                            "    obo:RO_0000057 :Organism_1 ;" +
+                            "    obo:RO_0000057 :Organism_2 .";
             builder.append(pubHeader);
             builder.append(pubBody);
 
-            builder.append("  :Organism_" + nanoPubId + "_1 <").append(type.getIRI())
-                    .append("> :Organism_" + nanoPubId + "_2 .\n");
+            builder.append("  :Organism_1 <").append(type.getIRI())
+                    .append("> :Organism_2 .\n");
 
-            appendOrganismForTaxon(builder, nanoPubId + "_1", source.taxon);
-            appendOrganismForTaxon(builder, nanoPubId + "_2", target.taxon);
+            appendOrganismForTaxon(builder, "1", source.taxon);
+            appendOrganismForTaxon(builder, "2", target.taxon);
 
             String eltonURI = "https://github.com/globalbioticinteractions/elton";
             String version = Version.getVersion();
@@ -101,12 +101,12 @@ public class CmdNanoPubs extends CmdInteractions {
 
             builder.append("}" +
                     " " +
-                    ":NanoPub_" + nanoPubId + "_Provenance {" +
-                    "  :NanoPub_" + nanoPubId + "_Assertion opm:wasDerivedFrom <" + dataset.getArchiveURI() + "> ;" +
+                    ":Provenance {" +
+                    "  :Assertion opm:wasDerivedFrom <" + dataset.getArchiveURI() + "> ;" +
                     "    opm:wasGeneratedBy <" + eltonURI + "> ." +
                     "}" +
                     " " +
-                    ":NanoPub_" + nanoPubId + "_Pubinfo {" +
+                    ":Pubinfo {" +
                     "  : pav:authoredBy <https://orcid.org/0000-0003-3138-4118> ." +
                     "  : pav:createdBy <" + eltonURI + "> ;" +
                     "    dcterms:created \"" + ISODateTimeFormat.dateTimeNoMillis().withZone(DateTimeZone.UTC).print(getDate().getTime()) + "\"^^xsd:dateTime ." +

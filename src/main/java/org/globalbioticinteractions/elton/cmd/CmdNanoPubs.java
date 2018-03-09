@@ -104,14 +104,12 @@ public class CmdNanoPubs extends CmdInteractions {
             if (studyDoi != null || citationString != null) {
             	if (studyDoi == null) {
             		builder.append("  :Assertion prov:wasDerivedFrom :Study .");
-            		String desc = StringEscapeUtils.escapeXml(citationString.replace("\n", " "));
-            		builder.append("  :Study dct:bibliographicCitation \"" + desc + "\" .");
+                    appendCitationFor(citationString, ":Study", builder);
             	} else {
             		String studyUrl = getDoiUrl(studyDoi);
             		builder.append("  :Assertion prov:wasDerivedFrom <" + studyUrl + "> .");
             		if (citationString != null) {
-                		String desc = StringEscapeUtils.escapeXml(citationString.replace("\n", " "));
-                		builder.append("  <" + studyUrl + "> dct:bibliographicCitation \"" + desc + "\" .");
+                        appendCitationFor(citationString, "<" + studyUrl + ">", builder);
             		}
             	}
             } else {
@@ -132,6 +130,11 @@ public class CmdNanoPubs extends CmdInteractions {
             } catch (OpenRDFException | MalformedNanopubException | TrustyUriException ex) {
             	throw new RuntimeException(ex);
             }
+        }
+
+        private void appendCitationFor(String citationString, String subject, StringBuilder builder) {
+            String desc = StringEscapeUtils.escapeXml(citationString.replace("\n", " "));
+            builder.append("  " + subject + " dct:bibliographicCitation \"" + desc + "\" .");
         }
 
         private void appendOrganismForTaxon(StringBuilder builder, String number, Taxon taxon) {

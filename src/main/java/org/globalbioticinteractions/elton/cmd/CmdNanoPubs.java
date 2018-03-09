@@ -22,6 +22,7 @@ import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.util.ExternalIdUtil;
+import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
@@ -104,12 +105,12 @@ public class CmdNanoPubs extends CmdInteractions {
             if (studyDoi != null || citationString != null) {
             	if (studyDoi == null) {
             		builder.append("  :Assertion prov:wasDerivedFrom :Study .");
-                    appendCitationFor(citationString, ":Study", builder);
+                    builder.append(rdfCitationSnippetFor(citationString, ":Study"));
             	} else {
             		String studyUrl = getDoiUrl(studyDoi);
             		builder.append("  :Assertion prov:wasDerivedFrom <" + studyUrl + "> .");
             		if (citationString != null) {
-                        appendCitationFor(citationString, "<" + studyUrl + ">", builder);
+                        builder.append(rdfCitationSnippetFor(citationString, "<" + studyUrl + ">"));
             		}
             	}
             } else {
@@ -120,6 +121,7 @@ public class CmdNanoPubs extends CmdInteractions {
                     " " +
                     ":Pubinfo {" +
                     "  : prov:wasDerivedFrom <" + datasetURI + "> ." +
+                    rdfCitationSnippetFor(CitationUtil.citationOrDefaultFor(dataset, ""), "<" + datasetURI + ">") +
                     "  : pav:createdBy <" + eltonURI + "> ." +
                     "}");
             try {
@@ -132,9 +134,9 @@ public class CmdNanoPubs extends CmdInteractions {
             }
         }
 
-        private void appendCitationFor(String citationString, String subject, StringBuilder builder) {
+        private String rdfCitationSnippetFor(String citationString, String subject) {
             String desc = StringEscapeUtils.escapeXml(citationString.replace("\n", " "));
-            builder.append("  " + subject + " dct:bibliographicCitation \"" + desc + "\" .");
+            return "  " + subject + " dct:bibliographicCitation \"" + desc + "\" .";
         }
 
         private void appendOrganismForTaxon(StringBuilder builder, String number, Taxon taxon) {

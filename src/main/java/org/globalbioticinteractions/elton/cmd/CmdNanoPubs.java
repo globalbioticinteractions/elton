@@ -1,6 +1,12 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.Parameters;
+import java.io.PrintStream;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import net.trustyuri.TrustyUriException;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -21,12 +27,15 @@ import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
+import org.nanopub.MalformedNanopubException;
+import org.nanopub.Nanopub;
+import org.nanopub.NanopubImpl;
+import org.nanopub.NanopubUtils;
+import org.nanopub.trusty.MakeTrustyNanopub;
+import org.openrdf.OpenRDFException;
+import org.openrdf.rio.RDFFormat;
 
-import java.io.PrintStream;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
+import com.beust.jcommander.Parameters;
 
 @Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions in Local Datasets")
 public class CmdNanoPubs extends CmdInteractions {
@@ -96,7 +105,14 @@ public class CmdNanoPubs extends CmdInteractions {
                     "  : pav:authoredBy <https://orcid.org/0000-0003-3138-4118> ." +
                     "  : pav:createdBy <" + eltonURI + "> ." +
                     "}");
-            out.println(builder.toString().replace("\n", " "));
+            try {
+            	Nanopub preNanopub = new NanopubImpl(builder.toString(), RDFFormat.TRIG);
+            	Nanopub trustyNanopub = MakeTrustyNanopub.transform(preNanopub);
+            	String trustyNanopubString = NanopubUtils.writeToString(trustyNanopub, RDFFormat.TRIG);
+            	out.println(trustyNanopubString.replace("\n", " "));
+            } catch (OpenRDFException | MalformedNanopubException | TrustyUriException ex) {
+            	throw new RuntimeException(ex);
+            }
         }
 
         private void appendOrganismForTaxon(StringBuilder builder, String number, Taxon taxon) {
@@ -104,7 +120,7 @@ public class CmdNanoPubs extends CmdInteractions {
             if (StringUtils.isNotBlank(s)) {
                 builder.append("  :Organism_").append(number).append(" a <").append(s).append(">   .\n");
             }
-            String name = StringEscapeUtils.escapeXml(taxon.getName());
+            String name = StringEscapeUtils.escapeXml(taxon.getName()).replace("\n", " ");
             if (StringUtils.isNotBlank(name)) {
                 builder.append("  :Organism_").append(number).append(" rdfs:label \"").append(name).append("\" .\n");
             }

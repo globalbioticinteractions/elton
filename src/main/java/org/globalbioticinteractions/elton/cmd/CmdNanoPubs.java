@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -58,8 +60,9 @@ public class CmdNanoPubs extends CmdInteractions {
             String nanoPubId = idGenerator.generate();
             String pubHeader = "@prefix np: <http://www.nanopub.org/nschema#> ." +
                     "@prefix dcterms: <http://purl.org/dc/terms/> ." +
-                    "@prefix opm: <http://purl.org/net/opmv/ns#> ." +
+                    "@prefix prov: <http://www.w3.org/ns/prov#> ." +
                     "@prefix pav: <http://swan.mindinformatics.org/ontologies/1.2/pav/> ." +
+                    "@prefix dct: <http://purl.org/dc/terms/> ." +
                     "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." +
                     "@prefix sio: <http://semanticscience.org/resource/> ." +
                     "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." +
@@ -96,13 +99,31 @@ public class CmdNanoPubs extends CmdInteractions {
 
             builder.append("}" +
                     " " +
-                    ":Provenance {" +
-                    "  :Assertion opm:wasDerivedFrom <" + datasetURI + "> ;" +
-                    "    opm:wasGeneratedBy <" + eltonURI + "> ." +
-                    "}" +
+                    ":Provenance {");
+ 
+            String studyDoi = StringUtils.isNotBlank(study.getDOI()) ? study.getDOI() : null;
+            String citationString = StringUtils.isNotBlank(study.getCitation()) ? study.getCitation() : null;
+            if (studyDoi != null || citationString != null) {
+            	if (studyDoi == null) {
+            		builder.append("  :Assertion prov:wasDerivedFrom :Study .");
+            		String desc = StringEscapeUtils.escapeXml(citationString.replace("\n", " "));
+            		builder.append("  :Study dct:bibliographicCitation \"" + desc + "\" .");
+            	} else {
+            		String studyUrl = getDoiUrl(studyDoi);
+            		builder.append("  :Assertion prov:wasDerivedFrom <" + studyUrl + "> .");
+            		if (citationString != null) {
+                		String desc = StringEscapeUtils.escapeXml(citationString.replace("\n", " "));
+                		builder.append("  <" + studyUrl + "> dct:bibliographicCitation \"" + desc + "\" .");
+            		}
+            	}
+            } else {
+            	builder.append("  :Assertion prov:wasDerivedFrom <" + datasetURI + "> .");
+            }
+
+            builder.append("}" +
                     " " +
                     ":Pubinfo {" +
-                    "  : pav:authoredBy <https://orcid.org/0000-0003-3138-4118> ." +
+                    "  : prov:wasDerivedFrom <" + datasetURI + "> ." +
                     "  : pav:createdBy <" + eltonURI + "> ." +
                     "}");
             try {
@@ -124,6 +145,20 @@ public class CmdNanoPubs extends CmdInteractions {
             if (StringUtils.isNotBlank(name)) {
                 builder.append("  :Organism_").append(number).append(" rdfs:label \"").append(name).append("\" .\n");
             }
+        }
+ 
+        private String getDoiUrl(String doi) {
+        	try {
+	        	if (doi.startsWith("doi:")) {
+	        		return URLEncoder.encode(doi, "UTF8").replace("%2F", "/").replace("%3A", ":").replaceFirst("^doi:", "https://doi.org/");
+	        	}
+	        	if (doi.startsWith("10.")) {
+	        		return "https://doi.org/" + URLEncoder.encode(doi, "UTF8").replace("%2F", "/").replace("%3A", ":");
+	        	}
+	        	return URLEncoder.encode(doi, "UTF8").replace("%2F", "/").replace("%3A", ":");
+        	} catch (UnsupportedEncodingException ex) {
+        		throw new RuntimeException(ex);
+        	}
         }
 
     }

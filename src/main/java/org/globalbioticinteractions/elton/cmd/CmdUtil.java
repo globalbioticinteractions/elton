@@ -1,11 +1,13 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.Dataset;
+import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
+import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
@@ -18,11 +20,6 @@ import org.globalbioticinteractions.dataset.DatasetFinderWithCache;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,5 +65,22 @@ class CmdUtil {
     public static List<String> datasetInfo(Dataset dataset) {
         String citation = CitationUtil.citationOrDefaultFor(dataset, "");
         return StreamUtil.streamOf(dataset, citation).collect(Collectors.toList());
+    }
+
+    public static void handleNamespaces(DatasetFinder finder, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix) {
+        try {
+            handleNamespaces(finder, namespace -> {
+                String msg = msgPrefix + " [" + namespace + "]...";
+                LOG.info(msg);
+                Dataset dataset = DatasetFactory.datasetFor(namespace, finder);
+                nodeFactory.getOrCreateDataset(dataset);
+                new GitHubImporterFactory()
+                        .createImporter(dataset, nodeFactory)
+                        .importStudy();
+                LOG.info(msg + "done.");
+            }, namespaces);
+        } catch (DatasetFinderException e) {
+            throw new RuntimeException("failed to complete name scan", e);
+        }
     }
 }

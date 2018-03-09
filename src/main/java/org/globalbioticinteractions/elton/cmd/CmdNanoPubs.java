@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Interaction;
@@ -20,9 +21,6 @@ import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
-import org.eol.globi.service.DatasetFactory;
-import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.GitHubImporterFactory;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 import org.globalbioticinteractions.elton.util.IdGenerator;
@@ -100,7 +98,7 @@ public class CmdNanoPubs extends CmdInteractions {
             builder.append("}" +
                     " " +
                     ":Provenance {");
- 
+
             String studyDoi = StringUtils.isNotBlank(study.getDOI()) ? study.getDOI() : null;
             String citationString = StringUtils.isNotBlank(study.getCitation()) ? study.getCitation() : null;
             if (studyDoi != null || citationString != null) {
@@ -146,7 +144,7 @@ public class CmdNanoPubs extends CmdInteractions {
                 builder.append("  :Organism_").append(number).append(" rdfs:label \"").append(name).append("\" .\n");
             }
         }
- 
+
         private String getDoiUrl(String doi) {
         	try {
 	        	if (doi.startsWith("doi:")) {
@@ -199,21 +197,9 @@ public class CmdNanoPubs extends CmdInteractions {
             }
         };
 
-        try {
-            CmdUtil.handleNamespaces(finder, namespace -> {
-                String msg = "scanning for interactions in [" + namespace + "]...";
-                LOG.info(msg);
-                Dataset dataset = DatasetFactory.datasetFor(namespace, finder);
-                nodeFactory.getOrCreateDataset(dataset);
-                new GitHubImporterFactory()
-                        .createImporter(dataset, nodeFactory)
-                        .importStudy();
-                LOG.info(msg + "done.");
-            }, getNamespaces());
-        } catch (DatasetFinderException e) {
-            throw new RuntimeException("failed to complete name scan", e);
-        }
+        CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "generating trusty nanopubs for");
     }
+
 }
 
 

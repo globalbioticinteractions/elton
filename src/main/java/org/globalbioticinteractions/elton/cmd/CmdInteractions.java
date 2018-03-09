@@ -150,20 +150,7 @@ public class CmdInteractions extends CmdDefaultParams {
             }
         };
 
-        try {
-            CmdUtil.handleNamespaces(finder, namespace -> {
-                String msg = "scanning for interactions in [" + namespace + "]...";
-                LOG.info(msg);
-                Dataset dataset = DatasetFactory.datasetFor(namespace, finder);
-                nodeFactory.getOrCreateDataset(dataset);
-                new GitHubImporterFactory()
-                        .createImporter(dataset, nodeFactory)
-                        .importStudy();
-                LOG.info(msg + "done.");
-            }, getNamespaces());
-        } catch (DatasetFinderException e) {
-            throw new RuntimeException("failed to complete name scan", e);
-        }
+        CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for interactions in");
     }
 }
 

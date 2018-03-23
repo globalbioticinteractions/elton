@@ -43,13 +43,13 @@ public class SpecimenTaxonOnly extends SpecimenNull {
     }
 
     @Override
-    public void interactsWith(Specimen target, InteractType type, Location location) {
-        if (location != null) {
+    public void interactsWith(Specimen target, InteractType type, Location providedLocation) {
+        if (providedLocation != null) {
             if (getSampleLocation() == null) {
-                this.location = location;
+                this.location = providedLocation;
             }
-            target.getSampleLocation() == null){
-                ((SpecimenTaxonOnly) target).location = location
+            if (target.getSampleLocation() == null){
+                ((SpecimenTaxonOnly) target).location = providedLocation;
             }
         }
         serializer.write(this, type, (SpecimenTaxonOnly) target, study, dataset, datasetInfo);

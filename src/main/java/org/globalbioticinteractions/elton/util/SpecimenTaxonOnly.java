@@ -17,6 +17,7 @@ public class SpecimenTaxonOnly extends SpecimenNull {
     private final Study study;
     private final Dataset dataset;
     private Stream<String> datasetInfo;
+    private Location location;
 
     public SpecimenTaxonOnly(Dataset dataset, Stream<String> datasetInfo, Study study, InteractionWriter serializer, Taxon taxon) {
         this.study = study;
@@ -27,7 +28,30 @@ public class SpecimenTaxonOnly extends SpecimenNull {
     }
 
     @Override
-    public void interactsWith(Specimen target, InteractType type, Location centroid) {
+    public Location getSampleLocation() {
+        return location;
+    }
+
+    @Override
+    public void caughtIn(Location sampleLocation) {
+        this.location = sampleLocation;
+    }
+
+    @Override
+    public void interactsWith(Specimen recipientSpecimen, InteractType relType) {
+        interactsWith(recipientSpecimen, relType, location);
+    }
+
+    @Override
+    public void interactsWith(Specimen target, InteractType type, Location location) {
+        if (location != null) {
+            if (getSampleLocation() == null) {
+                this.location = location;
+            }
+            target.getSampleLocation() == null){
+                ((SpecimenTaxonOnly) target).location = location
+            }
+        }
         serializer.write(this, type, (SpecimenTaxonOnly) target, study, dataset, datasetInfo);
     }
 

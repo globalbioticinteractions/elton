@@ -3,28 +3,18 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.Parameters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonNode;
-import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.InteractType;
-import org.eol.globi.domain.Interaction;
-import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
-import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
-import org.eol.globi.service.DatasetFactory;
-import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
+import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
-import java.net.URI;
-import java.util.List;
 import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "List Interacting Taxon Pairs For Local Datasets")
@@ -67,88 +57,7 @@ public class CmdInteractions extends CmdDefaultParams {
 
         InteractionWriter serializer = createSerializer(out);
 
-        NodeFactoryNull nodeFactory = new NodeFactoryNull() {
-            Dataset dataset;
-            List<String> datasetInfo;
-
-            @Override
-            public Dataset getOrCreateDataset(final Dataset dataset) {
-                this.dataset = new Dataset() {
-
-                    @Override
-                    public InputStream getResource(String resourceName) throws IOException {
-                        return dataset.getResource(resourceName);
-                    }
-
-                    @Override
-                    public URI getResourceURI(String resourceName) {
-                        return dataset.getResourceURI(resourceName);
-                    }
-
-                    @Override
-                    public URI getArchiveURI() {
-                        return dataset.getArchiveURI();
-                    }
-
-                    @Override
-                    public String getNamespace() {
-                        return dataset.getNamespace();
-                    }
-
-                    @Override
-                    public JsonNode getConfig() {
-                        return dataset.getConfig();
-                    }
-
-                    @Override
-                    public String getCitation() {
-                        return dataset.getCitation();
-                    }
-
-                    @Override
-                    public String getFormat() {
-                        return dataset.getFormat();
-                    }
-
-                    @Override
-                    public String getOrDefault(String key, String defaultValue) {
-                        return null;
-                    }
-
-                    @Override
-                    public String getDOI() {
-                        return dataset.getDOI();
-                    }
-
-                    @Override
-                    public URI getConfigURI() {
-                        return null;
-                    }
-
-                    @Override
-                    public void setConfig(JsonNode config) {
-
-                    }
-
-                    @Override
-                    public void setConfigURI(URI configURI) {
-
-                    }
-                };
-                this.datasetInfo = CmdUtil.datasetInfo(dataset);
-                return super.getOrCreateDataset(dataset);
-            }
-
-            @Override
-            public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), interaction.getStudy(), serializer, taxon);
-            }
-
-            @Override
-            public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), study, serializer, taxon);
-            }
-        };
+        NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, new DatasetProcessorForTSV());
 
         CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for interactions in");
     }

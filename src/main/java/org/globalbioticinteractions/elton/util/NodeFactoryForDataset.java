@@ -1,0 +1,45 @@
+package org.globalbioticinteractions.elton.util;
+
+import org.eol.globi.data.NodeFactoryException;
+import org.eol.globi.domain.Interaction;
+import org.eol.globi.domain.Specimen;
+import org.eol.globi.domain.Study;
+import org.eol.globi.domain.Taxon;
+import org.eol.globi.service.Dataset;
+import org.globalbioticinteractions.elton.cmd.CmdUtil;
+import org.globalbioticinteractions.elton.util.DatasetProcessor;
+import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
+import org.globalbioticinteractions.elton.util.InteractionWriter;
+import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
+
+import java.util.List;
+
+public class NodeFactoryForDataset extends NodeFactoryNull {
+    private final InteractionWriter serializer;
+    Dataset dataset;
+    private List<String> datasetInfo;
+    private DatasetProcessor processor;
+
+    public NodeFactoryForDataset(InteractionWriter serializer, DatasetProcessor processor) {
+        this.serializer = serializer;
+        this.processor = processor;
+    }
+
+    @Override
+    public Dataset getOrCreateDataset(final Dataset dataset) {
+        this.dataset = processor.process(dataset);
+        this.datasetInfo = CmdUtil.datasetInfo(dataset);
+        return super.getOrCreateDataset(dataset);
+    }
+
+    @Override
+    public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
+        return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), interaction.getStudy(), serializer, taxon);
+    }
+
+    @Override
+    public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
+        return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), study, serializer, taxon);
+    }
+}

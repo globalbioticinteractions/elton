@@ -3,7 +3,6 @@ package org.globalbioticinteractions.elton.cmd;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -13,11 +12,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eol.globi.data.NodeFactory;
-import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.InteractType;
-import org.eol.globi.domain.Interaction;
-import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
@@ -26,6 +21,7 @@ import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
+import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
 import org.nanopub.MalformedNanopubException;
@@ -180,27 +176,7 @@ public class CmdNanoPubs extends CmdInteractions {
 
         InteractionWriter serializer = createSerializer(out);
 
-        NodeFactoryNull nodeFactory = new NodeFactoryNull() {
-            Dataset dataset;
-            List<String> datasetInfo;
-
-            @Override
-            public Dataset getOrCreateDataset(Dataset dataset) {
-                this.dataset = dataset;
-                this.datasetInfo = CmdUtil.datasetInfo(dataset);
-                return super.getOrCreateDataset(dataset);
-            }
-
-            @Override
-            public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), interaction.getStudy(), serializer, taxon);
-            }
-
-            @Override
-            public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-                return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), study, serializer, taxon);
-            }
-        };
+        NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, dataset -> dataset);
 
         CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "generating trusty nanopubs for");
     }

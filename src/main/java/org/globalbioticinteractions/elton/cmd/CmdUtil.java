@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class CmdUtil {
+public class CmdUtil {
     private static final Log LOG = LogFactory.getLog(CmdUtil.class);
 
     static void handleNamespaces(DatasetFinder finder, NamespaceHandler handler, List<String> namespaces) throws DatasetFinderException {

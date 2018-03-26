@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
 import org.apache.commons.lang3.StringUtils;
+import org.globalbioticinteractions.elton.util.NanoPubWriter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,6 +40,5 @@ public class CmdNanoPubsTest {
             assertThat(StringUtils.trim(out1.toString().split("\\n")[0]), is(firstLine));
         }
     }
-
 
 }

@@ -18,6 +18,7 @@ import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class NodeFactoryForDataset extends NodeFactoryNull {
@@ -74,5 +75,12 @@ public class NodeFactoryForDataset extends NodeFactoryNull {
         return location.getEnvironments();
     }
 
+    public void setUnixEpochProperty(Specimen specimen, Date date) throws NodeFactoryException {
+        ((SpecimenTaxonOnly)specimen).setEventDate(date);
+    }
+
+    public Date getUnixEpochProperty(Specimen specimen) throws NodeFactoryException {
+        return ((SpecimenTaxonOnly)specimen).getEventDate();
+    }
 
 }

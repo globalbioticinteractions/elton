@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URI;
+import java.util.Date;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -29,6 +30,7 @@ public class NanoPubWriterTest {
         Stream<String> datasetInfo = Stream.of("someinfo");
         StudyImpl study = new StudyImpl("some study");
         SpecimenTaxonOnly specimen = new SpecimenTaxonOnly(dataset, datasetInfo, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123"));
+        specimen.setEventDate(new Date(0));
         LocationImpl location = new LocationImpl(12.2d, 1.2d, 2d, null);
         location.setLocality("some locality");
         location.setLocalityId("GEONAMES:123");
@@ -56,7 +58,7 @@ public class NanoPubWriterTest {
         assertThat(out.toString(), containsString("http://www.geonames.org/123"));
         assertThat(out.toString(), containsString("ENVO"));
         assertThat(out.toString(), containsString("geo:latitude 12.2 "));
-        assertThat(out.toString(), containsString("geo:longitude 1.2 "));
+        assertThat(out.toString(), containsString("prov:atTime \"1970-01-01T00:00:00Z\"^^xsd:dateTime"));
     }
 
 

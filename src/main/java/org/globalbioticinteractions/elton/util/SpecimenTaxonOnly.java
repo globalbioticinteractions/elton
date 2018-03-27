@@ -8,6 +8,7 @@ import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
 import org.globalbioticinteractions.dataset.CitationUtil;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,6 +19,7 @@ public class SpecimenTaxonOnly extends SpecimenNull {
     private final Dataset dataset;
     private Stream<String> datasetInfo;
     private Location location;
+    private Date eventDate;
 
     public SpecimenTaxonOnly(Dataset dataset, Stream<String> datasetInfo, Study study, InteractionWriter serializer, Taxon taxon) {
         this.study = study;
@@ -49,6 +51,14 @@ public class SpecimenTaxonOnly extends SpecimenNull {
             ((SpecimenTaxonOnly) target).location = providedLocation;
         }
         serializer.write(this, type, (SpecimenTaxonOnly) target, study, dataset, datasetInfo);
+    }
+
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public Date getEventDate() {
+        return this.eventDate;
     }
 
 }

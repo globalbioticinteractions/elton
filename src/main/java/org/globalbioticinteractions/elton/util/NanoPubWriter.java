@@ -8,9 +8,11 @@ import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
+import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.cmd.CmdNanoPubs;
+import org.joda.time.DateTimeUtils;
 import org.nanopub.MalformedNanopubException;
 import org.nanopub.Nanopub;
 import org.nanopub.NanopubImpl;
@@ -87,9 +89,14 @@ public class NanoPubWriter implements InteractionWriter {
             if (target.getSampleLocation().getLatitude() != null) {
                 builder.append("  :Interaction  geo:latitude \"").append(target.getSampleLocation().getLatitude()).append("\"^^xsd:decimal . \n");
             }
+
             if (target.getSampleLocation().getLongitude() != null) {
                 builder.append("  :Interaction  geo:longitude \"").append(target.getSampleLocation().getLongitude()).append("\"^^xsd:decimal . \n");
             }
+        }
+
+        if (target.getEventDate() != null) {
+            builder.append("  :Interaction  prov:atTime \"").append(DateUtil.printDate(target.getEventDate())).append("\"^^xsd:dateTime . \n");
         }
 
         String eltonURI = "https://doi.org/10.5281/zenodo.998263";

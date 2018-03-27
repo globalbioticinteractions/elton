@@ -45,6 +45,7 @@ public class NanoPubWriter implements InteractionWriter {
                 "@prefix sio: <http://semanticscience.org/resource/> ." +
                 "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." +
                 "@prefix obo: <http://purl.obolibrary.org/obo/> ." +
+                "@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> ." +
                 "@prefix : <http://purl.org/nanopub/temp/NanoPub_" + nanoPubId + "#> ." +
                 "\n" +
                 ":Head {" +
@@ -81,6 +82,13 @@ public class NanoPubWriter implements InteractionWriter {
                 if (StringUtils.isNotBlank(envoId)) {
                     builder.append("  :Interaction obo:BFO_0000066 <").append(envoId).append("> .\n");
                 }
+            }
+
+            if (target.getSampleLocation().getLatitude() != null) {
+                builder.append("  :Interaction  geo:latitude \"").append(target.getSampleLocation().getLatitude()).append("\"^^xsd:decimal . \n");
+            }
+            if (target.getSampleLocation().getLongitude() != null) {
+                builder.append("  :Interaction  geo:longitude \"").append(target.getSampleLocation().getLongitude()).append("\"^^xsd:decimal . \n");
             }
         }
 

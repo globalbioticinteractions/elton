@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.util;
 
 import org.eol.globi.domain.Environment;
 import org.eol.globi.domain.InteractType;
+import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.LocationImpl;
 import org.eol.globi.domain.StudyImpl;
 import org.eol.globi.domain.TaxonImpl;
@@ -21,14 +22,8 @@ public class NanoPubWriterTest {
 
     @Test
     public void testLocale() {
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        NanoPubWriter nanoPubWriter = new NanoPubWriter(new PrintStream(out), new IdGenerator() {
-            @Override
-            public String generate() {
-                return "1";
-            }
-        });
+        NanoPubWriter nanoPubWriter = new NanoPubWriter(new PrintStream(out), () -> "1");
 
         DatasetImpl dataset = new DatasetImpl("some/namespace", URI.create("some:uri"));
         Stream<String> datasetInfo = Stream.of("someinfo");
@@ -54,11 +49,14 @@ public class NanoPubWriterTest {
             }
         });
         specimen.caughtIn(location);
+
         nanoPubWriter.write(specimen, InteractType.ATE, specimen, study, dataset, datasetInfo);
 
         assertThat(out.toString(), containsString("some taxon"));
         assertThat(out.toString(), containsString("http://www.geonames.org/123"));
         assertThat(out.toString(), containsString("ENVO"));
+        assertThat(out.toString(), containsString("geo:latitude 12.2 "));
+        assertThat(out.toString(), containsString("geo:longitude 1.2 "));
     }
 
 

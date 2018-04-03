@@ -11,8 +11,6 @@ import org.eol.globi.service.Dataset;
 import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
-import org.globalbioticinteractions.elton.cmd.CmdNanoPubs;
-import org.joda.time.DateTimeUtils;
 import org.nanopub.MalformedNanopubException;
 import org.nanopub.Nanopub;
 import org.nanopub.NanopubImpl;
@@ -101,7 +99,7 @@ public class NanoPubWriter implements InteractionWriter {
 
         String eltonURI = "https://doi.org/10.5281/zenodo.998263";
 
-        String datasetURI = StringUtils.isNotBlank(dataset.getDOI()) ? dataset.getDOI() : dataset.getArchiveURI().toString();
+        String datasetURI = extractDatasetURI(dataset);
 
         builder.append("}" +
                 " " +
@@ -124,13 +122,11 @@ public class NanoPubWriter implements InteractionWriter {
             builder.append("  :Assertion prov:wasDerivedFrom <" + datasetURI + "> .");
         }
 
-        builder.append("}" +
-                " " +
-                ":Pubinfo {" +
-                "  : prov:wasDerivedFrom <" + datasetURI + "> ." +
-                rdfCitationSnippetFor(CitationUtil.citationOrDefaultFor(dataset, ""), "<" + datasetURI + ">") +
-                "  : pav:createdBy <" + eltonURI + "> ." +
-                "}");
+
+        builder.append("} :Pubinfo { : prov:wasDerivedFrom <")
+                .append(datasetURI).append("> .")
+                .append(rdfCitationSnippetFor(CitationUtil.citationOrDefaultFor(dataset, ""), "<" + datasetURI + ">"))
+                .append("  : pav:createdBy <").append(eltonURI).append("> .}");
         try {
             Nanopub preNanopub = new NanopubImpl(builder.toString(), RDFFormat.TRIG);
             Nanopub trustyNanopub = MakeTrustyNanopub.transform(preNanopub);
@@ -139,6 +135,18 @@ public class NanoPubWriter implements InteractionWriter {
         } catch (OpenRDFException | MalformedNanopubException | TrustyUriException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    static String extractDatasetURI(Dataset dataset) {
+        String datasetURI = dataset.getDOI();
+        if (StringUtils.isBlank(datasetURI)) {
+            if (StringUtils.startsWith(dataset.getArchiveURI().toString(), "https://github.com/")) {
+                datasetURI = dataset.getArchiveURI().toString().replaceFirst("/archive/[a-z0-9]+\\.zip", "");
+            } else {
+                datasetURI = dataset.getArchiveURI().toString();
+            }
+        }
+        return datasetURI;
     }
 
     private String rdfCitationSnippetFor(String citationString, String subject) {

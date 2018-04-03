@@ -8,6 +8,7 @@ import org.eol.globi.domain.StudyImpl;
 import org.eol.globi.domain.TaxonImpl;
 import org.eol.globi.service.DatasetImpl;
 import org.junit.Test;
+import org.nanopub.Nanopub;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -57,8 +58,27 @@ public class NanoPubWriterTest {
         assertThat(out.toString(), containsString("some taxon"));
         assertThat(out.toString(), containsString("http://www.geonames.org/123"));
         assertThat(out.toString(), containsString("ENVO"));
+        assertThat(out.toString(), containsString("<some:uri>"));
         assertThat(out.toString(), containsString("geo:latitude 12.2 "));
         assertThat(out.toString(), containsString("prov:atTime \"1970-01-01T00:00:00Z\"^^xsd:dateTime"));
+    }
+
+    @Test
+    public void extractDatasetURIGitHub() {
+        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("https://github.com/hurlbertlab/dietdatabase/archive/f98e5b3dc7480c92a468433400a725d71c2ad51c.zip")));
+        assertThat(datasetURI, is("https://github.com/hurlbertlab/dietdatabase"));
+    }
+
+    @Test
+    public void extractDatasetURIDOI() {
+        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("https://doi.org/10.123")));
+        assertThat(datasetURI, is("https://doi.org/10.123"));
+    }
+
+    @Test
+    public void extractDatasetURISomeNamespace() {
+        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("some:namespace")));
+        assertThat(datasetURI, is("some:namespace"));
     }
 
 

@@ -126,7 +126,8 @@ public class NanoPubWriter implements InteractionWriter {
         builder.append("} :Pubinfo { : prov:wasDerivedFrom <")
                 .append(datasetURI).append("> .")
                 .append(rdfCitationSnippetFor(CitationUtil.citationOrDefaultFor(dataset, ""), "<" + datasetURI + ">"))
-                .append("  : pav:createdBy <").append(eltonURI).append("> .}");
+                .append("  : pav:createdBy <").append(eltonURI).append("> .")
+                .append("  : dcterms:license <https://creativecommons.org/licenses/by/4.0/> . }");
         try {
             Nanopub preNanopub = new NanopubImpl(builder.toString(), RDFFormat.TRIG);
             Nanopub trustyNanopub = MakeTrustyNanopub.transform(preNanopub);

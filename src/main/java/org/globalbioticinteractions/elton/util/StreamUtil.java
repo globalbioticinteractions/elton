@@ -2,14 +2,18 @@ package org.globalbioticinteractions.elton.util;
 
 import org.apache.commons.lang.StringUtils;
 import org.eol.globi.Version;
+import org.eol.globi.domain.Location;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
+import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.Elton;
 
+import java.util.Date;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class StreamUtil {
@@ -46,5 +50,19 @@ public class StreamUtil {
         String urlOrEmpty = ExternalIdUtil.urlForExternalId(StringUtils.isBlank(doi) ? study.getExternalId() : doi);
         String citationOrEmpty = study == null ? "" : study.getCitation();
         return Stream.of(urlOrEmpty, citationOrEmpty);
+    }
+
+    public static Stream<String> streamOf(Date date) {
+        return Stream.of(DateUtil.printDate(date));
+    }
+
+    public static Stream<String> streamOf(Location loc) {
+
+        return loc == null
+                ? Stream.of("", "", "", "")
+                : Stream.of(loc.getLatitude() == null ? "" : loc.getLatitude().toString()
+                , loc.getLongitude() == null ? "" : loc.getLongitude().toString()
+                , StringUtils.defaultString(loc.getLocalityId())
+                , StringUtils.defaultString(loc.getLocality()));
     }
 }

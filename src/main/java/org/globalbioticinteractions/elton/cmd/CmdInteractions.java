@@ -19,8 +19,6 @@ import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "List Interacting Taxon Pairs For Local Datasets")
 public class CmdInteractions extends CmdDefaultParams {
-    private final static Log LOG = LogFactory.getLog(CmdInteractions.class);
-
     public class TsvWriter implements InteractionWriter {
         private final PrintStream out;
 
@@ -36,6 +34,8 @@ public class CmdInteractions extends CmdDefaultParams {
                     StreamUtil.streamOf(source.taxon),
                     interactStream,
                     StreamUtil.streamOf(target.taxon),
+                    StreamUtil.streamOf(target.getEventDate()),
+                    StreamUtil.streamOf(target.getSampleLocation()),
                     StreamUtil.streamOf(study),
                     datasetInfo).flatMap(x -> x);
             String row = StreamUtil.tsvRowOf(rowStream);

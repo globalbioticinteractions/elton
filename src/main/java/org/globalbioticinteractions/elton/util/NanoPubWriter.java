@@ -97,7 +97,7 @@ public class NanoPubWriter implements InteractionWriter {
             builder.append("  :Interaction  prov:atTime \"").append(DateUtil.printDate(target.getEventDate())).append("\"^^xsd:dateTime . \n");
         }
 
-        String eltonURI = "https://doi.org/10.5281/zenodo.1212599";
+        String eltonURI = "https://doi.org/10.5281/zenodo.998263";
 
         String datasetURI = extractDatasetURI(dataset);
 

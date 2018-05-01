@@ -47,7 +47,6 @@ public class SpecimenTaxonOnly extends SpecimenNull {
     @Override
     public void interactsWith(Specimen target, InteractType type, Location providedLocation) {
         if (providedLocation != null) {
-            System.out.println("locality: [" + providedLocation.getLocalityId() + "]");
             this.location = providedLocation;
             ((SpecimenTaxonOnly) target).location = providedLocation;
         }

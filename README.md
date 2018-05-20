@@ -130,6 +130,12 @@ Update / download all datasets (might take a while)
 
 ```java -jar elton.jar update```
 
+Note that elton is using [a rate-limited GitHub APIs](https://developer.github.com/v3/#rate-limiting). If you are seeing "Forbidden" http errors, suggest to provide OAUTH key/secret like:
+
+``` java -Dgithub.client.id=[client id] -Dgithub.client.secret=[client secret] -jar elton.jar update```
+
+Please refer to GitHub API documentation like https://developer.github.com/v3/#rate-limiting learn more about getting a client id/secret pair.
+
 List interactions of all locally cached datasets
 
 ```java -jar elton.jar interactions```

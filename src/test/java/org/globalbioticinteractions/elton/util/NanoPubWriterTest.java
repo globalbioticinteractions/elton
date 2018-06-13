@@ -13,7 +13,10 @@ import org.nanopub.Nanopub;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -28,7 +31,7 @@ public class NanoPubWriterTest {
         NanoPubWriter nanoPubWriter = new NanoPubWriter(new PrintStream(out), () -> "1");
 
         DatasetImpl dataset = new DatasetImpl("some/namespace", URI.create("some:uri"));
-        Stream<String> datasetInfo = Stream.of("someinfo");
+        List<String> datasetInfo = Collections.singletonList("someinfo");
         StudyImpl study = new StudyImpl("some study");
         SpecimenTaxonOnly specimen = new SpecimenTaxonOnly(dataset, datasetInfo, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123"));
         specimen.setEventDate(new Date(0));

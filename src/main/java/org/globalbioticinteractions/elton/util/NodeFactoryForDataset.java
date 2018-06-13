@@ -41,12 +41,12 @@ public class NodeFactoryForDataset extends NodeFactoryNull {
 
     @Override
     public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-        return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), interaction.getStudy(), serializer, taxon);
+        return new SpecimenTaxonOnly(dataset, datasetInfo, interaction.getStudy(), serializer, taxon);
     }
 
     @Override
     public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-        return new SpecimenTaxonOnly(dataset, datasetInfo.stream(), study, serializer, taxon);
+        return new SpecimenTaxonOnly(dataset, datasetInfo, study, serializer, taxon);
     }
 
     @Override

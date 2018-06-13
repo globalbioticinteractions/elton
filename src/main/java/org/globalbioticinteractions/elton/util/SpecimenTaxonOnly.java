@@ -17,11 +17,11 @@ public class SpecimenTaxonOnly extends SpecimenNull {
     final InteractionWriter serializer;
     private final Study study;
     private final Dataset dataset;
-    private Stream<String> datasetInfo;
+    private List<String> datasetInfo;
     private Location location;
     private Date eventDate;
 
-    public SpecimenTaxonOnly(Dataset dataset, Stream<String> datasetInfo, Study study, InteractionWriter serializer, Taxon taxon) {
+    public SpecimenTaxonOnly(Dataset dataset, List<String> datasetInfo, Study study, InteractionWriter serializer, Taxon taxon) {
         this.study = study;
         this.serializer = serializer;
         this.taxon = taxon;

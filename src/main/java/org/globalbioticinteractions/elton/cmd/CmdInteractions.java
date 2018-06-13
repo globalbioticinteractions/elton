@@ -15,6 +15,7 @@ import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "List Interacting Taxon Pairs For Local Datasets")
@@ -27,7 +28,7 @@ public class CmdInteractions extends CmdDefaultParams {
         }
 
         @Override
-        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset, Stream<String> datasetInfo) {
+        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset, List<String> datasetInfo) {
             Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
 
             Stream<String> rowStream = Stream.of(
@@ -37,7 +38,7 @@ public class CmdInteractions extends CmdDefaultParams {
                     StreamUtil.streamOf(target.getEventDate()),
                     StreamUtil.streamOf(target.getSampleLocation()),
                     StreamUtil.streamOf(study),
-                    datasetInfo).flatMap(x -> x);
+                    datasetInfo.stream()).flatMap(x -> x);
             String row = StreamUtil.tsvRowOf(rowStream);
             out.println(row);
         }

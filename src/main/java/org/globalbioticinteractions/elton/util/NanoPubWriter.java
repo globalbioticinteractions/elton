@@ -22,7 +22,7 @@ import org.openrdf.rio.RDFFormat;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.stream.Stream;
+import java.util.List;
 
 public class NanoPubWriter implements InteractionWriter {
     private final IdGenerator idGenerator;
@@ -34,7 +34,7 @@ public class NanoPubWriter implements InteractionWriter {
     }
 
     @Override
-    public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset, Stream<String> datasetInfo) {
+    public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset, List<String> datasetInfo) {
         String nanoPubId = idGenerator.generate();
         String pubHeader = "@prefix np: <http://www.nanopub.org/nschema#> ." +
                 "@prefix dcterms: <http://purl.org/dc/terms/> ." +

@@ -28,5 +28,12 @@ public class StreamUtilTest {
         assertThat(locationStream.collect(Collectors.toList()), is(Arrays.asList("12.1", "12.2", "some:localityId", "some locality")));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void tsvRowOf() {
+        Stream<String> row = Stream.of("one", "two");
+        assertThat(StreamUtil.tsvRowOf(Stream.concat(row, Stream.of("three"))), is("one\ttwo\tthree"));
+        assertThat(StreamUtil.tsvRowOf(row), is("one\ttwo"));
+    }
+
 
 }

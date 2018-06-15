@@ -52,11 +52,11 @@ public class StreamUtil {
         String citationOrEmpty = "";
         if (null != study) {
             DOI doi = study.getDOI();
+            doiOrEmpty = null == doi ? "" : doi.toString();
             String externalId = StringUtils.defaultIfBlank(study.getExternalId(), "");
-            if (StringUtils.isBlank(externalId) && null != doi) {
+            urlOrEmpty = ExternalIdUtil.urlForExternalId(externalId);
+            if (StringUtils.isBlank(urlOrEmpty) && null != doi) {
                 urlOrEmpty = doi.toURI().toString();
-            } else {
-                urlOrEmpty = ExternalIdUtil.urlForExternalId(externalId);
             }
             citationOrEmpty = StringUtils.defaultIfBlank(study.getCitation(), "");
         }

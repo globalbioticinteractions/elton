@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.util;
 
 import org.eol.globi.domain.LocationImpl;
+import org.eol.globi.domain.StudyImpl;
+import org.globalbioticinteractions.doi.DOI;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -17,6 +19,28 @@ public class StreamUtilTest {
     public void eventDate() {
         Stream<String> dateStream = StreamUtil.streamOf(new Date(0));
         assertThat(dateStream.collect(Collectors.toList()), is(Arrays.asList("1970-01-01T00:00:00Z")));
+    }
+
+    @Test
+    public void study() {
+        Stream<String> dateStream = StreamUtil.streamOf(new StudyImpl("some title", "source source", new DOI("123", "456"), "some citation"));
+        assertThat(dateStream.collect(Collectors.toList()), is(Arrays.asList("10.123/456", "https://doi.org/10.123/456", "some citation")));
+    }
+
+    @Test
+    public void studyUnsupportedExternalIdScheme() {
+        StudyImpl study = new StudyImpl("some title", "source source", new DOI("123", "456"), "some citation");
+        study.setExternalId("some:id");
+        Stream<String> dateStream = StreamUtil.streamOf(study);
+        assertThat(dateStream.collect(Collectors.toList()), is(Arrays.asList("10.123/456", "https://doi.org/10.123/456", "some citation")));
+    }
+
+    @Test
+    public void studySupportedExternalIdScheme() {
+        StudyImpl study = new StudyImpl("some title", "source source", new DOI("123", "456"), "some citation");
+        study.setExternalId("https://example.org/something");
+        Stream<String> dateStream = StreamUtil.streamOf(study);
+        assertThat(dateStream.collect(Collectors.toList()), is(Arrays.asList("10.123/456", "https://example.org/something", "some citation")));
     }
 
     @Test

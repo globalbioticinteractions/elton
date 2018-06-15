@@ -11,6 +11,7 @@ import org.eol.globi.service.Dataset;
 import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
+import org.globalbioticinteractions.doi.DOI;
 import org.nanopub.MalformedNanopubException;
 import org.nanopub.Nanopub;
 import org.nanopub.NanopubImpl;
@@ -105,7 +106,7 @@ public class NanoPubWriter implements InteractionWriter {
                 " " +
                 ":Provenance {");
 
-        String studyDoi = StringUtils.isNotBlank(study.getDOI()) ? study.getDOI() : null;
+        String studyDoi = study.getDOI() != null ? study.getDOI().toURI().toString() : null;
         String citationString = StringUtils.isNotBlank(study.getCitation()) ? study.getCitation() : null;
         if (studyDoi != null || citationString != null) {
             if (studyDoi == null) {
@@ -139,7 +140,8 @@ public class NanoPubWriter implements InteractionWriter {
     }
 
     static String extractDatasetURI(Dataset dataset) {
-        String datasetURI = dataset.getDOI();
+        DOI doi = dataset.getDOI();
+        String datasetURI = doi == null ? "" : doi.toURI().toString();
         if (StringUtils.isBlank(datasetURI)) {
             if (StringUtils.startsWith(dataset.getArchiveURI().toString(), "https://github.com/")) {
                 datasetURI = dataset.getArchiveURI().toString().replaceFirst("/archive/[a-z0-9]+\\.zip", "");

@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.util;
 
 import org.codehaus.jackson.JsonNode;
 import org.eol.globi.service.Dataset;
+import org.globalbioticinteractions.doi.DOI;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +54,7 @@ public class DatasetProcessorForTSV implements DatasetProcessor {
             }
 
             @Override
-            public String getDOI() {
+            public DOI getDOI() {
                 return dataset.getDOI();
             }
 

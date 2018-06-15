@@ -9,6 +9,7 @@ import org.eol.globi.service.Dataset;
 import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
+import org.globalbioticinteractions.doi.DOI;
 import org.globalbioticinteractions.elton.Elton;
 
 import java.util.Date;
@@ -46,10 +47,20 @@ public class StreamUtil {
     }
 
     public static Stream<String> streamOf(Study study) {
-        String doi = study == null ? "" : study.getDOI();
-        String urlOrEmpty = ExternalIdUtil.urlForExternalId(StringUtils.isBlank(doi) ? study.getExternalId() : doi);
-        String citationOrEmpty = study == null ? "" : study.getCitation();
-        return Stream.of(urlOrEmpty, citationOrEmpty);
+        String doiOrEmpty = "";
+        String urlOrEmpty = "";
+        String citationOrEmpty = "";
+        if (null != study) {
+            DOI doi = study.getDOI();
+            String externalId = StringUtils.defaultIfBlank(study.getExternalId(), "");
+            if (StringUtils.isBlank(externalId) && null != doi) {
+                urlOrEmpty = doi.toURI().toString();
+            } else {
+                urlOrEmpty = ExternalIdUtil.urlForExternalId(externalId);
+            }
+            citationOrEmpty = StringUtils.defaultIfBlank(study.getCitation(), "");
+        }
+        return Stream.of(doiOrEmpty, urlOrEmpty, citationOrEmpty);
     }
 
     public static Stream<String> streamOf(Date date) {

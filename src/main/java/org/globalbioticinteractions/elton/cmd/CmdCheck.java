@@ -17,6 +17,7 @@ import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderGitHubArchiveMaster;
 import org.eol.globi.service.DatasetFinderProxy;
+import org.eol.globi.util.CSVTSVUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
@@ -77,7 +78,7 @@ public class CmdCheck extends CmdOfflineParams {
             }
 
             String msgForRepo(String message) {
-                return "[" + repoName + "]: [" + message + "]";
+                return repoName + "\t" + message;
             }
         });
 
@@ -87,10 +88,11 @@ public class CmdCheck extends CmdOfflineParams {
                 throw new StudyImporterException(getResultMsg(repoName, warnings, errors) + ", please check your log.");
             }
         } finally {
-            infos.forEach(LOG::info);
-            warnings.forEach(LOG::warn);
-            errors.forEach(LOG::error);
-            System.out.println("\n" + getResultMsg(repoName, warnings, errors));
+            infos.forEach(System.out::println);
+            warnings.forEach(System.out::println);
+            errors.forEach(System.out::println);
+            System.out.println(repoName + "\t" + errors.size() + " error(s)");
+            System.out.println(repoName + "\t" + warnings.size() + " warning(s)");
         }
     }
 
@@ -111,10 +113,10 @@ public class CmdCheck extends CmdOfflineParams {
             @Override
             public void interactsWith(Specimen target, InteractType type, Location centroid) {
                 if (counter.get() > 0 && counter.get() % 1000 == 0) {
-                    System.out.println();
+                    System.err.println();
                 }
                 if (counter.get() % 10 == 0) {
-                    System.out.print(".");
+                    System.err.print(".");
                 }
                 counter.getAndIncrement();
             }

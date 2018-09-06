@@ -20,22 +20,25 @@ public class CmdLine {
         }
     }
 
+
     public static void run(String[] args) throws Throwable {
         JCommander jc = new CmdLine().buildCommander();
         try {
             jc.parse(args);
             CmdLine.run(jc.getCommands().get(jc.getParsedCommand()));
-        } catch (Throwable ex) {
-            LOG.error("unexpected exception", ex);
-            throw ex;
+        } catch (Throwable th) {
+            StringBuilder out = new StringBuilder();
+            jc.usage(out);
+            System.err.append(out.toString());
+            throw th;
         }
+
     }
 
     public class CommandMain implements Runnable {
 
         @Override
         public void run() {
-
         }
     }
 
@@ -51,6 +54,5 @@ public class CmdLine {
                 .addCommand("version", new CmdVersion())
                 .build();
     }
-
 
 }

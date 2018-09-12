@@ -4,7 +4,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
 
 public class CmdLine {
     private final static Log LOG = LogFactory.getLog(CmdLine.class);
@@ -22,29 +21,20 @@ public class CmdLine {
 
 
     public static void run(String[] args) throws Throwable {
-        JCommander jc = new CmdLine().buildCommander();
         try {
+            JCommander jc = new CmdLine().buildCommander();
             jc.parse(args);
             CmdLine.run(jc.getCommands().get(jc.getParsedCommand()));
-        } catch (Throwable th) {
-            StringBuilder out = new StringBuilder();
-            jc.usage(out);
-            System.err.append(out.toString());
-            throw th;
-        }
-
-    }
-
-    public class CommandMain implements Runnable {
-
-        @Override
-        public void run() {
+        } catch (MissingCommandException ex) {
+            System.err.println(ex.getMessage());
+            new CmdUsage().run();
         }
     }
 
     JCommander buildCommander() {
         return JCommander.newBuilder()
-                .addObject(new CommandMain())
+                .addObject(new CmdUsage())
+                .addCommand("usage", new CmdUsage(), "help")
                 .addCommand("list", new CmdList())
                 .addCommand("update", new CmdUpdate())
                 .addCommand("names", new CmdNames())

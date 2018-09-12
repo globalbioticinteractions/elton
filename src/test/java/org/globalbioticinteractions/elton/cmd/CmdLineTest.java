@@ -19,12 +19,12 @@ public class CmdLineTest {
         CmdLine.run(new String[]{"check", "--cache-dir=target/tmp-datasets", "globalbioticinteractions/template-dataset"});
     }
 
-    @Test(expected = MissingCommandException.class)
+    @Test
     public void invalidCommand() throws Throwable {
         CmdLine.run(new String[]{"bla", "globalbioticinteractions/template-dataset"});
     }
 
-    @Test(expected = MissingCommandException.class)
+    @Test
     public void noCommand() throws Throwable {
         CmdLine.run(new String[]{});
     }

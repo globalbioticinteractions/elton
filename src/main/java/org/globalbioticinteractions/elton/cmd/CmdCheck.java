@@ -121,10 +121,10 @@ public class CmdCheck extends CmdOfflineParams {
             getStderr().println(msg);
             studyImporterForGitHubData.importData(dataset);
             getStderr().println(" done.");
+            getStdout().println(repoName + "\t" + dataset.getArchiveURI().toString());
             if (warnings.size() > 0 || errors.size() > 0 || counter.get() == 0) {
                 throw new StudyImporterException("check not successful, please check log.");
             }
-            getStdout().println(repoName + "\t" + dataset.getArchiveURI().toString());
         } catch (DatasetFinderException e) {
             getStdout().println(repoName + "\tno local repository at [" + getWorkDir().toString() + "].");
             throw new StudyImporterException(e);

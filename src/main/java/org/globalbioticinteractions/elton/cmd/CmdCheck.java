@@ -88,6 +88,7 @@ public class CmdCheck extends CmdOfflineParams {
                 throw new StudyImporterException(getResultMsg(repoName, warnings, errors) + ", please check your log.");
             }
         } finally {
+            System.out.println("");
             infos.forEach(System.out::println);
             warnings.forEach(System.out::println);
             errors.forEach(System.out::println);

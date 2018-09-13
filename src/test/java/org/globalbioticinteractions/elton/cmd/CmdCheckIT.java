@@ -51,4 +51,16 @@ public class CmdCheckIT {
         CmdLine.run(actualOffline);
 
     }
+
+    @Test
+    public void runCheckJLewis() {
+        JCommander jc = new CmdLine().buildCommander();
+        jc.parse("check", "jhpoelen/JLewis_GoMexSi");
+
+        JCommander actual = jc.getCommands().get(jc.getParsedCommand());
+        Assert.assertEquals(actual.getObjects().size(), 1);
+        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdCheck.class);
+
+        CmdLine.run(actual);
+    }
 }

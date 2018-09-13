@@ -50,6 +50,9 @@ public class SpecimenTaxonOnly extends SpecimenNull {
             this.location = providedLocation;
             ((SpecimenTaxonOnly) target).location = providedLocation;
         }
+        if (eventDate != null) {
+            ((SpecimenTaxonOnly) target).setEventDate(eventDate);
+        }
         serializer.write(this, type, (SpecimenTaxonOnly) target, study, dataset, datasetInfo);
     }
 

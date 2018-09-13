@@ -44,13 +44,10 @@ public class CmdUtil {
     }
 
     static DatasetFinderWithCache createDataFinderLoggingCaching(DatasetFinder finder, String namespace, String cacheDir) {
-        return new DatasetFinderWithCache(new DatasetFinderLogger(finder, cacheDir), new CacheFactory() {
-            @Override
-            public Cache cacheFor(Dataset dataset) {
-                Cache pullThroughCache = new CachePullThrough(namespace, cacheDir);
-                CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir);
-                return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
-            }
+        return new DatasetFinderWithCache(new DatasetFinderLogger(finder, cacheDir), dataset -> {
+            Cache pullThroughCache = new CachePullThrough(namespace, cacheDir);
+            CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir);
+            return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
         });
     }
 

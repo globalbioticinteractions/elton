@@ -27,7 +27,7 @@ public class CmdUpdate extends CmdDefaultParams {
         DatasetFinder finder = new DatasetFinderProxy(Arrays.asList(new DatasetFinderZenodo(), new DatasetFinderGitHubArchive()));
         try {
             NamespaceHandler handler = namespace -> {
-                LOG.info("update of [" + namespace + "] starting...");
+                getStderr().println("update of [" + namespace + "] starting...");
 
                 Dataset dataset =
                         DatasetFactory.datasetFor(namespace,
@@ -40,13 +40,14 @@ public class CmdUpdate extends CmdDefaultParams {
                             .importStudy();
                 } catch (StudyImporterException ex) {
                     LOG.error("update of [" + namespace + "] failed.", ex);
+                    getStderr().println("update of [" + namespace + "] failed. [ " + ex.getMessage() + "]");
                 } finally {
-                    LOG.info("update of [" + namespace + "] done.");
+                    getStderr().println("update of [" + namespace + "] done.");
                 }
             };
-            LOG.info("updates starting...");
+            getStderr().println("updates starting...");
             CmdUtil.handleNamespaces(finder, handler, getNamespaces());
-            LOG.info("updates done.");
+            getStderr().println("updates done.");
         } catch (DatasetFinderException e) {
             throw new RuntimeException(e);
         }

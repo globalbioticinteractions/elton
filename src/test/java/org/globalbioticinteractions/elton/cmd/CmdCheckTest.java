@@ -69,7 +69,7 @@ public class CmdCheckTest {
         try {
             cmdCheck.run();
             fail("should have thrown");
-        } catch(Throwable ex) {
+        } catch (Throwable ex) {
 
         }
 
@@ -77,7 +77,7 @@ public class CmdCheckTest {
     }
 
     private void runOfflineWith(JCommander jc, String cacheDir) {
-        jc.parse("check", "--offline", "--cache-dir=" + cacheDir, "globalbioticinteractions/template-dataset");
+        jc.parse("check", "--cache-dir=" + cacheDir, "globalbioticinteractions/template-dataset");
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
@@ -86,7 +86,6 @@ public class CmdCheckTest {
         CmdCheck cmdCheck = (CmdCheck) o;
 
         assertThat(cmdCheck.getNamespaces(), is(Collections.singletonList("globalbioticinteractions/template-dataset")));
-        assertThat(cmdCheck.isOffline(), is(true));
         assertThat(cmdCheck.getCacheDir(), is(cacheDir));
 
         CmdLine.run(actual);

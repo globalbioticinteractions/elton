@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.MissingCommandException;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +15,7 @@ public class CmdLineTest {
 
     @Test
     public void check() throws Throwable {
+        CmdLine.run(new String[]{"update", "--cache-dir=target/tmp-datasets", "globalbioticinteractions/template-dataset"});
         CmdLine.run(new String[]{"check", "--cache-dir=target/tmp-datasets", "globalbioticinteractions/template-dataset"});
     }
 

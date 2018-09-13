@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.lang.System.exit;
 
 @Parameters(separators = "= ", commandDescription = "Check Dataset Accessibility. If no namespace is provided the local workdir is used.")
-public class CmdCheck extends CmdOfflineParams {
+public class CmdCheck extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdCheck.class);
 
     @Override
@@ -53,9 +53,7 @@ public class CmdCheck extends CmdOfflineParams {
 
     private void checkCacheOrRemote() throws StudyImporterException {
         for (String namespace : getNamespaces()) {
-            check(namespace, isOffline()
-                    ? CmdUtil.getDatasetFinderLocal(getCacheDir())
-                    : createDataFinderForGitHub(namespace, getCacheDir()));
+            check(namespace, CmdUtil.getDatasetFinderLocal(getCacheDir()));
         }
     }
 

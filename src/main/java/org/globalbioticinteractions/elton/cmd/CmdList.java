@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Parameters(separators = "= ", commandDescription = "List Available Datasets")
-public class CmdList extends CmdOfflineParams {
+public class CmdList extends CmdOnlineParams {
 
     @Override
     public void run() {
@@ -24,9 +24,9 @@ public class CmdList extends CmdOfflineParams {
 
     public void run(PrintStream out) {
         DatasetFinderLocal finderLocal = CmdUtil.getDatasetFinderLocal(getCacheDir());
-        DatasetFinder finder = isOffline()
-                ? finderLocal
-                : new DatasetFinderProxy(Arrays.asList(new DatasetFinderZenodo(), new DatasetFinderGitHubArchive(), finderLocal));
+        DatasetFinder finder = isOnline()
+                ? new DatasetFinderProxy(Arrays.asList(new DatasetFinderZenodo(), new DatasetFinderGitHubArchive(), finderLocal))
+                : finderLocal;
         try {
             List<String> namespaces = finder.findNamespaces()
                     .stream()

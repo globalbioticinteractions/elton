@@ -36,7 +36,7 @@ public class CmdListTest {
     }
 
     private ByteArrayOutputStream runCmd(JCommander jc, String cacheDir) {
-        jc.parse("list", "--offline", "--cache-dir=" + cacheDir);
+        jc.parse("list", "--cache-dir=" + cacheDir);
 
         Assert.assertEquals(jc.getParsedCommand(), "list");
 

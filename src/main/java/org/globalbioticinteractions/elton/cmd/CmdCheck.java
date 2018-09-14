@@ -137,17 +137,6 @@ public class CmdCheck extends CmdDefaultParams {
         }
     }
 
-    private DatasetFinder createDataFinderForGitHub(String namespace, String cacheDir) {
-        List<DatasetFinder> finders = Collections.singletonList(new DatasetFinderGitHubArchiveMaster(Collections.singletonList(namespace)));
-        DatasetFinderProxy finder = new DatasetFinderProxy(finders);
-        return CmdUtil.createDataFinderLoggingCaching(finder, namespace, cacheDir);
-    }
-
-    private static String getResultMsg(String repoName, Set<String> warnings, Set<String> errors, AtomicInteger counter) {
-        return "found [" + counter.get() + "] interactions in [" + repoName + "]"
-                + " and encountered [" + warnings.size() + "] warnings and [" + errors.size() + "] errors";
-    }
-
     private class NodeFactoryLogging extends NodeFactoryNull {
         final AtomicInteger counter;
 

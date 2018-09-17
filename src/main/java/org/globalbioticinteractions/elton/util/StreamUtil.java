@@ -6,6 +6,7 @@ import org.eol.globi.domain.Location;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
+import org.eol.globi.service.DatasetConstant;
 import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
@@ -20,13 +21,13 @@ import java.util.stream.Stream;
 public class StreamUtil {
     private static String version = Elton.getVersion();
 
-    public static Stream<String> streamOf(Dataset dataset, String citation) {
+    public static Stream<String> streamOf(Dataset dataset) {
         return Stream.of(
                 dataset.getNamespace(),
-                citation,
+                dataset.getCitation(),
                 dataset.getArchiveURI().toString(),
-                dataset.getOrDefault("accessedAt", ""),
-                dataset.getOrDefault("contentHash", ""),
+                dataset.getOrDefault(DatasetConstant.LAST_SEEN_AT, ""),
+                dataset.getOrDefault(DatasetConstant.CONTENT_HASH, ""),
                 version);
     }
 
@@ -68,7 +69,6 @@ public class StreamUtil {
     }
 
     public static Stream<String> streamOf(Location loc) {
-
         return loc == null
                 ? Stream.of("", "", "", "")
                 : Stream.of(loc.getLatitude() == null ? "" : loc.getLatitude().toString()

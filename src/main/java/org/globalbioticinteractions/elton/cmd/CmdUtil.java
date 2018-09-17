@@ -13,7 +13,6 @@ import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
 import org.globalbioticinteractions.cache.CachePullThrough;
-import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 import org.globalbioticinteractions.dataset.DatasetFinderLogger;
 import org.globalbioticinteractions.dataset.DatasetFinderWithCache;
@@ -51,7 +50,7 @@ public class CmdUtil {
         });
     }
 
-    static CacheFactory getCacheFactoryLocal(String cacheDir) {
+    private static CacheFactory getCacheFactoryLocal(String cacheDir) {
         return dataset -> new CacheLocalReadonly(dataset.getNamespace(), cacheDir);
     }
 
@@ -60,8 +59,7 @@ public class CmdUtil {
     }
 
     public static List<String> datasetInfo(Dataset dataset) {
-        String citation = CitationUtil.citationOrDefaultFor(dataset, "");
-        return StreamUtil.streamOf(dataset, citation).collect(Collectors.toList());
+        return StreamUtil.streamOf(dataset).collect(Collectors.toList());
     }
 
     public static void handleNamespaces(DatasetFinder finder, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix) {

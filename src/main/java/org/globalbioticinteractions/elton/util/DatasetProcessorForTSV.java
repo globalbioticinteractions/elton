@@ -50,7 +50,7 @@ public class DatasetProcessorForTSV implements DatasetProcessor {
 
             @Override
             public String getOrDefault(String key, String defaultValue) {
-                return null;
+                return dataset.getOrDefault(key, defaultValue);
             }
 
             @Override

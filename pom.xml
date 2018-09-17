@@ -5,11 +5,12 @@
     <groupId>org.globalbioticinteractions</groupId>
     <artifactId>elton</artifactId>
     <version>0.3.5-SNAPSHOT</version>
-    <name>GloBI commandline tool</name>
+    <name>Elton, a GloBI commandline tool</name>
     <description>Discover, cache and check species interaction data</description>
 
     <properties>
-        <globi.version>0.9.24</globi.version>
+        <!--<globi.version>0.9.24</globi.version>-->
+        <globi.version>0.6-SNAPSHOT</globi.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.testResourceEncoding>UTF-8</project.build.testResourceEncoding>

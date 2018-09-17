@@ -2,7 +2,6 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
 import org.apache.commons.lang3.StringUtils;
-import org.globalbioticinteractions.elton.util.NanoPubWriter;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -2,26 +2,20 @@ package org.globalbioticinteractions.elton.util;
 
 import org.eol.globi.domain.Environment;
 import org.eol.globi.domain.InteractType;
-import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.LocationImpl;
 import org.eol.globi.domain.StudyImpl;
 import org.eol.globi.domain.TaxonImpl;
 import org.eol.globi.service.DatasetImpl;
 import org.junit.Test;
-import org.nanopub.Nanopub;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class NanoPubWriterTest {
 
@@ -31,9 +25,8 @@ public class NanoPubWriterTest {
         NanoPubWriter nanoPubWriter = new NanoPubWriter(new PrintStream(out), () -> "1");
 
         DatasetImpl dataset = new DatasetImpl("some/namespace", URI.create("some:uri"));
-        List<String> datasetInfo = Collections.singletonList("someinfo");
         StudyImpl study = new StudyImpl("some study");
-        SpecimenTaxonOnly specimen = new SpecimenTaxonOnly(dataset, datasetInfo, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123"));
+        SpecimenTaxonOnly specimen = new SpecimenTaxonOnly(dataset, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123"));
         specimen.setEventDate(new Date(0));
         LocationImpl location = new LocationImpl(12.2d, 1.2d, 2d, null);
         location.setLocality("some locality");
@@ -56,7 +49,7 @@ public class NanoPubWriterTest {
         });
         specimen.caughtIn(location);
 
-        nanoPubWriter.write(specimen, InteractType.ATE, specimen, study, dataset, datasetInfo);
+        nanoPubWriter.write(specimen, InteractType.ATE, specimen, study, dataset);
 
         assertThat(out.toString(), containsString("some taxon"));
         assertThat(out.toString(), containsString("http://www.geonames.org/123"));

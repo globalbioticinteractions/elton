@@ -18,21 +18,17 @@ import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.DatasetFinderGitHubArchiveMaster;
-import org.eol.globi.service.DatasetFinderProxy;
 import org.eol.globi.service.DatasetImpl;
-import org.eol.globi.service.GitHubImporterFactory;
+import org.eol.globi.util.DateUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static java.lang.System.exit;
 
 @Parameters(separators = "= ", commandDescription = "Check Dataset Accessibility. If no namespace is provided the local workdir is used.")
 public class CmdCheck extends CmdDefaultParams {
@@ -81,36 +77,11 @@ public class CmdCheck extends CmdDefaultParams {
 
         ParserFactoryLocal parserFactory = new ParserFactoryLocal();
         AtomicInteger counter = new AtomicInteger(0);
-        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter);
+        ImportLogger importLogger = createImportLogger(repoName, infos, warnings, errors);
+
+        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter, importLogger);
         StudyImporterForGitHubData studyImporterForGitHubData = new StudyImporterForGitHubData(parserFactory, nodeFactory, finder);
-        studyImporterForGitHubData.setLogger(new ImportLogger() {
-            @Override
-            public void info(LogContext study, String message) {
-                addUntilFull(message, infos);
-            }
-
-            @Override
-            public void warn(LogContext study, String message) {
-                addUntilFull(message, warnings);
-            }
-
-            @Override
-            public void severe(LogContext study, String message) {
-                addUntilFull(message, errors);
-            }
-
-            private void addUntilFull(String message, Set<String> msgs) {
-                if (msgs.size() == 500) {
-                    msgs.add(">= 500 unique messages, turning off logging.");
-                } else if (msgs.size() < 500) {
-                    msgs.add(msgForRepo(message));
-                }
-            }
-
-            String msgForRepo(String message) {
-                return repoName + "\t" + message;
-            }
-        });
+        studyImporterForGitHubData.setLogger(importLogger);
 
         try {
             Dataset dataset = DatasetFactory.datasetFor(repoName, finder);
@@ -137,11 +108,44 @@ public class CmdCheck extends CmdDefaultParams {
         }
     }
 
+    private ImportLogger createImportLogger(String repoName, Set<String> infos, Set<String> warnings, Set<String> errors) {
+        return new ImportLogger() {
+            @Override
+            public void info(LogContext study, String message) {
+                addUntilFull(message, infos);
+            }
+
+            @Override
+            public void warn(LogContext study, String message) {
+                addUntilFull(message, warnings);
+            }
+
+            @Override
+            public void severe(LogContext study, String message) {
+                addUntilFull(message, errors);
+            }
+
+            private void addUntilFull(String message, Set<String> msgs) {
+                if (msgs.size() == 500) {
+                    msgs.add(">= 500 unique messages, turning off logging.");
+                } else if (msgs.size() < 500) {
+                    msgs.add(msgForRepo(message));
+                }
+            }
+
+            String msgForRepo(String message) {
+                return repoName + "\t" + message;
+            }
+        };
+    }
+
     private class NodeFactoryLogging extends NodeFactoryNull {
         final AtomicInteger counter;
+        final ImportLogger importLogger;
 
-        NodeFactoryLogging(AtomicInteger counter) {
+        public NodeFactoryLogging(AtomicInteger counter, ImportLogger importLogger) {
             this.counter = counter;
+            this.importLogger = importLogger;
         }
 
         final Specimen specimen = new SpecimenNull() {
@@ -157,9 +161,19 @@ public class CmdCheck extends CmdDefaultParams {
             }
         };
 
+
+
         @Override
         public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
             return specimen;
+        }
+
+
+        @Override
+        public void setUnixEpochProperty(Specimen specimen, Date date) throws NodeFactoryException {
+            if (date != null && date.after(new Date())) {
+                importLogger.warn(null, "date [" + DateUtil.printDate(date) + "] is in the future");
+            }
         }
     }
 }

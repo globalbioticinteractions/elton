@@ -20,9 +20,20 @@
 
 ## Install
 
+Elton needs Java 8+ to run. 
+
 ### Official releases
 
-You can use this project by including `elton.jar` from one of the [releases](https://github.com/globalbioticinteractions/elton/releases).
+
+On linux/mac, you can run the following to install a copy of elton:
+
+```console
+sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.5.4/preston.jar) > /usr/local/bin/elton && chmod +x /usr/local/bin/elton' && elton version
+```
+
+You can now run Elton from your commandline by typing something like ```elton version``` or any of the other documented commands.
+
+You can also install Elton by manually downloading `elton.jar` from one of the [releases](https://github.com/globalbioticinteractions/elton/releases). To start Elton using this method, you have to execute something like ```java -jar elton.jar versions``` or any of the other documented commands.
 
 ### Maven, Gradle, SBT
 Elton is made available through a [maven](https://maven.apache.org) repository.
@@ -53,10 +64,12 @@ To include elton in your project, add the following sections to your pom.xml (or
 * Run tests using `mvn test`.
 
 ## Usage
+Note that in the following section, it is assumed that Elton can be started by typing ```elton```. If this is not possible, see [Install](#install) for instructions on how to run Elton commands.
+
 
 Print usage
 ```sh
-java -jar elton.jar [command] [command options]
+elton [command] [command options]
 ```
 
 with
@@ -120,15 +133,15 @@ Usage: <main class> [command] [command options]
 
 List all datasets 
 
-```java -jar elton.jar list```
+```elton list```
 
 Update / download single dataset and cache locally in ./dataset folder
 
-```java -jar elton.jar update globalbioticinteractions/template-dataset```
+```elton update globalbioticinteractions/template-dataset```
 
 Update / download all datasets (might take a while)
 
-```java -jar elton.jar update```
+```elton update```
 
 Note that elton is using [a rate-limited GitHub APIs](https://developer.github.com/v3/#rate-limiting). If you are seeing "Forbidden" http errors, suggest to provide OAUTH key/secret like:
 
@@ -138,7 +151,7 @@ Please refer to GitHub API documentation like https://developer.github.com/v3/#r
 
 List interactions of all locally cached datasets
 
-```java -jar elton.jar interactions```
+```elton interactions```
 
 Note that you can retrieve an archived (and versioned) copy of existing species interaction datasets using [Elton's archive](https://github.com/globalbiotincinteractions/elton-archive) .
 

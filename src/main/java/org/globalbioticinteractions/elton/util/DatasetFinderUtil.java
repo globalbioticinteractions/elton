@@ -36,4 +36,21 @@ public class DatasetFinderUtil {
     public static DatasetFinder forCacheDir(String cacheDir) {
         return new DatasetFinderLocal(cacheDir, getCacheFactoryLocal(cacheDir));
     }
+
+    public static boolean emptyFinder(DatasetFinder finder) {
+        try {
+            Collection<String> namespaces = finder.findNamespaces();
+            return namespaces.isEmpty();
+        } catch (DatasetFinderException e) {
+            return false;
+        }
+    }
+
+    public static DatasetFinder forCacheDirOrLocalDir(String cacheDir, URI workDir) {
+        DatasetFinder finder = forCacheDir(cacheDir);
+        if (emptyFinder(finder)) {
+            finder = forLocalDir(workDir);
+        }
+        return finder;
+    }
 }

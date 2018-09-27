@@ -101,16 +101,14 @@ public class CmdInteractions extends CmdTabularWriterParams {
     }
 
     void run(PrintStream out) {
-        DatasetFinder finder = DatasetFinderUtil.forCacheDir(getCacheDir());
-
         TsvWriter serializer = new TsvWriter(out);
-
         if (!shouldSkipHeader()) {
             serializer.writeHeader();
         }
 
-        NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, new DatasetProcessorForTSV());
+        DatasetFinder finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
 
+        NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, new DatasetProcessorForTSV());
         CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for interactions in");
     }
 }

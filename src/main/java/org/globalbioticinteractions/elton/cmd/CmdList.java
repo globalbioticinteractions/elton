@@ -24,7 +24,7 @@ public class CmdList extends CmdOnlineParams {
     }
 
     public void run(PrintStream out) {
-        DatasetFinderLocal finderLocal = DatasetFinderUtil.forCacheDir(getCacheDir());
+        DatasetFinder finderLocal = DatasetFinderUtil.forCacheDir(getCacheDir());
         DatasetFinder finder = isOnline()
                 ? new DatasetFinderProxy(Arrays.asList(new DatasetFinderZenodo(), new DatasetFinderGitHubArchive(), finderLocal))
                 : finderLocal;

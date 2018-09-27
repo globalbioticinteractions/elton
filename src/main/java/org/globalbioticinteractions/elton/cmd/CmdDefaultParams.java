@@ -17,10 +17,6 @@ abstract class CmdDefaultParams implements Runnable {
     private PrintStream stdout = System.out;
     private URI workDir = null;
 
-    String getCacheDir() {
-        return cacheDir;
-    }
-
     @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();
 
@@ -48,6 +44,10 @@ abstract class CmdDefaultParams implements Runnable {
         return workDir == null
                 ? Paths.get("").toUri()
                 : workDir;
+    }
+
+    String getCacheDir() {
+        return cacheDir;
     }
 
     public void setWorkDir(URI workingDir) {

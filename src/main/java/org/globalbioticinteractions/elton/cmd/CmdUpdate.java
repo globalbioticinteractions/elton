@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.Parameters;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFactory;
@@ -32,11 +33,11 @@ public class CmdUpdate extends CmdDefaultParams {
                 Dataset dataset =
                         DatasetFactory.datasetFor(namespace,
                                 CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir()));
-                NodeFactoryNull nodeFactoryNull = new NodeFactoryNull();
-                nodeFactoryNull.getOrCreateDataset(dataset);
+                NodeFactory factory = new NodeFactoryNull();
+                factory.getOrCreateDataset(dataset);
                 try {
                     new GitHubImporterFactory()
-                            .createImporter(dataset, nodeFactoryNull)
+                            .createImporter(dataset, factory)
                             .importStudy();
                 } catch (StudyImporterException ex) {
                     LOG.error("update of [" + namespace + "] failed.", ex);

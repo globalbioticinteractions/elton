@@ -26,7 +26,7 @@ public class NanoPubWriterTest {
 
         DatasetImpl dataset = new DatasetImpl("some/namespace", URI.create("some:uri"));
         StudyImpl study = new StudyImpl("some study");
-        SpecimenTaxonOnly specimen = new SpecimenTaxonOnly(dataset, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123"));
+        SpecimenImpl specimen = new SpecimenImpl(dataset, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123"));
         specimen.setEventDate(new Date(0));
         LocationImpl location = new LocationImpl(12.2d, 1.2d, 2d, null);
         location.setLocality("some locality");

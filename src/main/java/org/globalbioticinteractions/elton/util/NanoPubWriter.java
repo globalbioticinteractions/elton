@@ -34,7 +34,7 @@ public class NanoPubWriter implements InteractionWriter {
     }
 
     @Override
-    public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset) {
+    public void write(SpecimenImpl source, InteractType type, SpecimenImpl target, Study study, Dataset dataset) {
         String nanoPubId = idGenerator.generate();
         String pubHeader = "@prefix np: <http://www.nanopub.org/nschema#> ." +
                 "@prefix dcterms: <http://purl.org/dc/terms/> ." +

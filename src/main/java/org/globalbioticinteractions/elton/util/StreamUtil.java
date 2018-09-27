@@ -1,7 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
 import org.apache.commons.lang.StringUtils;
-import org.eol.globi.Version;
 import org.eol.globi.domain.Location;
 import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
@@ -11,13 +10,11 @@ import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetConstant;
 import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.ExternalIdUtil;
-import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.doi.DOI;
 import org.globalbioticinteractions.elton.Elton;
 
 import java.util.Date;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class StreamUtil {
@@ -92,15 +89,15 @@ public class StreamUtil {
         return Stream.concat(streamOf(specimen.getBodyPart()), streamOf(specimen.getLifeStage()));
     }
 
-    private static Stream<String> streamOf(Term term) {
-        return Stream.of(emptyOrId(term), emptyOfName(term));
+    public static Stream<String> streamOf(Term term) {
+        return Stream.of(emptyOrId(term), emptyOrName(term));
     }
 
     private static String emptyOrId(Term term) {
         return term == null || term.getId() == null ? "" : term.getId();
     }
 
-    private static String emptyOfName(Term term) {
+    private static String emptyOrName(Term term) {
         return term == null || term.getName() == null ? "" : term.getName();
     }
 }

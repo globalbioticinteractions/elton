@@ -31,12 +31,12 @@ public class NodeFactoryForDataset extends NodeFactoryNull {
 
     @Override
     public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-        return new SpecimenTaxonOnly(dataset, interaction.getStudy(), serializer, taxon);
+        return new SpecimenImpl(dataset, interaction.getStudy(), serializer, taxon);
     }
 
     @Override
     public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-        return new SpecimenTaxonOnly(dataset, study, serializer, taxon);
+        return new SpecimenImpl(dataset, study, serializer, taxon);
     }
 
     @Override
@@ -66,11 +66,11 @@ public class NodeFactoryForDataset extends NodeFactoryNull {
     }
 
     public void setUnixEpochProperty(Specimen specimen, Date date) throws NodeFactoryException {
-        ((SpecimenTaxonOnly)specimen).setEventDate(date);
+        ((SpecimenImpl)specimen).setEventDate(date);
     }
 
     public Date getUnixEpochProperty(Specimen specimen) throws NodeFactoryException {
-        return ((SpecimenTaxonOnly)specimen).getEventDate();
+        return ((SpecimenImpl)specimen).getEventDate();
     }
 
 }

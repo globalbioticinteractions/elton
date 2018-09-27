@@ -5,13 +5,12 @@ import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFinder;
-import org.globalbioticinteractions.dataset.DatasetFinderLocal;
 import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
-import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
+import org.globalbioticinteractions.elton.util.SpecimenImpl;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 
@@ -32,7 +31,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
         }
 
         @Override
-        public void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset) {
+        public void write(SpecimenImpl source, InteractType type, SpecimenImpl target, Study study, Dataset dataset) {
             Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
 
             Stream<String> rowStream = Stream.of(
@@ -43,6 +42,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     Stream.of(target.getExternalId()),
                     StreamUtil.streamOf(target.taxon),
                     StreamUtil.streamOf(target),
+                    StreamUtil.streamOf(target.getBasisOfRecord()),
                     StreamUtil.streamOf(target.getEventDate()),
                     StreamUtil.streamOf(target.getSampleLocation()),
                     StreamUtil.streamOf(study),
@@ -78,6 +78,8 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     TARGET_BODY_PART_NAME,
                     TARGET_LIFE_STAGE_ID,
                     TARGET_LIFE_STAGE_NAME,
+                    BASIS_OF_RECORD_ID,
+                    BASIS_OF_RECORD_NAME,
                     EVENT_DATE,
                     DECIMAL_LATITUDE,
                     DECIMAL_LONGITUDE,

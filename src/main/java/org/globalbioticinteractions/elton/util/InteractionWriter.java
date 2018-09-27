@@ -5,5 +5,5 @@ import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
 
 public interface InteractionWriter {
-    void write(SpecimenTaxonOnly source, InteractType type, SpecimenTaxonOnly target, Study study, Dataset dataset);
+    void write(SpecimenImpl source, InteractType type, SpecimenImpl target, Study study, Dataset dataset);
 }

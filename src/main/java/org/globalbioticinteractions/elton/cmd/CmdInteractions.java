@@ -11,13 +11,18 @@ import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
 import org.globalbioticinteractions.elton.util.StreamUtil;
+import org.globalbioticinteractions.elton.util.TabularWriter;
 
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
+import static org.eol.globi.data.StudyImporterForMetaTable.EVENT_DATE;
+import static org.eol.globi.data.StudyImporterForTSV.*;
+
 @Parameters(separators = "= ", commandDescription = "List Interacting Taxon Pairs For Local Datasets")
-public class CmdInteractions extends CmdDefaultParams {
-    public class TsvWriter implements InteractionWriter {
+public class CmdInteractions extends CmdTabularWriterParams {
+
+    public class TsvWriter implements InteractionWriter, TabularWriter {
         private final PrintStream out;
 
         TsvWriter(PrintStream out) {
@@ -39,6 +44,35 @@ public class CmdInteractions extends CmdDefaultParams {
             String row = StreamUtil.tsvRowOf(rowStream);
             out.println(row);
         }
+
+        @Override
+        public void writeHeader() {
+            out.println(StreamUtil.tsvRowOf(Stream.concat(Stream.of(
+                    SOURCE_TAXON_ID,
+                    SOURCE_TAXON_NAME,
+                    "sourceTaxonRank",
+                    "sourceTaxonPath",
+                    "sourceTaxonPathIds",
+                    "sourceTaxonPathNames",
+                    INTERACTION_TYPE_ID,
+                    INTERACTION_TYPE_NAME,
+                    TARGET_TAXON_ID,
+                    TARGET_TAXON_NAME,
+                    "targetTaxonRank",
+                    "targetTaxonPath",
+                    "targetTaxonPathIds",
+                    "targetTaxonPathNames",
+                    EVENT_DATE,
+                    DECIMAL_LATITUDE,
+                    DECIMAL_LONGITUDE,
+                    LOCALITY_ID,
+                    LOCALITY_NAME,
+                    REFERENCE_DOI,
+                    REFERENCE_URL,
+                    REFERENCE_CITATION
+
+            ), StreamUtil.datasetHeaderFields())));
+        }
     }
 
     @Override
@@ -53,7 +87,11 @@ public class CmdInteractions extends CmdDefaultParams {
     void run(PrintStream out) {
         DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
 
-        InteractionWriter serializer = createSerializer(out);
+        TsvWriter serializer = new TsvWriter(out);
+
+        if (!shouldSkipHeader()) {
+            serializer.writeHeader();
+        }
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, new DatasetProcessorForTSV());
 

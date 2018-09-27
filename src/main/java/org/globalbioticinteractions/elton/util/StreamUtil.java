@@ -76,4 +76,13 @@ public class StreamUtil {
                 , StringUtils.defaultString(loc.getLocalityId())
                 , StringUtils.defaultString(loc.getLocality()));
     }
+
+    public static Stream<String> datasetHeaderFields() {
+        return Stream.of(DatasetConstant.NAMESPACE,
+                DatasetConstant.CITATION,
+                DatasetConstant.ARCHIVE_URI,
+                DatasetConstant.LAST_SEEN_AT,
+                DatasetConstant.CONTENT_HASH,
+                "eltonVersion");
+    }
 }

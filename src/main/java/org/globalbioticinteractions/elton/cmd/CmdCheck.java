@@ -18,12 +18,11 @@ import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.DatasetImpl;
 import org.eol.globi.util.DateUtil;
+import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -49,24 +48,13 @@ public class CmdCheck extends CmdDefaultParams {
 
     private void checkCacheOrRemote() throws StudyImporterException {
         for (String namespace : getNamespaces()) {
-            check(namespace, CmdUtil.getDatasetFinderLocal(getCacheDir()));
+            check(namespace, DatasetFinderUtil.forCacheDir(getCacheDir()));
         }
     }
 
     private void checkLocal() throws StudyImporterException {
         String localNamespace = "local";
-        DatasetFinder finderLocal = new DatasetFinder() {
-
-            @Override
-            public Collection<String> findNamespaces() throws DatasetFinderException {
-                return Collections.singletonList(localNamespace);
-            }
-
-            @Override
-            public Dataset datasetFor(String namespace) throws DatasetFinderException {
-                return new DatasetImpl(localNamespace, getWorkDir());
-            }
-        };
+        DatasetFinder finderLocal = DatasetFinderUtil.forLocalDir(getWorkDir());
         check(localNamespace, finderLocal);
     }
 

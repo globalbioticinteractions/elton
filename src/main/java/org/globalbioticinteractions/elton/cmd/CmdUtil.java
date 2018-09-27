@@ -50,14 +50,6 @@ public class CmdUtil {
         });
     }
 
-    private static CacheFactory getCacheFactoryLocal(String cacheDir) {
-        return dataset -> new CacheLocalReadonly(dataset.getNamespace(), cacheDir);
-    }
-
-    static DatasetFinderLocal getDatasetFinderLocal(String cacheDir) {
-        return new DatasetFinderLocal(cacheDir, getCacheFactoryLocal(cacheDir));
-    }
-
     public static List<String> datasetInfo(Dataset dataset) {
         return StreamUtil.streamOf(dataset).collect(Collectors.toList());
     }

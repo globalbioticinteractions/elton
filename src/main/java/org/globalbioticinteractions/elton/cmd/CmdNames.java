@@ -5,18 +5,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.NodeFactoryException;
-import org.eol.globi.data.StudyImporterForTSV;
-import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
+import org.eol.globi.service.DatasetFinder;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
-import org.globalbioticinteractions.elton.util.SpecimenTaxonOnly;
 import org.globalbioticinteractions.elton.util.StreamUtil;
-import org.globalbioticinteractions.elton.util.TabularWriter;
 import org.globalbioticinteractions.elton.util.TaxonWriter;
 
 import java.io.PrintStream;
@@ -32,7 +30,7 @@ public class CmdNames extends CmdTabularWriterParams {
     }
 
     void run(PrintStream out) {
-        DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
+        DatasetFinder finder = DatasetFinderUtil.forCacheDir(getCacheDir());
 
         TaxonWriter writer = createWriter(out);
 

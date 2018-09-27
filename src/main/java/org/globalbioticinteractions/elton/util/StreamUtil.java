@@ -3,8 +3,10 @@ package org.globalbioticinteractions.elton.util;
 import org.apache.commons.lang.StringUtils;
 import org.eol.globi.Version;
 import org.eol.globi.domain.Location;
+import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
+import org.eol.globi.domain.Term;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetConstant;
 import org.eol.globi.util.DateUtil;
@@ -84,5 +86,21 @@ public class StreamUtil {
                 DatasetConstant.LAST_SEEN_AT,
                 DatasetConstant.CONTENT_HASH,
                 "eltonVersion");
+    }
+
+    public static Stream<String> streamOf(Specimen specimen) {
+        return Stream.concat(streamOf(specimen.getBodyPart()), streamOf(specimen.getLifeStage()));
+    }
+
+    private static Stream<String> streamOf(Term term) {
+        return Stream.of(emptyOrId(term), emptyOfName(term));
+    }
+
+    private static String emptyOrId(Term term) {
+        return term == null || term.getId() == null ? "" : term.getId();
+    }
+
+    private static String emptyOfName(Term term) {
+        return term == null || term.getName() == null ? "" : term.getName();
     }
 }

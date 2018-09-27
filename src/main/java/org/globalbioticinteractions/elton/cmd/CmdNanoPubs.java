@@ -3,9 +3,8 @@ package org.globalbioticinteractions.elton.cmd;
 import java.io.PrintStream;
 import java.util.UUID;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NanoPubWriter;
@@ -37,7 +36,7 @@ public class CmdNanoPubs extends CmdInteractions {
     }
 
     void run(PrintStream out) {
-        DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
+        DatasetFinderLocal finder = DatasetFinderUtil.forCacheDir(getCacheDir());
 
         InteractionWriter serializer = createSerializer(out);
 

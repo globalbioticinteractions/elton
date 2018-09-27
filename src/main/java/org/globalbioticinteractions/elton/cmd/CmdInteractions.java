@@ -4,7 +4,9 @@ import com.beust.jcommander.Parameters;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
+import org.eol.globi.service.DatasetFinder;
 import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
@@ -34,9 +36,13 @@ public class CmdInteractions extends CmdTabularWriterParams {
             Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
 
             Stream<String> rowStream = Stream.of(
+                    Stream.of(source.getExternalId()),
                     StreamUtil.streamOf(source.taxon),
+                    StreamUtil.streamOf(source),
                     interactStream,
+                    Stream.of(target.getExternalId()),
                     StreamUtil.streamOf(target.taxon),
+                    StreamUtil.streamOf(target),
                     StreamUtil.streamOf(target.getEventDate()),
                     StreamUtil.streamOf(target.getSampleLocation()),
                     StreamUtil.streamOf(study),
@@ -48,20 +54,30 @@ public class CmdInteractions extends CmdTabularWriterParams {
         @Override
         public void writeHeader() {
             out.println(StreamUtil.tsvRowOf(Stream.concat(Stream.of(
+                    SOURCE_OCCURRENCE_ID,
                     SOURCE_TAXON_ID,
                     SOURCE_TAXON_NAME,
                     "sourceTaxonRank",
                     "sourceTaxonPath",
                     "sourceTaxonPathIds",
                     "sourceTaxonPathNames",
+                    SOURCE_BODY_PART_ID,
+                    SOURCE_BODY_PART_NAME,
+                    SOURCE_LIFE_STAGE_ID,
+                    SOURCE_LIFE_STAGE_NAME,
                     INTERACTION_TYPE_ID,
                     INTERACTION_TYPE_NAME,
+                    TARGET_OCCURRENCE_ID,
                     TARGET_TAXON_ID,
                     TARGET_TAXON_NAME,
                     "targetTaxonRank",
                     "targetTaxonPath",
                     "targetTaxonPathIds",
                     "targetTaxonPathNames",
+                    TARGET_BODY_PART_ID,
+                    TARGET_BODY_PART_NAME,
+                    TARGET_LIFE_STAGE_ID,
+                    TARGET_LIFE_STAGE_NAME,
                     EVENT_DATE,
                     DECIMAL_LATITUDE,
                     DECIMAL_LONGITUDE,
@@ -85,7 +101,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
     }
 
     void run(PrintStream out) {
-        DatasetFinderLocal finder = CmdUtil.getDatasetFinderLocal(getCacheDir());
+        DatasetFinder finder = DatasetFinderUtil.forCacheDir(getCacheDir());
 
         TsvWriter serializer = new TsvWriter(out);
 

@@ -2,12 +2,11 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.apache.commons.lang.StringUtils;
-import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.DatasetFinderGitHubArchive;
-import org.eol.globi.service.DatasetFinderProxy;
-import org.eol.globi.service.DatasetFinderZenodo;
-import org.globalbioticinteractions.dataset.DatasetFinderLocal;
+import org.eol.globi.service.DatasetRegistry;
+import org.eol.globi.service.DatasetRegistryGitHubArchive;
+import org.eol.globi.service.DatasetRegistryProxy;
+import org.eol.globi.service.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 
 import java.io.PrintStream;
@@ -24,9 +23,9 @@ public class CmdList extends CmdOnlineParams {
     }
 
     public void run(PrintStream out) {
-        DatasetFinder finderLocal = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
-        DatasetFinder finder = isOnline()
-                ? new DatasetFinderProxy(Arrays.asList(new DatasetFinderZenodo(), new DatasetFinderGitHubArchive(), finderLocal))
+        DatasetRegistry finderLocal = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry finder = isOnline()
+                ? new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(), new DatasetRegistryGitHubArchive(), finderLocal))
                 : finderLocal;
         try {
             List<String> namespaces = finder.findNamespaces()

@@ -7,11 +7,11 @@ import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFactory;
-import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.DatasetFinderGitHubArchive;
-import org.eol.globi.service.DatasetFinderProxy;
-import org.eol.globi.service.DatasetFinderZenodo;
+import org.eol.globi.service.DatasetRegistry;
+import org.eol.globi.service.DatasetRegistryGitHubArchive;
+import org.eol.globi.service.DatasetRegistryProxy;
+import org.eol.globi.service.DatasetRegistryZenodo;
 import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
@@ -25,7 +25,7 @@ public class CmdUpdate extends CmdDefaultParams {
 
     @Override
     public void run() {
-        DatasetFinder finder = new DatasetFinderProxy(Arrays.asList(new DatasetFinderZenodo(), new DatasetFinderGitHubArchive()));
+        DatasetRegistry finder = new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(), new DatasetRegistryGitHubArchive()));
         try {
             NamespaceHandler handler = namespace -> {
                 getStderr().println("update of [" + namespace + "] starting...");

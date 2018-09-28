@@ -4,7 +4,7 @@ import com.beust.jcommander.Parameters;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
-import org.eol.globi.service.DatasetFinder;
+import org.eol.globi.service.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
@@ -108,7 +108,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
             serializer.writeHeader();
         }
 
-        DatasetFinder finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, new DatasetProcessorForTSV());
         CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for interactions in");

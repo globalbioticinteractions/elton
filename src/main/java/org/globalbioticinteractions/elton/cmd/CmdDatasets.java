@@ -5,7 +5,7 @@ import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
-import org.eol.globi.service.DatasetFinder;
+import org.eol.globi.service.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.DatasetProcessor;
 import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
@@ -57,13 +57,24 @@ public class CmdDatasets extends CmdTabularWriterParams {
         }
 
         public void write(Dataset dataset) {
-            String row = StreamUtil.tsvRowOf(CmdUtil.datasetInfo(dataset).stream());
+            Stream<String> datasetInfo = CmdUtil.datasetInfo(dataset).stream();
+            String row = StreamUtil.tsvRowOf(datasetInfo);
             out.println(row);
         }
 
         @Override
         public void writeHeader() {
-            out.println(StreamUtil.tsvRowOf(StreamUtil.datasetHeaderFields()));
+            Stream<String> datasetHeaders = StreamUtil.datasetHeaderFields();
+            Stream.of("number_of_interactions",
+                    "number_of_distinct_interaction_types",
+                    "distinct_interactions",
+                    "distinct_taxa",
+                    "distinct_taxon_ids",
+                    "temporal_range",
+                    "spatial_range",
+                    "formats",
+                    "types");
+            out.println(StreamUtil.tsvRowOf(datasetHeaders));
         }
     }
 
@@ -78,7 +89,7 @@ public class CmdDatasets extends CmdTabularWriterParams {
             serializer.writeHeader();
         }
 
-        DatasetFinder finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
 
 
         final DatasetProcessor proxied = new DatasetProcessorForTSV();
@@ -92,6 +103,7 @@ public class CmdDatasets extends CmdTabularWriterParams {
             public Dataset getOrCreateDataset(Dataset dataset) {
                 return datasetProcessor.process(dataset);
             }
+
         };
 
         CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for datasets in");

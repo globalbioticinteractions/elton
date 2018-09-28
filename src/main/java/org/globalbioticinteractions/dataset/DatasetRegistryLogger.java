@@ -1,35 +1,33 @@
 package org.globalbioticinteractions.dataset;
 
 import org.eol.globi.service.Dataset;
-import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
+import org.eol.globi.service.DatasetRegistry;
 import org.globalbioticinteractions.cache.CacheLog;
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.cache.CachedURI;
-import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 
-public class DatasetFinderLogger implements DatasetFinder {
-    private final DatasetFinder finder;
+public class DatasetRegistryLogger implements DatasetRegistry {
+    private final DatasetRegistry finder;
 
     private final String cacheDir;
 
-    public DatasetFinderLogger(DatasetFinder finder, String cacheDir) {
+    public DatasetRegistryLogger(DatasetRegistry finder, String cacheDir) {
         this.finder = finder;
         this.cacheDir = cacheDir;
     }
 
     public Collection<String> findNamespaces() throws DatasetFinderException {
-        return this.getFinder().findNamespaces();
+        return this.getRegistry().findNamespaces();
     }
 
     public Dataset datasetFor(String namespace) throws DatasetFinderException {
-        Dataset dataset = this.getFinder().datasetFor(namespace);
+        Dataset dataset = this.getRegistry().datasetFor(namespace);
 
         try {
             String accessedAt = ISODateTimeFormat.dateTime().withZoneUTC().print(new Date().getTime());
@@ -43,7 +41,7 @@ public class DatasetFinderLogger implements DatasetFinder {
         return dataset;
     }
 
-    private DatasetFinder getFinder() {
+    private DatasetRegistry getRegistry() {
         return this.finder;
     }
 

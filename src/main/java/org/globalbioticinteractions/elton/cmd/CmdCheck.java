@@ -8,7 +8,7 @@ import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.data.ParserFactoryLocal;
 import org.eol.globi.data.StudyImporterException;
-import org.eol.globi.data.StudyImporterForGitHubData;
+import org.eol.globi.data.StudyImporterForRegistry;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Location;
 import org.eol.globi.domain.LogContext;
@@ -17,8 +17,8 @@ import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFactory;
-import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
+import org.eol.globi.service.DatasetRegistry;
 import org.eol.globi.util.DateUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
@@ -56,11 +56,11 @@ public class CmdCheck extends CmdDefaultParams {
 
     private void checkLocal() throws StudyImporterException {
         String localNamespace = "local";
-        DatasetFinder finderLocal = DatasetFinderUtil.forLocalDir(getWorkDir());
+        DatasetRegistry finderLocal = DatasetFinderUtil.forLocalDir(getWorkDir());
         check(localNamespace, finderLocal);
     }
 
-    private void check(String repoName, DatasetFinder finder) throws StudyImporterException {
+    private void check(String repoName, DatasetRegistry finder) throws StudyImporterException {
         final Set<String> infos = Collections.synchronizedSortedSet(new TreeSet<String>());
         final Set<String> warnings = Collections.synchronizedSortedSet(new TreeSet<String>());
         final Set<String> errors = Collections.synchronizedSortedSet(new TreeSet<String>());
@@ -70,7 +70,7 @@ public class CmdCheck extends CmdDefaultParams {
         ImportLogger importLogger = createImportLogger(repoName, infos, warnings, errors);
 
         NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter, importLogger);
-        StudyImporterForGitHubData studyImporterForGitHubData = new StudyImporterForGitHubData(parserFactory, nodeFactory, finder);
+        StudyImporterForRegistry studyImporterForGitHubData = new StudyImporterForRegistry(parserFactory, nodeFactory, finder);
         studyImporterForGitHubData.setLogger(importLogger);
 
         try {

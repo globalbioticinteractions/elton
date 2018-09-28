@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -50,8 +51,8 @@ public class CmdNanoPubsTest {
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         CmdNanoPubs cmdnNanopubs = (CmdNanoPubs) actual.getObjects().get(0);
-        String localTestPath = "src/test/resources/dataset-local-test";
-        cmdnNanopubs.setWorkDir(Paths.get(localTestPath).toUri());
+        String localTestPath = "/dataset-local-test/globi.json";
+        cmdnNanopubs.setWorkDir(new File(getClass().getResource(localTestPath).toURI()).getParentFile().toURI());
         cmdnNanopubs.setIdGenerator(() -> "1");
         if (actual.getObjects().get(0) instanceof Runnable) {
             ByteArrayOutputStream out1 = new ByteArrayOutputStream();

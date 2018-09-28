@@ -31,7 +31,7 @@ public class CmdListTest {
         assertThat(new File(cacheDirNonExisting).exists(), is(false));
         JCommander jc = new CmdLine().buildCommander();
         ByteArrayOutputStream out = runCmd(jc, cacheDirNonExisting);
-        assertThat(StringUtils.isBlank(out.toString()), is(true));
+        assertThat(out.toString(), is("local\n"));
         assertThat(new File(cacheDirNonExisting).exists(), is(false));
     }
 

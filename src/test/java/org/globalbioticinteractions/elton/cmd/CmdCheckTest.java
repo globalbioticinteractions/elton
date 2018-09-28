@@ -39,21 +39,47 @@ public class CmdCheckTest {
     @Test
     public void runCheckLocal() throws URISyntaxException {
 
-        CmdCheck cmdCheck = new CmdCheck();
+        String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
-        PrintStream err = new PrintStream(errOs);
-        cmdCheck.setStderr(err);
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
-        PrintStream out = new PrintStream(outOs);
-        cmdCheck.setStdout(out);
-        cmdCheck.setWorkDir(Paths.get("src/test/resources/dataset-local-test").toUri());
-        cmdCheck.run();
+        runCheck(localTestPath, errOs, outOs);
 
         assertThat(errOs.toString(), startsWith("checking [local] at [file:///"));
         assertThat(errOs.toString(), endsWith("done.\n"));
         assertThat(outOs.toString(), startsWith("local\tfile:///"));
         assertThat(outOs.toString(), endsWith("local\t11 interaction(s)\nlocal\t0 error(s)\nlocal\t0 warning(s)\n"));
     }
+
+    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs) {
+        CmdCheck cmdCheck = new CmdCheck();
+        PrintStream err = new PrintStream(errOs);
+        cmdCheck.setStderr(err);
+        PrintStream out = new PrintStream(outOs);
+        cmdCheck.setStdout(out);
+        cmdCheck.setWorkDir(Paths.get(localTestPath).toUri());
+        cmdCheck.run();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void runCheckLocalNoCitation() throws URISyntaxException {
+        assertOneWarning("src/test/resources/dataset-local-test-no-citation");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void runCheckLocalBlankCitation() throws URISyntaxException {
+        assertOneWarning("src/test/resources/dataset-local-test-blank-citation");
+    }
+
+    private void assertOneWarning(String localTestPath) {
+        ByteArrayOutputStream errOs = new ByteArrayOutputStream();
+        ByteArrayOutputStream outOs = new ByteArrayOutputStream();
+        try {
+            runCheck(localTestPath, errOs, outOs);
+        } finally {
+            assertThat(outOs.toString(), endsWith("local\t11 interaction(s)\nlocal\t0 error(s)\nlocal\t1 warning(s)\n"));
+        }
+    }
+
 
     @Test
     public void runCheckLocalNoRepo() throws URISyntaxException {

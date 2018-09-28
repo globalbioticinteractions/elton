@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.ImportLogger;
@@ -19,6 +20,7 @@ import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinder;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.util.DateUtil;
+import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
@@ -73,6 +75,9 @@ public class CmdCheck extends CmdDefaultParams {
 
         try {
             Dataset dataset = DatasetFactory.datasetFor(repoName, finder);
+            if (StringUtils.isBlank(CitationUtil.citationOrDefaultFor(dataset, ""))) {
+                importLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
+            }
             nodeFactory.getOrCreateDataset(dataset);
             String msg = "checking [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "]...";
             getStderr().println(msg);

@@ -39,6 +39,7 @@ public class CmdLine {
                 .addCommand("update", new CmdUpdate(), "pull")
                 .addCommand("names", new CmdNames())
                 .addCommand("interactions", new CmdInteractions())
+                .addCommand("datasets", new CmdDatasets())
                 .addCommand("nanopubs", new CmdNanoPubs())
                 .addCommand("check", new CmdCheck())
                 .addCommand("version", new CmdVersion())

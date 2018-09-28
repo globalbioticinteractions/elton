@@ -3,9 +3,12 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.Parameters;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.Dataset;
+import org.eol.globi.service.DatasetFactory;
+import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.DatasetProcessor;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
+import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
@@ -49,20 +52,14 @@ public class CmdDatasets extends CmdTabularWriterParams {
 
         DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
 
-        DatasetProcessor datasetProcessor = dataset -> {
-            serializer.write(dataset);
-            return dataset;
-        };
+        try {
+            CmdUtil.handleNamespaces(finder,
+                    namespace -> serializer.write(finder.datasetFor(namespace)),
+                    getNamespaces());
+        } catch (DatasetFinderException e) {
+            throw new RuntimeException("failed to datasets", e);
+        }
 
-        NodeFactory nodeFactory = new NodeFactoryNull() {
-            @Override
-            public Dataset getOrCreateDataset(Dataset dataset) {
-                return datasetProcessor.process(dataset);
-
-            }
-        };
-
-        CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for datasets in");
     }
 }
 

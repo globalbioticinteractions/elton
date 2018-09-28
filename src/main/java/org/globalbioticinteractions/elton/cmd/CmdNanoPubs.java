@@ -15,7 +15,7 @@ import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import com.beust.jcommander.Parameters;
 
 @Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions in Local Datasets")
-public class CmdNanoPubs extends CmdInteractions {
+public class CmdNanoPubs extends CmdDefaultParams {
 
     private IdGenerator idGenerator = () -> UUID.randomUUID().toString().replaceAll("-", "");
 

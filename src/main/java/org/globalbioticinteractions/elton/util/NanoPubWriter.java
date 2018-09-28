@@ -161,7 +161,8 @@ public class NanoPubWriter implements InteractionWriter {
         if (StringUtils.isNotBlank(s)) {
             builder.append("  :Organism_").append(number).append(" a <").append(s).append(">   .\n");
         }
-        String name = StringEscapeUtils.escapeXml(taxon.getName()).replace("\n", " ");
+
+        String name = StringUtils.replace(StringEscapeUtils.escapeXml(taxon.getName()), "\n", " ");
         if (StringUtils.isNotBlank(name)) {
             builder.append("  :Organism_").append(number).append(" rdfs:label \"").append(name).append("\" .\n");
         }

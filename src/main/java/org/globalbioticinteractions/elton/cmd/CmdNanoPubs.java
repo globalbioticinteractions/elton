@@ -12,7 +12,7 @@ import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import java.io.PrintStream;
 import java.util.UUID;
 
-@Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions in Local Datasets")
+@Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions of Published Datasets")
 public class CmdNanoPubs extends CmdDefaultParams {
 
     private IdGenerator idGenerator = () -> UUID.randomUUID().toString().replaceAll("-", "");
@@ -35,7 +35,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
     }
 
     void run(PrintStream out) {
-        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry finder = DatasetRegistryUtil.forCacheDir(getCacheDir());
 
         InteractionWriter serializer = createSerializer(out);
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, dataset -> dataset);

@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 
-public class DatasetFinderUtil {
+public class DatasetRegistryUtil {
     public static DatasetRegistry forLocalDir(URI localDir) {
         return new DatasetRegistry() {
             private final String localStaticNamespace = "local";

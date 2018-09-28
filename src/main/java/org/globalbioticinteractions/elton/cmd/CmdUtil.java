@@ -4,10 +4,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporter;
+import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
+import org.eol.globi.service.GeoNamesService;
 import org.eol.globi.service.GitHubImporterFactory;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
@@ -18,6 +20,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,11 +63,23 @@ public class CmdUtil {
                 LOG.info(msg);
                 Dataset dataset = DatasetFactory.datasetFor(namespace, finder);
                 nodeFactory.getOrCreateDataset(dataset);
+
                 StudyImporter importer = new GitHubImporterFactory()
                         .createImporter(dataset, nodeFactory);
 
-                importer
-                        .importStudy();
+                importer.setGeoNamesService(new GeoNamesService() {
+                    @Override
+                    public boolean hasTermForLocale(String locality) {
+                        return false;
+                    }
+
+                    @Override
+                    public LatLng findLatLng(String locality) throws IOException {
+                        return null;
+                    }
+                });
+
+                importer.importStudy();
                 LOG.info(msg + "done.");
             }, namespaces);
         } catch (DatasetFinderException e) {

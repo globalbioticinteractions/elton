@@ -5,7 +5,7 @@ import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
@@ -98,20 +98,16 @@ public class CmdInteractions extends CmdTabularWriterParams {
         run(System.out);
     }
 
-    InteractionWriter createSerializer(PrintStream out) {
-        return new TsvWriter(out);
-    }
-
     void run(PrintStream out) {
-        TsvWriter serializer = new TsvWriter(out);
+        TsvWriter writer = new TsvWriter(out);
         if (!shouldSkipHeader()) {
-            serializer.writeHeader();
+            writer.writeHeader();
         }
 
-        DatasetRegistry finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
 
-        NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, new DatasetProcessorForTSV());
-        CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for interactions in");
+        NodeFactoryNull nodeFactory = new NodeFactoryForDataset(writer, new DatasetProcessorForTSV());
+        CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "scanning for interactions in");
     }
 }
 

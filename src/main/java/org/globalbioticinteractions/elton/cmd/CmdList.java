@@ -7,7 +7,7 @@ import org.eol.globi.service.DatasetRegistry;
 import org.eol.globi.service.DatasetRegistryGitHubArchive;
 import org.eol.globi.service.DatasetRegistryProxy;
 import org.eol.globi.service.DatasetRegistryZenodo;
-import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -23,7 +23,7 @@ public class CmdList extends CmdOnlineParams {
     }
 
     public void run(PrintStream out) {
-        DatasetRegistry finderLocal = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry finderLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
         DatasetRegistry finder = isOnline()
                 ? new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(), new DatasetRegistryGitHubArchive(), finderLocal))
                 : finderLocal;

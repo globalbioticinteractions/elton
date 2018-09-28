@@ -11,7 +11,7 @@ import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TaxonWriter;
@@ -34,7 +34,7 @@ public class CmdNames extends CmdTabularWriterParams {
             writer.writeHeader();
         }
 
-        DatasetRegistry finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
         NodeFactory nodeFactory = createFactory(writer);
         CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for names in");
     }

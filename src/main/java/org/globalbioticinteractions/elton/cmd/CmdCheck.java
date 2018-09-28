@@ -21,7 +21,7 @@ import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
 import org.eol.globi.util.DateUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
-import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
@@ -50,13 +50,13 @@ public class CmdCheck extends CmdDefaultParams {
 
     private void checkCacheOrRemote() throws StudyImporterException {
         for (String namespace : getNamespaces()) {
-            check(namespace, DatasetFinderUtil.forCacheDir(getCacheDir()));
+            check(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir()));
         }
     }
 
     private void checkLocal() throws StudyImporterException {
         String localNamespace = "local";
-        DatasetRegistry finderLocal = DatasetFinderUtil.forLocalDir(getWorkDir());
+        DatasetRegistry finderLocal = DatasetRegistryUtil.forLocalDir(getWorkDir());
         check(localNamespace, finderLocal);
     }
 

@@ -2,7 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.eol.globi.service.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NanoPubWriter;
@@ -35,7 +35,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
     }
 
     void run(PrintStream out) {
-        DatasetRegistry finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
 
         InteractionWriter serializer = createSerializer(out);
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, dataset -> dataset);

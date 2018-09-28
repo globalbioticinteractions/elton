@@ -2,49 +2,16 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.eol.globi.data.NodeFactory;
-import org.eol.globi.domain.InteractType;
-import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetFinderUtil;
 import org.globalbioticinteractions.elton.util.DatasetProcessor;
-import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
-import org.globalbioticinteractions.elton.util.InteractionWriter;
-import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
-import org.globalbioticinteractions.elton.util.SpecimenImpl;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 
 import java.io.PrintStream;
 import java.util.stream.Stream;
-
-import static org.eol.globi.data.StudyImporterForMetaTable.EVENT_DATE;
-import static org.eol.globi.data.StudyImporterForTSV.BASIS_OF_RECORD_ID;
-import static org.eol.globi.data.StudyImporterForTSV.BASIS_OF_RECORD_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.DECIMAL_LATITUDE;
-import static org.eol.globi.data.StudyImporterForTSV.DECIMAL_LONGITUDE;
-import static org.eol.globi.data.StudyImporterForTSV.INTERACTION_TYPE_ID;
-import static org.eol.globi.data.StudyImporterForTSV.INTERACTION_TYPE_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.LOCALITY_ID;
-import static org.eol.globi.data.StudyImporterForTSV.LOCALITY_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.REFERENCE_CITATION;
-import static org.eol.globi.data.StudyImporterForTSV.REFERENCE_DOI;
-import static org.eol.globi.data.StudyImporterForTSV.REFERENCE_URL;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_BODY_PART_ID;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_BODY_PART_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_LIFE_STAGE_ID;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_LIFE_STAGE_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_OCCURRENCE_ID;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_TAXON_ID;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_TAXON_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_BODY_PART_ID;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_BODY_PART_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_LIFE_STAGE_ID;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_LIFE_STAGE_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_OCCURRENCE_ID;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_TAXON_ID;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_TAXON_NAME;
 
 @Parameters(separators = "= ", commandDescription = "List Info For Local Datasets")
 public class CmdDatasets extends CmdTabularWriterParams {
@@ -65,15 +32,6 @@ public class CmdDatasets extends CmdTabularWriterParams {
         @Override
         public void writeHeader() {
             Stream<String> datasetHeaders = StreamUtil.datasetHeaderFields();
-            Stream.of("number_of_interactions",
-                    "number_of_distinct_interaction_types",
-                    "distinct_interactions",
-                    "distinct_taxa",
-                    "distinct_taxon_ids",
-                    "temporal_range",
-                    "spatial_range",
-                    "formats",
-                    "types");
             out.println(StreamUtil.tsvRowOf(datasetHeaders));
         }
     }
@@ -89,21 +47,19 @@ public class CmdDatasets extends CmdTabularWriterParams {
             serializer.writeHeader();
         }
 
-        DatasetRegistry finder = DatasetFinderUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
+        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir());
 
-
-        final DatasetProcessor proxied = new DatasetProcessorForTSV();
         DatasetProcessor datasetProcessor = dataset -> {
             serializer.write(dataset);
-            return proxied.process(dataset);
+            return dataset;
         };
 
         NodeFactory nodeFactory = new NodeFactoryNull() {
             @Override
             public Dataset getOrCreateDataset(Dataset dataset) {
                 return datasetProcessor.process(dataset);
-            }
 
+            }
         };
 
         CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for datasets in");

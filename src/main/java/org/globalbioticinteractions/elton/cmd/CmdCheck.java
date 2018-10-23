@@ -84,9 +84,6 @@ public class CmdCheck extends CmdDefaultParams {
             studyImporterForGitHubData.importData(dataset);
             getStderr().println(" done.");
             getStdout().println(repoName + "\t" + dataset.getArchiveURI().toString());
-            if (warnings.size() > 0 || errors.size() > 0 || counter.get() == 0) {
-                throw new StudyImporterException("check not successful, please check log.");
-            }
         } catch (DatasetFinderException e) {
             getStdout().println(repoName + "\tno local repository at [" + getWorkDir().toString() + "].");
             throw new StudyImporterException(e);
@@ -100,7 +97,9 @@ public class CmdCheck extends CmdDefaultParams {
             getStdout().println(repoName + "\t" + counter.get() + " interaction(s)");
             getStdout().println(repoName + "\t" + errors.size() + " error(s)");
             getStdout().println(repoName + "\t" + warnings.size() + " warning(s)");
-
+        }
+        if (warnings.size() > 0 || errors.size() > 0 || counter.get() == 0) {
+            throw new StudyImporterException("check not successful, please check log.");
         }
     }
 

@@ -90,6 +90,9 @@ public class CmdCheck extends CmdDefaultParams {
         } catch (DatasetFinderException e) {
             getStdout().println(repoName + "\tno local repository at [" + getWorkDir().toString() + "].");
             throw new StudyImporterException(e);
+        } catch (Throwable e) {
+            errors.add(e.getMessage());
+            throw new StudyImporterException(e);
         } finally {
             infos.forEach(getStdout()::println);
             warnings.forEach(getStdout()::println);

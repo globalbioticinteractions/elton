@@ -41,7 +41,7 @@ public class CmdLine {
                 .addCommand("interactions", new CmdInteractions())
                 .addCommand("datasets", new CmdDatasets())
                 .addCommand("nanopubs", new CmdNanoPubs())
-                .addCommand("check", new CmdCheck())
+                .addCommand("check", new CmdCheck(), "test")
                 .addCommand("version", new CmdVersion())
                 .build();
     }

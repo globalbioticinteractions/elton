@@ -28,7 +28,7 @@ Elton needs Java 8+ to run.
 On linux/mac, you can run the following to install a copy of elton:
 
 ```console
-sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.5.6/elton.jar) > /usr/local/bin/elton && chmod +x /usr/local/bin/elton' && elton version
+sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.5.7/elton.jar) > /usr/local/bin/elton && chmod +x /usr/local/bin/elton' && elton version
 ```
 
 You can now run Elton from your commandline by typing something like ```elton version``` or any of the other documented commands.

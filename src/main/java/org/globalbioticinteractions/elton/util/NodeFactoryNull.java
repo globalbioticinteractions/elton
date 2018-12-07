@@ -5,6 +5,8 @@ import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.Environment;
 import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.Location;
+import org.eol.globi.domain.LogMessage;
+import org.eol.globi.domain.RelTypes;
 import org.eol.globi.domain.Season;
 import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
@@ -22,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 
 public class NodeFactoryNull implements NodeFactory {
 
@@ -33,11 +36,18 @@ public class NodeFactoryNull implements NodeFactory {
         return () -> seasonName;
     }
 
+    @Override
     public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
         return new SpecimenNull();
     }
 
+    @Override
     public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
+        return createSpecimen(study, taxon, RelTypes.COLLECTED, RelTypes.SUPPORTS);
+    }
+
+    @Override
+    public Specimen createSpecimen(Study study, Taxon taxon, RelTypes... types) throws NodeFactoryException {
         return createSpecimen(createInteraction(study), taxon);
     }
 
@@ -115,8 +125,38 @@ public class NodeFactoryNull implements NodeFactory {
         return dataset;
     }
 
-    public Interaction createInteraction(Study study) {
-        return null;
+    public Interaction createInteraction(final Study study) {
+        return new Interaction() {
+            @Override
+            public Collection<Specimen> getParticipants() {
+                return null;
+            }
+
+            @Override
+            public Study getStudy() {
+                return study;
+            }
+
+            @Override
+            public void appendLogMessage(String message, Level warning) {
+
+            }
+
+            @Override
+            public List<LogMessage> getLogMessages() {
+                return null;
+            }
+
+            @Override
+            public void setExternalId(String externalId) {
+
+            }
+
+            @Override
+            public String getExternalId() {
+                return null;
+            }
+        };
     }
 
 }

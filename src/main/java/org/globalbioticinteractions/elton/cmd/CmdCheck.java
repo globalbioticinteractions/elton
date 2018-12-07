@@ -10,8 +10,10 @@ import org.eol.globi.data.ParserFactoryLocal;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.data.StudyImporterForRegistry;
 import org.eol.globi.domain.InteractType;
+import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.Location;
 import org.eol.globi.domain.LogContext;
+import org.eol.globi.domain.RelTypes;
 import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
@@ -163,6 +165,15 @@ public class CmdCheck extends CmdDefaultParams {
             return specimen;
         }
 
+        @Override
+        public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
+            return specimen;
+        }
+
+        @Override
+        public Specimen createSpecimen(Study study, Taxon taxon, RelTypes... types) throws NodeFactoryException {
+            return specimen;
+        }
 
         @Override
         public void setUnixEpochProperty(Specimen specimen, Date date) throws NodeFactoryException {

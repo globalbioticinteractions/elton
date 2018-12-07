@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
@@ -49,7 +50,7 @@ public class CmdUpdateIT {
         
         File file = new File("./target/tmp-dataset/globalbioticinteractions/template-dataset/access.tsv");
         assertThat(file.exists(), is(true));
-        String[] jarUrls = FileUtils.readFileToString(file).split("jar:file:");
+        String[] jarUrls = FileUtils.readFileToString(file, StandardCharsets.UTF_8).split("jar:file:");
         assertTrue(jarUrls.length > 1);
         String localJarUrl = jarUrls[1].split("\t")[0];
         assertThat(localJarUrl, not(startsWith("/")));
@@ -73,7 +74,7 @@ public class CmdUpdateIT {
         String accessLog = getDatasetCacheDir() + "access.tsv";
         File accessLogFile = new File(accessLog);
         assertThat(accessLogFile.exists(), is(true));
-        return IOUtils.toString(accessLogFile.toURI()).split("\n").length;
+        return IOUtils.toString(accessLogFile.toURI(), StandardCharsets.UTF_8).split("\n").length;
     }
 
     private String getDatasetCacheDir() {

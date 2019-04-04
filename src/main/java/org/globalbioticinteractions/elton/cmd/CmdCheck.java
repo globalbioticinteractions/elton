@@ -27,8 +27,12 @@ import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
+import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,26 +44,41 @@ public class CmdCheck extends CmdDefaultParams {
     @Override
     public void run() {
         try {
+            List<URI> localNamespaces = new ArrayList<>();
+            List<String> remoteNamespaces = new ArrayList<>();
             if (getNamespaces().isEmpty()) {
-                checkLocal();
+                localNamespaces.add(getWorkDir());
             } else {
-                checkCacheOrRemote();
+                for (String namespace : getNamespaces()) {
+                    URI uri = URI.create(namespace);
+                    if (uri.isAbsolute() && new File(uri).exists()) {
+                        localNamespaces.add(uri);
+                    } else {
+                        remoteNamespaces.add(namespace);
+                    }
+                }
             }
+
+            for (URI localNamespace : localNamespaces) {
+                checkLocal(localNamespace);
+            }
+            checkCacheOrRemote(remoteNamespaces);
+
+
         } catch (StudyImporterException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void checkCacheOrRemote() throws StudyImporterException {
-        for (String namespace : getNamespaces()) {
+    private void checkCacheOrRemote(List<String> namespaces) throws StudyImporterException {
+        for (String namespace : namespaces) {
             check(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir()));
         }
     }
 
-    private void checkLocal() throws StudyImporterException {
-        String localNamespace = "local";
-        DatasetRegistry finderLocal = DatasetRegistryUtil.forLocalDir(getWorkDir());
-        check(localNamespace, finderLocal);
+    private void checkLocal(URI workDir) throws StudyImporterException {
+        DatasetRegistry finderLocal = DatasetRegistryUtil.forLocalDir(workDir);
+        check("local", finderLocal);
     }
 
     private void check(String repoName, DatasetRegistry finder) throws StudyImporterException {
@@ -100,8 +119,10 @@ public class CmdCheck extends CmdDefaultParams {
             getStdout().println(repoName + "\t" + errors.size() + " error(s)");
             getStdout().println(repoName + "\t" + warnings.size() + " warning(s)");
         }
-        if (warnings.size() > 0 || errors.size() > 0 || counter.get() == 0) {
+        if (warnings.size() > 0 || errors.size() > 0) {
             throw new StudyImporterException("check not successful, please check log.");
+        } else if (counter.get() == 0) {
+            throw new StudyImporterException("failed to find any interactions, please check dataset configuration and format.");
         }
     }
 

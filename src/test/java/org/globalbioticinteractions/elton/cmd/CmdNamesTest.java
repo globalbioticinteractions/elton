@@ -64,5 +64,25 @@ public class CmdNamesTest {
         }
     }
 
+    @Test
+    public void namesWithHeaderEmpty() throws URISyntaxException {
+        JCommander jc = new CmdLine().buildCommander();
+        jc.parse("names",
+                "--cache-dir=" + CmdTestUtil.cacheDirTestFor("/dataset-cache-empty/globalbioticinteractions/template-dataset/access.tsv"));
+
+        JCommander actual = jc.getCommands().get(jc.getParsedCommand());
+
+        if (actual.getObjects().get(0) instanceof Runnable) {
+            ByteArrayOutputStream out1 = new ByteArrayOutputStream();
+            PrintStream out = new PrintStream(out1);
+            ((CmdNames) actual.getObjects().get(0)).run(out);
+            String actualOutput = out1.toString();
+            String[] actualLines = StringUtils.splitByWholeSeparator(actualOutput, "\n");
+            assertThat(actualLines[0], is("taxonId\ttaxonName\ttaxonRank\ttaxonPath\ttaxonPathIds\ttaxonPathNames\tnamespace\tcitation\tarchiveURI\tlastSeenAt\tcontentHash\teltonVersion"));
+            assertThat(actualLines[1], is("\tLeptoconchus incycloseris\t\t\t\t\tglobalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f\tdev"));
+            assertThat(actualLines[1].split("\t").length, is(actualLines[0].split("\t").length));
+        }
+    }
+
 
 }

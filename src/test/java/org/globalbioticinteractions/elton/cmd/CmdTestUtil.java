@@ -10,7 +10,12 @@ import static org.junit.Assert.assertThat;
 
 final class CmdTestUtil {
     static String cacheDirTest() throws URISyntaxException {
-        URL accessURL = CmdNamesTest.class.getResource("/dataset-cache-test/globalbioticinteractions/template-dataset/access.tsv");
+        String name = "/dataset-cache-test/globalbioticinteractions/template-dataset/access.tsv";
+        return cacheDirTestFor(name);
+    }
+
+    static String cacheDirTestFor(String name) throws URISyntaxException {
+        URL accessURL = CmdNamesTest.class.getResource(name);
         assertThat(accessURL, is(notNullValue()));
         return new File(accessURL.toURI()).getParentFile().getParentFile().getParentFile().getAbsolutePath();
     }

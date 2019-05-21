@@ -26,26 +26,27 @@ public class CmdUpdate extends CmdDefaultParams {
     @Override
     public void run() {
         DatasetRegistry finder = new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(), new DatasetRegistryGitHubArchive()));
-        try {
-            NamespaceHandler handler = namespace -> {
-                getStderr().println("update of [" + namespace + "] starting...");
+        NamespaceHandler handler = namespace -> {
+            getStderr().println("update of [" + namespace + "] starting...");
 
-                Dataset dataset =
-                        DatasetFactory.datasetFor(namespace,
-                                CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir()));
-                NodeFactory factory = new NodeFactoryNull();
-                factory.getOrCreateDataset(dataset);
-                try {
-                    new GitHubImporterFactory()
-                            .createImporter(dataset, factory)
-                            .importStudy();
-                } catch (StudyImporterException ex) {
-                    LOG.error("update of [" + namespace + "] failed.", ex);
-                    getStderr().println("update of [" + namespace + "] failed. [ " + ex.getMessage() + "]");
-                } finally {
-                    getStderr().println("update of [" + namespace + "] done.");
-                }
-            };
+            Dataset dataset =
+                    DatasetFactory.datasetFor(namespace,
+                            CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir()));
+            NodeFactory factory = new NodeFactoryNull();
+            factory.getOrCreateDataset(dataset);
+            try {
+                new GitHubImporterFactory()
+                        .createImporter(dataset, factory)
+                        .importStudy();
+            } catch (StudyImporterException ex) {
+                LOG.error("update of [" + namespace + "] failed.", ex);
+                getStderr().println("update of [" + namespace + "] failed. [ " + ex.getMessage() + "]");
+            } finally {
+                getStderr().println("update of [" + namespace + "] done.");
+            }
+        };
+
+        try {
             getStderr().println("updates starting...");
             CmdUtil.handleNamespaces(finder, handler, getNamespaces());
             getStderr().println("updates done.");

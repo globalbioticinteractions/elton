@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporter;
+import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFactory;
@@ -61,29 +62,37 @@ public class CmdUtil {
             handleNamespaces(finder, namespace -> {
                 String msg = msgPrefix + " [" + namespace + "]...";
                 LOG.info(msg);
-                Dataset dataset = DatasetFactory.datasetFor(namespace, finder);
-                nodeFactory.getOrCreateDataset(dataset);
-
-                StudyImporter importer = new GitHubImporterFactory()
-                        .createImporter(dataset, nodeFactory);
-
-                importer.setGeoNamesService(new GeoNamesService() {
-                    @Override
-                    public boolean hasTermForLocale(String locality) {
-                        return false;
-                    }
-
-                    @Override
-                    public LatLng findLatLng(String locality) throws IOException {
-                        return null;
-                    }
-                });
-
-                importer.importStudy();
-                LOG.info(msg + "done.");
+                try {
+                    handleSingleNamespace(finder, nodeFactory, namespace);
+                    LOG.info(msg + "done.");
+                } catch (StudyImporterException | DatasetFinderException ex) {
+                    LOG.error(msg + "failed.", ex);
+                }
             }, namespaces);
         } catch (DatasetFinderException e) {
-            throw new RuntimeException("failed to complete name scan", e);
+            throw new RuntimeException(msgPrefix + "failed.", e);
         }
+    }
+
+    private static void handleSingleNamespace(DatasetRegistry finder, NodeFactory nodeFactory, String namespace) throws DatasetFinderException, StudyImporterException {
+        Dataset dataset = DatasetFactory.datasetFor(namespace, finder);
+        nodeFactory.getOrCreateDataset(dataset);
+
+        StudyImporter importer = new GitHubImporterFactory()
+                .createImporter(dataset, nodeFactory);
+
+        importer.setGeoNamesService(new GeoNamesService() {
+            @Override
+            public boolean hasTermForLocale(String locality) {
+                return false;
+            }
+
+            @Override
+            public LatLng findLatLng(String locality) throws IOException {
+                return null;
+            }
+        });
+
+        importer.importStudy();
     }
 }

@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.NodeFactory;
@@ -24,6 +25,7 @@ import org.globalbioticinteractions.elton.util.StreamUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,6 +61,8 @@ public class CmdUtil {
 
     public static void handleNamespaces(DatasetRegistry finder, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix) {
         try {
+            List<String> failedNamespaces = Collections.synchronizedList(new ArrayList<>());
+
             handleNamespaces(finder, namespace -> {
                 String msg = msgPrefix + " [" + namespace + "]...";
                 LOG.info(msg);
@@ -66,9 +70,15 @@ public class CmdUtil {
                     handleSingleNamespace(finder, nodeFactory, namespace);
                     LOG.info(msg + "done.");
                 } catch (StudyImporterException | DatasetFinderException ex) {
+                    failedNamespaces.add(namespace);
                     LOG.error(msg + "failed.", ex);
                 }
             }, namespaces);
+
+            if (failedNamespaces.size() > 0) {
+                throw new DatasetFinderException("failed to import datasets [" + StringUtils.join(failedNamespaces, ";") + "], please check the logs.");
+            }
+
         } catch (DatasetFinderException e) {
             throw new RuntimeException(msgPrefix + "failed.", e);
         }

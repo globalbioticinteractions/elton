@@ -26,8 +26,10 @@ import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
+import org.jline.terminal.TerminalBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,7 +92,7 @@ public class CmdCheck extends CmdDefaultParams {
         AtomicInteger counter = new AtomicInteger(0);
         ImportLogger importLogger = createImportLogger(repoName, infos, warnings, errors);
 
-        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter, importLogger);
+        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter, importLogger, getWidthOrDefault());
         StudyImporterForRegistry studyImporterForGitHubData = new StudyImporterForRegistry(parserFactory, nodeFactory, finder);
         studyImporterForGitHubData.setLogger(importLogger);
 
@@ -124,6 +126,16 @@ public class CmdCheck extends CmdDefaultParams {
         } else if (counter.get() == 0) {
             throw new StudyImporterException("failed to find any interactions, please check dataset configuration and format.");
         }
+    }
+
+    private int getWidthOrDefault() {
+        int width = 80;
+        try {
+            width = TerminalBuilder.builder().build().getWidth();
+        } catch (IOException e) {
+            // ignore
+        }
+        return width;
     }
 
     private ImportLogger createImportLogger(String repoName, Set<String> infos, Set<String> warnings, Set<String> errors) {
@@ -160,25 +172,27 @@ public class CmdCheck extends CmdDefaultParams {
     private class NodeFactoryLogging extends NodeFactoryNull {
         final AtomicInteger counter;
         final ImportLogger importLogger;
+        private final int width;
 
-        public NodeFactoryLogging(AtomicInteger counter, ImportLogger importLogger) {
+        public NodeFactoryLogging(AtomicInteger counter, ImportLogger importLogger, int width) {
             this.counter = counter;
             this.importLogger = importLogger;
+            this.width = width;
         }
 
         final Specimen specimen = new SpecimenNull() {
             @Override
             public void interactsWith(Specimen target, InteractType type, Location centroid) {
-                if (counter.get() > 0 && counter.get() % 1000 == 0) {
+                int reportBatchSize = 10;
+                if (counter.get() > 0 && counter.get() % (reportBatchSize * width) == 0) {
                     CmdCheck.super.getStderr().println();
                 }
-                if (counter.get() % 10 == 0) {
+                if (counter.get() % reportBatchSize == 0) {
                     CmdCheck.super.getStderr().print(".");
                 }
                 counter.getAndIncrement();
             }
         };
-
 
 
         @Override

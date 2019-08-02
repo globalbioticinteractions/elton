@@ -129,13 +129,14 @@ public class CmdCheck extends CmdDefaultParams {
     }
 
     private int getWidthOrDefault() {
-        int width = 80;
+        final int widthDefault = 80;
+        int width = widthDefault;
         try {
             width = TerminalBuilder.builder().build().getWidth();
         } catch (IOException e) {
             // ignore
         }
-        return width;
+        return width > 0 ? width : widthDefault;
     }
 
     private ImportLogger createImportLogger(String repoName, Set<String> infos, Set<String> warnings, Set<String> errors) {

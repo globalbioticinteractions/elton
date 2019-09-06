@@ -1,0 +1,8 @@
+{
+  "format": "rss",
+  "citation": "some citation",
+  "resources": {
+    "rss": "rss.xml",
+    "http://example.org/dwca.zip": "https://raw.githubusercontent.com/jhpoelen/eol-globi-data/master/eol-globi-data-sources/src/test/resources/org/eol/globi/data/AEC-DBCNet_DwC-A20160308-sample.zip"
+  }
+}

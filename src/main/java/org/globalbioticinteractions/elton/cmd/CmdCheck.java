@@ -93,8 +93,8 @@ public class CmdCheck extends CmdDefaultParams {
         ImportLogger importLogger = createImportLogger(repoName, infos, warnings, errors);
 
         NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter, importLogger, getWidthOrDefault());
-        StudyImporterForRegistry studyImporterForGitHubData = new StudyImporterForRegistry(parserFactory, nodeFactory, finder);
-        studyImporterForGitHubData.setLogger(importLogger);
+        StudyImporterForRegistry studyImporter = new StudyImporterForRegistry(parserFactory, nodeFactory, finder);
+        studyImporter.setLogger(importLogger);
 
         try {
             Dataset dataset = DatasetFactory.datasetFor(repoName, finder);
@@ -104,13 +104,14 @@ public class CmdCheck extends CmdDefaultParams {
             nodeFactory.getOrCreateDataset(dataset);
             String msg = "checking [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "]...";
             getStderr().println(msg);
-            studyImporterForGitHubData.importData(dataset);
+            studyImporter.importData(dataset);
             getStderr().println(" done.");
             getStdout().println(repoName + "\t" + dataset.getArchiveURI().toString());
         } catch (DatasetFinderException e) {
             getStdout().println(repoName + "\tno local repository at [" + getWorkDir().toString() + "].");
             throw new StudyImporterException(e);
         } catch (Throwable e) {
+            e.printStackTrace();
             errors.add(e.getMessage());
             throw new StudyImporterException(e);
         } finally {

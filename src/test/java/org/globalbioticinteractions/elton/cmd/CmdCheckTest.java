@@ -1,7 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
-import org.eol.globi.data.StudyImporterException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,6 +62,28 @@ public class CmdCheckTest {
     @Test(expected = RuntimeException.class)
     public void runCheckLocalNoCitation() throws URISyntaxException {
         assertOneWarning("src/test/resources/dataset-local-test-no-citation");
+    }
+
+    @Test
+    public void runCheckLocalWithRemoteDeps() throws URISyntaxException {
+        ByteArrayOutputStream errOs = new ByteArrayOutputStream();
+        ByteArrayOutputStream outOs = new ByteArrayOutputStream();
+        try {
+            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs);
+        } finally {
+            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t0 warning(s)\n"));
+        }
+    }
+
+    @Test
+    public void runCheckLocalWithResourceRelation() throws URISyntaxException {
+        ByteArrayOutputStream errOs = new ByteArrayOutputStream();
+        ByteArrayOutputStream outOs = new ByteArrayOutputStream();
+        try {
+            runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs);
+        } finally {
+            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t0 warning(s)\n"));
+        }
     }
 
     @Test(expected = RuntimeException.class)

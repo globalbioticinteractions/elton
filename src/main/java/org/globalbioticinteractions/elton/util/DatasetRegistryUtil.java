@@ -6,7 +6,9 @@ import org.eol.globi.service.DatasetImpl;
 import org.eol.globi.service.DatasetRegistry;
 import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
+import org.globalbioticinteractions.cache.CachePullThrough;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
+import org.globalbioticinteractions.dataset.DatasetWithCache;
 
 import java.net.URI;
 import java.util.Collection;
@@ -18,15 +20,17 @@ public class DatasetRegistryUtil {
             private final String localStaticNamespace = "local";
 
             @Override
-                public Collection<String> findNamespaces() throws DatasetFinderException {
+            public Collection<String> findNamespaces() throws DatasetFinderException {
                 return Collections.singletonList(localStaticNamespace);
-                }
+            }
 
-                @Override
-                public Dataset datasetFor(String namespace) throws DatasetFinderException {
-                    return new DatasetImpl("local", localDir);
-                }
-            };
+            @Override
+            public Dataset datasetFor(String namespace) throws DatasetFinderException {
+                DatasetImpl local = new DatasetImpl("local", localDir);
+                return new DatasetWithCache(local,
+                        new CachePullThrough("local", ".elton"));
+            }
+        };
     }
 
     private static CacheFactory getCacheFactoryLocal(String cacheDir) {

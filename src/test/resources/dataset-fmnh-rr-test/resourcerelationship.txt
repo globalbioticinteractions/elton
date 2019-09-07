@@ -1,0 +1,9 @@
+id	resourceID	relatedResourceID	relationshipOfResource	relationshipAccordingTo	relationshipEstablishedDate	relationshipRemarks
+8afec7db-7b19-44f7-8ac8-8d98614e71d2	8afec7db-7b19-44f7-8ac8-8d98614e71d2		Host to			NULL | http://n2t.net/ark:/65665/37d63a454-d948-4b1d-89db-89809887ef41 | 300465,300466 | 314471 | NULL
+7048675a-b110-4baf-91a3-2db138316709	7048675a-b110-4baf-91a3-2db138316709	10d8d814-2afc-4cf2-9843-a2b719346179	Ectoparasite Of	G. Heinrich	1954-12-04	NULL | NULL | 301120 | 315772 | "Host = Horse-shoe Bat"
+5c419063-682a-4b3f-8a27-9ed286717922	5c419063-682a-4b3f-8a27-9ed286717922	b3cba38d-38b1-4a2d-8d4f-f70bac2c5674	Stomach Contents of	C. M. Barber	1906-6	NULL | NULL | 145177 | NULL | "3 transferred to FMNH 30432-34. Stomach contents removed by A. de Queiroz, Aug 2003."
+5c419063-682a-4b3f-8a27-9ed286717922	5c419063-682a-4b3f-8a27-9ed286717922	c5800c16-3457-4182-bba5-6a266c27b653	Stomach Contents of	C. M. Barber	1906-6	NULL | NULL | 145177 | NULL |
+5c419063-682a-4b3f-8a27-9ed286717922	5c419063-682a-4b3f-8a27-9ed286717922	3efb94e7-5182-4dd3-bec5-aa838ba22b4f	Stomach Contents of	C. M. Barber	1906-6	NULL | NULL | 145177 | NULL |
+b3cba38d-38b1-4a2d-8d4f-f70bac2c5674	b3cba38d-38b1-4a2d-8d4f-f70bac2c5674	5c419063-682a-4b3f-8a27-9ed286717922	Stomach Contents	C. M. Barber	1906-1	
+c5800c16-3457-4182-bba5-6a266c27b653	c5800c16-3457-4182-bba5-6a266c27b653	5c419063-682a-4b3f-8a27-9ed286717922	Stomach Contents	C. M. Barber	1906-1	
+3efb94e7-5182-4dd3-bec5-aa838ba22b4f	3efb94e7-5182-4dd3-bec5-aa838ba22b4f	5c419063-682a-4b3f-8a27-9ed286717922	Stomach Contents	C. M. Barber	1906-1	

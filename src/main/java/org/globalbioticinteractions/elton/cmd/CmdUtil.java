@@ -80,7 +80,7 @@ public class CmdUtil {
             }
 
         } catch (DatasetFinderException e) {
-            throw new RuntimeException(msgPrefix + "failed.", e);
+            throw new RuntimeException(msgPrefix + " failed.", e);
         }
     }
 

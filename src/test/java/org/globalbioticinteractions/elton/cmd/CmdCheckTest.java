@@ -1,7 +1,11 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -10,6 +14,7 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.UUID;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.endsWith;
@@ -18,6 +23,22 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class CmdCheckTest {
+
+    private String testTmpDir = "target/test-cache";
+
+    @Before
+    public void generateTestUUID() {
+        this.testTmpDir = "target/test-cache/" + UUID.randomUUID();
+    }
+
+    @After
+    public void cleanCache() {
+        FileUtils.deleteQuietly(new File(getTestTmpDir()));
+    }
+
+    private String getTestTmpDir() {
+        return testTmpDir;
+    }
 
     @Test
     public void runCheck() throws URISyntaxException {
@@ -56,6 +77,7 @@ public class CmdCheckTest {
         PrintStream out = new PrintStream(outOs);
         cmdCheck.setStdout(out);
         cmdCheck.setWorkDir(Paths.get(localTestPath).toUri());
+        cmdCheck.setTmpDir(getTestTmpDir());
         cmdCheck.run();
     }
 
@@ -64,25 +86,25 @@ public class CmdCheckTest {
         assertOneWarning("src/test/resources/dataset-local-test-no-citation");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void runCheckLocalWithRemoteDeps() throws URISyntaxException {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs);
         } finally {
-            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t0 warning(s)\n"));
+            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t2 warning(s)\n"));
         }
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void runCheckLocalWithResourceRelation() throws URISyntaxException {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
             runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs);
         } finally {
-            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t0 warning(s)\n"));
+            assertThat(outOs.toString(), endsWith("local\t6 interaction(s)\nlocal\t0 error(s)\nlocal\t1 warning(s)\n"));
         }
     }
 

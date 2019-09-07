@@ -79,14 +79,14 @@ public class CmdCheck extends CmdDefaultParams {
     }
 
     private void checkLocal(URI workDir) throws StudyImporterException {
-        DatasetRegistry finderLocal = DatasetRegistryUtil.forLocalDir(workDir);
+        DatasetRegistry finderLocal = DatasetRegistryUtil.forLocalDir(workDir, getTmpDir());
         check("local", finderLocal);
     }
 
     private void check(String repoName, DatasetRegistry finder) throws StudyImporterException {
-        final Set<String> infos = Collections.synchronizedSortedSet(new TreeSet<String>());
-        final Set<String> warnings = Collections.synchronizedSortedSet(new TreeSet<String>());
-        final Set<String> errors = Collections.synchronizedSortedSet(new TreeSet<String>());
+        final Set<String> infos = Collections.synchronizedSortedSet(new TreeSet<>());
+        final Set<String> warnings = Collections.synchronizedSortedSet(new TreeSet<>());
+        final Set<String> errors = Collections.synchronizedSortedSet(new TreeSet<>());
 
         ParserFactoryLocal parserFactory = new ParserFactoryLocal();
         AtomicInteger counter = new AtomicInteger(0);

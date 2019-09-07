@@ -15,9 +15,12 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class DatasetRegistryUtil {
-    public static DatasetRegistry forLocalDir(URI localDir) {
+
+    public static final String NAMESPACE_LOCAL = "local";
+
+    public static DatasetRegistry forLocalDir(final URI localDir, final String localCacheDir) {
         return new DatasetRegistry() {
-            private final String localStaticNamespace = "local";
+            private final String localStaticNamespace = NAMESPACE_LOCAL;
 
             @Override
             public Collection<String> findNamespaces() throws DatasetFinderException {
@@ -26,9 +29,9 @@ public class DatasetRegistryUtil {
 
             @Override
             public Dataset datasetFor(String namespace) throws DatasetFinderException {
-                DatasetImpl local = new DatasetImpl("local", localDir);
+                DatasetImpl local = new DatasetImpl(NAMESPACE_LOCAL, localDir);
                 return new DatasetWithCache(local,
-                        new CachePullThrough("local", ".elton"));
+                        new CachePullThrough(NAMESPACE_LOCAL, localCacheDir));
             }
         };
     }
@@ -50,10 +53,10 @@ public class DatasetRegistryUtil {
         }
     }
 
-    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir) {
+    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, String tmpDir) {
         DatasetRegistry finder = forCacheDir(cacheDir);
         if (emptyFinder(finder)) {
-            finder = forLocalDir(workDir);
+            finder = forLocalDir(workDir, tmpDir);
         }
         return finder;
     }

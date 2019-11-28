@@ -4,6 +4,7 @@ import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetImpl;
 import org.eol.globi.service.DatasetRegistry;
+import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CachePullThrough;
@@ -18,7 +19,7 @@ public class DatasetRegistryUtil {
 
     public static final String NAMESPACE_LOCAL = "local";
 
-    public static DatasetRegistry forLocalDir(final URI localDir, final String localCacheDir) {
+    public static DatasetRegistry forLocalDir(final URI localDir, final String localCacheDir, InputStreamFactory streamFactory) {
         return new DatasetRegistry() {
             private final String localStaticNamespace = NAMESPACE_LOCAL;
 
@@ -29,19 +30,20 @@ public class DatasetRegistryUtil {
 
             @Override
             public Dataset datasetFor(String namespace) throws DatasetFinderException {
-                DatasetImpl local = new DatasetImpl(NAMESPACE_LOCAL, localDir);
+                DatasetImpl local = new DatasetImpl(NAMESPACE_LOCAL, localDir, streamFactory);
+
                 return new DatasetWithCache(local,
-                        new CachePullThrough(NAMESPACE_LOCAL, localCacheDir));
+                        new CachePullThrough(NAMESPACE_LOCAL, localCacheDir, streamFactory));
             }
         };
     }
 
-    private static CacheFactory getCacheFactoryLocal(String cacheDir) {
-        return dataset -> new CacheLocalReadonly(dataset.getNamespace(), cacheDir);
+    private static CacheFactory getCacheFactoryLocal(String cacheDir, InputStreamFactory streamFactory) {
+        return dataset -> new CacheLocalReadonly(dataset.getNamespace(), cacheDir, streamFactory);
     }
 
-    public static DatasetRegistry forCacheDir(String cacheDir) {
-        return new DatasetRegistryLocal(cacheDir, getCacheFactoryLocal(cacheDir));
+    public static DatasetRegistry forCacheDir(String cacheDir, InputStreamFactory streamFactory) {
+        return new DatasetRegistryLocal(cacheDir, getCacheFactoryLocal(cacheDir, streamFactory), streamFactory);
     }
 
     public static boolean emptyFinder(DatasetRegistry finder) {
@@ -53,10 +55,10 @@ public class DatasetRegistryUtil {
         }
     }
 
-    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, String tmpDir) {
-        DatasetRegistry finder = forCacheDir(cacheDir);
+    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, String tmpDir, InputStreamFactory streamFactory) {
+        DatasetRegistry finder = forCacheDir(cacheDir, streamFactory);
         if (emptyFinder(finder)) {
-            finder = forLocalDir(workDir, tmpDir);
+            finder = forLocalDir(workDir, tmpDir, streamFactory);
         }
         return finder;
     }

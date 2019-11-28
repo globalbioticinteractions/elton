@@ -22,14 +22,14 @@ import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
 import org.eol.globi.util.DateUtil;
+import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
-import org.jline.terminal.TerminalBuilder;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,10 +61,12 @@ public class CmdCheck extends CmdDefaultParams {
                 }
             }
 
+            InputStreamFactory factory = createInputStreamFactory();
+
             for (URI localNamespace : localNamespaces) {
-                checkLocal(localNamespace);
+                checkLocal(localNamespace, factory);
             }
-            checkCacheOrRemote(remoteNamespaces);
+            checkCacheOrRemote(remoteNamespaces, factory);
 
 
         } catch (StudyImporterException e) {
@@ -72,18 +74,18 @@ public class CmdCheck extends CmdDefaultParams {
         }
     }
 
-    private void checkCacheOrRemote(List<String> namespaces) throws StudyImporterException {
+    private void checkCacheOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         for (String namespace : namespaces) {
-            check(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir()));
+            check(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), inputStreamFactory), inputStreamFactory);
         }
     }
 
-    private void checkLocal(URI workDir) throws StudyImporterException {
-        DatasetRegistry finderLocal = DatasetRegistryUtil.forLocalDir(workDir, getTmpDir());
-        check("local", finderLocal);
+    private void checkLocal(URI workDir, InputStreamFactory inputStreamFactory) throws StudyImporterException {
+        DatasetRegistry finderLocal = DatasetRegistryUtil.forLocalDir(workDir, getTmpDir(), inputStreamFactory);
+        check("local", finderLocal, inputStreamFactory);
     }
 
-    private void check(String repoName, DatasetRegistry finder) throws StudyImporterException {
+    private void check(String repoName, DatasetRegistry finder, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         final Set<String> infos = Collections.synchronizedSortedSet(new TreeSet<>());
         final Set<String> warnings = Collections.synchronizedSortedSet(new TreeSet<>());
         final Set<String> errors = Collections.synchronizedSortedSet(new TreeSet<>());
@@ -92,12 +94,16 @@ public class CmdCheck extends CmdDefaultParams {
         AtomicInteger counter = new AtomicInteger(0);
         ImportLogger importLogger = createImportLogger(repoName, infos, warnings, errors);
 
-        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter, importLogger, getWidthOrDefault());
+        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter, importLogger);
         StudyImporterForRegistry studyImporter = new StudyImporterForRegistry(parserFactory, nodeFactory, finder);
         studyImporter.setLogger(importLogger);
 
         try {
-            Dataset dataset = DatasetFactory.datasetFor(repoName, finder);
+            Dataset dataset = new DatasetFactory(
+                    finder,
+                    inputStreamFactory)
+                    .datasetFor(repoName);
+
             if (StringUtils.isBlank(CitationUtil.citationOrDefaultFor(dataset, ""))) {
                 importLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
@@ -127,17 +133,6 @@ public class CmdCheck extends CmdDefaultParams {
         } else if (counter.get() == 0) {
             throw new StudyImporterException("failed to find any interactions, please check dataset configuration and format.");
         }
-    }
-
-    private int getWidthOrDefault() {
-        final int widthDefault = 80;
-        int width = widthDefault;
-        try {
-            width = TerminalBuilder.builder().build().getWidth();
-        } catch (IOException e) {
-            // ignore
-        }
-        return width > 0 ? width : widthDefault;
     }
 
     private ImportLogger createImportLogger(String repoName, Set<String> infos, Set<String> warnings, Set<String> errors) {
@@ -174,27 +169,22 @@ public class CmdCheck extends CmdDefaultParams {
     private class NodeFactoryLogging extends NodeFactoryNull {
         final AtomicInteger counter;
         final ImportLogger importLogger;
-        private final int width;
 
-        public NodeFactoryLogging(AtomicInteger counter, ImportLogger importLogger, int width) {
+        public NodeFactoryLogging(AtomicInteger counter, ImportLogger importLogger) {
             this.counter = counter;
             this.importLogger = importLogger;
-            this.width = width;
         }
 
         final Specimen specimen = new SpecimenNull() {
             @Override
             public void interactsWith(Specimen target, InteractType type, Location centroid) {
                 int reportBatchSize = 10;
-                if (counter.get() > 0 && counter.get() % (reportBatchSize * width) == 0) {
-                    CmdCheck.super.getStderr().println();
-                }
-                if (counter.get() % reportBatchSize == 0) {
-                    CmdCheck.super.getStderr().print(".");
-                }
+                int count = counter.get();
+                ProgressUtil.logProgress(reportBatchSize, count, getProgressCursor());
                 counter.getAndIncrement();
             }
         };
+
 
 
         @Override
@@ -219,4 +209,5 @@ public class CmdCheck extends CmdDefaultParams {
             }
         }
     }
+
 }

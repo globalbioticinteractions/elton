@@ -25,13 +25,14 @@ public class CmdUpdate extends CmdDefaultParams {
 
     @Override
     public void run() {
-        DatasetRegistry finder = new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(), new DatasetRegistryGitHubArchive()));
+        InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
+        DatasetRegistry finder = new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(inputStreamFactory), new DatasetRegistryGitHubArchive(inputStreamFactory)));
         NamespaceHandler handler = namespace -> {
             getStderr().println("update of [" + namespace + "] starting...");
 
             Dataset dataset =
-                    DatasetFactory.datasetFor(namespace,
-                            CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir()));
+                    new DatasetFactory(CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir()))
+                            .datasetFor(namespace);
             NodeFactory factory = new NodeFactoryNull();
             factory.getOrCreateDataset(dataset);
             try {

@@ -14,12 +14,12 @@ public class DatasetProcessorForTSV implements DatasetProcessor {
         return new Dataset() {
 
             @Override
-            public InputStream getResource(String resourceName) throws IOException {
+            public InputStream getResource(URI resourceName) throws IOException {
                 return dataset.getResource(resourceName);
             }
 
             @Override
-            public URI getResourceURI(String resourceName) {
+            public URI getResourceURI(URI resourceName) throws IOException {
                 return dataset.getResourceURI(resourceName);
             }
 

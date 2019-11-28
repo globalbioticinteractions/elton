@@ -1,15 +1,10 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
-import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.Dataset;
-import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetProcessor;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
-import org.globalbioticinteractions.elton.util.NamespaceHandler;
-import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 
@@ -50,7 +45,7 @@ public class CmdDatasets extends CmdTabularWriterParams {
             serializer.writeHeader();
         }
 
-        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir());
+        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), inStream -> inStream);
 
         try {
             CmdUtil.handleNamespaces(finder,

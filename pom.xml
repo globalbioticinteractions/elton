@@ -10,7 +10,7 @@
 
     <properties>
         <!--<globi.version>0.6-SNAPSHOT</globi.version>-->
-        <globi.version>0.12.10</globi.version>
+        <globi.version>0.13.0</globi.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.testResourceEncoding>UTF-8</project.build.testResourceEncoding>
@@ -43,6 +43,16 @@
             <groupId>org.nanopub</groupId>
             <artifactId>nanopub</artifactId>
             <version>1.17</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.beust</groupId>
+                    <artifactId>jcommander</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>

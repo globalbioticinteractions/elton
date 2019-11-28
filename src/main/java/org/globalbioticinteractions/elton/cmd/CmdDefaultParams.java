@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameter;
+import org.globalbioticinteractions.elton.util.ProgressCursor;
 
 import java.io.PrintStream;
 import java.net.URI;
@@ -18,6 +19,7 @@ abstract class CmdDefaultParams implements Runnable {
 
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
+    private ProgressCursor cursor = new ProgressCursor(stderr);
     private URI workDir = null;
 
     @Parameter(description = "[namespace1] [namespace2] ...")
@@ -68,4 +70,14 @@ abstract class CmdDefaultParams implements Runnable {
     public void setWorkDir(URI workingDir) {
         this.workDir = workingDir;
     }
+
+    public ProgressCursor getProgressCursor() {
+        return this.cursor;
+    }
+
+    public InputStreamFactoryLogging createInputStreamFactory() {
+        return new InputStreamFactoryLogging(getProgressCursor());
+    }
+
+
 }

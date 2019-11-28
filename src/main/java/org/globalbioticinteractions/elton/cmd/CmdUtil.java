@@ -13,6 +13,7 @@ import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
 import org.eol.globi.service.GeoNamesService;
 import org.eol.globi.service.GitHubImporterFactory;
+import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
@@ -48,9 +49,12 @@ public class CmdUtil {
     }
 
     static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry finder, String namespace, String cacheDir) {
+        return createDataFinderLoggingCaching(finder, namespace, cacheDir, inStream -> inStream);
+    }
+    static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry finder, String namespace, String cacheDir, InputStreamFactory factory) {
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(finder, cacheDir), dataset -> {
-            Cache pullThroughCache = new CachePullThrough(namespace, cacheDir);
-            CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir);
+            Cache pullThroughCache = new CachePullThrough(namespace, cacheDir, factory);
+            CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, factory);
             return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
         });
     }
@@ -85,7 +89,7 @@ public class CmdUtil {
     }
 
     private static void handleSingleNamespace(DatasetRegistry finder, NodeFactory nodeFactory, String namespace) throws DatasetFinderException, StudyImporterException {
-        Dataset dataset = DatasetFactory.datasetFor(namespace, finder);
+        Dataset dataset = new DatasetFactory(finder).datasetFor(namespace);
         nodeFactory.getOrCreateDataset(dataset);
 
         StudyImporter importer = new GitHubImporterFactory()

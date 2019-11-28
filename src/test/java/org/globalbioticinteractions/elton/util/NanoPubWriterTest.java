@@ -24,7 +24,7 @@ public class NanoPubWriterTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         NanoPubWriter nanoPubWriter = new NanoPubWriter(new PrintStream(out), () -> "1");
 
-        DatasetImpl dataset = new DatasetImpl("some/namespace", URI.create("some:uri"));
+        DatasetImpl dataset = new DatasetImpl("some/namespace", URI.create("some:uri"), inStream -> inStream);
         StudyImpl study = new StudyImpl("some study");
         SpecimenImpl specimen = new SpecimenImpl(dataset, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123"));
         specimen.setEventDate(new Date(0));
@@ -61,19 +61,19 @@ public class NanoPubWriterTest {
 
     @Test
     public void extractDatasetURIGitHub() {
-        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("https://github.com/hurlbertlab/dietdatabase/archive/f98e5b3dc7480c92a468433400a725d71c2ad51c.zip")));
+        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("https://github.com/hurlbertlab/dietdatabase/archive/f98e5b3dc7480c92a468433400a725d71c2ad51c.zip"), inStream -> inStream));
         assertThat(datasetURI, is("https://github.com/hurlbertlab/dietdatabase"));
     }
 
     @Test
     public void extractDatasetURIDOI() {
-        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("https://doi.org/10.123")));
+        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("https://doi.org/10.123"), inStream -> inStream));
         assertThat(datasetURI, is("https://doi.org/10.123"));
     }
 
     @Test
     public void extractDatasetURISomeNamespace() {
-        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("some:namespace")));
+        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("some:namespace"), inStream -> inStream));
         assertThat(datasetURI, is("some:namespace"));
     }
 

@@ -34,7 +34,7 @@ public class CmdNames extends CmdTabularWriterParams {
             writer.writeHeader();
         }
 
-        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir());
+        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), inStream -> inStream);
         NodeFactory nodeFactory = createFactory(writer);
         CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for names in");
     }

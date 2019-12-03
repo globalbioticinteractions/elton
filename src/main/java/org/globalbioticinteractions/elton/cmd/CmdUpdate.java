@@ -30,8 +30,9 @@ public class CmdUpdate extends CmdDefaultParams {
         NamespaceHandler handler = namespace -> {
             getStderr().println("update of [" + namespace + "] starting...");
 
+            DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir());
             Dataset dataset =
-                    new DatasetFactory(CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir()))
+                    new DatasetFactory(registry, createInputStreamFactory())
                             .datasetFor(namespace);
             NodeFactory factory = new NodeFactoryNull();
             factory.getOrCreateDataset(dataset);

@@ -104,7 +104,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
             writer.writeHeader();
         }
 
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), inStream -> inStream);
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(writer, new DatasetProcessorForTSV());
         CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "scanning for interactions in");

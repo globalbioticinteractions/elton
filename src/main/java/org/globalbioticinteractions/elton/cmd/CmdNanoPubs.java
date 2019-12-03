@@ -35,7 +35,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
     }
 
     void run(PrintStream out) {
-        DatasetRegistry finder = DatasetRegistryUtil.forCacheDir(getCacheDir(), inStream -> inStream);
+        DatasetRegistry finder = DatasetRegistryUtil.forCacheDir(getCacheDir(), createInputStreamFactory());
 
         InteractionWriter serializer = createSerializer(out);
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, dataset -> dataset);

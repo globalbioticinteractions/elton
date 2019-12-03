@@ -34,8 +34,8 @@ public class StreamUtil {
         return Stream.of(taxon.getExternalId(),
                 taxon.getName(),
                 taxon.getRank(),
-                taxon.getPath(),
                 taxon.getPathIds(),
+                taxon.getPath(),
                 taxon.getPathNames());
     }
 

@@ -56,8 +56,8 @@ public class CmdNames extends CmdTabularWriterParams {
                                 "taxonId",
                                 "taxonName",
                                 "taxonRank",
-                                "taxonPath",
                                 "taxonPathIds",
+                                "taxonPath",
                                 "taxonPathNames"),
                                 StreamUtil.datasetHeaderFields())));
             }

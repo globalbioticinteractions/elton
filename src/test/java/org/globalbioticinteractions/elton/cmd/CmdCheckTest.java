@@ -5,7 +5,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -62,7 +61,7 @@ public class CmdCheckTest {
         String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
-        runCheck(localTestPath, errOs, outOs);
+        runCheck(localTestPath, errOs, outOs, 10);
 
         assertThat(errOs.toString(), startsWith("checking [local] at [file:///"));
         assertThat(errOs.toString(), endsWith("done.\n"));
@@ -70,7 +69,7 @@ public class CmdCheckTest {
         assertThat(outOs.toString(), endsWith("local\t11 interaction(s)\nlocal\t0 error(s)\nlocal\t0 warning(s)\n"));
     }
 
-    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs) {
+    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines) {
         CmdCheck cmdCheck = new CmdCheck();
         PrintStream err = new PrintStream(errOs);
         cmdCheck.setStderr(err);
@@ -78,6 +77,7 @@ public class CmdCheckTest {
         cmdCheck.setStdout(out);
         cmdCheck.setWorkDir(Paths.get(localTestPath).toUri());
         cmdCheck.setTmpDir(getTestTmpDir());
+        cmdCheck.setMaxLines(maxLines);
         cmdCheck.run();
     }
 
@@ -91,7 +91,18 @@ public class CmdCheckTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs);
+            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 10);
+        } finally {
+            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t2 warning(s)\n"));
+        }
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void runCheckLocalWithRemoteDepsMax1Line() throws URISyntaxException {
+        ByteArrayOutputStream errOs = new ByteArrayOutputStream();
+        ByteArrayOutputStream outOs = new ByteArrayOutputStream();
+        try {
+            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 1);
         } finally {
             assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t2 warning(s)\n"));
         }
@@ -102,7 +113,7 @@ public class CmdCheckTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs);
+            runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs, 10);
         } finally {
             assertThat(outOs.toString(), endsWith("local\t6 interaction(s)\nlocal\t0 error(s)\nlocal\t1 warning(s)\n"));
         }
@@ -117,7 +128,7 @@ public class CmdCheckTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck(localTestPath, errOs, outOs);
+            runCheck(localTestPath, errOs, outOs, 10);
         } finally {
             assertThat(outOs.toString(), endsWith("local\t11 interaction(s)\nlocal\t0 error(s)\nlocal\t1 warning(s)\n"));
         }

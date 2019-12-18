@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -42,6 +43,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Parameters(separators = "= ", commandDescription = "Check Dataset Accessibility. If no namespace is provided the local workdir is used.")
 public class CmdCheck extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdCheck.class);
+
+    @Parameter(names = {"-n", "--lines"}, description = "print first n number of lines")
+    private Integer maxLines = null;
+
 
     @Override
     public void run() {
@@ -153,9 +158,11 @@ public class CmdCheck extends CmdDefaultParams {
             }
 
             private void addUntilFull(String message, Set<String> msgs) {
-                if (msgs.size() == 500) {
-                    msgs.add(">= 500 unique messages, turning off logging.");
-                } else if (msgs.size() < 500) {
+                Integer maxLines = getMaxLines();
+
+                if (maxLines != null && msgs.size() >= maxLines) {
+                    msgs.add("> " + maxLines + " unique messages, turning off logging.");
+                } else {
                     msgs.add(msgForRepo(message));
                 }
             }
@@ -164,6 +171,14 @@ public class CmdCheck extends CmdDefaultParams {
                 return repoName + "\t" + message;
             }
         };
+    }
+
+    public Integer getMaxLines() {
+        return maxLines;
+    }
+
+    public void setMaxLines(Integer maxLines) {
+        this.maxLines = maxLines;
     }
 
     private class NodeFactoryLogging extends NodeFactoryNull {
@@ -184,7 +199,6 @@ public class CmdCheck extends CmdDefaultParams {
                 counter.getAndIncrement();
             }
         };
-
 
 
         @Override

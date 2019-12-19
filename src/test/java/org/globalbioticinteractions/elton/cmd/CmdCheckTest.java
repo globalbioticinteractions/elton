@@ -47,7 +47,7 @@ public class CmdCheckTest {
     }
 
     @Test(expected = Exception.class)
-    public void runCheckNonExisting() throws URISyntaxException {
+    public void runCheckNonExisting() {
         assertThat(new File("this/should/not/exist").exists(), is(false));
         JCommander jc = new CmdLine().buildCommander();
         runOfflineWith(jc, "this/should/not/exist");
@@ -56,7 +56,7 @@ public class CmdCheckTest {
 
 
     @Test
-    public void runCheckLocal() throws URISyntaxException {
+    public void runCheckLocal() {
 
         String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
@@ -82,12 +82,12 @@ public class CmdCheckTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void runCheckLocalNoCitation() throws URISyntaxException {
+    public void runCheckLocalNoCitation() {
         assertOneWarning("src/test/resources/dataset-local-test-no-citation");
     }
 
     @Test(expected = RuntimeException.class)
-    public void runCheckLocalWithRemoteDeps() throws URISyntaxException {
+    public void runCheckLocalWithRemoteDeps() {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
@@ -98,7 +98,7 @@ public class CmdCheckTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void runCheckLocalWithRemoteDepsMax1Line() throws URISyntaxException {
+    public void runCheckLocalWithRemoteDepsMax1Line() {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
@@ -109,7 +109,7 @@ public class CmdCheckTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void runCheckLocalWithResourceRelation() throws URISyntaxException {
+    public void runCheckLocalWithResourceRelation() {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
@@ -120,7 +120,7 @@ public class CmdCheckTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void runCheckLocalBlankCitation() throws URISyntaxException {
+    public void runCheckLocalBlankCitation() {
         assertOneWarning("src/test/resources/dataset-local-test-blank-citation");
     }
 
@@ -136,7 +136,7 @@ public class CmdCheckTest {
 
 
     @Test
-    public void runCheckLocalNoRepo() throws URISyntaxException {
+    public void runCheckLocalNoRepo() {
 
         CmdCheck cmdCheck = new CmdCheck();
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();

@@ -31,6 +31,7 @@ import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Parameters(separators = "= ", commandDescription = "Check Dataset Accessibility. If no namespace is provided the local workdir is used.")
 public class CmdCheck extends CmdDefaultParams {
@@ -91,15 +93,14 @@ public class CmdCheck extends CmdDefaultParams {
     }
 
     private void check(String repoName, DatasetRegistry finder, InputStreamFactory inputStreamFactory) throws StudyImporterException {
-        final Set<String> infos = Collections.synchronizedSortedSet(new TreeSet<>());
-        final Set<String> warnings = Collections.synchronizedSortedSet(new TreeSet<>());
-        final Set<String> errors = Collections.synchronizedSortedSet(new TreeSet<>());
+        final AtomicLong warningCount = new AtomicLong(0);
+        final AtomicLong errorCount = new AtomicLong(0);
 
         ParserFactoryLocal parserFactory = new ParserFactoryLocal();
-        AtomicInteger counter = new AtomicInteger(0);
-        ImportLogger importLogger = createImportLogger(repoName, infos, warnings, errors);
+        AtomicInteger interactionCounter = new AtomicInteger(0);
+        ImportLogger importLogger = createImportLogger(repoName, warningCount, errorCount);
 
-        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(counter, importLogger);
+        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, importLogger);
         StudyImporterForRegistry studyImporter = new StudyImporterForRegistry(parserFactory, nodeFactory, finder);
         studyImporter.setLogger(importLogger);
 
@@ -117,59 +118,61 @@ public class CmdCheck extends CmdDefaultParams {
             getStderr().println(msg);
             studyImporter.importData(dataset);
             getStderr().println(" done.");
-            getStdout().println(repoName + "\t" + dataset.getArchiveURI().toString());
+            importLogger.info(null, dataset.getArchiveURI().toString());
         } catch (DatasetFinderException e) {
-            getStdout().println(repoName + "\tno local repository at [" + getWorkDir().toString() + "].");
+            importLogger.info(null, "no local repository at [" + getWorkDir().toString() + "]");
             throw new StudyImporterException(e);
         } catch (Throwable e) {
             e.printStackTrace();
-            errors.add(e.getMessage());
+            importLogger.severe(null, e.getMessage());
             throw new StudyImporterException(e);
         } finally {
-            infos.forEach(getStdout()::println);
-            warnings.forEach(getStdout()::println);
-            errors.forEach(getStdout()::println);
-            getStdout().println(repoName + "\t" + counter.get() + " interaction(s)");
-            getStdout().println(repoName + "\t" + errors.size() + " error(s)");
-            getStdout().println(repoName + "\t" + warnings.size() + " warning(s)");
+            importLogger.info(null, interactionCounter.get() + " interaction(s)");
+            importLogger.info(null, errorCount.get() + " error(s)");
+            importLogger.info(null, warningCount.get() + " warning(s)");
         }
-        if (warnings.size() > 0 || errors.size() > 0) {
+        if (warningCount.get() + errorCount.get() > 0) {
             throw new StudyImporterException("check not successful, please check log.");
-        } else if (counter.get() == 0) {
+        } else if (interactionCounter.get() == 0) {
             throw new StudyImporterException("failed to find any interactions, please check dataset configuration and format.");
         }
     }
 
-    private ImportLogger createImportLogger(String repoName, Set<String> infos, Set<String> warnings, Set<String> errors) {
+    private ImportLogger createImportLogger(final String repoName, AtomicLong warningCount, AtomicLong errorCount) {
         return new ImportLogger() {
+            private AtomicLong lineCount = new AtomicLong(0);
+
             @Override
-            public void info(LogContext study, String message) {
-                addUntilFull(message, infos);
+            public void info(LogContext ctx, String message) {
+                log(message);
             }
 
             @Override
-            public void warn(LogContext study, String message) {
-                addUntilFull(message, warnings);
+            public void warn(LogContext ctx, String message) {
+                log(message, "warn");
+                warningCount.incrementAndGet();
             }
 
             @Override
-            public void severe(LogContext study, String message) {
-                addUntilFull(message, errors);
+            public void severe(LogContext ctx, String message) {
+                log(message, "error");
+                errorCount.incrementAndGet();
             }
 
-            private void addUntilFull(String message, Set<String> msgs) {
+            private void log(String message, String level) {
                 Integer maxLines = getMaxLines();
 
-                if (maxLines != null && msgs.size() >= maxLines) {
-                    msgs.add("> " + maxLines + " unique messages, turning off logging.");
-                } else {
-                    msgs.add(msgForRepo(message));
+                if (maxLines == null || lineCount.get() < maxLines) {
+                    log(message);
                 }
+
+                lineCount.incrementAndGet();
             }
 
-            String msgForRepo(String message) {
-                return repoName + "\t" + message;
+            private void log(String message) {
+                getStdout().println(String.format("%s\t%s", repoName, message));
             }
+
         };
     }
 

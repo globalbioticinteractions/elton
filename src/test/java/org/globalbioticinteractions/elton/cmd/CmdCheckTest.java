@@ -93,7 +93,7 @@ public class CmdCheckTest {
         try {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 10);
         } finally {
-            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t2 warning(s)\n"));
+            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t3 warning(s)\n"));
         }
     }
 
@@ -104,7 +104,7 @@ public class CmdCheckTest {
         try {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 1);
         } finally {
-            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t2 warning(s)\n"));
+            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t3 warning(s)\n"));
         }
     }
 

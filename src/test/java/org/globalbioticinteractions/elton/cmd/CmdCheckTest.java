@@ -2,6 +2,9 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
 import org.apache.commons.io.FileUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.eol.globi.data.LogUtil;
+import org.eol.globi.domain.LogContext;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,10 +12,12 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static junit.framework.TestCase.fail;
@@ -170,4 +175,14 @@ public class CmdCheckTest {
 
         CmdLine.run(actual);
     }
+
+    @Test
+    public void findTermValue() throws IOException {
+        LogContext sourceOccurrenceId1 = LogUtil.contextFor(new HashMap<String, String>() {{
+            put("sourceOccurrenceId", "a8c61ad5-4cda-47df-9cb6-6c64b0e71bfa");
+        }});
+        String sourceOccurrenceId = CmdCheck.getFindTermValue(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
+        assertThat(sourceOccurrenceId, is("a8c61ad5-4cda-47df-9cb6-6c64b0e71bfa"));
+    }
+
 }

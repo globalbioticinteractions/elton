@@ -5,11 +5,14 @@ import com.beust.jcommander.Parameters;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.data.ParserFactoryLocal;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.data.StudyImporterForRegistry;
+import org.eol.globi.data.StudyImporterForTSV;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.Location;
@@ -19,10 +22,11 @@ import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.service.Dataset;
+import org.eol.globi.service.DatasetConstant;
 import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
-import org.eol.globi.util.DateUtil;
+import org.eol.globi.util.CSVTSVUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
@@ -31,20 +35,18 @@ import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
 import java.io.File;
-import java.io.PrintStream;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Parameters(separators = "= ", commandDescription = "Check Dataset Accessibility. If no namespace is provided the local workdir is used.")
 public class CmdCheck extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdCheck.class);
+    public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
 
     @Parameter(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Integer maxLines = null;
@@ -144,33 +146,57 @@ public class CmdCheck extends CmdDefaultParams {
 
             @Override
             public void info(LogContext ctx, String message) {
-                log(message);
+                log(ctx, message);
             }
 
             @Override
             public void warn(LogContext ctx, String message) {
-                log(message, "warn");
+                log(ctx, message, "warn");
                 warningCount.incrementAndGet();
             }
 
             @Override
             public void severe(LogContext ctx, String message) {
-                log(message, "error");
+                log(ctx, message, "error");
                 errorCount.incrementAndGet();
             }
 
-            private void log(String message, String level) {
+            private void log(LogContext ctx, String message, String level) {
                 Integer maxLines = getMaxLines();
 
                 if (maxLines == null || lineCount.get() < maxLines) {
-                    log(message);
+                    log(ctx, message);
                 }
 
                 lineCount.incrementAndGet();
             }
 
-            private void log(String message) {
-                getStdout().println(String.format("%s\t%s", repoName, message));
+            private void log(LogContext ctx, String msg) {
+                if (ctx == null) {
+                    log(msg);
+                } else {
+                    try {
+                        String contextString = ctx.toString();
+                        JsonNode message = new ObjectMapper().readTree(contextString);
+                        String contextSingleLineJSONString = new ObjectMapper().writeValueAsString(message);
+                        String archiveURI = getFindTermValue(message, DatasetConstant.ARCHIVE_URI);
+                        String catalogNumber = getFindTermValue(message, "sourceCatalogNumber");
+                        String collectionCode = getFindTermValue(message, "sourceCollectionCode");
+                        String collectionId = getFindTermValue(message, "sourceCollectionId");
+                        String institutionCode = getFindTermValue(message, "sourceInstitutionCode");
+                        String occurrenceId = getFindTermValue(message, "sourceOccurrenceId");
+                        String referenceUrl = getFindTermValue(message, "referenceUrl");
+                        String sourceCitation = getFindTermValue(message, StudyImporterForTSV.STUDY_SOURCE_CITATION);
+                        getStdout().println(String.format(LOG_FORMAT_STRING, repoName, msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, contextSingleLineJSONString));
+                    } catch (IOException e) {
+                        log(e.getMessage());
+                    }
+                }
+            }
+
+            private void log(String msg) {
+                String msgEscaped = CSVTSVUtil.escapeTSV(msg);
+                getStdout().println(String.format(LOG_FORMAT_STRING, repoName, msgEscaped, "", "", "", "", "", "", "", "", ""));
             }
 
         };
@@ -221,10 +247,17 @@ public class CmdCheck extends CmdDefaultParams {
 
         @Override
         public void setUnixEpochProperty(Specimen specimen, Date date) throws NodeFactoryException {
-            if (date != null && date.after(new Date())) {
-                importLogger.warn(null, "date [" + DateUtil.printDate(date) + "] is in the future");
-            }
+
         }
     }
+
+    public static String getFindTermValue(JsonNode message, String termURI) {
+        String termValue = "";
+        if (message.has(termURI)) {
+            termValue = message.get(termURI).getTextValue();
+        }
+        return termValue;
+    }
+
 
 }

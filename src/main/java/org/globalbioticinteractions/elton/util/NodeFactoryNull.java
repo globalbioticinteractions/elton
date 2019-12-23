@@ -5,7 +5,6 @@ import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.Environment;
 import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.Location;
-import org.eol.globi.domain.LogMessage;
 import org.eol.globi.domain.RelTypes;
 import org.eol.globi.domain.Season;
 import org.eol.globi.domain.Specimen;
@@ -24,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 
 public class NodeFactoryNull implements NodeFactory {
 
@@ -135,16 +133,6 @@ public class NodeFactoryNull implements NodeFactory {
             @Override
             public Study getStudy() {
                 return study;
-            }
-
-            @Override
-            public void appendLogMessage(String message, Level warning) {
-
-            }
-
-            @Override
-            public List<LogMessage> getLogMessages() {
-                return null;
             }
 
             @Override

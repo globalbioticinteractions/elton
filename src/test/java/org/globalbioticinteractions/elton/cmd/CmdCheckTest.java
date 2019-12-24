@@ -71,7 +71,10 @@ public class CmdCheckTest {
         assertThat(errOs.toString(), startsWith("checking [local] at [file:///"));
         assertThat(errOs.toString(), endsWith("done.\n"));
         assertThat(outOs.toString(), startsWith("local\tfile:///"));
-        assertThat(outOs.toString(), endsWith("local\t11 interaction(s)\nlocal\t0 error(s)\nlocal\t0 warning(s)\n"));
+        assertThat(outOs.toString(), endsWith(
+                "local\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                        "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                        "local\t0 warning(s)\t\t\t\t\t\t\t\t\t\n"));
     }
 
     private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines) {
@@ -91,25 +94,31 @@ public class CmdCheckTest {
         assertOneWarning("src/test/resources/dataset-local-test-no-citation");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void runCheckLocalWithRemoteDeps() {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 10);
         } finally {
-            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t3 warning(s)\n"));
+            assertThat(outOs.toString(), endsWith(
+                    "local\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "local\t0 warning(s)\t\t\t\t\t\t\t\t\t\n"));
         }
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void runCheckLocalWithRemoteDepsMax1Line() {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 1);
         } finally {
-            assertThat(outOs.toString(), endsWith("local\t1 interaction(s)\nlocal\t0 error(s)\nlocal\t3 warning(s)\n"));
+            assertThat(outOs.toString(), endsWith(
+                    "local\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "local\t0 warning(s)\t\t\t\t\t\t\t\t\t\n"));
         }
     }
 
@@ -120,7 +129,10 @@ public class CmdCheckTest {
         try {
             runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs, 10);
         } finally {
-            assertThat(outOs.toString(), endsWith("local\t6 interaction(s)\nlocal\t0 error(s)\nlocal\t1 warning(s)\n"));
+            assertThat(outOs.toString(), endsWith(
+                    "local\t6 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "local\t1 warning(s)\t\t\t\t\t\t\t\t\t\n"));
         }
     }
 
@@ -135,7 +147,10 @@ public class CmdCheckTest {
         try {
             runCheck(localTestPath, errOs, outOs, 10);
         } finally {
-            assertThat(outOs.toString(), endsWith("local\t11 interaction(s)\nlocal\t0 error(s)\nlocal\t1 warning(s)\n"));
+            assertThat(outOs.toString(), endsWith(
+                    "local\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "local\t1 warning(s)\t\t\t\t\t\t\t\t\t\n"));
         }
     }
 

@@ -18,6 +18,7 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,10 +34,15 @@ import static org.junit.Assert.assertThat;
 public class CmdCheckTest {
 
     private String testTmpDir = "target/test-cache";
+    private CmdCheck cmdCheck;
 
     @Before
-    public void generateTestUUID() {
+    public void init() {
         this.testTmpDir = "target/test-cache/" + UUID.randomUUID();
+        this.cmdCheck = new CmdCheck();
+        cmdCheck.setDateFactory(() -> new Date(0));
+        cmdCheck.setReviewerName("elton-dev");
+        cmdCheck.setReviewId("6a550a42-8951-416a-a187-34edbd3f87d0");
     }
 
     @After
@@ -75,17 +81,16 @@ public class CmdCheckTest {
         assertThat(errOs.toString(), startsWith("checking [local] at [file:///"));
         assertThat(errOs.toString(), endsWith("done.\n"));
 
-        assertThat(outOs.toString(), startsWith("namespace\treviewComment\t"));
-        assertThat(outOs.toString().split("\n")[1], startsWith("local\tfile:///"));
+        assertThat(outOs.toString(), startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewComment\t"));
+        assertThat(outOs.toString().split("\n")[1], startsWith("6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tfile:///"));
         assertThat(outOs.toString().split("\n")[1], endsWith("\t\t\t\t\t\t\t\t\t"));
         assertThat(outOs.toString(), endsWith(
-                "local\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
-                        "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                        "local\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
+                "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                        "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                        "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
     }
 
     private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines) {
-        CmdCheck cmdCheck = new CmdCheck();
         PrintStream err = new PrintStream(errOs);
         cmdCheck.setStderr(err);
         PrintStream out = new PrintStream(outOs);
@@ -109,9 +114,9 @@ public class CmdCheckTest {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 10);
         } finally {
             assertThat(outOs.toString(), endsWith(
-                    "local\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
+                    "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 
@@ -123,9 +128,9 @@ public class CmdCheckTest {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 1);
         } finally {
             assertThat(outOs.toString(), endsWith(
-                    "local\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
+                    "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 
@@ -138,13 +143,15 @@ public class CmdCheckTest {
         } finally {
             String reviewReport = outOs.toString();
             String[] lines = StringUtils.splitPreserveAllTokens(reviewReport, '\n');
+            int expectedNumberOfColumns = 14;
             for (String line : lines) {
-                assertThat("mismatching number of tabs in line [" + line + "]", StringUtils.splitPreserveAllTokens(line, '\t').length, is(11));
+                int numberOfColumns = StringUtils.splitPreserveAllTokens(line, '\t').length;
+                assertThat("mismatching number of columns in line [" + line + "]", numberOfColumns, is(expectedNumberOfColumns));
             }
             assertThat(reviewReport, endsWith(
-                    "local\t6 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t1 warning(s)\t\t\t\t\t\t\t\t\t"));
+                    "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t6 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t1 warning(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 
@@ -160,9 +167,9 @@ public class CmdCheckTest {
             runCheck(localTestPath, errOs, outOs, 10);
         } finally {
             assertThat(outOs.toString(), endsWith(
-                    "local\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t1 warning(s)\t\t\t\t\t\t\t\t\t"));
+                    "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\t1 warning(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 
@@ -170,7 +177,6 @@ public class CmdCheckTest {
     @Test
     public void runCheckLocalNoRepo() {
 
-        CmdCheck cmdCheck = new CmdCheck();
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         PrintStream err = new PrintStream(errOs);
         cmdCheck.setStderr(err);

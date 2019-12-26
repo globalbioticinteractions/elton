@@ -27,8 +27,10 @@ import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
 import org.eol.globi.util.CSVTSVUtil;
+import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.dataset.CitationUtil;
+import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
@@ -39,18 +41,27 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "Check Dataset Accessibility. If no namespace is provided the local workdir is used.")
 public class CmdCheck extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdCheck.class);
-    public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
+    public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
 
     @Parameter(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Integer maxLines = null;
+
+    private DateFactory dateFactory = Date::new;
+
+    private String reviewerName = "GloBI automated reviewer (elton-" + Elton.getVersion() + ")";
+
+    private String reviewId = UUID.randomUUID().toString();
 
     @Override
     public void run() {
@@ -142,7 +153,7 @@ public class CmdCheck extends CmdDefaultParams {
     }
 
     private void logHeader(PrintStream out) {
-        logValidationMessageNoNewLine(out, "namespace", "reviewComment", "archiveURI", "referenceUrl", "institutionCode", "collectionCode", "collectionId", "catalogNumber", "occurrenceId", "sourceCitation", "dataContext");
+        logReviewComment(out, "reviewId", "reviewDate", "reviewer", "namespace", "reviewComment", "archiveURI", "referenceUrl", "institutionCode", "collectionCode", "collectionId", "catalogNumber", "occurrenceId", "sourceCitation", "dataContext");
     }
 
     private ImportLogger createImportLogger(final String repoName, AtomicLong warningCount, AtomicLong errorCount) {
@@ -192,7 +203,7 @@ public class CmdCheck extends CmdDefaultParams {
                         String occurrenceId = getFindTermValue(message, "sourceOccurrenceId");
                         String referenceUrl = getFindTermValue(message, "referenceUrl");
                         String sourceCitation = getFindTermValue(message, StudyImporterForTSV.STUDY_SOURCE_CITATION);
-                        logValidationMessage(getStdout(), repoName, msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, contextSingleLineJSONString);
+                        logReviewCommentWithReviewerInfo(getStdout(), repoName, msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, contextSingleLineJSONString);
                     } catch (IOException e) {
                         log(e.getMessage());
                     }
@@ -202,18 +213,24 @@ public class CmdCheck extends CmdDefaultParams {
             private void log(String msg) {
                 String msgEscaped = CSVTSVUtil.escapeTSV(msg);
                 PrintStream stdout = getStdout();
-                logValidationMessage(stdout, repoName, msgEscaped, "", "", "", "", "", "", "", "", "");
+                logReviewCommentWithReviewerInfo(stdout, repoName, msgEscaped, "", "", "", "", "", "", "", "", "");
             }
 
         };
     }
 
-    private static void logValidationMessage(PrintStream out, String... fields) {
+    private void logReviewCommentWithReviewerInfo(PrintStream out, String... fields) {
         out.print('\n');
-        logValidationMessageNoNewLine(out, fields);
+        Stream<String> enrichedFields = Stream.concat(Stream.of(reviewId, DateUtil.printDate(dateFactory.getDate()), getReviewerName())
+                , Arrays.stream(fields));
+        logReviewComment(out, enrichedFields.toArray());
     }
 
-    private static void logValidationMessageNoNewLine(PrintStream out, String... fields) {
+    private String getReviewerName() {
+        return this.reviewerName;
+    }
+
+    private static void logReviewComment(PrintStream out, Object... fields) {
         out.print(String.format(LOG_FORMAT_STRING, fields));
     }
 
@@ -223,6 +240,10 @@ public class CmdCheck extends CmdDefaultParams {
 
     public void setMaxLines(Integer maxLines) {
         this.maxLines = maxLines;
+    }
+
+    public void setDateFactory(DateFactory dateFactory) {
+        this.dateFactory = dateFactory;
     }
 
     private class NodeFactoryLogging extends NodeFactoryNull {
@@ -272,6 +293,14 @@ public class CmdCheck extends CmdDefaultParams {
             termValue = message.get(termURI).getTextValue();
         }
         return termValue;
+    }
+
+    public void setReviewerName(String reviewerName) {
+        this.reviewerName = reviewerName;
+    }
+
+    public void setReviewId(String reviewId) {
+        this.reviewId = reviewId;
     }
 
 

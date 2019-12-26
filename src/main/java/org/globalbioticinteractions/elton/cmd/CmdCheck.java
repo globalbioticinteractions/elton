@@ -36,6 +36,7 @@ import org.globalbioticinteractions.elton.util.SpecimenNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,7 +51,6 @@ public class CmdCheck extends CmdDefaultParams {
 
     @Parameter(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Integer maxLines = null;
-
 
     @Override
     public void run() {
@@ -118,6 +118,7 @@ public class CmdCheck extends CmdDefaultParams {
             nodeFactory.getOrCreateDataset(dataset);
             String msg = "checking [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "]...";
             getStderr().println(msg);
+            logHeader(getStdout());
             studyImporter.importData(dataset);
             getStderr().println(" done.");
             importLogger.info(null, dataset.getArchiveURI().toString());
@@ -138,6 +139,10 @@ public class CmdCheck extends CmdDefaultParams {
         } else if (interactionCounter.get() == 0) {
             throw new StudyImporterException("failed to find any interactions, please check dataset configuration and format.");
         }
+    }
+
+    private void logHeader(PrintStream out) {
+        logValidationMessageNoNewLine(out, "namespace", "reviewComment", "archiveURI", "referenceUrl", "institutionCode", "collectionCode", "collectionId", "catalogNumber", "occurrenceId", "sourceCitation", "dataContext");
     }
 
     private ImportLogger createImportLogger(final String repoName, AtomicLong warningCount, AtomicLong errorCount) {
@@ -187,7 +192,7 @@ public class CmdCheck extends CmdDefaultParams {
                         String occurrenceId = getFindTermValue(message, "sourceOccurrenceId");
                         String referenceUrl = getFindTermValue(message, "referenceUrl");
                         String sourceCitation = getFindTermValue(message, StudyImporterForTSV.STUDY_SOURCE_CITATION);
-                        getStdout().println(String.format(LOG_FORMAT_STRING, repoName, msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, contextSingleLineJSONString));
+                        logValidationMessage(getStdout(), repoName, msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, contextSingleLineJSONString);
                     } catch (IOException e) {
                         log(e.getMessage());
                     }
@@ -196,10 +201,20 @@ public class CmdCheck extends CmdDefaultParams {
 
             private void log(String msg) {
                 String msgEscaped = CSVTSVUtil.escapeTSV(msg);
-                getStdout().println(String.format(LOG_FORMAT_STRING, repoName, msgEscaped, "", "", "", "", "", "", "", "", ""));
+                PrintStream stdout = getStdout();
+                logValidationMessage(stdout, repoName, msgEscaped, "", "", "", "", "", "", "", "", "");
             }
 
         };
+    }
+
+    private static void logValidationMessage(PrintStream out, String... fields) {
+        out.print('\n');
+        logValidationMessageNoNewLine(out, fields);
+    }
+
+    private static void logValidationMessageNoNewLine(PrintStream out, String... fields) {
+        out.print(String.format(LOG_FORMAT_STRING, fields));
     }
 
     public Integer getMaxLines() {

@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eol.globi.data.LogUtil;
 import org.eol.globi.domain.LogContext;
@@ -18,9 +19,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
@@ -70,11 +74,14 @@ public class CmdCheckTest {
 
         assertThat(errOs.toString(), startsWith("checking [local] at [file:///"));
         assertThat(errOs.toString(), endsWith("done.\n"));
-        assertThat(outOs.toString(), startsWith("local\tfile:///"));
+
+        assertThat(outOs.toString(), startsWith("namespace\treviewComment\t"));
+        assertThat(outOs.toString().split("\n")[1], startsWith("local\tfile:///"));
+        assertThat(outOs.toString().split("\n")[1], endsWith("\t\t\t\t\t\t\t\t\t"));
         assertThat(outOs.toString(), endsWith(
                 "local\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                         "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                        "local\t0 warning(s)\t\t\t\t\t\t\t\t\t\n"));
+                        "local\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
     }
 
     private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines) {
@@ -104,7 +111,7 @@ public class CmdCheckTest {
             assertThat(outOs.toString(), endsWith(
                     "local\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t0 warning(s)\t\t\t\t\t\t\t\t\t\n"));
+                            "local\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 
@@ -118,7 +125,7 @@ public class CmdCheckTest {
             assertThat(outOs.toString(), endsWith(
                     "local\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t0 warning(s)\t\t\t\t\t\t\t\t\t\n"));
+                            "local\t0 warning(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 
@@ -129,10 +136,15 @@ public class CmdCheckTest {
         try {
             runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs, 10);
         } finally {
-            assertThat(outOs.toString(), endsWith(
+            String reviewReport = outOs.toString();
+            String[] lines = StringUtils.splitPreserveAllTokens(reviewReport, '\n');
+            for (String line : lines) {
+                assertThat("mismatching number of tabs in line [" + line + "]", StringUtils.splitPreserveAllTokens(line, '\t').length, is(11));
+            }
+            assertThat(reviewReport, endsWith(
                     "local\t6 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t1 warning(s)\t\t\t\t\t\t\t\t\t\n"));
+                            "local\t1 warning(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 
@@ -150,7 +162,7 @@ public class CmdCheckTest {
             assertThat(outOs.toString(), endsWith(
                     "local\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "local\t0 error(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "local\t1 warning(s)\t\t\t\t\t\t\t\t\t\n"));
+                            "local\t1 warning(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 

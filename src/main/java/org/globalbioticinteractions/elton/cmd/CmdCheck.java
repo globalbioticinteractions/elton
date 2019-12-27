@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.data.ParserFactoryLocal;
@@ -193,17 +194,26 @@ public class CmdCheck extends CmdDefaultParams {
                 } else {
                     try {
                         String contextString = ctx.toString();
-                        JsonNode message = new ObjectMapper().readTree(contextString);
-                        String contextSingleLineJSONString = new ObjectMapper().writeValueAsString(message);
-                        String archiveURI = getFindTermValue(message, DatasetConstant.ARCHIVE_URI);
-                        String catalogNumber = getFindTermValue(message, "sourceCatalogNumber");
-                        String collectionCode = getFindTermValue(message, "sourceCollectionCode");
-                        String collectionId = getFindTermValue(message, "sourceCollectionId");
-                        String institutionCode = getFindTermValue(message, "sourceInstitutionCode");
-                        String occurrenceId = getFindTermValue(message, "sourceOccurrenceId");
-                        String referenceUrl = getFindTermValue(message, "referenceUrl");
-                        String sourceCitation = getFindTermValue(message, StudyImporterForTSV.STUDY_SOURCE_CITATION);
-                        logReviewCommentWithReviewerInfo(getStdout(), repoName, msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, contextSingleLineJSONString);
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode dataContext = mapper.readTree(contextString);
+                        ObjectNode review = mapper.createObjectNode();
+                        review.put("reviewId", reviewId);
+                        review.put("reviewDate", DateUtil.printDate(dateFactory.getDate()));
+                        review.put("reviewerName", getReviewerName());
+                        review.put("reviewComment", msg);
+                        review.put("namespace", repoName);
+                        review.put("context", dataContext);
+
+                        String reviewJsonString = mapper.writeValueAsString(review);
+                        String archiveURI = getFindTermValue(dataContext, DatasetConstant.ARCHIVE_URI);
+                        String catalogNumber = getFindTermValue(dataContext, "sourceCatalogNumber");
+                        String collectionCode = getFindTermValue(dataContext, "sourceCollectionCode");
+                        String collectionId = getFindTermValue(dataContext, "sourceCollectionId");
+                        String institutionCode = getFindTermValue(dataContext, "sourceInstitutionCode");
+                        String occurrenceId = getFindTermValue(dataContext, "sourceOccurrenceId");
+                        String referenceUrl = getFindTermValue(dataContext, "referenceUrl");
+                        String sourceCitation = getFindTermValue(dataContext, StudyImporterForTSV.STUDY_SOURCE_CITATION);
+                        logReviewCommentWithReviewerInfo(getStdout(), repoName, msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
                     } catch (IOException e) {
                         log(e.getMessage());
                     }

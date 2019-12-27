@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
-@Parameters(separators = "= ", commandDescription = "Check Dataset Accessibility. If no namespace is provided the local workdir is used.")
+@Parameters(separators = "= ", commandDescription = "Generates a review for interaction dataset(s). If no namespace is provided the local workdir is used.")
 public class CmdCheck extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdCheck.class);
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
@@ -128,7 +128,7 @@ public class CmdCheck extends CmdDefaultParams {
                 importLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
             nodeFactory.getOrCreateDataset(dataset);
-            String msg = "checking [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "]...";
+            String msg = "Reviewing [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "] using Elton version [" + Elton.getVersion() + "] ...";
             getStderr().println(msg);
             logHeader(getStdout());
             studyImporter.importData(dataset);

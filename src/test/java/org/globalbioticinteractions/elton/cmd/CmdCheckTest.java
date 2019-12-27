@@ -78,7 +78,7 @@ public class CmdCheckTest {
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         runCheck(localTestPath, errOs, outOs, 10);
 
-        assertThat(errOs.toString(), startsWith("checking [local] at [file:///"));
+        assertThat(errOs.toString(), startsWith("Reviewing [local] at [file:///"));
         assertThat(errOs.toString(), endsWith("done.\n"));
 
         assertThat(outOs.toString(), startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewComment\t"));

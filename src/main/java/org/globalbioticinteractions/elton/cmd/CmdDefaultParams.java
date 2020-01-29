@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameter;
+import org.apache.commons.lang.StringUtils;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 
 import java.io.PrintStream;
@@ -16,11 +17,11 @@ abstract class CmdDefaultParams implements Runnable {
     @Parameter(names = {"--tmp-dir"}, description = "tmp directory")
     private String tmpDir = "./.elton/tmp";
 
+    private URI workDir;
 
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
     private ProgressCursor cursor = new ProgressCursor(stderr);
-    private URI workDir = null;
 
     @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();
@@ -49,6 +50,7 @@ abstract class CmdDefaultParams implements Runnable {
         return workDir == null
                 ? Paths.get("").toUri()
                 : workDir;
+
     }
 
     public String getCacheDir() {

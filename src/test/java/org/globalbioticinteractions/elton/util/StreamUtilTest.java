@@ -6,6 +6,7 @@ import org.globalbioticinteractions.doi.DOI;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,7 +19,7 @@ public class StreamUtilTest {
     @Test
     public void eventDate() {
         Stream<String> dateStream = StreamUtil.streamOf(new Date(0));
-        assertThat(dateStream.collect(Collectors.toList()), is(Arrays.asList("1970-01-01T00:00:00Z")));
+        assertThat(dateStream.collect(Collectors.toList()), is(Collections.singletonList("1970-01-01T00:00:00Z")));
     }
 
     @Test
@@ -58,6 +59,5 @@ public class StreamUtilTest {
         assertThat(StreamUtil.tsvRowOf(Stream.concat(row, Stream.of("three"))), is("one\ttwo\tthree"));
         assertThat(StreamUtil.tsvRowOf(row), is("one\ttwo"));
     }
-
 
 }

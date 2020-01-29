@@ -4,12 +4,14 @@ import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.Environment;
 import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.Location;
+import org.eol.globi.domain.RelTypes;
 import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.domain.Term;
 import org.eol.globi.service.Dataset;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -31,12 +33,18 @@ public class NodeFactoryForDataset extends NodeFactoryNull {
 
     @Override
     public Specimen createSpecimen(Interaction interaction, Taxon taxon) throws NodeFactoryException {
-        return new SpecimenImpl(dataset, interaction.getStudy(), serializer, taxon);
+        return new SpecimenImpl(dataset, interaction.getStudy(), serializer, taxon, true);
     }
 
     @Override
     public Specimen createSpecimen(Study study, Taxon taxon) throws NodeFactoryException {
-        return new SpecimenImpl(dataset, study, serializer, taxon);
+        return new SpecimenImpl(dataset, study, serializer, taxon, true);
+    }
+
+    @Override
+    public Specimen createSpecimen(Study study, Taxon taxon, RelTypes... relTypes) throws NodeFactoryException {
+        boolean containsSupportingClaim = Arrays.asList(relTypes).contains(RelTypes.SUPPORTS);
+        return new SpecimenImpl(dataset, study, serializer, taxon, containsSupportingClaim);
     }
 
     @Override

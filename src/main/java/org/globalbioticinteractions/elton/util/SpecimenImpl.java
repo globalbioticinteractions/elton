@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
+import javafx.util.Pair;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Location;
 import org.eol.globi.domain.Specimen;
@@ -9,7 +10,9 @@ import org.eol.globi.domain.Term;
 import org.eol.globi.service.Dataset;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SpecimenImpl extends SpecimenNull {
     public final Taxon taxon;
@@ -22,12 +25,20 @@ public class SpecimenImpl extends SpecimenNull {
     private Term lifeStage;
     private String externalId;
     private Term basisOfRecord;
+    private Term sex;
+    private Map<String, String> properties;
+    private boolean supportingClaim;
 
     public SpecimenImpl(Dataset dataset, Study study, InteractionWriter serializer, Taxon taxon) {
+        this(dataset, study, serializer, taxon, true);
+    }
+
+    public SpecimenImpl(Dataset dataset, Study study, InteractionWriter serializer, Taxon taxon, boolean supportingClaim) {
         this.study = study;
         this.serializer = serializer;
         this.taxon = taxon;
         this.dataset = dataset;
+        this.supportingClaim = supportingClaim;
     }
 
     @Override
@@ -117,5 +128,36 @@ public class SpecimenImpl extends SpecimenNull {
     @Override
     public String getExternalId() {
         return externalId;
+    }
+
+    @Override
+    public Term getSex() {
+        return sex;
+    }
+
+    @Override
+    public void setSex(Term sex) {
+        this.sex = sex;
+    }
+
+    @Override
+    public void setProperty(String name, String value) {
+        if (properties == null) {
+            properties = new HashMap<>();
+        }
+        properties.put(name, value);
+    }
+
+    @Override
+    public String getProperty(String name) {
+        return properties == null
+                ? null
+                : properties.get(name);
+    }
+
+
+
+    public boolean isSupportingClaim() {
+        return supportingClaim;
     }
 }

@@ -1,12 +1,15 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
+import org.apache.commons.lang.StringUtils;
+import org.eol.globi.data.StudyImporterForTSV;
 import org.eol.globi.domain.InteractType;
+import org.eol.globi.domain.PropertyAndValueDictionary;
 import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
 import org.eol.globi.service.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
@@ -15,10 +18,50 @@ import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 
 import java.io.PrintStream;
+import java.net.URI;
 import java.util.stream.Stream;
 
 import static org.eol.globi.data.StudyImporterForMetaTable.EVENT_DATE;
-import static org.eol.globi.data.StudyImporterForTSV.*;
+import static org.eol.globi.data.StudyImporterForTSV.ARGUMENT_TYPE_ID;
+import static org.eol.globi.data.StudyImporterForTSV.BASIS_OF_RECORD_ID;
+import static org.eol.globi.data.StudyImporterForTSV.BASIS_OF_RECORD_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.DECIMAL_LATITUDE;
+import static org.eol.globi.data.StudyImporterForTSV.DECIMAL_LONGITUDE;
+import static org.eol.globi.data.StudyImporterForTSV.INTERACTION_TYPE_ID;
+import static org.eol.globi.data.StudyImporterForTSV.INTERACTION_TYPE_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.LOCALITY_ID;
+import static org.eol.globi.data.StudyImporterForTSV.LOCALITY_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.REFERENCE_CITATION;
+import static org.eol.globi.data.StudyImporterForTSV.REFERENCE_DOI;
+import static org.eol.globi.data.StudyImporterForTSV.REFERENCE_URL;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_BODY_PART_ID;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_BODY_PART_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_CATALOG_NUMBER;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_COLLECTION_CODE;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_INSTITUTION_CODE;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_LIFE_STAGE_ID;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_LIFE_STAGE_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_OCCURRENCE_ID;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_SEX_ID;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_SEX_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_TAXON_ID;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_TAXON_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_BODY_PART_ID;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_BODY_PART_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_CATALOG_NUMBER;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_COLLECTION_CODE;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_INSTITUTION_CODE;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_LIFE_STAGE_ID;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_LIFE_STAGE_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_OCCURRENCE_ID;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_SEX_ID;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_SEX_NAME;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_TAXON_ID;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_TAXON_NAME;
+import static org.eol.globi.domain.PropertyAndValueDictionary.CATALOG_NUMBER;
+import static org.eol.globi.domain.PropertyAndValueDictionary.COLLECTION_CODE;
+import static org.eol.globi.domain.PropertyAndValueDictionary.INSTITUTION_CODE;
+import static org.eol.globi.domain.PropertyAndValueDictionary.OCCURRENCE_ID;
 
 @Parameters(separators = "= ", commandDescription = "List Interacting Taxon Pairs For Local Datasets")
 public class CmdInteractions extends CmdTabularWriterParams {
@@ -34,12 +77,23 @@ public class CmdInteractions extends CmdTabularWriterParams {
         public void write(SpecimenImpl source, InteractType type, SpecimenImpl target, Study study, Dataset dataset) {
             Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
 
+            String sourceOccurrenceId = valueOrEmpty(source, OCCURRENCE_ID);
+            String sourceCatalogNumber = valueOrEmpty(source, CATALOG_NUMBER);
+            String sourceCollectionCode = valueOrEmpty(source, COLLECTION_CODE);
+            String sourceInstitutionCode = valueOrEmpty(source, INSTITUTION_CODE);
+
+            String targetOccurrenceId = valueOrEmpty(target, OCCURRENCE_ID);
+            String targetCatalogNumber = valueOrEmpty(target, CATALOG_NUMBER);
+            String targetCollectionCode = valueOrEmpty(target, COLLECTION_CODE);
+            String targetInstitutionCode = valueOrEmpty(target, INSTITUTION_CODE);
+
             Stream<String> rowStream = Stream.of(
-                    Stream.of(source.getExternalId()),
+                    Stream.of(source.isSupportingClaim() ? PropertyAndValueDictionary.SUPPORTS : PropertyAndValueDictionary.REFUTES),
+                    Stream.of(sourceOccurrenceId, sourceCatalogNumber, sourceCollectionCode, sourceInstitutionCode),
                     StreamUtil.streamOf(source.taxon),
                     StreamUtil.streamOf(source),
                     interactStream,
-                    Stream.of(target.getExternalId()),
+                    Stream.of(targetOccurrenceId, targetCatalogNumber, targetCollectionCode, targetInstitutionCode),
                     StreamUtil.streamOf(target.taxon),
                     StreamUtil.streamOf(target),
                     StreamUtil.streamOf(target.getBasisOfRecord()),
@@ -51,10 +105,19 @@ public class CmdInteractions extends CmdTabularWriterParams {
             out.println(row);
         }
 
+        private String valueOrEmpty(SpecimenImpl source, String key) {
+            String value = source.getProperty(key);
+            return StringUtils.isBlank(value) ? "" : value;
+        }
+
         @Override
         public void writeHeader() {
             out.println(StreamUtil.tsvRowOf(Stream.concat(Stream.of(
+                    ARGUMENT_TYPE_ID,
                     SOURCE_OCCURRENCE_ID,
+                    SOURCE_CATALOG_NUMBER,
+                    SOURCE_COLLECTION_CODE,
+                    SOURCE_INSTITUTION_CODE,
                     SOURCE_TAXON_ID,
                     SOURCE_TAXON_NAME,
                     "sourceTaxonRank",
@@ -65,9 +128,14 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     SOURCE_BODY_PART_NAME,
                     SOURCE_LIFE_STAGE_ID,
                     SOURCE_LIFE_STAGE_NAME,
+                    SOURCE_SEX_ID,
+                    SOURCE_SEX_NAME,
                     INTERACTION_TYPE_ID,
                     INTERACTION_TYPE_NAME,
                     TARGET_OCCURRENCE_ID,
+                    TARGET_CATALOG_NUMBER,
+                    TARGET_COLLECTION_CODE,
+                    TARGET_INSTITUTION_CODE,
                     TARGET_TAXON_ID,
                     TARGET_TAXON_NAME,
                     "targetTaxonRank",
@@ -78,6 +146,8 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     TARGET_BODY_PART_NAME,
                     TARGET_LIFE_STAGE_ID,
                     TARGET_LIFE_STAGE_NAME,
+                    TARGET_SEX_ID,
+                    TARGET_SEX_NAME,
                     BASIS_OF_RECORD_ID,
                     BASIS_OF_RECORD_NAME,
                     EVENT_DATE,
@@ -104,7 +174,11 @@ public class CmdInteractions extends CmdTabularWriterParams {
             writer.writeHeader();
         }
 
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
+                getCacheDir(),
+                getWorkDir(),
+                getTmpDir(),
+                createInputStreamFactory());
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(writer, new DatasetProcessorForTSV());
         CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "scanning for interactions in");

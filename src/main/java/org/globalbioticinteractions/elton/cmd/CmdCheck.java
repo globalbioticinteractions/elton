@@ -53,10 +53,13 @@ import java.util.stream.Stream;
 @Parameters(separators = "= ", commandDescription = "Generates a review for interaction dataset(s). If no namespace is provided the local workdir is used.")
 public class CmdCheck extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdCheck.class);
-    public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
+    public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
 
     @Parameter(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Integer maxLines = null;
+
+    @Parameter(names = {"--type"}, description = "select desired review comments types: info,note,summary", converter = ReviewCommentTypeConverter.class)
+    private List<ReviewCommentType> desiredReviewCommentTypes = Arrays.asList(ReviewCommentType.values());
 
     private DateFactory dateFactory = Date::new;
 
@@ -107,16 +110,16 @@ public class CmdCheck extends CmdDefaultParams {
     }
 
     private void check(String repoName, DatasetRegistry finder, InputStreamFactory inputStreamFactory) throws StudyImporterException {
-        final AtomicLong warningCount = new AtomicLong(0);
-        final AtomicLong errorCount = new AtomicLong(0);
+        final AtomicLong noteCounter = new AtomicLong(0);
+        final AtomicLong infoCounter = new AtomicLong(0);
 
         ParserFactoryLocal parserFactory = new ParserFactoryLocal();
         AtomicInteger interactionCounter = new AtomicInteger(0);
-        ImportLogger importLogger = createImportLogger(repoName, warningCount, errorCount);
+        ReviewReportLogger reviewReportLogger = createReviewReportLogger(repoName, noteCounter, infoCounter);
 
-        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, importLogger);
+        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, reviewReportLogger);
         StudyImporterForRegistry studyImporter = new StudyImporterForRegistry(parserFactory, nodeFactory, finder);
-        studyImporter.setLogger(importLogger);
+        studyImporter.setLogger(reviewReportLogger);
 
         try {
             Dataset dataset = new DatasetFactory(
@@ -125,108 +128,41 @@ public class CmdCheck extends CmdDefaultParams {
                     .datasetFor(repoName);
 
             if (StringUtils.isBlank(CitationUtil.citationOrDefaultFor(dataset, ""))) {
-                importLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
+                reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
             nodeFactory.getOrCreateDataset(dataset);
             String msg = "Reviewing [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "] using Elton version [" + Elton.getVersion() + "] ...";
             getStderr().println(msg);
             logHeader(getStdout());
             studyImporter.importData(dataset);
+            if (interactionCounter.get() == 0) {
+                reviewReportLogger.warn(null, "no interactions found");
+            }
             getStderr().println(" done.");
-            importLogger.info(null, dataset.getArchiveURI().toString());
+            reviewReportLogger.log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary);
         } catch (DatasetFinderException e) {
-            importLogger.info(null, "no local repository at [" + getWorkDir().toString() + "]");
+            reviewReportLogger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
             throw new StudyImporterException(e);
         } catch (Throwable e) {
             e.printStackTrace();
-            importLogger.severe(null, e.getMessage());
+            reviewReportLogger.severe(null, e.getMessage());
             throw new StudyImporterException(e);
         } finally {
-            importLogger.info(null, interactionCounter.get() + " interaction(s)");
-            importLogger.info(null, errorCount.get() + " error(s)");
-            importLogger.info(null, warningCount.get() + " warning(s)");
+            reviewReportLogger.log(null, interactionCounter.get() + " interaction(s)", ReviewCommentType.summary);
+            reviewReportLogger.log(null, noteCounter.get() + " note(s)", ReviewCommentType.summary);
+            reviewReportLogger.log(null, infoCounter.get() + " info(s)", ReviewCommentType.summary);
         }
-        if (warningCount.get() + errorCount.get() > 0) {
-            throw new StudyImporterException("check not successful, please check log.");
-        } else if (interactionCounter.get() == 0) {
-            throw new StudyImporterException("failed to find any interactions, please check dataset configuration and format.");
+        if (noteCounter.get() > 0) {
+            throw new StudyImporterException("review notes exists, please check review report.");
         }
     }
 
     private void logHeader(PrintStream out) {
-        logReviewComment(out, "reviewId", "reviewDate", "reviewer", "namespace", "reviewComment", "archiveURI", "referenceUrl", "institutionCode", "collectionCode", "collectionId", "catalogNumber", "occurrenceId", "sourceCitation", "dataContext");
+        logReviewComment(out, "reviewId", "reviewDate", "reviewer", "namespace", "reviewCommentType", "reviewComment", "archiveURI", "referenceUrl", "institutionCode", "collectionCode", "collectionId", "catalogNumber", "occurrenceId", "sourceCitation", "dataContext");
     }
 
-    private ImportLogger createImportLogger(final String repoName, AtomicLong warningCount, AtomicLong errorCount) {
-        return new ImportLogger() {
-            private AtomicLong lineCount = new AtomicLong(0);
-
-            @Override
-            public void info(LogContext ctx, String message) {
-                log(ctx, message);
-            }
-
-            @Override
-            public void warn(LogContext ctx, String message) {
-                log(ctx, message, "warn");
-                warningCount.incrementAndGet();
-            }
-
-            @Override
-            public void severe(LogContext ctx, String message) {
-                log(ctx, message, "error");
-                errorCount.incrementAndGet();
-            }
-
-            private void log(LogContext ctx, String message, String level) {
-                Integer maxLines = getMaxLines();
-
-                if (maxLines == null || lineCount.get() < maxLines) {
-                    log(ctx, message);
-                }
-
-                lineCount.incrementAndGet();
-            }
-
-            private void log(LogContext ctx, String msg) {
-                if (ctx == null) {
-                    log(msg);
-                } else {
-                    try {
-                        String contextString = ctx.toString();
-                        ObjectMapper mapper = new ObjectMapper();
-                        JsonNode dataContext = mapper.readTree(contextString);
-                        ObjectNode review = mapper.createObjectNode();
-                        review.put("reviewId", reviewId);
-                        review.put("reviewDate", DateUtil.printDate(dateFactory.getDate()));
-                        review.put("reviewerName", getReviewerName());
-                        review.put("reviewComment", msg);
-                        review.put("namespace", repoName);
-                        review.put("context", dataContext);
-
-                        String reviewJsonString = mapper.writeValueAsString(review);
-                        String archiveURI = getFindTermValue(dataContext, DatasetConstant.ARCHIVE_URI);
-                        String catalogNumber = getFindTermValue(dataContext, "sourceCatalogNumber");
-                        String collectionCode = getFindTermValue(dataContext, "sourceCollectionCode");
-                        String collectionId = getFindTermValue(dataContext, "sourceCollectionId");
-                        String institutionCode = getFindTermValue(dataContext, "sourceInstitutionCode");
-                        String occurrenceId = getFindTermValue(dataContext, "sourceOccurrenceId");
-                        String referenceUrl = getFindTermValue(dataContext, "referenceUrl");
-                        String sourceCitation = getFindTermValue(dataContext, StudyImporterForTSV.STUDY_SOURCE_CITATION);
-                        logReviewCommentWithReviewerInfo(getStdout(), repoName, msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
-                    } catch (IOException e) {
-                        log(e.getMessage());
-                    }
-                }
-            }
-
-            private void log(String msg) {
-                String msgEscaped = CSVTSVUtil.escapeTSV(msg);
-                PrintStream stdout = getStdout();
-                logReviewCommentWithReviewerInfo(stdout, repoName, msgEscaped, "", "", "", "", "", "", "", "", "");
-            }
-
-        };
+    private ReviewReportLogger createReviewReportLogger(final String repoName, AtomicLong noteCounter, AtomicLong infoCounter) {
+        return new ReviewReportLogger(infoCounter, noteCounter, repoName, desiredReviewCommentTypes);
     }
 
     private void logReviewCommentWithReviewerInfo(PrintStream out, String... fields) {
@@ -254,6 +190,10 @@ public class CmdCheck extends CmdDefaultParams {
 
     public void setDateFactory(DateFactory dateFactory) {
         this.dateFactory = dateFactory;
+    }
+
+    public void setDesiredReviewCommentTypes(List<ReviewCommentType> commentTypes) {
+        desiredReviewCommentTypes = commentTypes;
     }
 
     private class NodeFactoryLogging extends NodeFactoryNull {
@@ -302,7 +242,7 @@ public class CmdCheck extends CmdDefaultParams {
         if (message.has(termURI)) {
             termValue = message.get(termURI).getTextValue();
         }
-        return termValue;
+        return StringUtils.isBlank(termURI) ? "" : termValue;
     }
 
     public void setReviewerName(String reviewerName) {
@@ -314,4 +254,94 @@ public class CmdCheck extends CmdDefaultParams {
     }
 
 
+    private class ReviewReportLogger implements ImportLogger {
+        private final AtomicLong infoCounter;
+        private final AtomicLong noteCounter;
+        private final String repoName;
+        private final List<ReviewCommentType> reviewTypes;
+        private AtomicLong lineCount;
+
+        public ReviewReportLogger(AtomicLong infoCounter, AtomicLong noteCounter, String repoName, List<ReviewCommentType> desiredReviewCommentTypes) {
+            this.infoCounter = infoCounter;
+            this.noteCounter = noteCounter;
+            this.repoName = repoName;
+            lineCount = new AtomicLong(0);
+            this.reviewTypes = desiredReviewCommentTypes;
+        }
+
+
+        @Override
+        public void info(LogContext ctx, String message) {
+            log(ctx, message, ReviewCommentType.info);
+            infoCounter.incrementAndGet();
+        }
+
+        @Override
+        public void warn(LogContext ctx, String message) {
+            logWithCounter(ctx, message, ReviewCommentType.note);
+            noteCounter.incrementAndGet();
+        }
+
+        @Override
+        public void severe(LogContext ctx, String message) {
+            logWithCounter(ctx, message, ReviewCommentType.note);
+            noteCounter.incrementAndGet();
+        }
+
+        private void logWithCounter(LogContext ctx, String message, ReviewCommentType commentType) {
+            Integer maxLines = getMaxLines();
+
+            if (maxLines == null || lineCount.get() < maxLines) {
+                log(ctx, message, commentType);
+            }
+
+            lineCount.incrementAndGet();
+        }
+
+        public void log(LogContext ctx, String msg, ReviewCommentType commentType) {
+            if (desiredReviewCommentTypes.contains(commentType)) {
+                if (ctx == null) {
+                    log(msg, commentType);
+                } else {
+                    logWithContext(ctx, msg, commentType);
+                }
+            }
+        }
+
+        private void logWithContext(LogContext ctx, String msg, ReviewCommentType commentType) {
+            try {
+                String contextString = ctx.toString();
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode dataContext = mapper.readTree(contextString);
+                ObjectNode review = mapper.createObjectNode();
+                review.put("reviewId", reviewId);
+                review.put("reviewDate", DateUtil.printDate(dateFactory.getDate()));
+                review.put("reviewerName", getReviewerName());
+                review.put("reviewCommentType", commentType.getLabel());
+                review.put("reviewComment", msg);
+                review.put("namespace", repoName);
+                review.put("context", dataContext);
+
+                String reviewJsonString = mapper.writeValueAsString(review);
+                String archiveURI = getFindTermValue(dataContext, DatasetConstant.ARCHIVE_URI);
+                String catalogNumber = getFindTermValue(dataContext, "sourceCatalogNumber");
+                String collectionCode = getFindTermValue(dataContext, "sourceCollectionCode");
+                String collectionId = getFindTermValue(dataContext, "sourceCollectionId");
+                String institutionCode = getFindTermValue(dataContext, "sourceInstitutionCode");
+                String occurrenceId = getFindTermValue(dataContext, "sourceOccurrenceId");
+                String referenceUrl = getFindTermValue(dataContext, "referenceUrl");
+                String sourceCitation = getFindTermValue(dataContext, StudyImporterForTSV.STUDY_SOURCE_CITATION);
+                logReviewCommentWithReviewerInfo(getStdout(), repoName, commentType.getLabel(), msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
+            } catch (IOException e) {
+                log(e.getMessage(), ReviewCommentType.note);
+            }
+        }
+
+        private void log(String msg, ReviewCommentType commentType) {
+            String msgEscaped = CSVTSVUtil.escapeTSV(msg);
+            PrintStream stdout = getStdout();
+            logReviewCommentWithReviewerInfo(stdout, repoName, commentType.getLabel(), msgEscaped, "", "", "", "", "", "", "", "", "");
+        }
+
+    }
 }

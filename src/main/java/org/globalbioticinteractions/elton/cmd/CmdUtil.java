@@ -48,9 +48,6 @@ public class CmdUtil {
         }
     }
 
-    static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry finder, String namespace, String cacheDir) {
-        return createDataFinderLoggingCaching(finder, namespace, cacheDir, inStream -> inStream);
-    }
     static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry finder, String namespace, String cacheDir, InputStreamFactory factory) {
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(finder, cacheDir), dataset -> {
             Cache pullThroughCache = new CachePullThrough(namespace, cacheDir, factory);

@@ -93,7 +93,26 @@ public class SpecimenNull implements Specimen {
         return null;
     }
 
-    public void setProperty(String name, Object value) {
+    @Override
+    public void setProperty(String name, String value) {
+    }
+
+    @Override
+    public void setProperty(String name, Double value) {
+    }
+
+    @Override
+    public String getProperty(String name) {
+        return null;
+    }
+
+
+    public void setSex(Term term) {
+
+    }
+
+    public Term getSex() {
+        return null;
     }
 
     public void setExternalId(String externalId) {

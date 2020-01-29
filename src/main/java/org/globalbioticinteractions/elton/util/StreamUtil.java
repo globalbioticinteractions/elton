@@ -86,7 +86,9 @@ public class StreamUtil {
     }
 
     public static Stream<String> streamOf(Specimen specimen) {
-        return Stream.concat(streamOf(specimen.getBodyPart()), streamOf(specimen.getLifeStage()));
+        return Stream.concat(Stream.concat(streamOf(specimen.getBodyPart()),
+                streamOf(specimen.getLifeStage())),
+                streamOf(specimen.getSex()));
     }
 
     public static Stream<String> streamOf(Term term) {

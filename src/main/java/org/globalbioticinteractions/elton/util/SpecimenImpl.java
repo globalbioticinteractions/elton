@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.util;
 
-import javafx.util.Pair;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Location;
 import org.eol.globi.domain.Specimen;

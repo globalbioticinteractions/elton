@@ -237,12 +237,12 @@ public class CmdCheck extends CmdDefaultParams {
         }
     }
 
-    public static String getFindTermValue(JsonNode message, String termURI) {
+    public static String getFindTermValueOrEmptyString(JsonNode message, String termURI) {
         String termValue = "";
         if (message.has(termURI)) {
             termValue = message.get(termURI).getTextValue();
         }
-        return StringUtils.isBlank(termURI) ? "" : termValue;
+        return StringUtils.isBlank(termValue) ? "" : termValue;
     }
 
     public void setReviewerName(String reviewerName) {
@@ -323,14 +323,14 @@ public class CmdCheck extends CmdDefaultParams {
                 review.put("context", dataContext);
 
                 String reviewJsonString = mapper.writeValueAsString(review);
-                String archiveURI = getFindTermValue(dataContext, DatasetConstant.ARCHIVE_URI);
-                String catalogNumber = getFindTermValue(dataContext, "sourceCatalogNumber");
-                String collectionCode = getFindTermValue(dataContext, "sourceCollectionCode");
-                String collectionId = getFindTermValue(dataContext, "sourceCollectionId");
-                String institutionCode = getFindTermValue(dataContext, "sourceInstitutionCode");
-                String occurrenceId = getFindTermValue(dataContext, "sourceOccurrenceId");
-                String referenceUrl = getFindTermValue(dataContext, "referenceUrl");
-                String sourceCitation = getFindTermValue(dataContext, StudyImporterForTSV.STUDY_SOURCE_CITATION);
+                String archiveURI = getFindTermValueOrEmptyString(dataContext, DatasetConstant.ARCHIVE_URI);
+                String catalogNumber = getFindTermValueOrEmptyString(dataContext, "sourceCatalogNumber");
+                String collectionCode = getFindTermValueOrEmptyString(dataContext, "sourceCollectionCode");
+                String collectionId = getFindTermValueOrEmptyString(dataContext, "sourceCollectionId");
+                String institutionCode = getFindTermValueOrEmptyString(dataContext, "sourceInstitutionCode");
+                String occurrenceId = getFindTermValueOrEmptyString(dataContext, "sourceOccurrenceId");
+                String referenceUrl = getFindTermValueOrEmptyString(dataContext, "referenceUrl");
+                String sourceCitation = getFindTermValueOrEmptyString(dataContext, StudyImporterForTSV.STUDY_SOURCE_CITATION);
                 logReviewCommentWithReviewerInfo(getStdout(), repoName, commentType.getLabel(), msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
             } catch (IOException e) {
                 log(e.getMessage(), ReviewCommentType.note);

@@ -240,8 +240,17 @@ public class CmdCheckTest {
         LogContext sourceOccurrenceId1 = LogUtil.contextFor(new HashMap<String, String>() {{
             put("sourceOccurrenceId", "a8c61ad5-4cda-47df-9cb6-6c64b0e71bfa");
         }});
-        String sourceOccurrenceId = CmdCheck.getFindTermValue(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
+        String sourceOccurrenceId = CmdCheck.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
         assertThat(sourceOccurrenceId, is("a8c61ad5-4cda-47df-9cb6-6c64b0e71bfa"));
+    }
+
+    @Test
+    public void findTermValueNull() throws IOException {
+        LogContext sourceOccurrenceId1 = LogUtil.contextFor(new HashMap<String, String>() {{
+            put("sourceOccurrenceId", null);
+        }});
+        String sourceOccurrenceId = CmdCheck.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
+        assertThat(sourceOccurrenceId, is(""));
     }
 
 }

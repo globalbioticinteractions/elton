@@ -2,7 +2,6 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.apache.commons.lang.StringUtils;
-import org.eol.globi.data.StudyImporterForTSV;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.PropertyAndValueDictionary;
 import org.eol.globi.domain.Study;
@@ -18,7 +17,6 @@ import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 
 import java.io.PrintStream;
-import java.net.URI;
 import java.util.stream.Stream;
 
 import static org.eol.globi.data.StudyImporterForMetaTable.EVENT_DATE;
@@ -44,8 +42,6 @@ import static org.eol.globi.data.StudyImporterForTSV.SOURCE_LIFE_STAGE_NAME;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_OCCURRENCE_ID;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_SEX_ID;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_SEX_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_TAXON_ID;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_TAXON_NAME;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_BODY_PART_ID;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_BODY_PART_NAME;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_CATALOG_NUMBER;
@@ -56,12 +52,18 @@ import static org.eol.globi.data.StudyImporterForTSV.TARGET_LIFE_STAGE_NAME;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_OCCURRENCE_ID;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_SEX_ID;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_SEX_NAME;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_TAXON_ID;
-import static org.eol.globi.data.StudyImporterForTSV.TARGET_TAXON_NAME;
 import static org.eol.globi.domain.PropertyAndValueDictionary.CATALOG_NUMBER;
 import static org.eol.globi.domain.PropertyAndValueDictionary.COLLECTION_CODE;
 import static org.eol.globi.domain.PropertyAndValueDictionary.INSTITUTION_CODE;
 import static org.eol.globi.domain.PropertyAndValueDictionary.OCCURRENCE_ID;
+import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_ID;
+import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_NAME;
+import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_PATH;
+import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_PATH_NAMES;
+import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_ID;
+import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_NAME;
+import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH;
+import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH_NAMES;
 
 @Parameters(separators = "= ", commandDescription = "List Interacting Taxon Pairs For Local Datasets")
 public class CmdInteractions extends CmdTabularWriterParams {
@@ -122,8 +124,8 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     SOURCE_TAXON_NAME,
                     "sourceTaxonRank",
                     "sourceTaxonPathIds",
-                    "sourceTaxonPath",
-                    "sourceTaxonPathNames",
+                    SOURCE_TAXON_PATH,
+                    SOURCE_TAXON_PATH_NAMES,
                     SOURCE_BODY_PART_ID,
                     SOURCE_BODY_PART_NAME,
                     SOURCE_LIFE_STAGE_ID,
@@ -140,8 +142,8 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     TARGET_TAXON_NAME,
                     "targetTaxonRank",
                     "targetTaxonPathIds",
-                    "targetTaxonPath",
-                    "targetTaxonPathNames",
+                    TARGET_TAXON_PATH,
+                    TARGET_TAXON_PATH_NAMES,
                     TARGET_BODY_PART_ID,
                     TARGET_BODY_PART_NAME,
                     TARGET_LIFE_STAGE_ID,

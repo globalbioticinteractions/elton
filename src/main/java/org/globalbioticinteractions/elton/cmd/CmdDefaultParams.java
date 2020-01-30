@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.Parameter;
 import org.apache.commons.lang.StringUtils;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
+import org.globalbioticinteractions.elton.util.ProgressCursorDotsAndPlusses;
 
 import java.io.PrintStream;
 import java.net.URI;
@@ -21,7 +22,7 @@ abstract class CmdDefaultParams implements Runnable {
 
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
-    private ProgressCursor cursor = new ProgressCursor(stderr);
+    private ProgressCursor cursor = new ProgressCursorDotsAndPlusses(stderr);
 
     @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();

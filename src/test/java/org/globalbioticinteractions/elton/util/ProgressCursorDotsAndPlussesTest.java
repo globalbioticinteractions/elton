@@ -11,12 +11,12 @@ import java.nio.charset.StandardCharsets;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-public class ProgressCursorTest {
+public class ProgressCursorDotsAndPlussesTest {
 
     @Test
     public void progress() throws UnsupportedEncodingException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ProgressCursor progressCursor = new ProgressCursor(new PrintStream(out));
+        ProgressCursor progressCursor = new ProgressCursorDotsAndPlusses(new PrintStream(out));
         progressCursor.increment();
         assertThat(out.toString(StandardCharsets.UTF_8.name()), is("."));
     }
@@ -24,7 +24,7 @@ public class ProgressCursorTest {
     @Test
     public void progressNextLine() throws UnsupportedEncodingException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ProgressCursor progressCursor = new ProgressCursor(new PrintStream(out));
+        ProgressCursorDotsAndPlusses progressCursor = new ProgressCursorDotsAndPlusses(new PrintStream(out));
         for (int i = 0; i < progressCursor.getWidth(); i++) {
             progressCursor.increment();
         }

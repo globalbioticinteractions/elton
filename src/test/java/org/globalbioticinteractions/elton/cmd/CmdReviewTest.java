@@ -77,8 +77,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         runCheck(localTestPath, errOs, outOs, 100);
 
-        assertThat(errOs.toString(), startsWith("Reviewing [local] at [file:///"));
-        assertThat(errOs.toString(), endsWith("done.\n"));
+        assertThat(errOs.toString(), is("reviewing [local]... \bdone.\n"));
 
         assertThat(outOs.toString(), startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewCommentType\treviewComment\t"));
         String[] lines = outOs.toString().split("\n");
@@ -97,8 +96,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         runCheck(localTestPath, errOs, outOs, 100, Arrays.asList(ReviewCommentType.summary));
 
-        assertThat(errOs.toString(), startsWith("Reviewing [local] at [file:///"));
-        assertThat(errOs.toString(), endsWith("done.\n"));
+        assertThat(errOs.toString(), is("reviewing [local]... \bdone.\n"));
 
         assertThat(outOs.toString(), startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewCommentType\treviewComment\t"));
         String[] lines = outOs.toString().split("\n");
@@ -217,7 +215,7 @@ public class CmdReviewTest {
 
         }
 
-        assertThat(errOs.toString(), is(" failed.\n"));
+        assertThat(errOs.toString(), is("\bfailed.\n"));
     }
 
     private void runOfflineWith(JCommander jc, String cacheDir) {

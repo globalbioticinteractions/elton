@@ -30,18 +30,18 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class CmdCheckTest {
+public class CmdReviewTest {
 
     private String testTmpDir = "target/test-cache";
-    private CmdCheck cmdCheck;
+    private CmdReview cmdReview;
 
     @Before
     public void init() {
         this.testTmpDir = "target/test-cache/" + UUID.randomUUID();
-        this.cmdCheck = new CmdCheck();
-        cmdCheck.setDateFactory(() -> new Date(0));
-        cmdCheck.setReviewerName("elton-dev");
-        cmdCheck.setReviewId("6a550a42-8951-416a-a187-34edbd3f87d0");
+        this.cmdReview = new CmdReview();
+        cmdReview.setDateFactory(() -> new Date(0));
+        cmdReview.setReviewerName("elton-dev");
+        cmdReview.setReviewId("6a550a42-8951-416a-a187-34edbd3f87d0");
     }
 
     @After
@@ -117,14 +117,14 @@ public class CmdCheckTest {
 
     private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines, List<ReviewCommentType> commentTypes) {
         PrintStream err = new PrintStream(errOs);
-        cmdCheck.setStderr(err);
+        cmdReview.setStderr(err);
         PrintStream out = new PrintStream(outOs);
-        cmdCheck.setStdout(out);
-        cmdCheck.setWorkDir(Paths.get(localTestPath).toUri());
-        cmdCheck.setTmpDir(getTestTmpDir());
-        cmdCheck.setMaxLines(maxLines);
-        cmdCheck.setDesiredReviewCommentTypes(commentTypes);
-        cmdCheck.run();
+        cmdReview.setStdout(out);
+        cmdReview.setWorkDir(Paths.get(localTestPath).toUri());
+        cmdReview.setTmpDir(getTestTmpDir());
+        cmdReview.setMaxLines(maxLines);
+        cmdReview.setDesiredReviewCommentTypes(commentTypes);
+        cmdReview.run();
     }
 
     @Test(expected = RuntimeException.class)
@@ -205,13 +205,13 @@ public class CmdCheckTest {
 
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         PrintStream err = new PrintStream(errOs);
-        cmdCheck.setStderr(err);
+        cmdReview.setStderr(err);
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(outOs);
-        cmdCheck.setStdout(out);
-        cmdCheck.setWorkDir(Paths.get("src/test/resources/dataset-local-test-non-exist").toUri());
+        cmdReview.setStdout(out);
+        cmdReview.setWorkDir(Paths.get("src/test/resources/dataset-local-test-non-exist").toUri());
         try {
-            cmdCheck.run();
+            cmdReview.run();
             fail("should have thrown");
         } catch (Throwable ex) {
 
@@ -226,11 +226,11 @@ public class CmdCheckTest {
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
         Object o = actual.getObjects().get(0);
-        Assert.assertEquals(o.getClass(), CmdCheck.class);
-        CmdCheck cmdCheck = (CmdCheck) o;
+        Assert.assertEquals(o.getClass(), CmdReview.class);
+        CmdReview cmdReview = (CmdReview) o;
 
-        assertThat(cmdCheck.getNamespaces(), is(Collections.singletonList("globalbioticinteractions/template-dataset")));
-        assertThat(cmdCheck.getCacheDir(), is(cacheDir));
+        assertThat(cmdReview.getNamespaces(), is(Collections.singletonList("globalbioticinteractions/template-dataset")));
+        assertThat(cmdReview.getCacheDir(), is(cacheDir));
 
         CmdLine.run(actual);
     }
@@ -240,7 +240,7 @@ public class CmdCheckTest {
         LogContext sourceOccurrenceId1 = LogUtil.contextFor(new HashMap<String, String>() {{
             put("sourceOccurrenceId", "a8c61ad5-4cda-47df-9cb6-6c64b0e71bfa");
         }});
-        String sourceOccurrenceId = CmdCheck.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
+        String sourceOccurrenceId = CmdReview.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
         assertThat(sourceOccurrenceId, is("a8c61ad5-4cda-47df-9cb6-6c64b0e71bfa"));
     }
 
@@ -249,7 +249,7 @@ public class CmdCheckTest {
         LogContext sourceOccurrenceId1 = LogUtil.contextFor(new HashMap<String, String>() {{
             put("sourceOccurrenceId", null);
         }});
-        String sourceOccurrenceId = CmdCheck.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
+        String sourceOccurrenceId = CmdReview.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
         assertThat(sourceOccurrenceId, is(""));
     }
 

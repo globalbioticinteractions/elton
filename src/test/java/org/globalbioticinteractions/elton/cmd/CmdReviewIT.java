@@ -11,7 +11,7 @@ import java.io.File;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class CmdCheckIT {
+public class CmdReviewIT {
 
     @Before
     public void emptyCache() {
@@ -25,7 +25,7 @@ public class CmdCheckIT {
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
-        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdCheck.class);
+        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdReview.class);
 
         CmdLine.run(actual);
     }
@@ -37,7 +37,7 @@ public class CmdCheckIT {
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
-        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdCheck.class);
+        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdReview.class);
 
         CmdLine.run(actual);
 
@@ -46,7 +46,7 @@ public class CmdCheckIT {
 
         JCommander actualOffline = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actualOffline.getObjects().size(), 1);
-        Assert.assertEquals(actualOffline.getObjects().get(0).getClass(), CmdCheck.class);
+        Assert.assertEquals(actualOffline.getObjects().get(0).getClass(), CmdReview.class);
 
         CmdLine.run(actualOffline);
 
@@ -59,7 +59,7 @@ public class CmdCheckIT {
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
-        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdCheck.class);
+        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdReview.class);
 
         CmdLine.run(actual);
     }

@@ -51,8 +51,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "Generates a review for interaction dataset(s). If no namespace is provided the local workdir is used.")
-public class CmdCheck extends CmdDefaultParams {
-    private final static Log LOG = LogFactory.getLog(CmdCheck.class);
+public class CmdReview extends CmdDefaultParams {
+    private final static Log LOG = LogFactory.getLog(CmdReview.class);
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
 
     @Parameter(names = {"-n", "--lines"}, description = "print first n number of lines")
@@ -131,8 +131,8 @@ public class CmdCheck extends CmdDefaultParams {
                 reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
             nodeFactory.getOrCreateDataset(dataset);
-            String msg = "Reviewing [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "] using Elton version [" + Elton.getVersion() + "] ...";
-            getStderr().println(msg);
+            String msg = "Reviewing [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "] using Elton version [" + Elton.getVersion() + "]...";
+            getStderr().print(msg);
             logHeader(getStdout());
             studyImporter.importData(dataset);
             if (interactionCounter.get() == 0) {
@@ -142,6 +142,7 @@ public class CmdCheck extends CmdDefaultParams {
             reviewReportLogger.log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary);
         } catch (DatasetFinderException e) {
             reviewReportLogger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
+            getStderr().println(" failed.");
             throw new StudyImporterException(e);
         } catch (Throwable e) {
             e.printStackTrace();

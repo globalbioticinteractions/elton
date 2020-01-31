@@ -78,7 +78,8 @@ public class CmdReviewTest {
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         runCheck(localTestPath, errOs, outOs, 100);
 
-        assertThat(errOs.toString(), is("reviewing [local]... \bdone.\n"));
+        assertThat(errOs.toString(), containsString("reviewing [local]..."));
+        assertThat(errOs.toString(), endsWith("done.\n"));
 
         assertThat(outOs.toString(), startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewCommentType\treviewComment\t"));
         String[] lines = outOs.toString().split("\n");

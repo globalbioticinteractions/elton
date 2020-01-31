@@ -88,7 +88,7 @@ public class CmdReview extends CmdDefaultParams {
             InputStreamFactory factory = createInputStreamFactory();
 
             for (URI localNamespace : localNamespaces) {
-                checkLocal(localNamespace, factory);
+                reviewLocal(localNamespace, factory);
             }
             checkCacheOrRemote(remoteNamespaces, factory);
 
@@ -100,16 +100,16 @@ public class CmdReview extends CmdDefaultParams {
 
     private void checkCacheOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         for (String namespace : namespaces) {
-            check(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), inputStreamFactory), inputStreamFactory);
+            review(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), inputStreamFactory), inputStreamFactory);
         }
     }
 
-    private void checkLocal(URI workDir, InputStreamFactory inputStreamFactory) throws StudyImporterException {
+    private void reviewLocal(URI workDir, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         DatasetRegistry finderLocal = DatasetRegistryUtil.forLocalDir(workDir, getTmpDir(), inputStreamFactory);
-        check("local", finderLocal, inputStreamFactory);
+        review("local", finderLocal, inputStreamFactory);
     }
 
-    private void check(String repoName, DatasetRegistry finder, InputStreamFactory inputStreamFactory) throws StudyImporterException {
+    private void review(String repoName, DatasetRegistry finder, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         final AtomicLong noteCounter = new AtomicLong(0);
         final AtomicLong infoCounter = new AtomicLong(0);
 

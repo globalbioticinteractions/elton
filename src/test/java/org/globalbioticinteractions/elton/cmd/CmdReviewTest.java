@@ -72,7 +72,6 @@ public class CmdReviewTest {
 
     @Test
     public void runCheckLocal() {
-
         String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
@@ -89,6 +88,14 @@ public class CmdReviewTest {
         assertThat(lines[lines.length - 1], is(last));
         assertThat(lines[lines.length - 2], is(secondToLast));
         assertThat(lines[lines.length - 3], is(thirdToLast));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void throwOnEmpty() {
+        String localTestPath = "src/test/resources/dataset-local-test-no-records";
+        ByteArrayOutputStream errOs = new ByteArrayOutputStream();
+        ByteArrayOutputStream outOs = new ByteArrayOutputStream();
+        runCheck(localTestPath, errOs, outOs, 100);
     }
 
     @Test
@@ -130,7 +137,7 @@ public class CmdReviewTest {
         cmdReview.run();
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void runCheckLocalNoCitation() {
         assertOneWarning("src/test/resources/dataset-local-test-no-citation");
     }
@@ -163,7 +170,7 @@ public class CmdReviewTest {
         }
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void runCheckLocalWithResourceRelation() {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
@@ -184,7 +191,7 @@ public class CmdReviewTest {
         }
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void runCheckLocalBlankCitation() {
         assertOneWarning("src/test/resources/dataset-local-test-blank-citation");
     }

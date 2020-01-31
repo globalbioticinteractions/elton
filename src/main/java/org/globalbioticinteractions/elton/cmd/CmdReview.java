@@ -153,8 +153,8 @@ public class CmdReview extends CmdDefaultParams {
             reviewReportLogger.log(null, noteCounter.get() + " note(s)", ReviewCommentType.summary);
             reviewReportLogger.log(null, infoCounter.get() + " info(s)", ReviewCommentType.summary);
         }
-        if (noteCounter.get() > 0) {
-            throw new StudyImporterException("review notes exists, please check review report.");
+        if (interactionCounter.get() == 0) {
+            throw new StudyImporterException("No interactions found, nothing to review. Please check logs.");
         }
     }
 

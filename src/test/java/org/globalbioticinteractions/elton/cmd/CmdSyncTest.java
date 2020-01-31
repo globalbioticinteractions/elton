@@ -15,7 +15,7 @@ public class CmdSyncTest {
         JCommander jc = new CmdLine().buildCommander();
         jc.parse("update", "--cache-dir=./target/tmp-dataset", "globalbioticinteractions/template-dataset");
 
-        Assert.assertEquals(jc.getParsedCommand(), "update");
+        Assert.assertEquals(jc.getParsedCommand(), "sync");
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);

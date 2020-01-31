@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
-@Parameters(separators = "= ", commandDescription = "Generates a review for interaction dataset(s). If no namespace is provided the local workdir is used.")
+@Parameters(separators = "= ", commandDescription = "Review Datasets. If no namespace is provided the local workdir is used.")
 public class CmdReview extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdReview.class);
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";

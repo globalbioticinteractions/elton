@@ -19,7 +19,7 @@ import org.globalbioticinteractions.elton.util.TaxonWriter;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
-@Parameters(separators = "= ", commandDescription = "List Dataset (Taxon) Names For Local Datasets")
+@Parameters(separators = "= ", commandDescription = "List Taxon Names")
 public class CmdNames extends CmdTabularWriterParams {
     private final static Log LOG = LogFactory.getLog(CmdNames.class);
 

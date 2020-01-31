@@ -3,7 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.Parameters;
 import org.globalbioticinteractions.elton.Elton;
 
-@Parameters(separators = "= ", commandDescription = "Show Version")
+@Parameters(separators = "= ", commandDescription = "Print Version")
 public class CmdVersion implements Runnable {
 
     @Override

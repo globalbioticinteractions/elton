@@ -36,12 +36,12 @@ public class CmdLine {
                 .addObject(new CmdUsage())
                 .addCommand("usage", new CmdUsage(), "help")
                 .addCommand("list", new CmdList(), "ls")
-                .addCommand("update", new CmdUpdate(), "pull")
+                .addCommand("sync", new CmdSync(), "pull", "update")
                 .addCommand("names", new CmdNames())
                 .addCommand("interactions", new CmdInteractions())
                 .addCommand("datasets", new CmdDatasets())
                 .addCommand("nanopubs", new CmdNanoPubs())
-                .addCommand("check", new CmdReview(), "test", "review")
+                .addCommand("review", new CmdReview(), "test", "check")
                 .addCommand("version", new CmdVersion())
                 .build();
     }

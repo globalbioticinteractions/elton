@@ -65,7 +65,7 @@ import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_NAME;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH_NAMES;
 
-@Parameters(separators = "= ", commandDescription = "List Interacting Taxon Pairs For Local Datasets")
+@Parameters(separators = "= ", commandDescription = "List Pairwise Interaction Records")
 public class CmdInteractions extends CmdTabularWriterParams {
 
     public class TsvWriter implements InteractionWriter, TabularWriter {

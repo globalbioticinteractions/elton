@@ -11,7 +11,7 @@ import org.globalbioticinteractions.elton.util.TabularWriter;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
-@Parameters(separators = "= ", commandDescription = "List Info For Local Datasets")
+@Parameters(separators = "= ", commandDescription = "List Datasets Details")
 public class CmdDatasets extends CmdTabularWriterParams {
 
     public class TsvDatasetWriter implements TabularWriter {

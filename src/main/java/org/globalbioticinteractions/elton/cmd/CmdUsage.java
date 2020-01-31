@@ -3,7 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "Shows usage")
+@Parameters(commandDescription = "Print Usage")
 public class CmdUsage implements Runnable {
 
     @Override

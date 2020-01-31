@@ -19,7 +19,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-public class CmdUpdateIT {
+public class CmdSyncIT {
 
     @Before
     public void emptyCache() {
@@ -44,7 +44,7 @@ public class CmdUpdateIT {
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
-        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdUpdate.class);
+        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdSync.class);
 
         CmdLine.run(actual);
         
@@ -88,7 +88,7 @@ public class CmdUpdateIT {
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
-        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdUpdate.class);
+        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdSync.class);
 
         CmdLine.run(actual);
     }
@@ -99,7 +99,7 @@ public class CmdUpdateIT {
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
         Object cmd = actual.getObjects().get(0);
-        Assert.assertEquals(cmd.getClass(), CmdUpdate.class);
-        assertThat(((CmdUpdate) cmd).getCacheDir(), is("./bla"));
+        Assert.assertEquals(cmd.getClass(), CmdSync.class);
+        assertThat(((CmdSync) cmd).getCacheDir(), is("./bla"));
     }
 }

@@ -132,7 +132,7 @@ public class CmdReview extends CmdDefaultParams {
                 reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
             nodeFactory.getOrCreateDataset(dataset);
-            getStderr().print("reviewing [" + repoName + "]... ");
+            getStderr().print("creating review [" + repoName + "]... ");
             logHeader(getStdout());
             studyImporter.importData(dataset);
             if (interactionCounter.get() == 0) {

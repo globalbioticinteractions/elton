@@ -77,7 +77,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         runCheck(localTestPath, errOs, outOs, 100);
 
-        assertThat(errOs.toString(), containsString("reviewing [local]..."));
+        assertThat(errOs.toString(), containsString("creating review [local]..."));
         assertThat(errOs.toString(), endsWith("done.\n"));
 
         assertThat(outOs.toString(), startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewCommentType\treviewComment\t"));
@@ -107,7 +107,7 @@ public class CmdReviewTest {
                 100,
                 Collections.singletonList(ReviewCommentType.summary));
 
-        assertThat(errOs.toString(), containsString("reviewing [local]..."));
+        assertThat(errOs.toString(), containsString("creating review [local]..."));
         assertThat(errOs.toString(), endsWith("done.\n"));
 
         assertThat(outOs.toString(), startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewCommentType\treviewComment\t"));

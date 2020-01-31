@@ -19,7 +19,7 @@ import org.globalbioticinteractions.elton.util.TaxonWriter;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
-@Parameters(separators = "= ", commandDescription = "List Taxon Names")
+@Parameters(separators = "= ", commandDescription = "List Taxa")
 public class CmdNames extends CmdTabularWriterParams {
     private final static Log LOG = LogFactory.getLog(CmdNames.class);
 
@@ -36,7 +36,7 @@ public class CmdNames extends CmdTabularWriterParams {
 
         DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
         NodeFactory nodeFactory = createFactory(writer);
-        CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "scanning for names in");
+        CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "listing taxa", getStderr());
     }
 
     private TaxonWriter createWriter(PrintStream out) {

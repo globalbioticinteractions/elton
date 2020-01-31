@@ -17,6 +17,7 @@ import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Parameters(separators = "= ", commandDescription = "Sync Datasets With Remote Sources")
 public class CmdSync extends CmdDefaultParams {
@@ -26,11 +27,21 @@ public class CmdSync extends CmdDefaultParams {
     @Override
     public void run() {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
-        DatasetRegistry finder = new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(inputStreamFactory), new DatasetRegistryGitHubArchive(inputStreamFactory)));
+
+        List<DatasetRegistry> registries = Arrays.asList(
+                new DatasetRegistryZenodo(inputStreamFactory),
+                new DatasetRegistryGitHubArchive(inputStreamFactory));
+
+        DatasetRegistry registryProxy = new DatasetRegistryProxy(registries);
         NamespaceHandler handler = namespace -> {
             getStderr().print("updating [" + namespace + "]... ");
 
-            DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir(), inputStreamFactory);
+            DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
+                    registryProxy,
+                    namespace,
+                    getCacheDir(),
+                    inputStreamFactory);
+
             Dataset dataset =
                     new DatasetFactory(registry, createInputStreamFactory())
                             .datasetFor(namespace);
@@ -40,16 +51,15 @@ public class CmdSync extends CmdDefaultParams {
                 new GitHubImporterFactory()
                         .createImporter(dataset, factory)
                         .importStudy();
+                getStderr().println("done.");
             } catch (StudyImporterException ex) {
-                LOG.error("\bupdate of [" + namespace + "] failed.", ex);
-                getStderr().println("failed with [ " + ex.getMessage() + "]");
-            } finally {
-                getStderr().println("\bdone.");
+                LOG.error("update of [" + namespace + "] failed.", ex);
+                getStderr().println("failed with [ " + ex.getMessage() + "].");
             }
         };
 
         try {
-            CmdUtil.handleNamespaces(finder, handler, getNamespaces());
+            CmdUtil.handleNamespaces(registryProxy, handler, getNamespaces());
         } catch (DatasetFinderException e) {
             throw new RuntimeException(e);
         }

@@ -20,15 +20,9 @@ public class ProgressCursorRotating implements ProgressCursor {
     @Override
     public void increment() {
         int pos = position.get();
-        if (isFirst.get()) {
-            isFirst.set(false);
-        } else {
-            out.print('\b');
-        }
         out.print(rotatingCharacters[pos]);
-
+        out.print('\b');
         position.set((pos + 1) % 7);
-
     }
 
 }

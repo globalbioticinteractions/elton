@@ -1,9 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameter;
-import org.apache.commons.lang.StringUtils;
-import org.globalbioticinteractions.elton.util.ProgressCursor;
-import org.globalbioticinteractions.elton.util.ProgressCursorDotsAndPlusses;
+import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursorRotating;
 
 import java.io.PrintStream;
@@ -23,7 +21,7 @@ abstract class CmdDefaultParams implements Runnable {
 
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
-    private ProgressCursor cursor = new ProgressCursorRotating(stderr);
+    private ProgressCursorFactory cursorFactory = () -> new ProgressCursorRotating(stderr);
 
     @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();
@@ -75,12 +73,12 @@ abstract class CmdDefaultParams implements Runnable {
         this.workDir = workingDir;
     }
 
-    public ProgressCursor getProgressCursor() {
-        return this.cursor;
+    public ProgressCursorFactory getProgressCursorFactory() {
+        return this.cursorFactory;
     }
 
     public InputStreamFactoryLogging createInputStreamFactory() {
-        return new InputStreamFactoryLogging(getProgressCursor());
+        return new InputStreamFactoryLogging(getProgressCursorFactory());
     }
 
 

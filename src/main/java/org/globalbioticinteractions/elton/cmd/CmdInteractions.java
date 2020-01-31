@@ -65,7 +65,7 @@ import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_NAME;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH_NAMES;
 
-@Parameters(separators = "= ", commandDescription = "List Pairwise Interaction Records")
+@Parameters(separators = "= ", commandDescription = "List Interactions")
 public class CmdInteractions extends CmdTabularWriterParams {
 
     public class TsvWriter implements InteractionWriter, TabularWriter {
@@ -183,7 +183,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 createInputStreamFactory());
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(writer, new DatasetProcessorForTSV());
-        CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "scanning for interactions in");
+        CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "listing interactions", getStderr());
     }
 }
 

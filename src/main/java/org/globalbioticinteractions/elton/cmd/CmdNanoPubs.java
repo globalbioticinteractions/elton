@@ -12,7 +12,7 @@ import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import java.io.PrintStream;
 import java.util.UUID;
 
-@Parameters(separators = "= ", commandDescription = "Generate Nanopubs Describing Interactions of Published Datasets")
+@Parameters(separators = "= ", commandDescription = "List Interaction Nanopubs, see http://nanopub.org")
 public class CmdNanoPubs extends CmdDefaultParams {
 
     private IdGenerator idGenerator = () -> UUID.randomUUID().toString().replaceAll("-", "");
@@ -43,7 +43,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
         CmdUtil.handleNamespaces(finder
                 , nodeFactory
                 , getNamespaces()
-                , "generating trusty nanopubs for");
+                , "listing nanopubs", getStderr());
     }
 
 }

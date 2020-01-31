@@ -60,19 +60,21 @@ public class CmdUtil {
         return StreamUtil.streamOf(dataset).collect(Collectors.toList());
     }
 
-    public static void handleNamespaces(DatasetRegistry finder, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix) {
+    public static void handleNamespaces(DatasetRegistry finder, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix, Appendable out) {
         try {
             List<String> failedNamespaces = Collections.synchronizedList(new ArrayList<>());
 
             handleNamespaces(finder, namespace -> {
-                String msg = msgPrefix + " [" + namespace + "]...";
-                LOG.info(msg);
+                out.append(msgPrefix)
+                        .append(" [")
+                        .append(namespace)
+                        .append("]... ");
                 try {
                     handleSingleNamespace(finder, nodeFactory, namespace);
-                    LOG.info(msg + "done.");
+                    out.append("done.\n");
                 } catch (StudyImporterException | DatasetFinderException ex) {
                     failedNamespaces.add(namespace);
-                    LOG.error(msg + "failed.", ex);
+                    out.append("failed.\n");
                 }
             }, namespaces);
 

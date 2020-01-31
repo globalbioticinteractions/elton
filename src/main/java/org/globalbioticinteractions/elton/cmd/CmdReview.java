@@ -34,6 +34,7 @@ import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
@@ -90,8 +91,8 @@ public class CmdReview extends CmdDefaultParams {
             for (URI localNamespace : localNamespaces) {
                 reviewLocal(localNamespace, factory);
             }
-            checkCacheOrRemote(remoteNamespaces, factory);
 
+            checkCacheOrRemote(remoteNamespaces, factory);
 
         } catch (StudyImporterException e) {
             throw new RuntimeException(e);
@@ -131,18 +132,17 @@ public class CmdReview extends CmdDefaultParams {
                 reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
             nodeFactory.getOrCreateDataset(dataset);
-            String msg = "reviewing [" + repoName + "]... ";
-            getStderr().print(msg);
+            getStderr().print("reviewing [" + repoName + "]... ");
             logHeader(getStdout());
             studyImporter.importData(dataset);
             if (interactionCounter.get() == 0) {
                 reviewReportLogger.warn(null, "no interactions found");
             }
-            getStderr().println("\bdone.");
+            getStderr().println("done.");
             reviewReportLogger.log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary);
         } catch (DatasetFinderException e) {
             reviewReportLogger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
-            getStderr().println("\bfailed.");
+            getStderr().println("failed.");
             throw new StudyImporterException(e);
         } catch (Throwable e) {
             e.printStackTrace();
@@ -200,6 +200,7 @@ public class CmdReview extends CmdDefaultParams {
     private class NodeFactoryLogging extends NodeFactoryNull {
         final AtomicInteger counter;
         final ImportLogger importLogger;
+        final ProgressCursor cursor = getProgressCursorFactory().createProgressCursor();
 
         public NodeFactoryLogging(AtomicInteger counter, ImportLogger importLogger) {
             this.counter = counter;
@@ -211,7 +212,7 @@ public class CmdReview extends CmdDefaultParams {
             public void interactsWith(Specimen target, InteractType type, Location centroid) {
                 int reportBatchSize = 10;
                 int count = counter.get();
-                ProgressUtil.logProgress(reportBatchSize, count, getProgressCursor());
+                ProgressUtil.logProgress(reportBatchSize, count, cursor);
                 counter.getAndIncrement();
             }
         };

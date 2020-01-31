@@ -28,7 +28,7 @@ public class CmdUpdate extends CmdDefaultParams {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
         DatasetRegistry finder = new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(inputStreamFactory), new DatasetRegistryGitHubArchive(inputStreamFactory)));
         NamespaceHandler handler = namespace -> {
-            getStderr().print("updating [" + namespace + "]...");
+            getStderr().print("updating [" + namespace + "]... ");
 
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(finder, namespace, getCacheDir(), inputStreamFactory);
             Dataset dataset =
@@ -41,17 +41,15 @@ public class CmdUpdate extends CmdDefaultParams {
                         .createImporter(dataset, factory)
                         .importStudy();
             } catch (StudyImporterException ex) {
-                LOG.error("update of [" + namespace + "] failed.", ex);
+                LOG.error("\bupdate of [" + namespace + "] failed.", ex);
                 getStderr().println("failed with [ " + ex.getMessage() + "]");
             } finally {
-                getStderr().println("done.");
+                getStderr().println("\bdone.");
             }
         };
 
         try {
-            getStderr().println("updates starting...");
             CmdUtil.handleNamespaces(finder, handler, getNamespaces());
-            getStderr().println("updates done.");
         } catch (DatasetFinderException e) {
             throw new RuntimeException(e);
         }

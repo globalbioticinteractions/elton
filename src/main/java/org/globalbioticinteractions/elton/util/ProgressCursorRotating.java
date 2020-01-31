@@ -22,9 +22,8 @@ public class ProgressCursorRotating implements ProgressCursor {
         int pos = position.get();
         if (isFirst.get()) {
             isFirst.set(false);
-            out.print('\n');
         } else {
-            out.print('\r');
+            out.print('\b');
         }
         out.print(rotatingCharacters[pos]);
 

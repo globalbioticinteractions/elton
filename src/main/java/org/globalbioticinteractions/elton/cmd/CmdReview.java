@@ -131,18 +131,18 @@ public class CmdReview extends CmdDefaultParams {
                 reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
             nodeFactory.getOrCreateDataset(dataset);
-            String msg = "Reviewing [" + repoName + "] at [" + dataset.getArchiveURI().toString() + "] using Elton version [" + Elton.getVersion() + "]...";
+            String msg = "reviewing [" + repoName + "]... ";
             getStderr().print(msg);
             logHeader(getStdout());
             studyImporter.importData(dataset);
             if (interactionCounter.get() == 0) {
                 reviewReportLogger.warn(null, "no interactions found");
             }
-            getStderr().println(" done.");
+            getStderr().println("\bdone.");
             reviewReportLogger.log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary);
         } catch (DatasetFinderException e) {
             reviewReportLogger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
-            getStderr().println(" failed.");
+            getStderr().println("\bfailed.");
             throw new StudyImporterException(e);
         } catch (Throwable e) {
             e.printStackTrace();

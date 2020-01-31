@@ -19,7 +19,7 @@ public class ProgressCursorRotatingTest {
         for(int i=0; i< 8; i++) {
             progressCursor.increment();
         }
-        assertThat(out.toString(StandardCharsets.UTF_8.name()), is("\n-\r\\\r|\r/\r-\r\\\r|\r-"));
+        assertThat(out.toString(StandardCharsets.UTF_8.name()), is("-\b\\\b|\b/\b-\b\\\b|\b-"));
     }
 
 }

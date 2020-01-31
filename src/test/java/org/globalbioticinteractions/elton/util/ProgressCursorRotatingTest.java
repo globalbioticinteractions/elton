@@ -16,10 +16,10 @@ public class ProgressCursorRotatingTest {
     public void progress() throws UnsupportedEncodingException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ProgressCursor progressCursor = new ProgressCursorRotating(new PrintStream(out));
-        for(int i=0; i< 8; i++) {
+        for(int i=0; i< 10; i++) {
             progressCursor.increment();
         }
-        assertThat(out.toString(StandardCharsets.UTF_8.name()), is("-\b\\\b|\b/\b-\b\\\b|\b-"));
+        assertThat(out.toString(StandardCharsets.UTF_8.name()), is("-\b\\\b|\b/\b-\b\\\b|\b-\b\\\b|"));
     }
 
 }

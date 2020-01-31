@@ -217,7 +217,7 @@ public class CmdReviewTest {
 
         }
 
-        assertThat(errOs.toString(), is(""));
+        assertThat(errOs.toString(), is(" failed.\n"));
     }
 
     private void runOfflineWith(JCommander jc, String cacheDir) {

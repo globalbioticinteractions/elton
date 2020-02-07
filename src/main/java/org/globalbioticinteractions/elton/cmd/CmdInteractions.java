@@ -36,6 +36,7 @@ import static org.eol.globi.data.StudyImporterForTSV.SOURCE_BODY_PART_ID;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_BODY_PART_NAME;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_CATALOG_NUMBER;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_COLLECTION_CODE;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_COLLECTION_ID;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_INSTITUTION_CODE;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_LIFE_STAGE_ID;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_LIFE_STAGE_NAME;
@@ -46,6 +47,7 @@ import static org.eol.globi.data.StudyImporterForTSV.TARGET_BODY_PART_ID;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_BODY_PART_NAME;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_CATALOG_NUMBER;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_COLLECTION_CODE;
+import static org.eol.globi.data.StudyImporterForTSV.TARGET_COLLECTION_ID;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_INSTITUTION_CODE;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_LIFE_STAGE_ID;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_LIFE_STAGE_NAME;
@@ -82,20 +84,22 @@ public class CmdInteractions extends CmdTabularWriterParams {
             String sourceOccurrenceId = valueOrEmpty(source, OCCURRENCE_ID);
             String sourceCatalogNumber = valueOrEmpty(source, CATALOG_NUMBER);
             String sourceCollectionCode = valueOrEmpty(source, COLLECTION_CODE);
+            String sourceCollectionId = valueOrEmpty(source, "collectionId");
             String sourceInstitutionCode = valueOrEmpty(source, INSTITUTION_CODE);
 
             String targetOccurrenceId = valueOrEmpty(target, OCCURRENCE_ID);
             String targetCatalogNumber = valueOrEmpty(target, CATALOG_NUMBER);
             String targetCollectionCode = valueOrEmpty(target, COLLECTION_CODE);
+            String targetCollectionId = valueOrEmpty(target, "collectionId");
             String targetInstitutionCode = valueOrEmpty(target, INSTITUTION_CODE);
 
             Stream<String> rowStream = Stream.of(
                     Stream.of(source.isSupportingClaim() ? PropertyAndValueDictionary.SUPPORTS : PropertyAndValueDictionary.REFUTES),
-                    Stream.of(sourceOccurrenceId, sourceCatalogNumber, sourceCollectionCode, sourceInstitutionCode),
+                    Stream.of(sourceOccurrenceId, sourceCatalogNumber, sourceCollectionCode, sourceCollectionId, sourceInstitutionCode),
                     StreamUtil.streamOf(source.taxon),
                     StreamUtil.streamOf(source),
                     interactStream,
-                    Stream.of(targetOccurrenceId, targetCatalogNumber, targetCollectionCode, targetInstitutionCode),
+                    Stream.of(targetOccurrenceId, targetCatalogNumber, targetCollectionCode, targetCollectionId, targetInstitutionCode),
                     StreamUtil.streamOf(target.taxon),
                     StreamUtil.streamOf(target),
                     StreamUtil.streamOf(target.getBasisOfRecord()),
@@ -119,6 +123,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     SOURCE_OCCURRENCE_ID,
                     SOURCE_CATALOG_NUMBER,
                     SOURCE_COLLECTION_CODE,
+                    SOURCE_COLLECTION_ID,
                     SOURCE_INSTITUTION_CODE,
                     SOURCE_TAXON_ID,
                     SOURCE_TAXON_NAME,
@@ -137,6 +142,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     TARGET_OCCURRENCE_ID,
                     TARGET_CATALOG_NUMBER,
                     TARGET_COLLECTION_CODE,
+                    TARGET_COLLECTION_ID,
                     TARGET_INSTITUTION_CODE,
                     TARGET_TAXON_ID,
                     TARGET_TAXON_NAME,

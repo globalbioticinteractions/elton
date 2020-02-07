@@ -12,7 +12,7 @@ import org.eol.globi.service.DatasetRegistry;
 import org.eol.globi.service.DatasetRegistryGitHubArchive;
 import org.eol.globi.service.DatasetRegistryProxy;
 import org.eol.globi.service.DatasetRegistryZenodo;
-import org.eol.globi.service.GitHubImporterFactory;
+import org.eol.globi.service.StudyImporterFactory;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 
@@ -48,7 +48,7 @@ public class CmdSync extends CmdDefaultParams {
             NodeFactory factory = new NodeFactoryNull();
             factory.getOrCreateDataset(dataset);
             try {
-                new GitHubImporterFactory()
+                new StudyImporterFactory()
                         .createImporter(dataset, factory)
                         .importStudy();
                 getStderr().println("done.");

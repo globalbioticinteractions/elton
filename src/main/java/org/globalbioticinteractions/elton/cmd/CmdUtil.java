@@ -12,7 +12,7 @@ import org.eol.globi.service.DatasetFactory;
 import org.eol.globi.service.DatasetFinderException;
 import org.eol.globi.service.DatasetRegistry;
 import org.eol.globi.service.GeoNamesService;
-import org.eol.globi.service.GitHubImporterFactory;
+import org.eol.globi.service.StudyImporterFactory;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
@@ -91,7 +91,7 @@ public class CmdUtil {
         Dataset dataset = new DatasetFactory(finder).datasetFor(namespace);
         nodeFactory.getOrCreateDataset(dataset);
 
-        StudyImporter importer = new GitHubImporterFactory()
+        StudyImporter importer = new StudyImporterFactory()
                 .createImporter(dataset, nodeFactory);
 
         importer.setGeoNamesService(new GeoNamesService() {

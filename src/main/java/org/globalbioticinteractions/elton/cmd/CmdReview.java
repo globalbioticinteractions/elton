@@ -58,7 +58,7 @@ import static org.eol.globi.data.StudyImporterForTSV.SOURCE_INSTITUTION_CODE;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_OCCURRENCE_ID;
 
 @Parameters(separators = "= ", commandDescription = "Review Datasets. If no namespace is provided the local workdir is used.")
-public class CmdReview extends CmdDefaultParams {
+public class CmdReview extends CmdTabularWriterParams {
     private final static Log LOG = LogFactory.getLog(CmdReview.class);
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
 
@@ -139,7 +139,9 @@ public class CmdReview extends CmdDefaultParams {
             }
             nodeFactory.getOrCreateDataset(dataset);
             getStderr().print("creating review [" + repoName + "]... ");
-            logHeader(getStdout());
+            if (!shouldSkipHeader()) {
+                logHeader(getStdout());
+            }
             studyImporter.importData(dataset);
             if (interactionCounter.get() == 0) {
                 reviewReportLogger.warn(null, "no interactions found");

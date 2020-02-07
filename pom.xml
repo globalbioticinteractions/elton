@@ -9,7 +9,7 @@
     <description>Discover, cache and check species interaction data</description>
 
     <properties>
-        <globi.version>0.15.4</globi.version>
+        <globi.version>0.15.5</globi.version>
         <!--<globi.version>0.6-SNAPSHOT</globi.version>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>

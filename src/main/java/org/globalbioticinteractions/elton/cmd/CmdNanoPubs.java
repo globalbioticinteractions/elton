@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.eol.globi.service.DatasetRegistry;
+import org.eol.globi.tool.NullImportLogger;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
@@ -30,20 +31,27 @@ public class CmdNanoPubs extends CmdDefaultParams {
         run(System.out);
     }
 
-    InteractionWriter createSerializer(PrintStream out) {
+    private InteractionWriter createSerializer(PrintStream out) {
         return new NanoPubWriter(out, this.getIdGenerator());
     }
 
     void run(PrintStream out) {
-        DatasetRegistry finder = DatasetRegistryUtil.forCacheDir(getCacheDir(), createInputStreamFactory());
+        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(
+                getCacheDir(),
+                getWorkDir(),
+                getTmpDir(),
+                createInputStreamFactory());
 
         InteractionWriter serializer = createSerializer(out);
+
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, dataset -> dataset);
 
         CmdUtil.handleNamespaces(finder
                 , nodeFactory
                 , getNamespaces()
-                , "listing nanopubs", getStderr());
+                , "listing nanopubs",
+                getStderr(),
+                new NullImportLogger());
     }
 
 }

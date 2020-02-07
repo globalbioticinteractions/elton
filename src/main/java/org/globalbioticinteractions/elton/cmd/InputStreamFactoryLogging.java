@@ -4,15 +4,14 @@ import org.apache.commons.io.input.ProxyInputStream;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
+import org.globalbioticinteractions.elton.util.ProgressUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InputStreamFactoryLogging implements InputStreamFactory {
 
-    private final AtomicBoolean hasStarted = new AtomicBoolean(false);
     private final AtomicLong byteCounter = new AtomicLong(0);
     private final ProgressCursorFactory cursorFactory;
 
@@ -31,7 +30,7 @@ public class InputStreamFactoryLogging implements InputStreamFactory {
             protected void afterRead(int n) throws IOException {
                 super.afterRead(n);
                 long l = byteCounter.addAndGet(n);
-                if (l > 1024 * 128) {
+                if (l > ProgressUtil.BYTE_TRANSFER_PROGRESS_BATCH_SIZE) {
                     cursor.increment();
                     byteCounter.set(0);
                 }

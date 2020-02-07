@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameter;
+import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursorRotating;
 
@@ -21,7 +22,14 @@ abstract class CmdDefaultParams implements Runnable {
 
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
-    private ProgressCursorFactory cursorFactory = () -> new ProgressCursorRotating(stderr);
+
+    private ProgressCursorFactory cursorFactory = new ProgressCursorFactory() {
+        private final ProgressCursor cursor = new ProgressCursorRotating(stderr);
+        @Override
+        public ProgressCursor createProgressCursor() {
+            return cursor;
+        }
+    };
 
     @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();

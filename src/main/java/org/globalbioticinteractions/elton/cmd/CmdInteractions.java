@@ -2,7 +2,9 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.apache.commons.lang.StringUtils;
+import org.eol.globi.data.ImportLogger;
 import org.eol.globi.domain.InteractType;
+import org.eol.globi.domain.LogContext;
 import org.eol.globi.domain.PropertyAndValueDictionary;
 import org.eol.globi.domain.Study;
 import org.eol.globi.service.Dataset;
@@ -12,11 +14,13 @@ import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenImpl;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 
 import java.io.PrintStream;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static org.eol.globi.data.StudyImporterForMetaTable.EVENT_DATE;
@@ -189,7 +193,35 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 createInputStreamFactory());
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(writer, new DatasetProcessorForTSV());
-        CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "listing interactions", getStderr());
+        CmdUtil.handleNamespaces(
+                registry,
+                nodeFactory,
+                getNamespaces(),
+                "listing interactions",
+                getStderr(), new ImportLogger() {
+                    final AtomicLong lineCounter = new AtomicLong(0);
+                    @Override
+                    public void warn(LogContext ctx, String message) {
+                        reportProgress();
+                    }
+
+                    @Override
+                    public void info(LogContext ctx, String message) {
+                        reportProgress();
+                    }
+
+                    @Override
+                    public void severe(LogContext ctx, String message) {
+                        reportProgress();
+                    }
+
+                    private void reportProgress() {
+                        long l = lineCounter.incrementAndGet();
+                        if (l % ProgressUtil.LOG_ACTIVITY_PROGRESS_BATCH_SIZE == 0) {
+                            getProgressCursorFactory().createProgressCursor().increment();
+                        }
+                    }
+                });
     }
 }
 

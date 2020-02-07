@@ -34,7 +34,6 @@ import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
-import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
@@ -208,7 +207,6 @@ public class CmdReview extends CmdTabularWriterParams {
     private class NodeFactoryLogging extends NodeFactoryNull {
         final AtomicInteger counter;
         final ImportLogger importLogger;
-        final ProgressCursor cursor = getProgressCursorFactory().createProgressCursor();
 
         public NodeFactoryLogging(AtomicInteger counter, ImportLogger importLogger) {
             this.counter = counter;
@@ -218,9 +216,8 @@ public class CmdReview extends CmdTabularWriterParams {
         final Specimen specimen = new SpecimenNull() {
             @Override
             public void interactsWith(Specimen target, InteractType type, Location centroid) {
-                int reportBatchSize = 10;
                 int count = counter.get();
-                ProgressUtil.logProgress(reportBatchSize, count, cursor);
+                ProgressUtil.logProgress(ProgressUtil.SPECIMEN_CREATED_PROGRESS_BATCH_SIZE, count, getProgressCursorFactory().createProgressCursor());
                 counter.getAndIncrement();
             }
         };
@@ -268,7 +265,6 @@ public class CmdReview extends CmdTabularWriterParams {
         private final AtomicLong infoCounter;
         private final AtomicLong noteCounter;
         private final String repoName;
-        private final List<ReviewCommentType> reviewTypes;
         private AtomicLong lineCount;
 
         public ReviewReportLogger(AtomicLong infoCounter, AtomicLong noteCounter, String repoName, List<ReviewCommentType> desiredReviewCommentTypes) {
@@ -276,13 +272,13 @@ public class CmdReview extends CmdTabularWriterParams {
             this.noteCounter = noteCounter;
             this.repoName = repoName;
             lineCount = new AtomicLong(0);
-            this.reviewTypes = desiredReviewCommentTypes;
+            lineCount = new AtomicLong(0);
         }
 
 
         @Override
         public void info(LogContext ctx, String message) {
-            log(ctx, message, ReviewCommentType.info);
+            logWithCounter(ctx, message, ReviewCommentType.info);
             infoCounter.incrementAndGet();
         }
 
@@ -305,7 +301,10 @@ public class CmdReview extends CmdTabularWriterParams {
                 log(ctx, message, commentType);
             }
 
-            lineCount.incrementAndGet();
+            long l = lineCount.incrementAndGet();
+            if (l % ProgressUtil.LOG_ACTIVITY_PROGRESS_BATCH_SIZE == 0) {
+                getProgressCursorFactory().createProgressCursor().increment();
+            }
         }
 
         public void log(LogContext ctx, String msg, ReviewCommentType commentType) {

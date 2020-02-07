@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProgressCursorRotating implements ProgressCursor {
     private final AtomicInteger position = new AtomicInteger(0);
-    private final AtomicBoolean isFirst = new AtomicBoolean(true);
     private final PrintStream out;
 
     private final char[] rotatingCharacters = new char[] {

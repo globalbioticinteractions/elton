@@ -6,6 +6,10 @@ import java.io.IOException;
 
 public class ProgressUtil {
 
+    public static final int LOG_ACTIVITY_PROGRESS_BATCH_SIZE = 500;
+    public static final int BYTE_TRANSFER_PROGRESS_BATCH_SIZE = 1024 * 128;
+    public static final int SPECIMEN_CREATED_PROGRESS_BATCH_SIZE = 100;
+
     public static void logProgress(int reportBatchSize, int count, ProgressCursor cursor) {
         if (count % reportBatchSize == 0) {
             cursor.increment();

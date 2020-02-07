@@ -187,7 +187,7 @@ public class CmdReviewTest {
             assertThat(reviewReport, endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t6 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t1 note(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t7 info(s)\t\t\t\t\t\t\t\t\t"));
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t6 info(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 

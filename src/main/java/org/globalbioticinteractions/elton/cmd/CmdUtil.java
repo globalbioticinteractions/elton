@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporter;
 import org.eol.globi.data.StudyImporterException;
@@ -60,17 +61,17 @@ public class CmdUtil {
         return StreamUtil.streamOf(dataset).collect(Collectors.toList());
     }
 
-    public static void handleNamespaces(DatasetRegistry finder, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix, Appendable out) {
+    public static void handleNamespaces(DatasetRegistry registry, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix, Appendable out, ImportLogger logger) {
         try {
             List<String> failedNamespaces = Collections.synchronizedList(new ArrayList<>());
 
-            handleNamespaces(finder, namespace -> {
+            handleNamespaces(registry, namespace -> {
                 out.append(msgPrefix)
                         .append(" [")
                         .append(namespace)
                         .append("]... ");
                 try {
-                    handleSingleNamespace(finder, nodeFactory, namespace);
+                    handleSingleNamespace(registry, nodeFactory, namespace, logger);
                     out.append("done.\n");
                 } catch (StudyImporterException | DatasetFinderException ex) {
                     failedNamespaces.add(namespace);
@@ -87,7 +88,7 @@ public class CmdUtil {
         }
     }
 
-    private static void handleSingleNamespace(DatasetRegistry finder, NodeFactory nodeFactory, String namespace) throws DatasetFinderException, StudyImporterException {
+    private static void handleSingleNamespace(DatasetRegistry finder, NodeFactory nodeFactory, String namespace, ImportLogger logger) throws DatasetFinderException, StudyImporterException {
         Dataset dataset = new DatasetFactory(finder).datasetFor(namespace);
         nodeFactory.getOrCreateDataset(dataset);
 
@@ -105,6 +106,7 @@ public class CmdUtil {
                 return null;
             }
         });
+        importer.setLogger(logger);
 
         importer.importStudy();
     }

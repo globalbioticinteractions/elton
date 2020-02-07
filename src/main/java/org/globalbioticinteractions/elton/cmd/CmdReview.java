@@ -51,6 +51,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_CATALOG_NUMBER;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_COLLECTION_CODE;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_COLLECTION_ID;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_INSTITUTION_CODE;
+import static org.eol.globi.data.StudyImporterForTSV.SOURCE_OCCURRENCE_ID;
+
 @Parameters(separators = "= ", commandDescription = "Review Datasets. If no namespace is provided the local workdir is used.")
 public class CmdReview extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdReview.class);
@@ -326,11 +332,11 @@ public class CmdReview extends CmdDefaultParams {
 
                 String reviewJsonString = mapper.writeValueAsString(review);
                 String archiveURI = getFindTermValueOrEmptyString(dataContext, DatasetConstant.ARCHIVE_URI);
-                String catalogNumber = getFindTermValueOrEmptyString(dataContext, "sourceCatalogNumber");
-                String collectionCode = getFindTermValueOrEmptyString(dataContext, "sourceCollectionCode");
-                String collectionId = getFindTermValueOrEmptyString(dataContext, "sourceCollectionId");
-                String institutionCode = getFindTermValueOrEmptyString(dataContext, "sourceInstitutionCode");
-                String occurrenceId = getFindTermValueOrEmptyString(dataContext, "sourceOccurrenceId");
+                String catalogNumber = getFindTermValueOrEmptyString(dataContext, SOURCE_CATALOG_NUMBER);
+                String collectionCode = getFindTermValueOrEmptyString(dataContext, SOURCE_COLLECTION_CODE);
+                String collectionId = getFindTermValueOrEmptyString(dataContext, SOURCE_COLLECTION_ID);
+                String institutionCode = getFindTermValueOrEmptyString(dataContext, SOURCE_INSTITUTION_CODE);
+                String occurrenceId = getFindTermValueOrEmptyString(dataContext, SOURCE_OCCURRENCE_ID);
                 String referenceUrl = getFindTermValueOrEmptyString(dataContext, "referenceUrl");
                 String sourceCitation = getFindTermValueOrEmptyString(dataContext, StudyImporterForTSV.STUDY_SOURCE_CITATION);
                 logReviewCommentWithReviewerInfo(getStdout(), repoName, commentType.getLabel(), msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);

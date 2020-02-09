@@ -150,9 +150,9 @@ public class CmdReviewTest {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 100);
         } finally {
             assertThat(outOs.toString(), endsWith(
-                    "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                    "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t4 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t0 note(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 info(s)\t\t\t\t\t\t\t\t\t"));
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t4 info(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 
@@ -164,9 +164,9 @@ public class CmdReviewTest {
             runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 1);
         } finally {
             assertThat(outOs.toString(), endsWith(
-                    "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
+                    "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t4 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t0 note(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 info(s)\t\t\t\t\t\t\t\t\t"));
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t4 info(s)\t\t\t\t\t\t\t\t\t"));
         }
     }
 

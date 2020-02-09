@@ -33,7 +33,7 @@ public class CmdSync extends CmdDefaultParams {
                 new DatasetRegistryGitHubArchive(inputStreamFactory));
 
         DatasetRegistry registryProxy = new DatasetRegistryProxy(registries);
-        NamespaceHandler handler = namespace -> {
+        NamespaceHandler namespaceHandler = namespace -> {
             getStderr().print("updating [" + namespace + "]... ");
 
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
@@ -59,7 +59,7 @@ public class CmdSync extends CmdDefaultParams {
         };
 
         try {
-            CmdUtil.handleNamespaces(registryProxy, handler, getNamespaces());
+            CmdUtil.handleNamespaces(registryProxy, namespaceHandler, getNamespaces());
         } catch (DatasetFinderException e) {
             throw new RuntimeException(e);
         }

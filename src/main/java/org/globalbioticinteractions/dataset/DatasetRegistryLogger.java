@@ -13,12 +13,12 @@ import java.util.Collection;
 import java.util.Date;
 
 public class DatasetRegistryLogger implements DatasetRegistry {
-    private final DatasetRegistry finder;
+    private final DatasetRegistry registry;
 
     private final String cacheDir;
 
-    public DatasetRegistryLogger(DatasetRegistry finder, String cacheDir) {
-        this.finder = finder;
+    public DatasetRegistryLogger(DatasetRegistry registry, String cacheDir) {
+        this.registry = registry;
         this.cacheDir = cacheDir;
     }
 
@@ -42,7 +42,7 @@ public class DatasetRegistryLogger implements DatasetRegistry {
     }
 
     private DatasetRegistry getRegistry() {
-        return this.finder;
+        return this.registry;
     }
 
     private String getCacheDir() {

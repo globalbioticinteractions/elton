@@ -34,10 +34,10 @@ import java.util.stream.Collectors;
 public class CmdUtil {
     private static final Log LOG = LogFactory.getLog(CmdUtil.class);
 
-    static void handleNamespaces(DatasetRegistry finder, NamespaceHandler handler, List<String> namespaces) throws DatasetFinderException {
+    static void handleNamespaces(DatasetRegistry registry, NamespaceHandler handler, List<String> namespaces) throws DatasetFinderException {
         List<String> selectedNamespaces = new ArrayList<>(namespaces);
         if (selectedNamespaces.isEmpty()) {
-            selectedNamespaces = new ArrayList<>(finder.findNamespaces());
+            selectedNamespaces = new ArrayList<>(registry.findNamespaces());
         }
 
         for (String namespace : selectedNamespaces) {
@@ -49,8 +49,8 @@ public class CmdUtil {
         }
     }
 
-    static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry finder, String namespace, String cacheDir, InputStreamFactory factory) {
-        return new DatasetRegistryWithCache(new DatasetRegistryLogger(finder, cacheDir), dataset -> {
+    static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry registry, String namespace, String cacheDir, InputStreamFactory factory) {
+        return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, cacheDir), dataset -> {
             Cache pullThroughCache = new CachePullThrough(namespace, cacheDir, factory);
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, factory);
             return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));

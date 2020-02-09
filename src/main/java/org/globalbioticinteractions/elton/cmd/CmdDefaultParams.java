@@ -18,6 +18,9 @@ abstract class CmdDefaultParams implements Runnable {
     @Parameter(names = {"--tmp-dir"}, description = "tmp directory")
     private String tmpDir = "./.elton/tmp";
 
+    @Parameter(description = "[namespace1] [namespace2] ...")
+    private List<String> namespaces = new ArrayList<>();
+
     private URI workDir;
 
     private PrintStream stderr = System.err;
@@ -30,9 +33,6 @@ abstract class CmdDefaultParams implements Runnable {
             return cursor;
         }
     };
-
-    @Parameter(description = "[namespace1] [namespace2] ...")
-    private List<String> namespaces = new ArrayList<>();
 
     List<String> getNamespaces() {
         return namespaces;

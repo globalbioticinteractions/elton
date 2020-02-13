@@ -8,7 +8,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class CmdSyncTest {
+public class CmdUpdateTest {
 
     @Test
     public void update() {
@@ -20,11 +20,11 @@ public class CmdSyncTest {
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
         Object cmd = actual.getObjects().get(0);
-        Assert.assertEquals(cmd.getClass(), CmdSync.class);
-        CmdSync cmdSync = (CmdSync) actual.getObjects().get(0);
+        Assert.assertEquals(cmd.getClass(), CmdUpdate.class);
+        CmdUpdate cmdUpdate = (CmdUpdate) actual.getObjects().get(0);
 
-        assertThat(cmdSync.getNamespaces().size(), is(1));
-        assertThat(cmdSync.getNamespaces(), hasItem("globalbioticinteractions/template-dataset"));
+        assertThat(cmdUpdate.getNamespaces().size(), is(1));
+        assertThat(cmdUpdate.getNamespaces(), hasItem("globalbioticinteractions/template-dataset"));
     }
 
 

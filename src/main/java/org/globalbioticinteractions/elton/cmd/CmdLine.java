@@ -36,7 +36,7 @@ public class CmdLine {
                 .addObject(new CmdUsage())
                 .addCommand("usage", new CmdUsage(), "help")
                 .addCommand("list", new CmdList(), "ls")
-                .addCommand("sync", new CmdSync(), "pull", "update")
+                .addCommand("sync", new CmdUpdate(), "pull", "update")
                 .addCommand("names", new CmdNames(), "taxa", "taxon", "name")
                 .addCommand("interactions", new CmdInteractions(), "interaction", "interact")
                 .addCommand("datasets", new CmdDatasets())

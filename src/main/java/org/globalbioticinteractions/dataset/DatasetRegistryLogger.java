@@ -29,10 +29,9 @@ public class DatasetRegistryLogger implements DatasetRegistry {
 
         try {
             String accessedAt = ISODateTimeFormat.dateTime().withZoneUTC().print(new Date().getTime());
-            ContentProvenance meta = new ContentProvenance(namespace, dataset.getArchiveURI(), null, null, accessedAt);
-            meta.setType("application/globi");
-            File provenanceLog = ProvenanceLog.getProvenanceLogFile(CacheUtil.getCacheDirForNamespace(this.getCacheDir(), namespace));
-            ProvenanceLog.appendProvenanceLog(provenanceLog, meta);
+            ContentProvenance prov = new ContentProvenance(namespace, dataset.getArchiveURI(), null, null, accessedAt);
+            prov.setType("application/globi");
+            ProvenanceLog.appendProvenanceLog(new File(getCacheDir()), prov);
         } catch (IOException var4) {
             throw new DatasetFinderException("failed to record access", var4);
         }

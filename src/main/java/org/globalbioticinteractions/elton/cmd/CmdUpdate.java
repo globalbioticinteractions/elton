@@ -19,10 +19,10 @@ import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import java.util.Arrays;
 import java.util.List;
 
-@Parameters(separators = "= ", commandDescription = "Sync Datasets With Remote Sources")
-public class CmdSync extends CmdDefaultParams {
+@Parameters(separators = "= ", commandDescription = "Update Local Datasets With Remote Sources")
+public class CmdUpdate extends CmdDefaultParams {
 
-    private final static Log LOG = LogFactory.getLog(CmdSync.class);
+    private final static Log LOG = LogFactory.getLog(CmdUpdate.class);
 
     @Override
     public void run() {

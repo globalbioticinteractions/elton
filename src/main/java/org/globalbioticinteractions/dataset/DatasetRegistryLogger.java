@@ -1,13 +1,11 @@
 package org.globalbioticinteractions.dataset;
 
-import org.eol.globi.service.Dataset;
-import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.DatasetRegistry;
-import org.globalbioticinteractions.cache.CacheLog;
 import org.globalbioticinteractions.cache.CacheUtil;
-import org.globalbioticinteractions.cache.CachedURI;
+import org.globalbioticinteractions.cache.ContentProvenance;
+import org.globalbioticinteractions.cache.ProvenanceLog;
 import org.joda.time.format.ISODateTimeFormat;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -31,9 +29,10 @@ public class DatasetRegistryLogger implements DatasetRegistry {
 
         try {
             String accessedAt = ISODateTimeFormat.dateTime().withZoneUTC().print(new Date().getTime());
-            CachedURI meta = new CachedURI(namespace, dataset.getArchiveURI(), null, null, accessedAt);
+            ContentProvenance meta = new ContentProvenance(namespace, dataset.getArchiveURI(), null, null, accessedAt);
             meta.setType("application/globi");
-            CacheLog.appendAccessLog(meta, CacheLog.getAccessFile(CacheUtil.getCacheDirForNamespace(this.getCacheDir(), namespace)));
+            File provenanceLog = ProvenanceLog.getProvenanceLogFile(CacheUtil.getCacheDirForNamespace(this.getCacheDir(), namespace));
+            ProvenanceLog.appendProvenanceLog(provenanceLog, meta);
         } catch (IOException var4) {
             throw new DatasetFinderException("failed to record access", var4);
         }

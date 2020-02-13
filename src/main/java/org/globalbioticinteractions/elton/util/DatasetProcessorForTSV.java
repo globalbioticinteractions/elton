@@ -1,7 +1,7 @@
 package org.globalbioticinteractions.elton.util;
 
 import org.codehaus.jackson.JsonNode;
-import org.eol.globi.service.Dataset;
+import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.doi.DOI;
 
 import java.io.IOException;
@@ -14,13 +14,13 @@ public class DatasetProcessorForTSV implements DatasetProcessor {
         return new Dataset() {
 
             @Override
-            public InputStream getResource(URI resourceName) throws IOException {
-                return dataset.getResource(resourceName);
+            public InputStream retrieve(URI resourceName) throws IOException {
+                return dataset.retrieve(resourceName);
             }
 
             @Override
-            public URI getResourceURI(URI resourceName) throws IOException {
-                return dataset.getResourceURI(resourceName);
+            public URI getLocalURI(URI resourceName) throws IOException {
+                return dataset.getLocalURI(resourceName);
             }
 
             @Override

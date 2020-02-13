@@ -2,11 +2,11 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.apache.commons.lang.StringUtils;
-import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.DatasetRegistry;
-import org.eol.globi.service.DatasetRegistryGitHubArchive;
-import org.eol.globi.service.DatasetRegistryProxy;
-import org.eol.globi.service.DatasetRegistryZenodo;
+import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
+import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
+import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 
 import java.io.PrintStream;

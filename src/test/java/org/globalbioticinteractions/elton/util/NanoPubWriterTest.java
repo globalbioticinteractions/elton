@@ -5,7 +5,7 @@ import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.LocationImpl;
 import org.eol.globi.domain.StudyImpl;
 import org.eol.globi.domain.TaxonImpl;
-import org.eol.globi.service.DatasetImpl;
+import org.globalbioticinteractions.dataset.DatasetImpl;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;

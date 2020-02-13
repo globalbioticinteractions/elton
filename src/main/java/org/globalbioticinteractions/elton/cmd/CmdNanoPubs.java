@@ -1,7 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
-import org.eol.globi.service.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.eol.globi.tool.NullImportLogger;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.IdGenerator;

@@ -1,9 +1,9 @@
 package org.globalbioticinteractions.elton.util;
 
-import org.eol.globi.service.Dataset;
-import org.eol.globi.service.DatasetFinderException;
-import org.eol.globi.service.DatasetImpl;
-import org.eol.globi.service.DatasetRegistry;
+import org.globalbioticinteractions.dataset.Dataset;
+import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetImpl;
+import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;

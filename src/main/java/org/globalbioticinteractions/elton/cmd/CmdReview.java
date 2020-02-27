@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.eol.globi.data.CharsetConstant;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.data.ParserFactoryLocal;
@@ -60,6 +61,7 @@ import static org.eol.globi.data.StudyImporterForTSV.SOURCE_OCCURRENCE_ID;
 public class CmdReview extends CmdTabularWriterParams {
     private final static Log LOG = LogFactory.getLog(CmdReview.class);
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
+    public static final long LOG_NUMBER_OF_FIELDS = Arrays.stream(LOG_FORMAT_STRING.split("\t")).filter(x -> x.equals("%s")).count();
 
     @Parameter(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Integer maxLines = null;
@@ -184,8 +186,11 @@ public class CmdReview extends CmdTabularWriterParams {
         return this.reviewerName;
     }
 
-    private static void logReviewComment(PrintStream out, Object... fields) {
-        out.print(String.format(LOG_FORMAT_STRING, fields));
+    static void logReviewComment(PrintStream out, Object... fields) {
+        if (fields.length != LOG_NUMBER_OF_FIELDS) {
+            throw new IllegalArgumentException("not enough log fields: need [" + LOG_NUMBER_OF_FIELDS + "], but found [" + fields.length +"] in [" + StringUtils.join(fields, CharsetConstant.SEPARATOR));
+        }
+        out.print(String.format(LOG_FORMAT_STRING, Stream.of(fields).map(x -> CSVTSVUtil.escapeTSV((String)x)).toArray()));
     }
 
     public Integer getMaxLines() {

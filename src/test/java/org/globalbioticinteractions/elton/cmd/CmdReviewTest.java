@@ -2,6 +2,8 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eol.globi.data.LogUtil;
@@ -16,12 +18,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.MissingFormatArgumentException;
 import java.util.UUID;
 
 import static junit.framework.TestCase.fail;
@@ -261,6 +266,47 @@ public class CmdReviewTest {
         }});
         String sourceOccurrenceId = CmdReview.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
         assertThat(sourceOccurrenceId, is(""));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void logTooShort() {
+        CmdReview.logReviewComment(new PrintStream(new ByteArrayOutputStream()), "one", "two");
+    }
+
+    @Test
+    public void logSuffientNumberOfFields() {
+        List<String> fields = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
+            fields.add(Integer.toString(i));
+        }
+        CmdReview.logReviewComment(new PrintStream(new ByteArrayOutputStream()), fields.toArray());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void logTooManyFields() {
+        List<String> fields = new ArrayList<>();
+        for (int i = 0; i < 16; i++) {
+            fields.add(Integer.toString(i));
+        }
+        CmdReview.logReviewComment(new PrintStream(new ByteArrayOutputStream()), fields.toArray());
+    }
+
+    @Test
+    public void escapeNewlinesAndTabs() throws IOException {
+        List<String> fields = new ArrayList<>();
+        for (int i = 0; i < CmdReview.LOG_NUMBER_OF_FIELDS; i++) {
+            fields.add(Integer.toString(i) + "bla\n\t");
+        }
+
+
+        ByteArrayOutputStream out1 = new ByteArrayOutputStream();
+        try (PrintStream out = new PrintStream(out1)) {
+            CmdReview.logReviewComment(out, fields.toArray());
+        }
+        String loggedString = IOUtils.toString(out1.toByteArray(), StandardCharsets.UTF_8.name());
+        assertThat(loggedString.split("\t").length, is((int) CmdReview.LOG_NUMBER_OF_FIELDS));
+        assertThat(loggedString.split("\n").length, is(1));
+
     }
 
 }

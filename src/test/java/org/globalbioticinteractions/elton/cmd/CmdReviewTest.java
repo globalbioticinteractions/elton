@@ -295,7 +295,7 @@ public class CmdReviewTest {
     public void escapeNewlinesAndTabs() throws IOException {
         List<String> fields = new ArrayList<>();
         for (int i = 0; i < CmdReview.LOG_NUMBER_OF_FIELDS; i++) {
-            fields.add(Integer.toString(i) + "bla\n\t");
+            fields.add(i + "bla\n\t");
         }
 
 

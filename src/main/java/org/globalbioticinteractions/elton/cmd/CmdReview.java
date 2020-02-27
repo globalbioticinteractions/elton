@@ -190,7 +190,7 @@ public class CmdReview extends CmdTabularWriterParams {
         if (fields.length != LOG_NUMBER_OF_FIELDS) {
             throw new IllegalArgumentException("not enough log fields: need [" + LOG_NUMBER_OF_FIELDS + "], but found [" + fields.length +"] in [" + StringUtils.join(fields, CharsetConstant.SEPARATOR));
         }
-        out.print(String.format(LOG_FORMAT_STRING, Stream.of(fields).map(x -> CSVTSVUtil.escapeTSV((String)x)).toArray()));
+        out.print(String.format(LOG_FORMAT_STRING, Stream.of(fields).map(x -> x == null ? "" : CSVTSVUtil.escapeTSV(x.toString())).toArray()));
     }
 
     public Integer getMaxLines() {

@@ -53,7 +53,6 @@ public class CmdUpdateIT {
         String[] jarUrls = FileUtils.readFileToString(file, StandardCharsets.UTF_8).split("jar:file:");
         assertTrue(jarUrls.length > 1);
         String localJarUrl = jarUrls[1].split("\t")[0];
-        assertThat(localJarUrl, not(startsWith("/")));
         assertNotNull(new URL("jar:file:" + localJarUrl).openStream());
 
         int numberOfLogEntries = getNumberOfLogEntries();
@@ -94,7 +93,7 @@ public class CmdUpdateIT {
     }
 
     private void assertUpdateCmd(JCommander jc) {
-        Assert.assertEquals(jc.getParsedCommand(), "update");
+        Assert.assertEquals(jc.getParsedCommand(), "sync");
 
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);

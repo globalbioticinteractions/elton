@@ -28,27 +28,15 @@ public class CmdUpdateTest {
         assertThat(cmdUpdate.getNamespaces(), hasItem("globalbioticinteractions/template-dataset"));
     }
 
-    @Test(expected = ParameterException.class)
-    public void unsupportedRegistry() {
-        JCommander jc = new CmdLine().buildCommander();
-        try {
-            jc.parse("update", "--registries", "foo", "--cache-dir=./target/tmp-dataset", "globalbioticinteractions/template-dataset");
-        } catch (ParameterException ex) {
-            assertThat("registry [foo] not supported", is(ex.getMessage()));
-            throw ex;
-        }
-    }
-
     @Test
     public void supportedRegistries() {
         JCommander jc = new CmdLine().buildCommander();
-        jc.parse("update", "--registries", "zenodo", "github", "--cache-dir=./target/tmp-dataset", "globalbioticinteractions/template-dataset");
+        jc.parse("update", "--registries", "zenodo,github", "--cache-dir=./target/tmp-dataset", "globalbioticinteractions/template-dataset");
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
         Assert.assertEquals(actual.getObjects().size(), 1);
         Object cmd = actual.getObjects().get(0);
         Assert.assertEquals(cmd.getClass(), CmdUpdate.class);
         CmdUpdate cmdUpdate = (CmdUpdate) actual.getObjects().get(0);
-
         assertThat(cmdUpdate.getRegistryNames(), hasItem("zenodo"));
         assertThat(cmdUpdate.getRegistryNames(), hasItem("github"));
     }

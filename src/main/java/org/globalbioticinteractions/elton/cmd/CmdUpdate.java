@@ -2,7 +2,6 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.beust.jcommander.converters.CommaParameterSplitter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.NodeFactory;
@@ -25,9 +24,8 @@ public class CmdUpdate extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdUpdate.class);
 
     @Parameter(names = {"--registries", "--registry"},
-            description = "[registry1],[registry2] ...",
-            variableArity = true,
-            validateWith = RegistryNameValidator.class)
+            description = "[registry1] [registry2] ..."
+            )
 
     private List<String> registryNames = new ArrayList<String>() {{
         add("zenodo");
@@ -45,7 +43,7 @@ public class CmdUpdate extends CmdDefaultParams {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);
             } catch (DatasetFinderException e) {
-                throw new RuntimeException("unsupport registry with name [" + registryName + "]");
+                throw new RuntimeException("unsupported registry with name [" + registryName + "]");
             }
         }
 

@@ -56,10 +56,10 @@ public class DatasetRegistryUtil {
     }
 
     public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, String tmpDir, InputStreamFactory streamFactory) {
-        DatasetRegistry finder = forCacheDir(cacheDir, streamFactory);
-        if (emptyFinder(finder)) {
-            finder = forLocalDir(workDir, tmpDir, streamFactory);
+        DatasetRegistry registry = forCacheDir(cacheDir, streamFactory);
+        if (emptyFinder(registry)) {
+            registry = forLocalDir(workDir, tmpDir, streamFactory);
         }
-        return finder;
+        return registry;
     }
 }

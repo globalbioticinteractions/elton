@@ -117,7 +117,7 @@ public class CmdReview extends CmdTabularWriterParams {
         review("local", finderLocal, inputStreamFactory);
     }
 
-    private void review(String repoName, DatasetRegistry finder, InputStreamFactory inputStreamFactory) throws StudyImporterException {
+    private void review(String repoName, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         final AtomicLong noteCounter = new AtomicLong(0);
         final AtomicLong infoCounter = new AtomicLong(0);
 
@@ -126,12 +126,12 @@ public class CmdReview extends CmdTabularWriterParams {
         ReviewReportLogger reviewReportLogger = createReviewReportLogger(repoName, noteCounter, infoCounter);
 
         NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, reviewReportLogger);
-        StudyImporterForRegistry studyImporter = new StudyImporterForRegistry(parserFactory, nodeFactory, finder);
+        StudyImporterForRegistry studyImporter = new StudyImporterForRegistry(parserFactory, nodeFactory, registry);
         studyImporter.setLogger(reviewReportLogger);
 
         try {
             Dataset dataset = new DatasetFactory(
-                    finder,
+                    registry,
                     inputStreamFactory)
                     .datasetFor(repoName);
 

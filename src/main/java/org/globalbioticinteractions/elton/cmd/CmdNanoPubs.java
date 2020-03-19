@@ -36,7 +36,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
     }
 
     void run(PrintStream out) {
-        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
                 getWorkDir(),
                 getTmpDir(),
@@ -46,7 +46,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, dataset -> dataset);
 
-        CmdUtil.handleNamespaces(finder
+        CmdUtil.handleNamespaces(registry
                 , nodeFactory
                 , getNamespaces()
                 , "listing nanopubs",

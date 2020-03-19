@@ -45,11 +45,11 @@ public class CmdDatasets extends CmdTabularWriterParams {
             serializer.writeHeader();
         }
 
-        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
 
         try {
-            CmdUtil.handleNamespaces(finder,
-                    namespace -> serializer.write(finder.datasetFor(namespace)),
+            CmdUtil.handleNamespaces(registry,
+                    namespace -> serializer.write(registry.datasetFor(namespace)),
                     getNamespaces());
         } catch (DatasetFinderException e) {
             throw new RuntimeException("failed to datasets", e);

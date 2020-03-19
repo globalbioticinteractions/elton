@@ -46,9 +46,9 @@ public class DatasetRegistryUtil {
         return new DatasetRegistryLocal(cacheDir, getCacheFactoryLocal(cacheDir, streamFactory), streamFactory);
     }
 
-    public static boolean emptyFinder(DatasetRegistry finder) {
+    public static boolean emptyFinder(DatasetRegistry registry) {
         try {
-            Collection<String> namespaces = finder.findNamespaces();
+            Collection<String> namespaces = registry.findNamespaces();
             return namespaces.isEmpty();
         } catch (DatasetFinderException e) {
             return false;

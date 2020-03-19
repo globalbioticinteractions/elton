@@ -24,12 +24,12 @@ public class CmdList extends CmdOnlineParams {
 
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
-        DatasetRegistry finderLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), inputStreamFactory);
-        DatasetRegistry finder = isOnline()
-                ? new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(inputStreamFactory), new DatasetRegistryGitHubArchive(inputStreamFactory), finderLocal))
-                : finderLocal;
+        DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), inputStreamFactory);
+        DatasetRegistry registry = isOnline()
+                ? new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(inputStreamFactory), new DatasetRegistryGitHubArchive(inputStreamFactory), registryLocal))
+                : registryLocal;
         try {
-            List<String> namespaces = finder.findNamespaces()
+            List<String> namespaces = registry.findNamespaces()
                     .stream()
                     .filter(StringUtils::isNotEmpty)
                     .distinct()

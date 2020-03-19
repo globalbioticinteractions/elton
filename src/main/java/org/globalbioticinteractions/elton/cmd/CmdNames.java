@@ -35,9 +35,9 @@ public class CmdNames extends CmdTabularWriterParams {
             writer.writeHeader();
         }
 
-        DatasetRegistry finder = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
         NodeFactory nodeFactory = createFactory(writer);
-        CmdUtil.handleNamespaces(finder, nodeFactory, getNamespaces(), "listing taxa", getStderr(), new NullImportLogger());
+        CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "listing taxa", getStderr(), new NullImportLogger());
     }
 
     private TaxonWriter createWriter(PrintStream out) {

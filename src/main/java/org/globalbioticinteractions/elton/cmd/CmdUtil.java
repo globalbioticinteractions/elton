@@ -88,8 +88,8 @@ public class CmdUtil {
         }
     }
 
-    private static void handleSingleNamespace(DatasetRegistry finder, NodeFactory nodeFactory, String namespace, ImportLogger logger) throws DatasetFinderException, StudyImporterException {
-        Dataset dataset = new DatasetFactory(finder).datasetFor(namespace);
+    private static void handleSingleNamespace(DatasetRegistry registry, NodeFactory nodeFactory, String namespace, ImportLogger logger) throws DatasetFinderException, StudyImporterException {
+        Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
         nodeFactory.getOrCreateDataset(dataset);
 
         StudyImporter importer = new StudyImporterFactory()

@@ -24,7 +24,7 @@ public class CmdUpdate extends CmdDefaultParams {
     private final static Log LOG = LogFactory.getLog(CmdUpdate.class);
 
     @Parameter(names = {"--registries", "--registry"},
-            description = "[registry1] [registry2] ..."
+            description = "[registry1],[registry2],..."
             )
 
     private List<String> registryNames = new ArrayList<String>() {{

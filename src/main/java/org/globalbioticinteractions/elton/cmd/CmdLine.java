@@ -43,6 +43,7 @@ public class CmdLine {
                 .addCommand("nanopubs", new CmdNanoPubs())
                 .addCommand("review", new CmdReview(), "test", "check")
                 .addCommand("version", new CmdVersion())
+                .addCommand("registries", new CmdSupportedRegistries())
                 .build();
     }
 

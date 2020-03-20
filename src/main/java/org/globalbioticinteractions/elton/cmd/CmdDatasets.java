@@ -45,7 +45,7 @@ public class CmdDatasets extends CmdTabularWriterParams {
             serializer.writeHeader();
         }
 
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), createInputStreamFactory());
 
         try {
             CmdUtil.handleNamespaces(registry,

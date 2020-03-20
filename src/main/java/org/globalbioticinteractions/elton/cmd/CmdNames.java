@@ -35,7 +35,7 @@ public class CmdNames extends CmdTabularWriterParams {
             writer.writeHeader();
         }
 
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), getTmpDir(), createInputStreamFactory());
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), createInputStreamFactory());
         NodeFactory nodeFactory = createFactory(writer);
         CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "listing taxa", getStderr(), new NullImportLogger());
     }

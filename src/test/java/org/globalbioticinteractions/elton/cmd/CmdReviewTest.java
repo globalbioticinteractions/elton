@@ -3,7 +3,6 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.JCommander;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eol.globi.data.LogUtil;
@@ -26,7 +25,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.MissingFormatArgumentException;
 import java.util.UUID;
 
 import static junit.framework.TestCase.fail;
@@ -38,12 +36,12 @@ import static org.junit.Assert.assertThat;
 
 public class CmdReviewTest {
 
-    private String testTmpDir = "target/test-cache";
+    private String testCacheDir = "target/test-cache";
     private CmdReview cmdReview;
 
     @Before
     public void init() {
-        this.testTmpDir = "target/test-cache/" + UUID.randomUUID();
+        this.testCacheDir = "target/test-cache/" + UUID.randomUUID();
         this.cmdReview = new CmdReview();
         cmdReview.setDateFactory(() -> new Date(0));
         cmdReview.setReviewerName("elton-dev");
@@ -52,11 +50,11 @@ public class CmdReviewTest {
 
     @After
     public void cleanCache() {
-        FileUtils.deleteQuietly(new File(getTestTmpDir()));
+        FileUtils.deleteQuietly(new File(getTestCacheDir()));
     }
 
-    private String getTestTmpDir() {
-        return testTmpDir;
+    private String getTestCacheDir() {
+        return testCacheDir;
     }
 
     @Test
@@ -136,7 +134,7 @@ public class CmdReviewTest {
         PrintStream out = new PrintStream(outOs);
         cmdReview.setStdout(out);
         cmdReview.setWorkDir(Paths.get(localTestPath).toUri());
-        cmdReview.setTmpDir(getTestTmpDir());
+        cmdReview.setCacheDir(getTestCacheDir());
         cmdReview.setMaxLines(maxLines);
         cmdReview.setDesiredReviewCommentTypes(commentTypes);
         cmdReview.run();

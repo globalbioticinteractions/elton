@@ -43,10 +43,13 @@ public class DatasetRegistryUtil {
     }
 
     public static DatasetRegistry forCacheDir(String cacheDir, InputStreamFactory streamFactory) {
-        return new DatasetRegistryLocal(cacheDir, getCacheFactoryLocal(cacheDir, streamFactory), streamFactory);
+        return new DatasetRegistryLocal(
+                cacheDir,
+                getCacheFactoryLocal(cacheDir, streamFactory),
+                streamFactory);
     }
 
-    public static boolean emptyFinder(DatasetRegistry registry) {
+    private static boolean isEmpty(DatasetRegistry registry) {
         try {
             Collection<String> namespaces = registry.findNamespaces();
             return namespaces.isEmpty();
@@ -55,10 +58,10 @@ public class DatasetRegistryUtil {
         }
     }
 
-    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, String tmpDir, InputStreamFactory streamFactory) {
+    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, InputStreamFactory streamFactory) {
         DatasetRegistry registry = forCacheDir(cacheDir, streamFactory);
-        if (emptyFinder(registry)) {
-            registry = forLocalDir(workDir, tmpDir, streamFactory);
+        if (isEmpty(registry)) {
+            registry = forLocalDir(workDir, cacheDir, streamFactory);
         }
         return registry;
     }

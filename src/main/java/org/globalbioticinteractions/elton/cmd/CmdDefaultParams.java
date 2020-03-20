@@ -15,9 +15,6 @@ abstract class CmdDefaultParams implements Runnable {
     @Parameter(names = {"--cache-dir", "-c"}, description = "cache directory")
     private String cacheDir = "./datasets";
 
-    @Parameter(names = {"--tmp-dir"}, description = "tmp directory")
-    private String tmpDir = "./.elton/tmp";
-
     @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();
 
@@ -67,14 +64,6 @@ abstract class CmdDefaultParams implements Runnable {
 
     public void setCacheDir(String cacheDir) {
         this.cacheDir = cacheDir;
-    }
-
-    public String getTmpDir() {
-        return tmpDir;
-    }
-
-    public String setTmpDir(String tmpDir) {
-        return this.tmpDir = tmpDir;
     }
 
     public void setWorkDir(URI workingDir) {

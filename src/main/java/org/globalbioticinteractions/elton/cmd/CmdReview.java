@@ -113,7 +113,7 @@ public class CmdReview extends CmdTabularWriterParams {
     }
 
     private void reviewLocal(URI workDir, InputStreamFactory inputStreamFactory) throws StudyImporterException {
-        DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(workDir, getTmpDir(), inputStreamFactory);
+        DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(workDir, getCacheDir(), inputStreamFactory);
         review("local", registryLocal, inputStreamFactory);
     }
 

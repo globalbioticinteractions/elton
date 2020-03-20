@@ -38,7 +38,9 @@ public class CmdUpdate extends CmdDefaultParams {
 
         List<DatasetRegistry> registries = new ArrayList<>();
         for (String registryName : registryNames) {
-            DatasetRegistryFactoryImpl datasetRegistryFactory = new DatasetRegistryFactoryImpl(inputStreamFactory);
+            DatasetRegistryFactoryImpl datasetRegistryFactory
+                    = new DatasetRegistryFactoryImpl(
+                            getWorkDir(), getCacheDir(), inputStreamFactory);
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);

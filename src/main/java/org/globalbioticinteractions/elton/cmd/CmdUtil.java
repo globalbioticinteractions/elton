@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class CmdUtil {
@@ -64,7 +65,7 @@ public class CmdUtil {
     public static void handleNamespaces(DatasetRegistry registry, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix, Appendable out, ImportLogger logger) {
         try {
             List<String> failedNamespaces = Collections.synchronizedList(new ArrayList<>());
-
+            final AtomicReference<Throwable> firstException = new AtomicReference<>();
             handleNamespaces(registry, namespace -> {
                 out.append(msgPrefix)
                         .append(" [")
@@ -75,12 +76,15 @@ public class CmdUtil {
                     out.append("done.\n");
                 } catch (StudyImporterException | DatasetFinderException ex) {
                     failedNamespaces.add(namespace);
+                    if (firstException.get() == null) {
+                        firstException.set(ex);
+                    }
                     out.append("failed.\n");
                 }
             }, namespaces);
 
-            if (failedNamespaces.size() > 0) {
-                throw new DatasetFinderException("failed to import datasets [" + StringUtils.join(failedNamespaces, ";") + "], please check the logs.");
+            if (failedNamespaces.size() > 0 && firstException.get() != null) {
+                throw new DatasetFinderException("failed to import datasets [" + StringUtils.join(failedNamespaces, ";") + "], please check the logs.", firstException.get());
             }
 
         } catch (DatasetFinderException e) {

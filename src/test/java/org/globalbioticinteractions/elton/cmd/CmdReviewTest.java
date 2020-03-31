@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import static junit.framework.TestCase.fail;
@@ -250,7 +250,7 @@ public class CmdReviewTest {
 
     @Test
     public void findTermValue() throws IOException {
-        LogContext sourceOccurrenceId1 = LogUtil.contextFor(new HashMap<String, String>() {{
+        LogContext sourceOccurrenceId1 = LogUtil.contextFor(new TreeMap<String, String>() {{
             put("sourceOccurrenceId", "a8c61ad5-4cda-47df-9cb6-6c64b0e71bfa");
         }});
         String sourceOccurrenceId = CmdReview.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
@@ -259,7 +259,7 @@ public class CmdReviewTest {
 
     @Test
     public void findTermValueNull() throws IOException {
-        LogContext sourceOccurrenceId1 = LogUtil.contextFor(new HashMap<String, String>() {{
+        LogContext sourceOccurrenceId1 = LogUtil.contextFor(new TreeMap<String, String>() {{
             put("sourceOccurrenceId", null);
         }});
         String sourceOccurrenceId = CmdReview.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");

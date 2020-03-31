@@ -9,9 +9,9 @@ import org.eol.globi.domain.Term;
 import org.globalbioticinteractions.dataset.Dataset;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class SpecimenImpl extends SpecimenNull {
     public final Taxon taxon;
@@ -142,7 +142,7 @@ public class SpecimenImpl extends SpecimenNull {
     @Override
     public void setProperty(String name, String value) {
         if (properties == null) {
-            properties = new HashMap<>();
+            properties = new TreeMap<>();
         }
         properties.put(name, value);
     }

@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.service.StudyImporterFactory;
+import org.eol.globi.service.StudyImporterFactoryImpl;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderException;
@@ -65,8 +66,8 @@ public class CmdUpdate extends CmdDefaultParams {
             NodeFactory factory = new NodeFactoryNull();
             factory.getOrCreateDataset(dataset);
             try {
-                new StudyImporterFactory()
-                        .createImporter(dataset, factory)
+                new StudyImporterFactoryImpl(factory)
+                        .createImporter(dataset)
                         .importStudy();
                 getStderr().println("done.");
             } catch (StudyImporterException ex) {

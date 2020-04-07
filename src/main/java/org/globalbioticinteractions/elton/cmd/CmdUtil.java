@@ -8,6 +8,7 @@ import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporter;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
+import org.eol.globi.service.StudyImporterFactoryImpl;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetFinderException;
@@ -96,8 +97,8 @@ public class CmdUtil {
         Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
         nodeFactory.getOrCreateDataset(dataset);
 
-        StudyImporter importer = new StudyImporterFactory()
-                .createImporter(dataset, nodeFactory);
+        StudyImporter importer = new StudyImporterFactoryImpl(nodeFactory)
+                .createImporter(dataset);
 
         importer.setGeoNamesService(new GeoNamesService() {
             @Override

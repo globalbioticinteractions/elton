@@ -15,6 +15,9 @@ abstract class CmdDefaultParams implements Runnable {
     @Parameter(names = {"--cache-dir", "-c"}, description = "cache directory")
     private String cacheDir = "./datasets";
 
+    @Parameter(names = {"--no-progress"}, description = "do not show progress indicator")
+    private boolean noProgress = false;
+
     @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();
 
@@ -23,7 +26,7 @@ abstract class CmdDefaultParams implements Runnable {
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
 
-    private ProgressCursorFactory cursorFactory = new ProgressCursorFactory() {
+    final private ProgressCursorFactory cursorFactory = new ProgressCursorFactory() {
         private final ProgressCursor cursor = new ProgressCursorRotating(stderr);
         @Override
         public ProgressCursor createProgressCursor() {
@@ -71,7 +74,9 @@ abstract class CmdDefaultParams implements Runnable {
     }
 
     public ProgressCursorFactory getProgressCursorFactory() {
-        return this.cursorFactory;
+        return noProgress
+                ? () -> () -> {}
+                 : cursorFactory;
     }
 
     public InputStreamFactoryLogging createInputStreamFactory() {

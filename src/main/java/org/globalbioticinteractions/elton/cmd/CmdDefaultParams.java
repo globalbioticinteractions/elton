@@ -15,13 +15,14 @@ abstract class CmdDefaultParams implements Runnable {
     @Parameter(names = {"--cache-dir", "-c"}, description = "cache directory")
     private String cacheDir = "./datasets";
 
+    @Parameter(names = {"--work-dir", "-w"}, description = "work directory")
+    private String workDir = ".";
+
     @Parameter(names = {"--no-progress"}, description = "do not show progress indicator")
     private boolean noProgress = false;
 
     @Parameter(description = "[namespace1] [namespace2] ...")
     private List<String> namespaces = new ArrayList<>();
-
-    private URI workDir;
 
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
@@ -57,7 +58,7 @@ abstract class CmdDefaultParams implements Runnable {
     public URI getWorkDir() {
         return workDir == null
                 ? Paths.get("").toUri()
-                : workDir;
+                : Paths.get(workDir).toUri();
 
     }
 
@@ -69,7 +70,7 @@ abstract class CmdDefaultParams implements Runnable {
         this.cacheDir = cacheDir;
     }
 
-    public void setWorkDir(URI workingDir) {
+    public void setWorkDir(String workingDir) {
         this.workDir = workingDir;
     }
 

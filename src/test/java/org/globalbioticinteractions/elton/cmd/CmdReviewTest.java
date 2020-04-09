@@ -133,7 +133,7 @@ public class CmdReviewTest {
         cmdReview.setStderr(err);
         PrintStream out = new PrintStream(outOs);
         cmdReview.setStdout(out);
-        cmdReview.setWorkDir(Paths.get(localTestPath).toUri());
+        cmdReview.setWorkDir(Paths.get(localTestPath).toAbsolutePath().toString());
         cmdReview.setCacheDir(getTestCacheDir());
         cmdReview.setMaxLines(maxLines);
         cmdReview.setDesiredReviewCommentTypes(commentTypes);
@@ -222,7 +222,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(outOs);
         cmdReview.setStdout(out);
-        cmdReview.setWorkDir(Paths.get("src/test/resources/dataset-local-test-non-exist").toUri());
+        cmdReview.setWorkDir(Paths.get("src/test/resources/dataset-local-test-non-exist").toAbsolutePath().toString());
         try {
             cmdReview.run();
             fail("should have thrown");

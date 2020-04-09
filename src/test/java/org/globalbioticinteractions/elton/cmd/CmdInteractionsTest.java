@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.JCommander;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -45,6 +46,30 @@ public class CmdInteractionsTest {
         }
     }
 
+    @Ignore
+    @Test
+    public void interactionsLocalWithCache() throws URISyntaxException {
+        JCommander jc = new CmdLine().buildCommander();
+        URL resource = getClass().getResource("/dataset-local-with-cache/data/local/access.tsv");
+        File dataDir = new File(resource.toURI()).getParentFile().getParentFile();
+        jc.parse("interactions",
+                "--cache-dir=" + dataDir.getAbsolutePath(),
+                "--work-dir=" + dataDir.getParentFile().getAbsolutePath(),
+                "--skip-header");
+
+        JCommander actual = jc.getCommands().get(jc.getParsedCommand());
+        Assert.assertEquals(actual.getObjects().size(), 1);
+        Object cmd = actual.getObjects().get(0);
+        Assert.assertEquals(cmd.getClass(), CmdInteractions.class);
+
+        if (actual.getObjects().get(0) instanceof Runnable) {
+            ByteArrayOutputStream out1 = new ByteArrayOutputStream();
+            PrintStream out = new PrintStream(out1);
+            ((CmdInteractions) actual.getObjects().get(0)).run(out);
+            assertThat(out1.toString().split("\n")[0], is("https://en.wiktionary.org/wiki/support\t\t\t\t\t\t\tLeptoconchus incycloseris\t\t\t\t\t\t\t\t\t\t\thttp://purl.obolibrary.org/obo/RO_0002444\tparasiteOf\t\t\t\t\t\t\tFungia (Cycloseris) costulata\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t10.1007/s13127-011-0039-1\thttps://doi.org/10.1007/s13127-011-0039-1\tGittenberger, A., Gittenberger, E. (2011). Cryptic, adaptive radiation of endoparasitic snails: sibling species of Leptoconchus (Gastropoda: Coralliophilidae) in corals. Org Divers Evol, 11(1), 21–41. doi:10.1007/s13127-011-0039-1\tglobalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f\tdev"));
+        }
+    }
+
     @Test
     public void interactionsWithHeader() throws URISyntaxException {
         JCommander jc = new CmdLine().buildCommander();
@@ -70,7 +95,7 @@ public class CmdInteractionsTest {
         URL resource = getClass().getResource("/dataset-local-refuting-test/interactions.tsv");
         assertNotNull(resource);
         File file = new File(resource.toURI());
-        URI workDir = file.getParentFile().toURI();
+        File workDir = file.getParentFile();
 
         JCommander jc = new CmdLine().buildCommander();
         jc.parse("interactions",
@@ -80,7 +105,7 @@ public class CmdInteractionsTest {
         if (actual.getObjects().get(0) instanceof Runnable) {
             ByteArrayOutputStream out1 = new ByteArrayOutputStream();
             PrintStream out = new PrintStream(out1);
-            ((CmdInteractions) actual.getObjects().get(0)).setWorkDir(workDir);
+            ((CmdInteractions) actual.getObjects().get(0)).setWorkDir(workDir.getAbsolutePath());
             ((CmdInteractions) actual.getObjects().get(0)).run(out);
             String actual1 = out1.toString();
             String[] lines = StringUtils.splitByWholeSeparator(actual1, "\n");

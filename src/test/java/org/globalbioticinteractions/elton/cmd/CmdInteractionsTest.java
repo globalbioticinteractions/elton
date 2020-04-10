@@ -8,10 +8,13 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -91,7 +94,7 @@ public class CmdInteractionsTest {
     }
 
     @Test
-    public void refutingInteractionsWithHeader() throws URISyntaxException {
+    public void refutingInteractionsWithHeader() throws URISyntaxException, IOException {
         URL resource = getClass().getResource("/dataset-local-refuting-test/interactions.tsv");
         assertNotNull(resource);
         File file = new File(resource.toURI());
@@ -99,7 +102,8 @@ public class CmdInteractionsTest {
 
         JCommander jc = new CmdLine().buildCommander();
         jc.parse("interactions",
-                "--cache-dir=" + CmdTestUtil.cacheDirTestFor("/dataset-cache-null/empty/empty/access.tsv"));
+                "--cache-dir=" + Files.createTempDirectory(Paths.get("target"), "test-cache"),
+                "--work-dir=" + workDir.getAbsolutePath());
         JCommander actual = jc.getCommands().get(jc.getParsedCommand());
 
         if (actual.getObjects().get(0) instanceof Runnable) {

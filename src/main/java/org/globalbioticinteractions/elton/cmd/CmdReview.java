@@ -99,14 +99,14 @@ public class CmdReview extends CmdTabularWriterParams {
                 reviewLocal(localNamespace, factory);
             }
 
-            checkCacheOrRemote(remoteNamespaces, factory);
+            reviewCachedOrRemote(remoteNamespaces, factory);
 
         } catch (StudyImporterException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void checkCacheOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
+    private void reviewCachedOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         for (String namespace : namespaces) {
             review(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), inputStreamFactory), inputStreamFactory);
         }

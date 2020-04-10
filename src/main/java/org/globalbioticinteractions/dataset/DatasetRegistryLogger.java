@@ -30,7 +30,7 @@ public class DatasetRegistryLogger implements DatasetRegistry {
         try {
             String accessedAt = ISODateTimeFormat.dateTime().withZoneUTC().print(new Date().getTime());
             ContentProvenance prov = new ContentProvenance(namespace, dataset.getArchiveURI(), null, null, accessedAt);
-            prov.setType("application/globi");
+            prov.setType(CacheUtil.MIME_TYPE_GLOBI);
             ProvenanceLog.appendProvenanceLog(new File(getCacheDir()), prov);
         } catch (IOException var4) {
             throw new DatasetFinderException("failed to record access", var4);

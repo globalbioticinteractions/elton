@@ -3,7 +3,7 @@ package org.globalbioticinteractions.elton.util;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.CachePullThrough;
 import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
@@ -24,12 +24,12 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
     }
 
     @Override
-    public Collection<String> findNamespaces() throws DatasetFinderException {
+    public Collection<String> findNamespaces() throws DatasetRegistryException {
         return Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL);
     }
 
     @Override
-    public Dataset datasetFor(String namespace) throws DatasetFinderException {
+    public Dataset datasetFor(String namespace) throws DatasetRegistryException {
         DatasetImpl local = new DatasetImpl(DatasetRegistryUtil.NAMESPACE_LOCAL, localArchiveDir, streamFactory);
 
         return new DatasetWithCache(local,

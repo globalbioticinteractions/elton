@@ -20,11 +20,11 @@ public class DatasetRegistryLogger implements DatasetRegistry {
         this.cacheDir = cacheDir;
     }
 
-    public Collection<String> findNamespaces() throws DatasetFinderException {
+    public Collection<String> findNamespaces() throws DatasetRegistryException {
         return this.getRegistry().findNamespaces();
     }
 
-    public Dataset datasetFor(String namespace) throws DatasetFinderException {
+    public Dataset datasetFor(String namespace) throws DatasetRegistryException {
         Dataset dataset = this.getRegistry().datasetFor(namespace);
 
         try {
@@ -33,7 +33,7 @@ public class DatasetRegistryLogger implements DatasetRegistry {
             prov.setType(CacheUtil.MIME_TYPE_GLOBI);
             ProvenanceLog.appendProvenanceLog(new File(getCacheDir()), prov);
         } catch (IOException var4) {
-            throw new DatasetFinderException("failed to record access", var4);
+            throw new DatasetRegistryException("failed to record access", var4);
         }
 
         return dataset;

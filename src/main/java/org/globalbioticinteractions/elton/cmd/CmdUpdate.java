@@ -10,7 +10,7 @@ import org.eol.globi.service.StudyImporterFactory;
 import org.eol.globi.service.StudyImporterFactoryImpl;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
@@ -45,7 +45,7 @@ public class CmdUpdate extends CmdDefaultParams {
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);
-            } catch (DatasetFinderException e) {
+            } catch (DatasetRegistryException e) {
                 throw new RuntimeException("unsupported registry with name [" + registryName + "]");
             }
         }
@@ -78,7 +78,7 @@ public class CmdUpdate extends CmdDefaultParams {
 
         try {
             CmdUtil.handleNamespaces(registryProxy, namespaceHandler, getNamespaces());
-        } catch (DatasetFinderException e) {
+        } catch (DatasetRegistryException e) {
             throw new RuntimeException(e);
         }
     }

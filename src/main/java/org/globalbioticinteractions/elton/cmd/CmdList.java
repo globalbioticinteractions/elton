@@ -2,7 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.apache.commons.lang.StringUtils;
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
@@ -36,7 +36,7 @@ public class CmdList extends CmdOnlineParams {
                     .sorted()
                     .collect(Collectors.toList());
             out.println(StringUtils.join(namespaces, "\n"));
-        } catch (DatasetFinderException e) {
+        } catch (DatasetRegistryException e) {
             throw new RuntimeException(e);
         }
     }

@@ -11,7 +11,7 @@ import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.StudyImporterFactoryImpl;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.eol.globi.service.GeoNamesService;
 import org.eol.globi.service.StudyImporterFactory;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class CmdUtil {
     private static final Log LOG = LogFactory.getLog(CmdUtil.class);
 
-    static void handleNamespaces(DatasetRegistry registry, NamespaceHandler handler, List<String> namespaces) throws DatasetFinderException {
+    static void handleNamespaces(DatasetRegistry registry, NamespaceHandler handler, List<String> namespaces) throws DatasetRegistryException {
         List<String> selectedNamespaces = new ArrayList<>(namespaces);
         if (selectedNamespaces.isEmpty()) {
             selectedNamespaces = new ArrayList<>(registry.findNamespaces());
@@ -75,7 +75,7 @@ public class CmdUtil {
                 try {
                     handleSingleNamespace(registry, nodeFactory, namespace, logger);
                     out.append("done.\n");
-                } catch (StudyImporterException | DatasetFinderException ex) {
+                } catch (StudyImporterException | DatasetRegistryException ex) {
                     failedNamespaces.add(namespace);
                     if (firstException.get() == null) {
                         firstException.set(ex);
@@ -85,15 +85,15 @@ public class CmdUtil {
             }, namespaces);
 
             if (failedNamespaces.size() > 0 && firstException.get() != null) {
-                throw new DatasetFinderException("failed to import datasets [" + StringUtils.join(failedNamespaces, ";") + "], please check the logs.", firstException.get());
+                throw new DatasetRegistryException("failed to import datasets [" + StringUtils.join(failedNamespaces, ";") + "], please check the logs.", firstException.get());
             }
 
-        } catch (DatasetFinderException e) {
+        } catch (DatasetRegistryException e) {
             throw new RuntimeException(msgPrefix + " failed.", e);
         }
     }
 
-    private static void handleSingleNamespace(DatasetRegistry registry, NodeFactory nodeFactory, String namespace, ImportLogger logger) throws DatasetFinderException, StudyImporterException {
+    private static void handleSingleNamespace(DatasetRegistry registry, NodeFactory nodeFactory, String namespace, ImportLogger logger) throws DatasetRegistryException, StudyImporterException {
         Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
         nodeFactory.getOrCreateDataset(dataset);
 

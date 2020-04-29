@@ -1,6 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class DatasetRegistryFactoryImplTest {
 
     @Test
-    public void list() throws DatasetFinderException {
+    public void list() throws DatasetRegistryException {
         List<DatasetRegistry> registries = new ArrayList<>();
         Set<String> supportedRegistries = DatasetRegistryFactoryImpl.getSupportedRegistries();
         for (String supportedRegistry : supportedRegistries) {

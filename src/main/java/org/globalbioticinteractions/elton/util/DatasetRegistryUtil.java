@@ -1,6 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.CacheFactory;
@@ -33,7 +33,7 @@ public class DatasetRegistryUtil {
         try {
             Collection<String> namespaces = registry.findNamespaces();
             return namespaces.isEmpty();
-        } catch (DatasetFinderException e) {
+        } catch (DatasetRegistryException e) {
             return false;
         }
     }

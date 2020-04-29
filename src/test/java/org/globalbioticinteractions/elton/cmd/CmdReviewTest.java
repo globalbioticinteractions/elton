@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eol.globi.data.LogUtil;
 import org.eol.globi.domain.LogContext;
+import org.eol.globi.util.CSVTSVUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,6 +30,8 @@ import java.util.UUID;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
@@ -156,6 +159,27 @@ public class CmdReviewTest {
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t0 note(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t5 info(s)\t\t\t\t\t\t\t\t\t"));
+        }
+    }
+
+    @Test
+    public void runCheckLocalWithPopulatedDynamicPropertiesWithoutInteractionTerms() throws IOException {
+        // related to https://github.com/globalbioticinteractions/elton/issues/34
+        ByteArrayOutputStream errOs = new ByteArrayOutputStream();
+        ByteArrayOutputStream outOs = new ByteArrayOutputStream();
+        try {
+            runCheck("src/test/resources/ucsb-izc-default-interaction", errOs, outOs, 100);
+        } finally {
+
+            String reviewReport = outOs.toString();
+            String[] lines = StringUtils.split(reviewReport, "\n");
+            List<String> reviewMessages = new ArrayList<>();
+            for (String line : lines) {
+                String[] values = CSVTSVUtil.splitTSV(line);
+                reviewMessages.add(values[5]);
+
+            }
+            assertThat(reviewMessages, not(hasItem("no interaction type defined")));
         }
     }
 

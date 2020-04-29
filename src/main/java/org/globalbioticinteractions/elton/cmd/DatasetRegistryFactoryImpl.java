@@ -2,8 +2,9 @@ package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.collections4.MapUtils;
 import org.eol.globi.util.InputStreamFactory;
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.util.DatasetRegistrySingleDir;
@@ -34,10 +35,10 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
     }
 
     @Override
-    public DatasetRegistry createRegistryByName(String name) throws DatasetFinderException {
+    public DatasetRegistry createRegistryByName(String name) throws DatasetRegistryException {
         Class<? extends DatasetRegistry> registryClass = REGISTRY_LOOKUP.get(name);
         if (registryClass == null) {
-            throw new DatasetFinderException("failed to create registry for [" + name + "]: not supported");
+            throw new DatasetRegistryException("failed to create registry for [" + name + "]: not supported");
         }
         try {
             Class<?>[] paramTypes = {URI.class, String.class, InputStreamFactory.class};
@@ -46,13 +47,13 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
                 Class<?>[] paramTypesShort = {InputStreamFactory.class};
                 Optional<Constructor<? extends DatasetRegistry>> constructor2 = constructorFor(registryClass, paramTypesShort);
                 return constructor2
-                        .orElseThrow(() -> new DatasetFinderException("failed to create registry for [" + name + "]")
+                        .orElseThrow(() -> new DatasetRegistryException("failed to create registry for [" + name + "]")
                         ).newInstance(inputStreamFactory);
             } else {
                 return constructor.get().newInstance(getWorkDir(), getCacheDir(), inputStreamFactory);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new DatasetFinderException("failed to create registry for [" + name + "]", e);
+            throw new DatasetRegistryException("failed to create registry for [" + name + "]", e);
         }
     }
 

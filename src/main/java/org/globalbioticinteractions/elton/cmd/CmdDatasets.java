@@ -2,7 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
 import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.StreamUtil;
@@ -51,7 +51,7 @@ public class CmdDatasets extends CmdTabularWriterParams {
             CmdUtil.handleNamespaces(registry,
                     namespace -> serializer.write(registry.datasetFor(namespace)),
                     getNamespaces());
-        } catch (DatasetFinderException e) {
+        } catch (DatasetRegistryException e) {
             throw new RuntimeException("failed to datasets", e);
         }
 

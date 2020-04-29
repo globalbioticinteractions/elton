@@ -26,7 +26,7 @@ import org.eol.globi.domain.Taxon;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetConstant;
 import org.globalbioticinteractions.dataset.DatasetFactory;
-import org.globalbioticinteractions.dataset.DatasetFinderException;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.eol.globi.util.CSVTSVUtil;
 import org.eol.globi.util.DateUtil;
@@ -149,7 +149,7 @@ public class CmdReview extends CmdTabularWriterParams {
             }
             getStderr().println("done.");
             reviewReportLogger.log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary);
-        } catch (DatasetFinderException e) {
+        } catch (DatasetRegistryException e) {
             reviewReportLogger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
             getStderr().println("failed.");
             throw new StudyImporterException(e);

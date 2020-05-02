@@ -60,16 +60,21 @@ import static org.eol.globi.data.StudyImporterForTSV.TARGET_SEX_ID;
 import static org.eol.globi.data.StudyImporterForTSV.TARGET_SEX_NAME;
 import static org.eol.globi.domain.PropertyAndValueDictionary.CATALOG_NUMBER;
 import static org.eol.globi.domain.PropertyAndValueDictionary.COLLECTION_CODE;
+import static org.eol.globi.domain.PropertyAndValueDictionary.COLLECTION_ID;
 import static org.eol.globi.domain.PropertyAndValueDictionary.INSTITUTION_CODE;
 import static org.eol.globi.domain.PropertyAndValueDictionary.OCCURRENCE_ID;
 import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_ID;
 import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_NAME;
 import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_PATH;
+import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_PATH_IDS;
 import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_PATH_NAMES;
+import static org.eol.globi.service.TaxonUtil.SOURCE_TAXON_RANK;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_ID;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_NAME;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH;
+import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH_IDS;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH_NAMES;
+import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_RANK;
 
 @Parameters(separators = "= ", commandDescription = "List Interactions")
 public class CmdInteractions extends CmdTabularWriterParams {
@@ -88,13 +93,13 @@ public class CmdInteractions extends CmdTabularWriterParams {
             String sourceOccurrenceId = valueOrEmpty(source, OCCURRENCE_ID);
             String sourceCatalogNumber = valueOrEmpty(source, CATALOG_NUMBER);
             String sourceCollectionCode = valueOrEmpty(source, COLLECTION_CODE);
-            String sourceCollectionId = valueOrEmpty(source, "collectionId");
+            String sourceCollectionId = valueOrEmpty(source, COLLECTION_ID);
             String sourceInstitutionCode = valueOrEmpty(source, INSTITUTION_CODE);
 
             String targetOccurrenceId = valueOrEmpty(target, OCCURRENCE_ID);
             String targetCatalogNumber = valueOrEmpty(target, CATALOG_NUMBER);
             String targetCollectionCode = valueOrEmpty(target, COLLECTION_CODE);
-            String targetCollectionId = valueOrEmpty(target, "collectionId");
+            String targetCollectionId = valueOrEmpty(target, COLLECTION_ID);
             String targetInstitutionCode = valueOrEmpty(target, INSTITUTION_CODE);
 
             Stream<String> rowStream = Stream.of(
@@ -131,8 +136,8 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     SOURCE_INSTITUTION_CODE,
                     SOURCE_TAXON_ID,
                     SOURCE_TAXON_NAME,
-                    "sourceTaxonRank",
-                    "sourceTaxonPathIds",
+                    SOURCE_TAXON_RANK,
+                    SOURCE_TAXON_PATH_IDS,
                     SOURCE_TAXON_PATH,
                     SOURCE_TAXON_PATH_NAMES,
                     SOURCE_BODY_PART_ID,
@@ -150,8 +155,8 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     TARGET_INSTITUTION_CODE,
                     TARGET_TAXON_ID,
                     TARGET_TAXON_NAME,
-                    "targetTaxonRank",
-                    "targetTaxonPathIds",
+                    TARGET_TAXON_RANK,
+                    TARGET_TAXON_PATH_IDS,
                     TARGET_TAXON_PATH,
                     TARGET_TAXON_PATH_NAMES,
                     TARGET_BODY_PART_ID,

@@ -92,7 +92,7 @@ public class CmdUpdateTest {
         assertThat(provenanceLog.exists(), is(true));
 
         String provenanceLogString = IOUtils.toString(provenanceLog.toURI(), StandardCharsets.UTF_8);
-        
+
         String[] lines = StringUtils.split(provenanceLogString, "\n");
 
         assertThat(lines.length, is(3));

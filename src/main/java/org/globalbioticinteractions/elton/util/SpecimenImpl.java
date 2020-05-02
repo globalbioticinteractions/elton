@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 public class SpecimenImpl extends SpecimenNull {
     public final Taxon taxon;
-    final InteractionWriter serializer;
+    private final InteractionWriter serializer;
     private final Study study;
     private final Dataset dataset;
     private Location location;

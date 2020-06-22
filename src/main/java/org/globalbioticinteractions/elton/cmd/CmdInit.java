@@ -8,13 +8,19 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.HttpGet;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.eol.globi.util.CSVTSVUtil;
+import org.eol.globi.util.HttpUtil;
 import org.eol.globi.util.ResourceUtil;
 
+import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +46,33 @@ public class CmdInit extends CmdDefaultParams {
     @Parameter(names = {"--data-citation"}, description = "data citation", required = true)
     private String dataCitation;
 
+    @Override
+    public void run() {
+        for (String namespace : getNamespaces()) {
+            try {
+                System.err.print("generating [README.md]...");
+                write(generateReadme(getDataCitation(), namespace), "README.md");
+                System.err.println(" done.");
+                System.err.print("generating [globi.json]...");
+                write(generateConfig(getDataUrl(), getDataCitation()), "globi.json");
+                System.err.println(" done.");
+                System.err.print("generating [.travis.yml]...");
+                InputStream travis = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/.travis.yml");
+                IOUtils.copy(travis, getFileOutputStream(".travis.yml"));
+                System.err.println(" done.");
+                System.err.print("generating [.gitignore]...");
+                InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");
+                IOUtils.copy(gitIgnore, getFileOutputStream(".gitignore"));
+                System.err.println(" done.");
+            } catch (IOException e) {
+                throw new RuntimeException("failed to initialize [" + namespace + "]", e);
+            }
+        }
+
+    }
+
+
+
     static String generateReadme(String citation, String namespace) {
         return "[![Build Status](https://travis-ci.com/" + namespace + ".svg)](https://travis-ci.com/" + namespace + ") [![GloBI](http://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:" + namespace + ")](http://globalbioticinteractions.org/?accordingTo=globi:" + namespace + ")\n" +
                 "\n" +
@@ -48,14 +82,26 @@ public class CmdInit extends CmdDefaultParams {
     }
 
     static List<String> firstTwoLines(String urlString) throws IOException {
-        InputStream inputStream = ResourceUtil.asInputStream(urlString, in -> in);
+        try (InputStream inputStream = asInputStream(urlString)) {
+            BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(inputStream));
 
-        BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(inputStream));
+            String candidateHeader = inputStreamReader.readLine();
+            String candidateValues = inputStreamReader.readLine();
 
-        String candidateHeader = inputStreamReader.readLine();
-        String candidateValues = inputStreamReader.readLine();
+            return Arrays.asList(candidateHeader, candidateValues);
 
-        return Arrays.asList(candidateHeader, candidateValues);
+        }
+
+    }
+
+    private static InputStream asInputStream(String urlString) throws IOException {
+        InputStream is;
+        if (StringUtils.startsWith(urlString, "http")) {
+            is = URI.create(urlString).toURL().openStream();
+        } else {
+            is = ResourceUtil.asInputStream(urlString);
+        }
+        return is;
     }
 
     static List<String> inferColumnNamesTSV(List<String> firstTwoLines) {
@@ -150,24 +196,6 @@ public class CmdInit extends CmdDefaultParams {
         return columnNames;
     }
 
-    @Override
-    public void run() {
-        for (String namespace : getNamespaces()) {
-            try {
-                write(generateReadme(getDataCitation(), namespace), "README.md");
-                write(generateConfig(getDataUrl(), getDataCitation()), "globi.json");
-                InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
-                InputStream travis = ResourceUtil.asInputStream(URI.create("classpath:/org/globalbioticinteractions/elton/template/.travis.yml"), inputStreamFactory);
-                IOUtils.copy(travis, getFileOutputStream(".travis.yml"));
-                InputStream gitIgnore = ResourceUtil.asInputStream(URI.create("classpath:/org/globalbioticinteractions/elton/template/.gitignore"), inputStreamFactory);
-                IOUtils.copy(gitIgnore, getFileOutputStream(".gitignore"));
-                IOUtils.copy(gitIgnore, getFileOutputStream(".gitignore"));
-            } catch (IOException e) {
-                throw new RuntimeException("failed to initialize [" + namespace + "]", e);
-            }
-        }
-
-    }
 
     private void write(String content, String filename) throws IOException {
         IOUtils.copy(IOUtils.toInputStream(content, StandardCharsets.UTF_8),

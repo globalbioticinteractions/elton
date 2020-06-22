@@ -3,7 +3,6 @@ package org.globalbioticinteractions.elton.cmd;
 import com.Ostermiller.util.LabeledCSVParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.util.CSVTSVUtil;
 import org.hamcrest.core.Is;
@@ -32,7 +31,7 @@ public class CmdInitTest {
         FileUtils.forceMkdir(tempFile);
 
         CmdInit cmdInit = new CmdInit();
-        cmdInit.setDataUrl("classpath:/org/globalbioticinteractions/elton/cmd/data.csv");
+        cmdInit.setDataUrl(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
         cmdInit.setDataCitation("some citation");
         cmdInit.setWorkDir(tempFile.getAbsolutePath());
         cmdInit.getNamespaces().add("some/namespace");

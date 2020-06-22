@@ -44,6 +44,7 @@ public class CmdLine {
                 .addCommand("review", new CmdReview(), "test", "check")
                 .addCommand("version", new CmdVersion())
                 .addCommand("registries", new CmdSupportedRegistries())
+                .addCommand("init", new CmdInit())
                 .build();
     }
 

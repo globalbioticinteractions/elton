@@ -55,8 +55,9 @@ public class CmdInitTest {
 
         String expectedReadme = "[![Build Status](https://travis-ci.com/globalbioticinteractions/ummzi.svg)](https://travis-ci.com/globalbioticinteractions/ummzi) [![GloBI](http://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:globalbioticinteractions/ummzi)](http://globalbioticinteractions.org/?accordingTo=globi:globalbioticinteractions/ummzi)\n" +
                 "\n" +
-                "Configuration to help make: \n\nthe parasite-host records in collection of the University of Michigan Museum of Zoology Division of Insects" +
-                "\navailable through Global Biotic Interactions (GloBI, https://globalbioticinteractions.org).";
+                "Configuration to help Global Biotic Interactions (GloBI, https://globalbioticinteractions.org) index: \n" +
+                "\n" +
+                "the parasite-host records in collection of the University of Michigan Museum of Zoology Division of Insects";
 
         String actualReadme = CmdInit.generateReadme(citation, namespace);
 

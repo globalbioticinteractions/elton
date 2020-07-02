@@ -17,12 +17,7 @@ public class DatasetProcessorForTSV implements DatasetProcessor {
             public InputStream retrieve(URI resourceName) throws IOException {
                 return dataset.retrieve(resourceName);
             }
-
-            @Override
-            public URI getLocalURI(URI resourceName) throws IOException {
-                return dataset.getLocalURI(resourceName);
-            }
-
+            
             @Override
             public URI getArchiveURI() {
                 return dataset.getArchiveURI();

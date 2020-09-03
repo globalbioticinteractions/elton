@@ -4,7 +4,9 @@ import com.beust.jcommander.JCommander;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 import org.eol.globi.data.LogUtil;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.util.CSVTSVUtil;
@@ -28,7 +30,6 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
@@ -237,9 +238,8 @@ public class CmdReviewTest {
     }
 
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void runCheckLocalNoRepo() {
-
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         PrintStream err = new PrintStream(errOs);
         cmdReview.setStderr(err);
@@ -249,12 +249,10 @@ public class CmdReviewTest {
         cmdReview.setWorkDir(Paths.get("src/test/resources/dataset-local-test-non-exist").toAbsolutePath().toString());
         try {
             cmdReview.run();
-            fail("should have thrown");
-        } catch (Throwable ex) {
-
+        } finally {
+            assertThat(errOs.toString(), is("failed.\n"));
         }
 
-        assertThat(errOs.toString(), is("failed.\n"));
     }
 
     private void runOfflineWith(JCommander jc, String cacheDir) {
@@ -328,6 +326,23 @@ public class CmdReviewTest {
         String loggedString = IOUtils.toString(out1.toByteArray(), StandardCharsets.UTF_8.name());
         assertThat(loggedString.split("\t").length, is((int) CmdReview.LOG_NUMBER_OF_FIELDS));
         assertThat(loggedString.split("\n").length, is(1));
+
+    }
+
+    @Test
+    public void parseAndSortContext() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode review = mapper.createObjectNode();
+        review.put("reviewId", "some id");
+        review.put("namespace", "some namespace");
+        final String content = "{ \"zfoo\": \"bar\", \"foo\": \"bar\"}";
+        final JsonNode dataContextSorted = CmdReview.parseAndSortContext(content);
+
+        review.put("context", dataContextSorted);
+        String reviewJsonString = mapper.writeValueAsString(review.get("context"));
+
+        assertThat(reviewJsonString, is("{\"foo\":\"bar\",\"zfoo\":\"bar\"}"));
+
 
     }
 

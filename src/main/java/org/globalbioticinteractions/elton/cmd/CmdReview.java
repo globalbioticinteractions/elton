@@ -46,10 +46,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_CATALOG_NUMBER;
 import static org.eol.globi.data.StudyImporterForTSV.SOURCE_COLLECTION_CODE;
@@ -74,6 +78,8 @@ public class CmdReview extends CmdTabularWriterParams {
     private String reviewerName = "GloBI automated reviewer (elton-" + Elton.getVersion() + ")";
 
     private String reviewId = UUID.randomUUID().toString();
+
+
 
     @Override
     public void run() {
@@ -266,6 +272,26 @@ public class CmdReview extends CmdTabularWriterParams {
     }
 
 
+    static JsonNode parseAndSortContext(String content) throws IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode dataContext = objectMapper.readTree(content);
+        return dataContext.isObject()
+                ? sortJsonObjByPropertyNames(objectMapper, dataContext)
+                : dataContext;
+    }
+
+    private static ObjectNode sortJsonObjByPropertyNames(ObjectMapper mapper, JsonNode dataContext) {
+        final ObjectNode dataContextSorted = mapper.createObjectNode();
+        final Spliterator<Map.Entry<String, JsonNode>> fields = Spliterators.spliteratorUnknownSize(dataContext.getFields(), 0);
+
+        StreamSupport
+                .stream(fields, false)
+                .sorted((o1, o2) -> StringUtils.compare(o1.getKey(), o2.getKey()))
+                .forEach(kv -> dataContextSorted.put(kv.getKey(), kv.getValue()));
+
+        return dataContextSorted;
+    }
+
     private class ReviewReportLogger implements ImportLogger {
         private final AtomicLong infoCounter;
         private final AtomicLong noteCounter;
@@ -326,7 +352,7 @@ public class CmdReview extends CmdTabularWriterParams {
             try {
                 String contextString = ctx.toString();
                 ObjectMapper mapper = new ObjectMapper();
-                JsonNode dataContext = mapper.readTree(contextString);
+                JsonNode dataContext = parseAndSortContext(contextString);
                 ObjectNode review = mapper.createObjectNode();
                 review.put("reviewId", reviewId);
                 review.put("reviewDate", DateUtil.printDate(dateFactory.getDate()));

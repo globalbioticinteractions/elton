@@ -1,12 +1,13 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.Ostermiller.util.LabeledCSVParser;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.util.CSVTSVUtil;
 import org.hamcrest.core.Is;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,11 +25,42 @@ import static org.junit.Assert.assertThat;
 
 public class CmdInitTest {
 
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
+    @Test(expected = RuntimeException.class)
+    public void throwOnNoNamespace() throws IOException {
+        CmdInit cmdInit = new CmdInit();
+        cmdInit.setDataUrl(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
+        cmdInit.setDataCitation("some citation");
+
+        try {
+            cmdInit.run();
+        } catch (RuntimeException ex) {
+            assertThat(ex.getMessage(), Is.is("no dataset namespace found: please provide one and only one dataset namespace"));
+            throw ex;
+        }
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void throwOnMultipleNamespaces() throws IOException {
+        CmdInit cmdInit = new CmdInit();
+        cmdInit.setDataUrl(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
+        cmdInit.setDataCitation("some citation");
+        cmdInit.getNamespaces().add("some/namespace1");
+        cmdInit.getNamespaces().add("some/namespace2");
+
+        try {
+            cmdInit.run();
+        } catch (RuntimeException ex) {
+            assertThat(ex.getMessage(), Is.is("found multiple namespaces: please provide one and only one dataset namespace"));
+            throw ex;
+        }
+    }
+
     @Test
     public void gatherInput() throws IOException {
-        File tempFile = File.createTempFile("init", "test", new File("target"));
-        FileUtils.forceDelete(tempFile);
-        FileUtils.forceMkdir(tempFile);
+        File tempFile = folder.newFolder();
 
         CmdInit cmdInit = new CmdInit();
         cmdInit.setDataUrl(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
@@ -104,26 +136,32 @@ public class CmdInitTest {
                 "    \"@language\" : \"en\"\n" +
                 "  } ],\n" +
                 "  \"rdfs:comment\" : [ \"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\" ],\n" +
-                "  \"url\" : \"classpath:/org/globalbioticinteractions/elton/cmd/data.csv\",\n" +
-                "  \"dcterms:bibliographicCitation\" : \"some citation\",\n" +
-                "  \"delimiter\" : \",\",\n" +
-                "  \"headerRowCount\" : 1,\n" +
-                "  \"null\" : [ \"\" ],\n" +
-                "  \"tableSchema\" : {\n" +
-                "    \"columns\" : [ {\n" +
-                "      \"name\" : \"header1\",\n" +
-                "      \"titles\" : \"header1\",\n" +
-                "      \"datatype\" : \"string\"\n" +
-                "    }, {\n" +
-                "      \"name\" : \"header2\",\n" +
-                "      \"titles\" : \"header2\",\n" +
-                "      \"datatype\" : \"string\"\n" +
-                "    }, {\n" +
-                "      \"name\" : \"header3\",\n" +
-                "      \"titles\" : \"header3\",\n" +
-                "      \"datatype\" : \"string\"\n" +
-                "    } ]\n" +
-                "  }\n" +
+                "  \"tables\" : [ {\n" +
+                "    \"@context\" : [ \"http://www.w3.org/ns/csvw\", {\n" +
+                "      \"@language\" : \"en\"\n" +
+                "    } ],\n" +
+                "    \"rdfs:comment\" : [ \"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\" ],\n" +
+                "    \"url\" : \"classpath:/org/globalbioticinteractions/elton/cmd/data.csv\",\n" +
+                "    \"dcterms:bibliographicCitation\" : \"some citation\",\n" +
+                "    \"delimiter\" : \",\",\n" +
+                "    \"headerRowCount\" : 1,\n" +
+                "    \"null\" : [ \"\" ],\n" +
+                "    \"tableSchema\" : {\n" +
+                "      \"columns\" : [ {\n" +
+                "        \"name\" : \"header1\",\n" +
+                "        \"titles\" : \"header1\",\n" +
+                "        \"datatype\" : \"string\"\n" +
+                "      }, {\n" +
+                "        \"name\" : \"header2\",\n" +
+                "        \"titles\" : \"header2\",\n" +
+                "        \"datatype\" : \"string\"\n" +
+                "      }, {\n" +
+                "        \"name\" : \"header3\",\n" +
+                "        \"titles\" : \"header3\",\n" +
+                "        \"datatype\" : \"string\"\n" +
+                "      } ]\n" +
+                "    }\n" +
+                "  } ]\n" +
                 "}";
 
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.csv";
@@ -141,26 +179,32 @@ public class CmdInitTest {
                 "    \"@language\" : \"en\"\n" +
                 "  } ],\n" +
                 "  \"rdfs:comment\" : [ \"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\" ],\n" +
-                "  \"url\" : \"classpath:/org/globalbioticinteractions/elton/cmd/data.tsv\",\n" +
-                "  \"dcterms:bibliographicCitation\" : \"some citation\",\n" +
-                "  \"delimiter\" : \"\\t\",\n" +
-                "  \"headerRowCount\" : 1,\n" +
-                "  \"null\" : [ \"\" ],\n" +
-                "  \"tableSchema\" : {\n" +
-                "    \"columns\" : [ {\n" +
-                "      \"name\" : \"header1\",\n" +
-                "      \"titles\" : \"header1\",\n" +
-                "      \"datatype\" : \"string\"\n" +
-                "    }, {\n" +
-                "      \"name\" : \"header2\",\n" +
-                "      \"titles\" : \"header2\",\n" +
-                "      \"datatype\" : \"string\"\n" +
-                "    }, {\n" +
-                "      \"name\" : \"header3\",\n" +
-                "      \"titles\" : \"header3\",\n" +
-                "      \"datatype\" : \"string\"\n" +
-                "    } ]\n" +
-                "  }\n" +
+                "  \"tables\" : [ {\n" +
+                "    \"@context\" : [ \"http://www.w3.org/ns/csvw\", {\n" +
+                "      \"@language\" : \"en\"\n" +
+                "    } ],\n" +
+                "    \"rdfs:comment\" : [ \"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\" ],\n" +
+                "    \"url\" : \"classpath:/org/globalbioticinteractions/elton/cmd/data.tsv\",\n" +
+                "    \"dcterms:bibliographicCitation\" : \"some citation\",\n" +
+                "    \"delimiter\" : \"\\t\",\n" +
+                "    \"headerRowCount\" : 1,\n" +
+                "    \"null\" : [ \"\" ],\n" +
+                "    \"tableSchema\" : {\n" +
+                "      \"columns\" : [ {\n" +
+                "        \"name\" : \"header1\",\n" +
+                "        \"titles\" : \"header1\",\n" +
+                "        \"datatype\" : \"string\"\n" +
+                "      }, {\n" +
+                "        \"name\" : \"header2\",\n" +
+                "        \"titles\" : \"header2\",\n" +
+                "        \"datatype\" : \"string\"\n" +
+                "      }, {\n" +
+                "        \"name\" : \"header3\",\n" +
+                "        \"titles\" : \"header3\",\n" +
+                "        \"datatype\" : \"string\"\n" +
+                "      } ]\n" +
+                "    }\n" +
+                "  } ]\n" +
                 "}";
 
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.tsv";

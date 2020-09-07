@@ -37,6 +37,14 @@ public class CmdInit extends CmdDefaultParams {
 
     @Override
     public void run() {
+        if (getNamespaces().size() == 0) {
+            throw new RuntimeException("no dataset namespace found: please provide one and only one dataset namespace");
+        } else if (getNamespaces().size() > 1) {
+            throw new RuntimeException("found multiple namespaces: please provide one and only one dataset namespace");
+        }
+
+
+
         for (String namespace : getNamespaces()) {
             try {
                 System.err.print("generating [README.md]...");
@@ -134,16 +142,26 @@ public class CmdInit extends CmdDefaultParams {
 
     private static String generateConfig(String urlString, String citation, List<String> columnNames, String delimiter) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.put("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
-        objectNode.put("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
-        objectNode.put("url", urlString);
-        objectNode.put("dcterms:bibliographicCitation", citation);
-        objectNode.put("delimiter", delimiter);
-        objectNode.put("headerRowCount", 1);
-        objectNode.put("null", mapper.readTree("[\"\"]"));
-        objectNode.put("tableSchema", generateColumns(columnNames));
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objectNode);
+
+        ObjectNode tableNode = mapper.createObjectNode();
+        tableNode.put("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
+        tableNode.put("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
+        tableNode.put("url", urlString);
+        tableNode.put("dcterms:bibliographicCitation", citation);
+        tableNode.put("delimiter", delimiter);
+        tableNode.put("headerRowCount", 1);
+        tableNode.put("null", mapper.readTree("[\"\"]"));
+        tableNode.put("tableSchema", generateColumns(columnNames));
+
+        final ArrayNode tablesNode = mapper.createArrayNode();
+        tablesNode.add(tableNode);
+
+        ObjectNode rootNode = mapper.createObjectNode();
+        rootNode.put("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
+        rootNode.put("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
+        rootNode.put("tables", tablesNode);
+
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
     }
 
     private static List<String> extractColumnNamesCSV(List<String> firstTwoLines) throws IOException {

@@ -24,13 +24,13 @@ public class StreamUtilTest {
 
     @Test
     public void study() {
-        Stream<String> dateStream = StreamUtil.streamOf(new StudyImpl("some title", "source source", new DOI("123", "456"), "some citation"));
+        Stream<String> dateStream = StreamUtil.streamOf(new StudyImpl("some title", new DOI("123", "456"), "some citation"));
         assertThat(dateStream.collect(Collectors.toList()), is(Arrays.asList("10.123/456", "https://doi.org/10.123/456", "some citation")));
     }
 
     @Test
     public void studyUnsupportedExternalIdScheme() {
-        StudyImpl study = new StudyImpl("some title", "source source", new DOI("123", "456"), "some citation");
+        StudyImpl study = new StudyImpl("some title", new DOI("123", "456"), "some citation");
         study.setExternalId("some:id");
         Stream<String> dateStream = StreamUtil.streamOf(study);
         assertThat(dateStream.collect(Collectors.toList()), is(Arrays.asList("10.123/456", "https://doi.org/10.123/456", "some citation")));
@@ -38,7 +38,7 @@ public class StreamUtilTest {
 
     @Test
     public void studySupportedExternalIdScheme() {
-        StudyImpl study = new StudyImpl("some title", "source source", new DOI("123", "456"), "some citation");
+        StudyImpl study = new StudyImpl("some title", new DOI("123", "456"), "some citation");
         study.setExternalId("https://example.org/something");
         Stream<String> dateStream = StreamUtil.streamOf(study);
         assertThat(dateStream.collect(Collectors.toList()), is(Arrays.asList("10.123/456", "https://example.org/something", "some citation")));

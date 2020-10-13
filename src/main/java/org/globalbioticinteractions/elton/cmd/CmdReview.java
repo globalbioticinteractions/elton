@@ -13,8 +13,8 @@ import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.data.ParserFactoryLocal;
 import org.eol.globi.data.StudyImporterException;
-import org.eol.globi.data.StudyImporterForRegistry;
-import org.eol.globi.data.StudyImporterForTSV;
+import org.eol.globi.data.DatasetImporterForRegistry;
+import org.eol.globi.data.DatasetImporterForTSV;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.Location;
@@ -55,11 +55,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_CATALOG_NUMBER;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_COLLECTION_CODE;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_COLLECTION_ID;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_INSTITUTION_CODE;
-import static org.eol.globi.data.StudyImporterForTSV.SOURCE_OCCURRENCE_ID;
+import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_CATALOG_NUMBER;
+import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_COLLECTION_CODE;
+import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_COLLECTION_ID;
+import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_INSTITUTION_CODE;
+import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_OCCURRENCE_ID;
 
 @Parameters(separators = "= ", commandDescription = "Review Datasets. If no namespace is provided the local workdir is used.")
 public class CmdReview extends CmdTabularWriterParams {
@@ -132,7 +132,7 @@ public class CmdReview extends CmdTabularWriterParams {
         ReviewReportLogger reviewReportLogger = createReviewReportLogger(repoName, noteCounter, infoCounter);
 
         NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, reviewReportLogger);
-        StudyImporterForRegistry studyImporter = new StudyImporterForRegistry(parserFactory, nodeFactory, registry);
+        DatasetImporterForRegistry studyImporter = new DatasetImporterForRegistry(parserFactory, nodeFactory, registry);
         studyImporter.setLogger(reviewReportLogger);
 
         try {
@@ -370,7 +370,7 @@ public class CmdReview extends CmdTabularWriterParams {
                 String institutionCode = getFindTermValueOrEmptyString(dataContext, SOURCE_INSTITUTION_CODE);
                 String occurrenceId = getFindTermValueOrEmptyString(dataContext, SOURCE_OCCURRENCE_ID);
                 String referenceUrl = getFindTermValueOrEmptyString(dataContext, "referenceUrl");
-                String sourceCitation = getFindTermValueOrEmptyString(dataContext, StudyImporterForTSV.STUDY_SOURCE_CITATION);
+                String sourceCitation = getFindTermValueOrEmptyString(dataContext, DatasetImporterForTSV.STUDY_SOURCE_CITATION);
                 logReviewCommentWithReviewerInfo(getStdout(), repoName, commentType.getLabel(), msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
             } catch (IOException e) {
                 log(e.getMessage(), ReviewCommentType.note);

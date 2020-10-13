@@ -43,24 +43,22 @@ public class CmdInit extends CmdDefaultParams {
             throw new RuntimeException("found multiple namespaces: please provide one and only one dataset namespace");
         }
 
-
-
         for (String namespace : getNamespaces()) {
             try {
-                System.err.print("generating [README.md]...");
+                getStderr().print("generating [README.md]...");
                 write(generateReadme(getDataCitation(), namespace), "README.md");
-                System.err.println(" done.");
-                System.err.print("generating [globi.json]...");
+                getStderr().println(" done.");
+                getStderr().print("generating [globi.json]...");
                 write(generateConfig(getDataUrl(), getDataCitation()), "globi.json");
-                System.err.println(" done.");
-                System.err.print("generating [.travis.yml]...");
+                getStderr().println(" done.");
+                getStderr().print("generating [.travis.yml]...");
                 InputStream travis = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/.travis.yml");
                 IOUtils.copy(travis, getFileOutputStream(".travis.yml"));
-                System.err.println(" done.");
-                System.err.print("generating [.gitignore]...");
+                getStderr().println(" done.");
+                getStderr().print("generating [.gitignore]...");
                 InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");
                 IOUtils.copy(gitIgnore, getFileOutputStream(".gitignore"));
-                System.err.println(" done.");
+                getStderr().println(" done.");
             } catch (IOException e) {
                 throw new RuntimeException("failed to initialize [" + namespace + "]", e);
             }

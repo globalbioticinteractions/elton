@@ -12,9 +12,6 @@ import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.domain.Term;
 import org.eol.globi.domain.TermImpl;
-import org.eol.globi.geo.Ecoregion;
-import org.eol.globi.geo.EcoregionFinder;
-import org.eol.globi.geo.EcoregionFinderException;
 import org.eol.globi.service.AuthorIdResolver;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.eol.globi.service.TermLookupService;
@@ -98,17 +95,6 @@ public class NodeFactoryNull implements NodeFactory {
 
     public TermLookupService getTermLookupService() {
         return name -> Collections.singletonList(new TermImpl(name, (String) null));
-    }
-
-    public EcoregionFinder getEcoregionFinder() {
-        return new EcoregionFinder() {
-            public Collection<Ecoregion> findEcoregion(double lat, double lng) throws EcoregionFinderException {
-                return Collections.emptyList();
-            }
-
-            public void shutdown() {
-            }
-        };
     }
 
     public AuthorIdResolver getAuthorResolver() {

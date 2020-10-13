@@ -5,7 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
-import org.eol.globi.data.StudyImporter;
+import org.eol.globi.data.DatasetImporter;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.StudyImporterFactoryImpl;
@@ -97,7 +97,8 @@ public class CmdUtil {
         Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
         nodeFactory.getOrCreateDataset(dataset);
 
-        StudyImporter importer = new StudyImporterFactoryImpl(nodeFactory)
+
+        DatasetImporter importer = new StudyImporterFactoryImpl(nodeFactory)
                 .createImporter(dataset);
 
         importer.setGeoNamesService(new GeoNamesService() {

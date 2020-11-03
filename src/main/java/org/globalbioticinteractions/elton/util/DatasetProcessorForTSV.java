@@ -14,6 +14,16 @@ public class DatasetProcessorForTSV implements DatasetProcessor {
         return new Dataset() {
 
             @Override
+            public void setExternalId(String externalId) {
+
+            }
+
+            @Override
+            public String getExternalId() {
+                return null;
+            }
+
+            @Override
             public InputStream retrieve(URI resourceName) throws IOException {
                 return dataset.retrieve(resourceName);
             }

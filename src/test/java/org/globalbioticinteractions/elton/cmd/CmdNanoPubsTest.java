@@ -6,14 +6,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class CmdNanoPubsTest {
 

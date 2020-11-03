@@ -10,17 +10,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 public class CmdInteractionsTest {
 

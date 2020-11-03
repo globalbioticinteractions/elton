@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CmdListTest {
 

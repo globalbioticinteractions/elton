@@ -6,7 +6,7 @@ import java.net.URL;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 final class CmdTestUtil {
     static String cacheDirTest() throws URISyntaxException {

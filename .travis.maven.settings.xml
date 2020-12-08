@@ -10,7 +10,7 @@
             <password>${env.S3_PASSWORD}</password>
             <configuration>
               <endpoint>https://blob.globalbioticinteractions.org</endpoint>
-            <configuration>
+            </configuration>
         </server>
     </servers>
 </settings>

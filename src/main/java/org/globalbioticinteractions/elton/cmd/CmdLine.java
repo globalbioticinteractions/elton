@@ -2,11 +2,8 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class CmdLine {
-    private final static Log LOG = LogFactory.getLog(CmdLine.class);
 
     public static void run(JCommander actual) {
         if (actual == null) {

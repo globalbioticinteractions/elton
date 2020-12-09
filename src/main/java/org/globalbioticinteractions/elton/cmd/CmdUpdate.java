@@ -2,19 +2,18 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
-import org.eol.globi.service.StudyImporterFactory;
 import org.eol.globi.service.StudyImporterFactoryImpl;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
-import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.List;
 @Parameters(separators = "= ", commandDescription = "Update Local Datasets With Remote Sources")
 public class CmdUpdate extends CmdDefaultParams {
 
-    private final static Log LOG = LogFactory.getLog(CmdUpdate.class);
+    private final static Logger LOG = LoggerFactory.getLogger(CmdUpdate.class);
 
     @Parameter(names = {"--registries", "--registry"},
             description = "[registry1],[registry2],..."

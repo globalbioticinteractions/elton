@@ -3,8 +3,8 @@ package org.globalbioticinteractions.elton.cmd;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
@@ -63,7 +63,6 @@ import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_OCCURRENCE_ID;
 
 @Parameters(separators = "= ", commandDescription = "Review Datasets. If no namespace is provided the local workdir is used.")
 public class CmdReview extends CmdTabularWriterParams {
-    private final static Log LOG = LogFactory.getLog(CmdReview.class);
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
     public static final long LOG_NUMBER_OF_FIELDS = Arrays.stream(LOG_FORMAT_STRING.split("\t")).filter(x -> x.equals("%s")).count();
 
@@ -78,7 +77,6 @@ public class CmdReview extends CmdTabularWriterParams {
     private String reviewerName = "GloBI automated reviewer (elton-" + Elton.getVersion() + ")";
 
     private String reviewId = UUID.randomUUID().toString();
-
 
 
     @Override
@@ -194,7 +192,7 @@ public class CmdReview extends CmdTabularWriterParams {
 
     static void logReviewComment(PrintStream out, Object... fields) {
         if (fields.length != LOG_NUMBER_OF_FIELDS) {
-            throw new IllegalArgumentException("not enough log fields: need [" + LOG_NUMBER_OF_FIELDS + "], but found [" + fields.length +"] in [" + StringUtils.join(fields, CharsetConstant.SEPARATOR));
+            throw new IllegalArgumentException("not enough log fields: need [" + LOG_NUMBER_OF_FIELDS + "], but found [" + fields.length + "] in [" + StringUtils.join(fields, CharsetConstant.SEPARATOR));
         }
         out.print(String.format(LOG_FORMAT_STRING, Stream.of(fields).map(x -> x == null ? "" : CSVTSVUtil.escapeTSV(x.toString())).toArray()));
     }

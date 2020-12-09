@@ -1,29 +1,28 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.eol.globi.data.DatasetImporter;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
-import org.eol.globi.data.DatasetImporter;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
-import org.eol.globi.service.StudyImporterFactoryImpl;
-import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetFactory;
-import org.globalbioticinteractions.dataset.DatasetRegistryException;
-import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.eol.globi.service.GeoNamesService;
-import org.eol.globi.service.StudyImporterFactory;
+import org.eol.globi.service.StudyImporterFactoryImpl;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
 import org.globalbioticinteractions.cache.CachePullThrough;
+import org.globalbioticinteractions.dataset.Dataset;
+import org.globalbioticinteractions.dataset.DatasetFactory;
+import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLogger;
 import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.StreamUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class CmdUtil {
-    private static final Log LOG = LogFactory.getLog(CmdUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CmdUtil.class);
 
     static void handleNamespaces(DatasetRegistry registry, NamespaceHandler handler, List<String> namespaces) throws DatasetRegistryException {
         List<String> selectedNamespaces = new ArrayList<>(namespaces);

@@ -1,17 +1,15 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameters;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.Interaction;
 import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
+import org.eol.globi.tool.NullImportLogger;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.eol.globi.tool.NullImportLogger;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.StreamUtil;
@@ -22,7 +20,6 @@ import java.util.stream.Stream;
 
 @Parameters(separators = "= ", commandDescription = "List Taxa")
 public class CmdNames extends CmdTabularWriterParams {
-    private final static Log LOG = LogFactory.getLog(CmdNames.class);
 
     @Override
     public void run() {

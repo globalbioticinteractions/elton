@@ -5,11 +5,12 @@
     <groupId>org.globalbioticinteractions</groupId>
     <artifactId>elton</artifactId>
     <version>0.3.5-SNAPSHOT</version>
-    <name>Elton, a GloBI commandline tool</name>
-    <description>Discover, cache and check species interaction data</description>
+    <name>Elton</name>
+    <description>Discover, access and review species interaction data</description>
 
     <properties>
         <globi.version>0.19.4</globi.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.testResourceEncoding>UTF-8</project.build.testResourceEncoding>
@@ -17,6 +18,16 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.eol</groupId>
             <artifactId>eol-globi-registry</artifactId>
@@ -44,8 +55,12 @@
         <dependency>
             <groupId>org.nanopub</groupId>
             <artifactId>nanopub</artifactId>
-            <version>1.17</version>
+            <version>1.32</version>
             <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpclient</artifactId>

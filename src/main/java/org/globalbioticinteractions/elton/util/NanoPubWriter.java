@@ -3,22 +3,21 @@ package org.globalbioticinteractions.elton.util;
 import net.trustyuri.TrustyUriException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eol.globi.domain.Environment;
 import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
-import org.globalbioticinteractions.dataset.Dataset;
 import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.ExternalIdUtil;
 import org.globalbioticinteractions.dataset.CitationUtil;
+import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.doi.DOI;
 import org.nanopub.MalformedNanopubException;
 import org.nanopub.Nanopub;
 import org.nanopub.NanopubImpl;
 import org.nanopub.NanopubUtils;
 import org.nanopub.trusty.MakeTrustyNanopub;
-import org.openrdf.OpenRDFException;
-import org.openrdf.rio.RDFFormat;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -133,7 +132,7 @@ public class NanoPubWriter implements InteractionWriter {
             Nanopub trustyNanopub = MakeTrustyNanopub.transform(preNanopub);
             String trustyNanopubString = NanopubUtils.writeToString(trustyNanopub, RDFFormat.TRIG);
             out.println(trustyNanopubString.replace("\n", " "));
-        } catch (OpenRDFException | MalformedNanopubException | TrustyUriException ex) {
+        } catch (MalformedNanopubException | TrustyUriException ex) {
             throw new RuntimeException(ex);
         }
     }

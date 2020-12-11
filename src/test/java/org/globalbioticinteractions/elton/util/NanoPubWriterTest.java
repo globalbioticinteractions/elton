@@ -55,7 +55,7 @@ public class NanoPubWriterTest {
         assertThat(out.toString(), containsString("http://www.geonames.org/123"));
         assertThat(out.toString(), containsString("ENVO"));
         assertThat(out.toString(), containsString("<some:uri>"));
-        assertThat(out.toString(), containsString("geo:latitude 12.2 "));
+        assertThat(out.toString(), containsString("geo:latitude 12.2;"));
         assertThat(out.toString(), containsString("prov:atTime \"1970-01-01T00:00:00Z\"^^xsd:dateTime"));
     }
 

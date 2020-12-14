@@ -124,7 +124,7 @@ public class NanoPubWriter implements InteractionWriter {
 
         builder.append("} :Pubinfo { : prov:wasDerivedFrom <")
                 .append(datasetURI).append("> .")
-                .append(rdfCitationSnippetFor(CitationUtil.citationOrDefaultFor(dataset, ""), "<" + datasetURI + ">"))
+                .append(rdfCitationSnippetFor(CitationUtil.citationFor(dataset), "<" + datasetURI + ">"))
                 .append("  : pav:createdBy <").append(eltonURI).append("> .")
                 .append("  : dcterms:license <https://creativecommons.org/licenses/by/4.0/> . }");
         try {

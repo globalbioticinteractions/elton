@@ -137,7 +137,9 @@ public class CmdReview extends CmdTabularWriterParams {
                     inputStreamFactory)
                     .datasetFor(repoName);
 
-            if (StringUtils.isBlank(CitationUtil.citationFor(dataset))) {
+            String citationString = CitationUtil.citationFor(dataset);
+            if (StringUtils.startsWith(citationString, "<")
+                    && StringUtils.endsWith(citationString, ">")) {
                 reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
             nodeFactory.getOrCreateDataset(dataset);

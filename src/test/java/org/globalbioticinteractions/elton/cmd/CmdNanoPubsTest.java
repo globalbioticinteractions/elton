@@ -34,8 +34,8 @@ public class CmdNanoPubsTest {
             ByteArrayOutputStream out1 = new ByteArrayOutputStream();
             PrintStream out = new PrintStream(out1);
             ((CmdNanoPubs) actual.getObjects().get(0)).run(out);
-            String firstLine = "@prefix this: <http://purl.org/np/RA96f-eYFLMX8KiI3va4gZhIWKiKeyauntLYn_9f7RZrM> ." +
-                    " @prefix sub: <http://purl.org/np/RA96f-eYFLMX8KiI3va4gZhIWKiKeyauntLYn_9f7RZrM#> ." +
+            String firstLine = "@prefix this: <http://purl.org/np/RAM--3NEBQBShWIe6LfGgwADTY4xDLL7-hIcxs7b5uI7o> ." +
+                    " @prefix sub: <http://purl.org/np/RAM--3NEBQBShWIe6LfGgwADTY4xDLL7-hIcxs7b5uI7o#> ." +
                     " @prefix np: <http://www.nanopub.org/nschema#> ." +
                     " @prefix dcterms: <http://purl.org/dc/terms/> ." +
                     " @prefix prov: <http://www.w3.org/ns/prov#> ." +
@@ -63,7 +63,7 @@ public class CmdNanoPubsTest {
                     "   this: dcterms:license <https://creativecommons.org/licenses/by/4.0/>;" +
                     "     pav:createdBy <https://doi.org/10.5281/zenodo.998263>;" +
                     "     prov:wasDerivedFrom <https://doi.org/10.5281/zenodo.207958> ." +
-                    "      <https://doi.org/10.5281/zenodo.207958> dcterms:bibliographicCitation \"Jorrit H. Poelen. 2014. Species associations manually extracted from literature.\" ." +
+                    "      <https://doi.org/10.5281/zenodo.207958> dcterms:bibliographicCitation \"Jorrit H. Poelen. 2014. Species associations manually extracted from literature. doi:10.5281/zenodo.207958\" ." +
                     " }";
             assertThat(StringUtils.trim(out1.toString().split("\\n")[0]), is(firstLine));
         }

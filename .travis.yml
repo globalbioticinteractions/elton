@@ -7,9 +7,6 @@ before_install:
   - cp .travis.settings.xml $HOME/.m2/settings.xml
 before_script: "./.travis.version_if_tag.sh"
 after_success: "./.travis.deploy_if_tag.sh"
-cache:
-  directories:
-    - "$HOME/.m2"
 env:
   global:
     - secure: LxBf+LzoRJTu50JcvegltG2M6DelYnN/sJRXwiSVRzXs2vcmrokb5I/LW2ORw5dzf3j5LtHnBeiNdcgD5xh2dqDkBncpQK1yVvPHa75oeagdWYUMk6KQBERzkHmuepiEy52sJPD88fgq1Es0QHqd54tZH4vbs0SS3QgQwupxrlNfRkCOMp1M9y4oa9hrMpKeRG572HP/BEsXp5in5++r1MOWy6fKp6mS0PXlM4xbHrXx4hPgcJ9KVVjV4tWT64eOt0goWpPwQvh5M1aguX5THs+xAfZRUDl8iA1RrSEjAkdOAN+qJ0l2r/8XvRVg35dfKaIg5NOiJ+S6tXPsvTxu5I1K2vB39FzLNFwkAinE7FRmy/XxvVDw0QosAoeCG2O5n6+RlXXCSi6LJ+NH06B0MxE6eUN+BUgi28aG/mjtEbwUrYiHf4nh0jsm7k7efG4UBGZXqPNc1p1Lj4IEMWUOpscJXP77jZPLz9vYIdEz9jxd830SfcTptNZOg3UmwsqRJCGJOGaUGvhDl/RtL9j4HhJDzUmT/dbZ4E9hMaAkfmZMz+KtrdVk/rZRW2+cXdcMIg0+dvIBAz1Gh7N8uiEjJ4U7AlltR+szdj/ZbAKq5eT4BKB6KXW4apiR5BqsLAgDfHpbq1Ot+S/SzPOx+SiEQjMsBe34l8vdO9HAhujmSvM=

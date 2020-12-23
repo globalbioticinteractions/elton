@@ -104,7 +104,7 @@
             <extension>
                 <groupId>org.globalbioticinteractions</groupId>
                 <artifactId>maven-s3-wagon</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.3</version>
             </extension>
         </extensions>
         <plugins>
@@ -153,20 +153,6 @@
         </plugins>
     </build>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>globi-plugins</id>
-            <name>Plugin Repository</name>
-            <url>https://depot.globalbioticinteractions.org/release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
-
     <repositories>
         <repository>
             <id>globi-release-http</id>
@@ -196,7 +182,7 @@
     <distributionManagement>
         <repository>
             <id>globi-release</id>
-            <name>AWS Release Repository</name>
+            <name>Release Repository</name>
             <url>s3://globi/release</url>
         </repository>
     </distributionManagement>

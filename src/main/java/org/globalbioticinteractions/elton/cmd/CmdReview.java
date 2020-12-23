@@ -36,9 +36,11 @@ import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -158,8 +160,10 @@ public class CmdReview extends CmdTabularWriterParams {
             getStderr().println("failed.");
             throw new StudyImporterException(e);
         } catch (Throwable e) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintWriter(out));
             e.printStackTrace();
-            reviewReportLogger.severe(null, e.getMessage());
+            reviewReportLogger.severe(null, new String(out.toByteArray()));
             throw new StudyImporterException(e);
         } finally {
             reviewReportLogger.log(null, interactionCounter.get() + " interaction(s)", ReviewCommentType.summary);

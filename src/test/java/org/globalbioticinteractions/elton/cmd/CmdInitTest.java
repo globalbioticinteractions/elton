@@ -72,12 +72,14 @@ public class CmdInitTest {
         assertFalse(new File(tempFile, "globi.json").exists());
         assertFalse(new File(tempFile, ".travis.yaml").exists());
         assertFalse(new File(tempFile, ".gitignore").exists());
+        assertFalse(new File(tempFile, ".github/workflows/review.yml").exists());
         cmdInit.run();
 
         assertTrue(new File(tempFile, "README.md").exists());
         assertTrue(new File(tempFile, "globi.json").exists());
         assertTrue(new File(tempFile, ".travis.yml").exists());
         assertTrue(new File(tempFile, ".gitignore").exists());
+        assertTrue(new File(tempFile, ".github/workflows/review.yml").exists());
     }
 
     @Test

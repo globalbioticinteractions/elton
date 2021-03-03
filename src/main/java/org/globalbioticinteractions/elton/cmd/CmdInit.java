@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import com.Ostermiller.util.LabeledCSVParser;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
@@ -58,6 +59,10 @@ public class CmdInit extends CmdDefaultParams {
                 getStderr().print("generating [.gitignore]...");
                 InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");
                 IOUtils.copy(gitIgnore, getFileOutputStream(".gitignore"));
+                getStderr().println(" done.");
+                getStderr().print("generating [.github/workflows/review.yml]...");
+                InputStream githubAction = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/github.review.action.yml");
+                IOUtils.copy(githubAction, getFileOutputStream(".github/workflows/review.yml"));
                 getStderr().println(" done.");
             } catch (IOException e) {
                 throw new RuntimeException("failed to initialize [" + namespace + "]", e);
@@ -206,8 +211,10 @@ public class CmdInit extends CmdDefaultParams {
                 getFileOutputStream(filename));
     }
 
-    private FileOutputStream getFileOutputStream(String filename) throws FileNotFoundException {
-        return new FileOutputStream(new File(new File(getWorkDir()), filename));
+    private FileOutputStream getFileOutputStream(String filename) throws IOException {
+        File file = new File(new File(getWorkDir()), filename);
+        FileUtils.forceMkdirParent(file);
+        return new FileOutputStream(file);
     }
 
     public void setDataUrl(String dataUrl) {

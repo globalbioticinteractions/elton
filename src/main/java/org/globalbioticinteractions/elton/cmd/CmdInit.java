@@ -74,7 +74,7 @@ public class CmdInit extends CmdDefaultParams {
 
 
     static String generateReadme(String citation, String namespace) {
-        return "[![Build Status](https://travis-ci.com/" + namespace + ".svg)](https://travis-ci.com/" + namespace + ") [![GloBI](http://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:" + namespace + ")](http://globalbioticinteractions.org/?accordingTo=globi:" + namespace + ")\n" +
+        return "[![Build Status](https://travis-ci.com/" + namespace + ".svg)](https://travis-ci.com/" + namespace + ") [![GloBI](https://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:" + namespace + ")](https://globalbioticinteractions.org/?accordingTo=globi:" + namespace + ")\n" +
                 "\n" +
                 "Configuration to help Global Biotic Interactions (GloBI, https://globalbioticinteractions.org) index: \n\n" +
                 citation;

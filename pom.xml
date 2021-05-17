@@ -9,7 +9,7 @@
     <description>Discover, access and review species interaction data</description>
 
     <properties>
-        <globi.version>0.20.5</globi.version>
+        <globi.version>0.21.0</globi.version>
         <slf4j.version>1.7.30</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>

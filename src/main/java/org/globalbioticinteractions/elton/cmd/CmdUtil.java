@@ -8,6 +8,7 @@ import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.GeoNamesService;
 import org.eol.globi.service.StudyImporterFactoryImpl;
+import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
@@ -92,27 +93,31 @@ public class CmdUtil {
         }
     }
 
-    private static void handleSingleNamespace(DatasetRegistry registry, NodeFactory nodeFactory, String namespace, ImportLogger logger) throws DatasetRegistryException, StudyImporterException {
+    private static void handleSingleNamespace(DatasetRegistry registry,
+                                              NodeFactory nodeFactory, String namespace,
+                                              ImportLogger logger) throws DatasetRegistryException, StudyImporterException {
         Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
-        nodeFactory.getOrCreateDataset(dataset);
 
+        DatasetImportUtil.importDataset(
+                null,
+                dataset,
+                nodeFactory,
+                logger,
+                createDummyGeoNamesService()
+        );
+    }
 
-        DatasetImporter importer = new StudyImporterFactoryImpl(nodeFactory)
-                .createImporter(dataset);
+    private static GeoNamesService createDummyGeoNamesService() {
+        return new GeoNamesService() {
+                @Override
+                public boolean hasTermForLocale(String locality) {
+                    return false;
+                }
 
-        importer.setGeoNamesService(new GeoNamesService() {
-            @Override
-            public boolean hasTermForLocale(String locality) {
-                return false;
-            }
-
-            @Override
-            public LatLng findLatLng(String locality) throws IOException {
-                return null;
-            }
-        });
-        importer.setLogger(logger);
-
-        importer.importStudy();
+                @Override
+                public LatLng findLatLng(String locality) throws IOException {
+                    return null;
+                }
+            };
     }
 }

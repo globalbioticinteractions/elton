@@ -22,6 +22,7 @@ import org.eol.globi.domain.Specimen;
 import org.eol.globi.domain.Study;
 import org.eol.globi.domain.Taxon;
 import org.eol.globi.util.CSVTSVUtil;
+import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.dataset.CitationUtil;
@@ -149,7 +150,15 @@ public class CmdReview extends CmdTabularWriterParams {
             if (!shouldSkipHeader()) {
                 logHeader(getStdout());
             }
-            studyImporter.importData(dataset);
+
+            DatasetImportUtil.importDataset(
+                    null,
+                    dataset,
+                    nodeFactory,
+                    studyImporter.getLogger(),
+                    studyImporter.getGeoNamesService()
+            );
+
             if (interactionCounter.get() == 0) {
                 reviewReportLogger.warn(null, "no interactions found");
             }

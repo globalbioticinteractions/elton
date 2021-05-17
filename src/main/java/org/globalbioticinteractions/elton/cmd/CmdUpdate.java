@@ -5,6 +5,7 @@ import com.beust.jcommander.Parameters;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.service.StudyImporterFactoryImpl;
+import org.eol.globi.util.DatasetImportUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -65,9 +66,11 @@ public class CmdUpdate extends CmdDefaultParams {
             NodeFactory factory = new NodeFactoryNull();
             factory.getOrCreateDataset(dataset);
             try {
-                new StudyImporterFactoryImpl(factory)
-                        .createImporter(dataset)
-                        .importStudy();
+                DatasetImportUtil.importDataset(
+                        null,
+                        dataset,
+                        factory,
+                        null);
                 getStderr().println("done.");
             } catch (StudyImporterException ex) {
                 LOG.error("update of [" + namespace + "] failed.", ex);

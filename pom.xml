@@ -93,6 +93,12 @@
             <version>3.12.1</version>
         </dependency>
         <dependency>
+            <groupId>bio.guoda</groupId>
+            <artifactId>preston-cas</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.1</version>

@@ -1,25 +1,23 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eol.globi.data.DatasetImporter;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.GeoNamesService;
-import org.eol.globi.service.StudyImporterFactoryImpl;
 import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
-import org.globalbioticinteractions.cache.CachePullThrough;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLogger;
 import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
+import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.slf4j.Logger;
@@ -53,7 +51,7 @@ public class CmdUtil {
 
     static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry registry, String namespace, String cacheDir, InputStreamFactory factory) {
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, cacheDir), dataset -> {
-            Cache pullThroughCache = new CachePullThrough(namespace, cacheDir, factory);
+            Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, factory);
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, factory);
             return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
         });

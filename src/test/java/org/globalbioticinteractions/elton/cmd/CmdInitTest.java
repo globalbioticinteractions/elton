@@ -87,7 +87,9 @@ public class CmdInitTest {
         String citation = "the parasite-host records in collection of the University of Michigan Museum of Zoology Division of Insects";
         String namespace = "globalbioticinteractions/ummzi";
 
-        String expectedReadme = "[![Review](https://github.com/globalbioticinteractions/ummzi/actions/workflows/review.yml/badge.svg)](https://github.com/globalbioticinteractions/ummzi/actions) [![Build Status](https://travis-ci.com/globalbioticinteractions/ummzi.svg)](https://travis-ci.com/globalbioticinteractions/ummzi) [![GloBI](https://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:globalbioticinteractions/ummzi)](https://globalbioticinteractions.org/?accordingTo=globi:globalbioticinteractions/ummzi)\n" +
+        String expectedReadme = "[![Review](https://github.com/globalbioticinteractions/ummzi/actions/workflows/review.yml/badge.svg)](https://github.com/globalbioticinteractions/ummzi/actions)" +
+                " [![Build Status](https://travis-ci.com/globalbioticinteractions/ummzi.svg)](https://travis-ci.com/globalbioticinteractions/ummzi)" +
+                " [![GloBI](https://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:globalbioticinteractions/ummzi&refutes=true&refutes=false)](https://globalbioticinteractions.org/?accordingTo=globi:globalbioticinteractions/ummzi)\n" +
                 "\n" +
                 "Configuration to help Global Biotic Interactions (GloBI, https://globalbioticinteractions.org) index: \n" +
                 "\n" +

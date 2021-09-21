@@ -133,4 +133,8 @@ public class NodeFactoryNull implements NodeFactory {
         };
     }
 
+    @Override
+    public void close() throws Exception {
+
+    }
 }

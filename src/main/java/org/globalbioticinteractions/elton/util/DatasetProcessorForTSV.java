@@ -1,6 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.doi.DOI;
 

@@ -3,13 +3,13 @@ package org.globalbioticinteractions.elton.cmd;
 import com.Ostermiller.util.LabeledCSVParser;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.ObjectNode;
 import org.eol.globi.util.CSVTSVUtil;
 import org.eol.globi.util.ResourceUtil;
 
@@ -148,22 +148,22 @@ public class CmdInit extends CmdDefaultParams {
         ObjectMapper mapper = new ObjectMapper();
 
         ObjectNode tableNode = mapper.createObjectNode();
-        tableNode.put("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
-        tableNode.put("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
+        tableNode.set("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
+        tableNode.set("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
         tableNode.put("url", urlString);
         tableNode.put("dcterms:bibliographicCitation", citation);
         tableNode.put("delimiter", delimiter);
         tableNode.put("headerRowCount", 1);
-        tableNode.put("null", mapper.readTree("[\"\"]"));
-        tableNode.put("tableSchema", generateColumns(columnNames));
+        tableNode.set("null", mapper.readTree("[\"\"]"));
+        tableNode.set("tableSchema", generateColumns(columnNames));
 
         final ArrayNode tablesNode = mapper.createArrayNode();
         tablesNode.add(tableNode);
 
         ObjectNode rootNode = mapper.createObjectNode();
-        rootNode.put("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
-        rootNode.put("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
-        rootNode.put("tables", tablesNode);
+        rootNode.set("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
+        rootNode.set("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
+        rootNode.set("tables", tablesNode);
 
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
     }
@@ -189,7 +189,7 @@ public class CmdInit extends CmdDefaultParams {
                 .forEach(arrayNode::add);
 
         ObjectNode objectNode = new ObjectMapper().createObjectNode();
-        objectNode.put("columns", arrayNode);
+        objectNode.set("columns", arrayNode);
         return objectNode;
     }
 

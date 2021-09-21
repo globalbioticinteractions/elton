@@ -1,12 +1,12 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.JCommander;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
 import org.eol.globi.data.LogUtil;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.util.CSVTSVUtil;
@@ -37,6 +37,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertNotNull;
 
 public class CmdReviewTest {
 
@@ -284,7 +285,10 @@ public class CmdReviewTest {
         LogContext sourceOccurrenceId1 = LogUtil.contextFor(new TreeMap<String, String>() {{
             put("sourceOccurrenceId", null);
         }});
-        String sourceOccurrenceId = CmdReview.getFindTermValueOrEmptyString(new ObjectMapper().readTree(sourceOccurrenceId1.toString()), "sourceOccurrenceId");
+        JsonNode message = new ObjectMapper().readTree(sourceOccurrenceId1.toString());
+        assertNotNull(message);
+        String sourceOccurrenceId = CmdReview.getFindTermValueOrEmptyString(
+                message, "sourceOccurrenceId");
         assertThat(sourceOccurrenceId, is(""));
     }
 
@@ -338,7 +342,7 @@ public class CmdReviewTest {
         final String content = "{ \"zfoo\": \"bar\", \"foo\": \"bar\"}";
         final JsonNode dataContextSorted = CmdReview.parseAndSortContext(content);
 
-        review.put("context", dataContextSorted);
+        review.set("context", dataContextSorted);
         String reviewJsonString = mapper.writeValueAsString(review.get("context"));
 
         assertThat(reviewJsonString, is("{\"foo\":\"bar\",\"zfoo\":\"bar\"}"));

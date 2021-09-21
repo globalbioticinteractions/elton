@@ -2,10 +2,10 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
 import org.eol.globi.data.CharsetConstant;
 import org.eol.globi.data.DatasetImporterForRegistry;
 import org.eol.globi.data.DatasetImporterForTSV;
@@ -268,8 +268,8 @@ public class CmdReview extends CmdTabularWriterParams {
 
     public static String getFindTermValueOrEmptyString(JsonNode message, String termURI) {
         String termValue = "";
-        if (message.has(termURI)) {
-            termValue = message.get(termURI).getTextValue();
+        if (message.has(termURI) && message.hasNonNull(termURI)) {
+            termValue = message.get(termURI).asText();
         }
         return StringUtils.isBlank(termValue) ? "" : termValue;
     }
@@ -293,12 +293,13 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private static ObjectNode sortJsonObjByPropertyNames(ObjectMapper mapper, JsonNode dataContext) {
         final ObjectNode dataContextSorted = mapper.createObjectNode();
-        final Spliterator<Map.Entry<String, JsonNode>> fields = Spliterators.spliteratorUnknownSize(dataContext.getFields(), 0);
+        final Spliterator<Map.Entry<String, JsonNode>> fields
+                = Spliterators.spliteratorUnknownSize(dataContext.fields(), 0);
 
         StreamSupport
                 .stream(fields, false)
                 .sorted((o1, o2) -> StringUtils.compare(o1.getKey(), o2.getKey()))
-                .forEach(kv -> dataContextSorted.put(kv.getKey(), kv.getValue()));
+                .forEach(kv -> dataContextSorted.set(kv.getKey(), kv.getValue()));
 
         return dataContextSorted;
     }
@@ -371,7 +372,7 @@ public class CmdReview extends CmdTabularWriterParams {
                 review.put("reviewCommentType", commentType.getLabel());
                 review.put("reviewComment", msg);
                 review.put("namespace", repoName);
-                review.put("context", dataContext);
+                review.set("context", dataContext);
 
                 String reviewJsonString = mapper.writeValueAsString(review);
                 String archiveURI = getFindTermValueOrEmptyString(dataContext, DatasetConstant.ARCHIVE_URI);

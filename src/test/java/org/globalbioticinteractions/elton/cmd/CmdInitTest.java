@@ -88,7 +88,7 @@ public class CmdInitTest {
         String namespace = "globalbioticinteractions/ummzi";
 
         String expectedReadme = "[![Review](https://github.com/globalbioticinteractions/ummzi/actions/workflows/review.yml/badge.svg)](https://github.com/globalbioticinteractions/ummzi/actions)" +
-                " [![Build Status](https://travis-ci.com/globalbioticinteractions/ummzi.svg)](https://travis-ci.com/globalbioticinteractions/ummzi)" +
+                " [![Build Status](https://app.travis-ci.com/globalbioticinteractions/ummzi.svg)](https://app.travis-ci.com/globalbioticinteractions/ummzi)" +
                 " [![GloBI](https://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:globalbioticinteractions/ummzi&refutes=true&refutes=false)](https://globalbioticinteractions.org/?accordingTo=globi:globalbioticinteractions/ummzi)\n" +
                 "\n" +
                 "Configuration to help Global Biotic Interactions (GloBI, https://globalbioticinteractions.org) index: \n" +

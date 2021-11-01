@@ -54,7 +54,8 @@ public class NodeFactoryNull implements NodeFactory {
         return study;
     }
 
-    public Study findStudy(String title) {
+    @Override
+    public Study findStudy(Study title) {
         return null;
     }
 

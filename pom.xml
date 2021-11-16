@@ -10,7 +10,7 @@
 
     <properties>
         <globi.version>0.23.1</globi.version>
-        <preston.version>0.3.0</preston.version>
+        <preston.version>0.3.4</preston.version>
         <slf4j.version>1.7.30</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
@@ -113,6 +113,10 @@
                 <exclusion>
                     <groupId>org.apache.tika</groupId>
                     <artifactId>tika-parsers</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

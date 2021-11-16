@@ -1,6 +1,6 @@
 package org.globalbioticinteractions.elton.store;
 
-import bio.guoda.preston.model.RefNodeFactory;
+import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.Dereferencer;
 import bio.guoda.preston.store.DereferencerContentAddressed;
@@ -53,7 +53,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         DereferencerContentAddressed derefCas = new DereferencerContentAddressed(deref, blobStore);
 
 
-        IRI dereferenced = derefCas.dereference(RefNodeFactory.toIRI(resourceURI));
+        IRI dereferenced = derefCas.get(RefNodeFactory.toIRI(resourceURI));
 
         URI localPathURI = keyToPath.toPath(dereferenced);
         ContentProvenance contentProvenanceWithNamespace

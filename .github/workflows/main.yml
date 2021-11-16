@@ -12,6 +12,8 @@ jobs:
           cache: maven
       - name: Test with Maven
         run: mvn test
+  build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11

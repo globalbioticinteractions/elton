@@ -3,7 +3,7 @@
 [![Build Status](https://app.travis-ci.com/globalbioticinteractions/elton.svg)](https://app.travis-ci.com/globalbioticinteractions/elton) [![Java CI](https://github.com/globalbioticinteractions/elton/actions/workflows/main.yml/badge.svg)](https://github.com/globalbioticinteractions/elton/actions/workflows/main.yml) [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![DOI](https://zenodo.org/badge/103732996.svg)](https://zenodo.org/badge/latestdoi/103732996)
 
- A commandline tool for [GloBI](https://globalbioticinteraction.org) named after ecologist [Charles S. Elton](https://en.wikipedia.org/wiki/Charles_Sutherland_Elton), author of [Animal Ecology](https://doi.org/10.5962/bhl.title.7435). Can be used in combination with [elton-archive](https://github.com/globalbioticinteractions/elton-archive).
+ A commandline tool for [GloBI](https://globalbioticinteraction.org) named after ecologist [Charles S. Elton](https://en.wikipedia.org/wiki/Charles_Sutherland_Elton), author of [Animal Ecology](https://doi.org/10.5962/bhl.title.7435). 
 
 <a href="http://globalbioticinteractions.org/">
   <img src="http://www.globalbioticinteractions.org/assets/globi.svg" height="120">

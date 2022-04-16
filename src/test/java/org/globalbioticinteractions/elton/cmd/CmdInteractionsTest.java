@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 public class CmdInteractionsTest {
 
     @Rule
-    private TemporaryFolder tmpFolder = new TemporaryFolder();
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @Test
     public void interactionsNoHeader() throws URISyntaxException {
@@ -33,7 +33,7 @@ public class CmdInteractionsTest {
         CmdInteractions cmd = new CmdInteractions();
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
         cmd.setSkipHeader(true);
-        cmd.setNamespaces(Arrays.asList("globalbioticinteractions/template-dataset"));
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.run(out);
         assertThat(out1.toString().split("\n")[0], is("https://en.wiktionary.org/wiki/support\t\t\t\t\t\t\tLeptoconchus incycloseris\t\t\t\t\t\t\t\t\t\t\thttp://purl.obolibrary.org/obo/RO_0002444\tparasiteOf\t\t\t\t\t\t\tFungia (Cycloseris) costulata\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t10.1007/s13127-011-0039-1\thttps://doi.org/10.1007/s13127-011-0039-1\tGittenberger, A., Gittenberger, E. (2011). Cryptic, adaptive radiation of endoparasitic snails: sibling species of Leptoconchus (Gastropoda: Coralliophilidae) in corals. Org Divers Evol, 11(1), 21–41. doi:10.1007/s13127-011-0039-1\tglobalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f\tdev"));
     }
@@ -60,7 +60,7 @@ public class CmdInteractionsTest {
     public void interactionsWithHeader() throws URISyntaxException {
         CmdInteractions cmd = new CmdInteractions();
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
-        cmd.setNamespaces(Arrays.asList("globalbioticinteractions/template-dataset"));
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
@@ -83,7 +83,7 @@ public class CmdInteractionsTest {
         CmdInteractions cmd = new CmdInteractions();
         cmd.setCacheDir(tmpFolder.newFolder().getAbsolutePath());
         cmd.setWorkDir(workDir.getAbsolutePath());
-        cmd.setNamespaces(Arrays.asList("globalbioticinteractions/template-dataset"));
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();

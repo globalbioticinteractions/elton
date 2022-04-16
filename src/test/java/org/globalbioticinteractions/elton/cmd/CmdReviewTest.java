@@ -3,16 +3,16 @@ package org.globalbioticinteractions.elton.cmd;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.data.LogUtil;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.util.CSVTSVUtil;
 import org.globalbioticinteractions.elton.Elton;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -40,25 +39,18 @@ import static org.junit.Assert.assertNotNull;
 
 public class CmdReviewTest {
 
-    private String testCacheDir = "target/test-cache";
+    @Rule
+    public TemporaryFolder tmpDir = new TemporaryFolder();
+
     private CmdReview cmdReview;
 
     @Before
-    public void init() {
-        this.testCacheDir = "target/test-cache/" + UUID.randomUUID();
+    public void init() throws IOException {
         this.cmdReview = new CmdReview();
         cmdReview.setDateFactory(() -> new Date(0));
+        cmdReview.setCacheDir(tmpDir.newFolder().getAbsolutePath());
         cmdReview.setReviewerName("elton-dev");
         cmdReview.setReviewId("6a550a42-8951-416a-a187-34edbd3f87d0");
-    }
-
-    @After
-    public void cleanCache() {
-        FileUtils.deleteQuietly(new File(getTestCacheDir()));
-    }
-
-    private String getTestCacheDir() {
-        return testCacheDir;
     }
 
     @Test
@@ -67,7 +59,7 @@ public class CmdReviewTest {
         runOfflineWith(cacheDir);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void runCheckNonExisting() {
         assertThat(new File("this/should/not/exist").exists(), is(false));
         runOfflineWith("this/should/not/exist");
@@ -76,7 +68,7 @@ public class CmdReviewTest {
 
 
     @Test
-    public void runCheckLocal() {
+    public void runCheckLocal() throws IOException {
         String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
@@ -96,7 +88,7 @@ public class CmdReviewTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void throwOnEmpty() {
+    public void throwOnEmpty() throws IOException {
         String localTestPath = "src/test/resources/dataset-local-test-no-records";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
@@ -104,7 +96,7 @@ public class CmdReviewTest {
     }
 
     @Test
-    public void runCheckLocalSummaryOnly() {
+    public void runCheckLocalSummaryOnly() throws IOException {
         String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
@@ -126,29 +118,29 @@ public class CmdReviewTest {
         assertThat(lines[lines.length - 3], is(thirdToLast));
     }
 
-    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines) {
+    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines) throws IOException {
         runCheck(localTestPath, errOs, outOs, maxLines, Arrays.asList(ReviewCommentType.values()));
     }
 
-    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines, List<ReviewCommentType> commentTypes) {
+    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines, List<ReviewCommentType> commentTypes) throws IOException {
         PrintStream err = new PrintStream(errOs);
         cmdReview.setStderr(err);
         PrintStream out = new PrintStream(outOs);
         cmdReview.setStdout(out);
         cmdReview.setWorkDir(Paths.get(localTestPath).toAbsolutePath().toString());
-        cmdReview.setCacheDir(getTestCacheDir());
+        cmdReview.setCacheDir(tmpDir.newFolder().getAbsolutePath());
         cmdReview.setMaxLines(maxLines);
         cmdReview.setDesiredReviewCommentTypes(commentTypes);
         cmdReview.run();
     }
 
     @Test
-    public void runCheckLocalNoCitation() {
+    public void runCheckLocalNoCitation() throws IOException {
         assertOneWarning("src/test/resources/dataset-local-test-no-citation");
     }
 
     @Test
-    public void runCheckLocalWithRemoteDeps() {
+    public void runCheckLocalWithRemoteDeps() throws IOException {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
@@ -183,7 +175,7 @@ public class CmdReviewTest {
     }
 
     @Test
-    public void runCheckLocalWithRemoteDepsMax1Line() {
+    public void runCheckLocalWithRemoteDepsMax1Line() throws IOException {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
@@ -197,7 +189,7 @@ public class CmdReviewTest {
     }
 
     @Test
-    public void runCheckLocalWithResourceRelation() {
+    public void runCheckLocalWithResourceRelation() throws IOException {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
@@ -218,11 +210,11 @@ public class CmdReviewTest {
     }
 
     @Test
-    public void runCheckLocalBlankCitation() {
+    public void runCheckLocalBlankCitation() throws IOException {
         assertOneWarning("src/test/resources/dataset-local-test-blank-citation");
     }
 
-    private void assertOneWarning(String localTestPath) {
+    private void assertOneWarning(String localTestPath) throws IOException {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {

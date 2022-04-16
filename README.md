@@ -12,6 +12,7 @@
 ## Table of Contents
 
 - [Install](#install)
+- [Documentation](docs/elton.adoc)
 - [Usage](#usage)
 - [Examples](#examples)
 - [Building](#building)
@@ -63,6 +64,10 @@ To include elton in your project, add the following sections to your pom.xml (or
 * Run `mvn package`
 * Copy `target/elton-0.3.2-jar-with-dependencies.jar`
 * Run tests using `mvn test`.
+
+## Documentation 
+
+For documentation, see [docs/elton.adoc](docs/elton.adoc).
 
 ## Usage
 Note that in the following section, it is assumed that Elton can be started by typing ```elton```. If this is not possible, see [Install](#install) for instructions on how to run Elton commands.

@@ -1,0 +1,94 @@
+// tag::picocli-generated-full-manpage[]
+// tag::picocli-generated-man-section-header[]
+:doctype: manpage
+:revnumber: 0.12.5-SNAPSHOT
+:manmanual: Elton Manual
+:mansource: 0.12.5-SNAPSHOT
+:man-linkstyle: pass:[blue R < >]
+= elton(1)
+
+// end::picocli-generated-man-section-header[]
+
+// tag::picocli-generated-man-section-name[]
+== Name
+
+elton - elton - access to species interaction datasets
+
+// end::picocli-generated-man-section-name[]
+
+// tag::picocli-generated-man-section-synopsis[]
+== Synopsis
+
+*elton* [*-hV*] [COMMAND]
+
+// end::picocli-generated-man-section-synopsis[]
+
+// tag::picocli-generated-man-section-description[]
+== Description
+
+elton - access to species interaction datasets
+
+// end::picocli-generated-man-section-description[]
+
+// tag::picocli-generated-man-section-options[]
+== Options
+
+*-h*, *--help*::
+  Show this help message and exit.
+
+*-V*, *--version*::
+  Print version information and exit.
+
+// end::picocli-generated-man-section-options[]
+
+// tag::picocli-generated-man-section-arguments[]
+// end::picocli-generated-man-section-arguments[]
+
+// tag::picocli-generated-man-section-commands[]
+== Commands
+
+xref:elton-init.adoc[*init*]::
+  Initialize a GloBI indexed dataset configuration
+
+xref:elton-interactions.adoc[*interactions*, *interaction*, *interact*]::
+  List Interactions
+
+xref:elton-names.adoc[*names*, *taxa*, *taxon*, *name*]::
+  List taxa
+
+xref:elton-review.adoc[*review*, *test*, *check*]::
+  Review Datasets. If no namespace is provided the local workdir is used.
+
+xref:elton-datasets.adoc[*datasets*]::
+  List Datasets Details
+
+xref:elton-registries.adoc[*registries*]::
+  Lists supported Registries
+
+xref:elton-version.adoc[*version*]::
+  Print version
+
+xref:elton-nanopubs.adoc[*nanopubs*]::
+  List Interaction Nanopubs, see http://nanopub.org
+
+xref:elton-list.adoc[*list*, *ls*]::
+  List Available Datasets
+
+xref:elton-sync.adoc[*sync*, *pull*, *update*]::
+  Update Local Datasets With Remote Sources
+
+xref:elton-gen-manpage.adoc[*gen-manpage*]::
+  Generates man pages for all commands in the specified directory.
+
+xref:elton-help.adoc[*help*]::
+  Displays help information about the specified command
+
+// end::picocli-generated-man-section-commands[]
+
+// tag::picocli-generated-man-section-exit-status[]
+// end::picocli-generated-man-section-exit-status[]
+
+// tag::picocli-generated-man-section-footer[]
+// end::picocli-generated-man-section-footer[]
+
+// end::picocli-generated-full-manpage[]

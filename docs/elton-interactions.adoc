@@ -1,0 +1,68 @@
+// tag::picocli-generated-full-manpage[]
+// tag::picocli-generated-man-section-header[]
+:doctype: manpage
+:revnumber: 
+:manmanual: Elton Manual
+:mansource: 
+:man-linkstyle: pass:[blue R < >]
+= elton-interactions(1)
+
+// end::picocli-generated-man-section-header[]
+
+// tag::picocli-generated-man-section-name[]
+== Name
+
+elton-interactions - List Interactions
+
+// end::picocli-generated-man-section-name[]
+
+// tag::picocli-generated-man-section-synopsis[]
+== Synopsis
+
+*elton interactions* [*-s*] [*--no-progress*] [*-c*=_<cacheDir>_] [*-w*=_<workDir>_]
+                   [_<namespaces>_...]
+
+// end::picocli-generated-man-section-synopsis[]
+
+// tag::picocli-generated-man-section-description[]
+== Description
+
+List Interactions
+
+// end::picocli-generated-man-section-description[]
+
+// tag::picocli-generated-man-section-options[]
+== Options
+
+*-c*, *--cache-dir*=_<cacheDir>_::
+  Cache directory
+
+*--no-progress*::
+  Do not show progress indicator
+
+*-s*, *--no-header, --skip-header*::
+  Skip header
+
+*-w*, *--work-dir*=_<workDir>_::
+  Work directory
+
+// end::picocli-generated-man-section-options[]
+
+// tag::picocli-generated-man-section-arguments[]
+== Arguments
+
+[_<namespaces>_...]::
+  [namespace1] [namespace2] ...
+
+// end::picocli-generated-man-section-arguments[]
+
+// tag::picocli-generated-man-section-commands[]
+// end::picocli-generated-man-section-commands[]
+
+// tag::picocli-generated-man-section-exit-status[]
+// end::picocli-generated-man-section-exit-status[]
+
+// tag::picocli-generated-man-section-footer[]
+// end::picocli-generated-man-section-footer[]
+
+// end::picocli-generated-full-manpage[]

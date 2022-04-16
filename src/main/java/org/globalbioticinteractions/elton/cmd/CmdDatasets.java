@@ -1,17 +1,20 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.Parameters;
 import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
+import picocli.CommandLine;
 
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
-@Parameters(separators = "= ", commandDescription = "List Datasets Details")
+@CommandLine.Command(
+        name = "datasets",
+        description = "List Datasets Details"
+)
 public class CmdDatasets extends CmdTabularWriterParams {
 
     public class TsvDatasetWriter implements TabularWriter {

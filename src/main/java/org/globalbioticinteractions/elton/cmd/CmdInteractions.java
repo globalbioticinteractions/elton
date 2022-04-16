@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.Parameters;
 import org.apache.commons.lang.StringUtils;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.domain.InteractType;
@@ -18,6 +17,7 @@ import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenImpl;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
+import picocli.CommandLine;
 
 import java.io.PrintStream;
 import java.util.concurrent.atomic.AtomicLong;
@@ -76,7 +76,11 @@ import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH_IDS;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_PATH_NAMES;
 import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_RANK;
 
-@Parameters(separators = "= ", commandDescription = "List Interactions")
+@CommandLine.Command(
+        name = "interactions",
+        aliases = {"interaction", "interact"},
+        description = "List Interactions"
+)
 public class CmdInteractions extends CmdTabularWriterParams {
 
     public class TsvWriter implements InteractionWriter, TabularWriter {

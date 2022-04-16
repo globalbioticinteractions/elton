@@ -1,9 +1,9 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.Parameter;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursorRotating;
+import picocli.CommandLine;
 
 import java.io.PrintStream;
 import java.net.URI;
@@ -12,16 +12,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract class CmdDefaultParams implements Runnable {
-    @Parameter(names = {"--cache-dir", "-c"}, description = "cache directory")
+    @CommandLine.Option (names = {"--cache-dir", "-c"},
+            description = "Cache directory"
+    )
     private String cacheDir = "./datasets";
 
-    @Parameter(names = {"--work-dir", "-w"}, description = "work directory")
+    @CommandLine.Option (names = {"--work-dir", "-w"},
+            description = "Work directory"
+    )
     private String workDir = ".";
 
-    @Parameter(names = {"--no-progress"}, description = "do not show progress indicator")
+    @CommandLine.Option (names = {"--no-progress"},
+            description = "Do not show progress indicator"
+    )
     private boolean noProgress = false;
 
-    @Parameter(description = "[namespace1] [namespace2] ...")
+    public void setNamespaces(List<String> namespaces) {
+        this.namespaces = namespaces;
+    }
+
+    @CommandLine.Parameters (
+            description = "[namespace1] [namespace2] ..."
+    )
     private List<String> namespaces = new ArrayList<>();
 
     private PrintStream stderr = System.err;

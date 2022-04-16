@@ -1,8 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import com.Ostermiller.util.LabeledCSVParser;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -12,10 +10,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.util.CSVTSVUtil;
 import org.eol.globi.util.ResourceUtil;
+import picocli.CommandLine;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,13 +25,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@Parameters(separators = "= ", commandDescription = "Initialize a GloBI indexed dataset configuration")
+@CommandLine.Command(
+        name = "init",
+        description = "Initialize a GloBI indexed dataset configuration"
+)
 public class CmdInit extends CmdDefaultParams {
 
-    @Parameter(names = {"--data-url"}, description = "data url", required = true)
+    @CommandLine.Option(names = {"--data-url"}, description = "data url", required = true)
     private String dataUrl;
 
-    @Parameter(names = {"--data-citation"}, description = "data citation", required = true)
+    @CommandLine.Option(names = {"--data-citation"}, description = "data citation", required = true)
     private String dataCitation;
 
     @Override

@@ -1,7 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -36,6 +34,7 @@ import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
+import picocli.CommandLine;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,20 +61,25 @@ import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_COLLECTION_ID;
 import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_INSTITUTION_CODE;
 import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_OCCURRENCE_ID;
 
-@Parameters(separators = "= ", commandDescription = "Review Datasets. If no namespace is provided the local workdir is used.")
+@CommandLine.Command(
+        name = "review",
+        aliases = {"test", "check"},
+        description = "Review Datasets. If no namespace is provided the local workdir is used."
+)
 public class CmdReview extends CmdTabularWriterParams {
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
     public static final long LOG_NUMBER_OF_FIELDS = Arrays.stream(LOG_FORMAT_STRING.split("\t")).filter(x -> x.equals("%s")).count();
 
-    @Parameter(names = {"-n", "--lines"}, description = "print first n number of lines")
+    @CommandLine.Option(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Integer maxLines = null;
 
-    @Parameter(names = {"--type"}, description = "select desired review comments types: info,note,summary", converter = ReviewCommentTypeConverter.class)
+    @CommandLine.Option(names = {"--type"}, description = "select desired review comments types: info,note,summary")
+
     private List<ReviewCommentType> desiredReviewCommentTypes = Arrays.asList(ReviewCommentType.values());
 
     private DateFactory dateFactory = Date::new;
 
-    private String reviewerName = "GloBI automated reviewer (elton-" + Elton.getVersion() + ")";
+    private String reviewerName = "GloBI automated reviewer (elton-" + Elton.getVersionString() + ")";
 
     private String reviewId = UUID.randomUUID().toString();
 

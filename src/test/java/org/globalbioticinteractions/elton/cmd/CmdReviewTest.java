@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.JCommander;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,8 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.data.LogUtil;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.util.CSVTSVUtil;
+import org.globalbioticinteractions.elton.Elton;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -64,16 +63,14 @@ public class CmdReviewTest {
 
     @Test
     public void runCheck() throws URISyntaxException {
-        JCommander jc = new CmdLine().buildCommander();
         String cacheDir = CmdTestUtil.cacheDirTest();
-        runOfflineWith(jc, cacheDir);
+        runOfflineWith(cacheDir);
     }
 
     @Test(expected = Exception.class)
     public void runCheckNonExisting() {
         assertThat(new File("this/should/not/exist").exists(), is(false));
-        JCommander jc = new CmdLine().buildCommander();
-        runOfflineWith(jc, "this/should/not/exist");
+        runOfflineWith("this/should/not/exist");
         assertThat(new File("this/should/not/exist").exists(), is(false));
     }
 
@@ -256,19 +253,8 @@ public class CmdReviewTest {
 
     }
 
-    private void runOfflineWith(JCommander jc, String cacheDir) {
-        jc.parse("check", "--cache-dir=" + cacheDir, "globalbioticinteractions/template-dataset");
-
-        JCommander actual = jc.getCommands().get(jc.getParsedCommand());
-        Assert.assertEquals(actual.getObjects().size(), 1);
-        Object o = actual.getObjects().get(0);
-        Assert.assertEquals(o.getClass(), CmdReview.class);
-        CmdReview cmdReview = (CmdReview) o;
-
-        assertThat(cmdReview.getNamespaces(), is(Collections.singletonList("globalbioticinteractions/template-dataset")));
-        assertThat(cmdReview.getCacheDir(), is(cacheDir));
-
-        CmdLine.run(actual);
+    private void runOfflineWith(String cacheDir) {
+        Elton.run(new String[]{"check", "--cache-dir=" + cacheDir, "globalbioticinteractions/template-dataset"});
     }
 
     @Test

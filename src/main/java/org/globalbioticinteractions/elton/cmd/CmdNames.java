@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.Parameters;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.Interaction;
@@ -14,11 +13,16 @@ import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TaxonWriter;
+import picocli.CommandLine;
 
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
-@Parameters(separators = "= ", commandDescription = "List Taxa")
+@CommandLine.Command(
+        name = "names",
+        aliases = {"taxa", "taxon", "name"},
+        description = "List taxa"
+)
 public class CmdNames extends CmdTabularWriterParams {
 
     @Override

@@ -1,11 +1,14 @@
 package org.globalbioticinteractions.elton.cmd;
 
 
-import com.beust.jcommander.Parameters;
 import org.apache.commons.collections4.list.TreeList;
 import org.apache.commons.lang3.StringUtils;
+import picocli.CommandLine;
 
-@Parameters(commandDescription = "Lists supported Registries")
+@CommandLine.Command (
+        name = "registries",
+        description = "Lists supported Registries"
+)
 public class CmdSupportedRegistries implements Runnable {
 
     @Override

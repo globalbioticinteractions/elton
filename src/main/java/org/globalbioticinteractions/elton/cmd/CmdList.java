@@ -1,20 +1,24 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.Parameters;
 import org.apache.commons.lang.StringUtils;
-import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
+import picocli.CommandLine;
 
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Parameters(separators = "= ", commandDescription = "List Available Datasets")
+@CommandLine.Command(
+        name = "list",
+        aliases = "ls",
+        description = "List Available Datasets"
+)
 public class CmdList extends CmdOnlineParams {
 
     @Override

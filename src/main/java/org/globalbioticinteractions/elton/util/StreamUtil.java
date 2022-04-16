@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StreamUtil {
-    private static String version = Elton.getVersion();
+    private static String version = Elton.getVersionString();
 
     public static Stream<String> streamOf(Dataset dataset) {
         return Stream.of(

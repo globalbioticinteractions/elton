@@ -1,54 +1,40 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.JCommander;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 public class CmdUpdateIT {
 
-    @Before
-    public void emptyCache() {
-        FileUtils.deleteQuietly(new File("target/tmp-dataset"));
-    }
+    @Rule
+    private TemporaryFolder tmpDir = new TemporaryFolder();
 
-    @Test
-    public void update() {
-        JCommander jc = new CmdLine().buildCommander();
-        jc.parse("update", "--cache-dir=./bla");
-        assertUpdateCmd(jc);
-
-        jc = new CmdLine().buildCommander();
-        jc.parse("update", "-c", "./bla");
-        assertUpdateCmd(jc);
-    }
 
     @Test
     public void runUpdate() throws IOException {
-        JCommander jc = new CmdLine().buildCommander();
-        jc.parse("update", "--cache-dir=./target/tmp-dataset", "globalbioticinteractions/template-dataset");
 
-        JCommander actual = jc.getCommands().get(jc.getParsedCommand());
-        Assert.assertEquals(actual.getObjects().size(), 1);
-        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdUpdate.class);
+        CmdUpdate cmd = new CmdUpdate();
+        File file1 = tmpDir.newFolder();
+        String absolutePath = file1.getAbsolutePath();
+        cmd.setCacheDir(absolutePath);
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 
-        CmdLine.run(actual);
-        
-        File file = new File("./target/tmp-dataset/globalbioticinteractions/template-dataset/access.tsv");
+        cmd.run();
+
+        File file = new File(file1,"globalbioticinteractions/template-dataset/access.tsv");
         assertThat(file.exists(), is(true));
         String[] jarUrls = FileUtils.readFileToString(file, StandardCharsets.UTF_8).split("jar:file:");
         assertTrue(jarUrls.length > 1);
@@ -60,7 +46,7 @@ public class CmdUpdateIT {
         int numberOfCacheFiles = getNumberOfCacheFiles();
 
         // rerun
-        CmdLine.run(actual);
+        cmd.run();
         assertThat("should update regardless or preexisting entries in cache", getNumberOfLogEntries() + 3 > numberOfLogEntries, is(true));
         assertThat("number of cached files should not have changed after update", numberOfCacheFiles, is(getNumberOfCacheFiles()));
     }
@@ -80,25 +66,4 @@ public class CmdUpdateIT {
         return "target/tmp-dataset/globalbioticinteractions/template-dataset/";
     }
 
-    @Test
-    public void runUpdateHafner() {
-        JCommander jc = new CmdLine().buildCommander();
-        jc.parse("update", "--cache-dir=./target/tmp-dataset", "globalbioticinteractions/hafner");
-
-        JCommander actual = jc.getCommands().get(jc.getParsedCommand());
-        Assert.assertEquals(actual.getObjects().size(), 1);
-        Assert.assertEquals(actual.getObjects().get(0).getClass(), CmdUpdate.class);
-
-        CmdLine.run(actual);
-    }
-
-    private void assertUpdateCmd(JCommander jc) {
-        Assert.assertEquals(jc.getParsedCommand(), "sync");
-
-        JCommander actual = jc.getCommands().get(jc.getParsedCommand());
-        Assert.assertEquals(actual.getObjects().size(), 1);
-        Object cmd = actual.getObjects().get(0);
-        Assert.assertEquals(cmd.getClass(), CmdUpdate.class);
-        assertThat(((CmdUpdate) cmd).getCacheDir(), is("./bla"));
-    }
 }

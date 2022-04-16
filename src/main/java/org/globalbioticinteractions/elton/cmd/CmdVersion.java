@@ -1,14 +1,14 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.beust.jcommander.Parameters;
 import org.globalbioticinteractions.elton.Elton;
+import picocli.CommandLine;
 
-@Parameters(separators = "= ", commandDescription = "Print Version")
+@CommandLine.Command (name = "version", description = "Print version")
 public class CmdVersion implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(Elton.getVersion());
+        System.out.println(Elton.getVersionString());
     }
 
 }

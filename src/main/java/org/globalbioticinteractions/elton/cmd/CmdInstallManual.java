@@ -23,12 +23,15 @@ public class CmdInstallManual implements Runnable {
 
     @Override
     public void run() {
+        installManPage(Elton.class);
+    }
+
+    private static void installManPage(Class<Elton> programClass) {
         File manPageDir = new File("/usr/local/share/man/man1/");
-        Class<Elton> programClass = Elton.class;
         String programName = StringUtils.lowerCase(programClass.getSimpleName());
         File file = new File(manPageDir, programName + ".1");
         String packageName = "/" + programClass.getPackage().getName().replace('.', '/');
-        try (InputStream resourceAsStream = getClass().getResourceAsStream(packageName + "/docs/manpage/" + programName + ".1")) {
+        try (InputStream resourceAsStream = programClass.getResourceAsStream(packageName + "/docs/manpage/" + programName + ".1")) {
             if (manPageDir.exists()) {
                 IOUtils.copy(resourceAsStream,
                         new FileOutputStream(file));

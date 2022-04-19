@@ -38,7 +38,7 @@ import static java.lang.System.exit;
                 ManPageGenerator.class,
                 CommandLine.HelpCommand.class
         },
-        description = "elton - access to species interaction datasets",
+        description = "discover existing species interaction datasets",
         mixinStandardHelpOptions = true)
 
 public class Elton implements CommandLine.IVersionProvider {

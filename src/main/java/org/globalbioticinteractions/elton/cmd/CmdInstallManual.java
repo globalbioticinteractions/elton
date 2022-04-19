@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.globalbioticinteractions.elton.Elton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -22,8 +24,11 @@ public class CmdInstallManual implements Runnable {
     @Override
     public void run() {
         File manPageDir = new File("/usr/local/share/man/man1/");
-        File file = new File(manPageDir, "preston.1");
-        try (InputStream resourceAsStream = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/docs/manpage/elton.1")) {
+        Class<Elton> programClass = Elton.class;
+        String programName = StringUtils.lowerCase(programClass.getSimpleName());
+        File file = new File(manPageDir, programName + ".1");
+        String packageName = "/" + programClass.getPackage().getName().replace('.', '/');
+        try (InputStream resourceAsStream = getClass().getResourceAsStream(packageName + "/docs/manpage/" + programName + ".1")) {
             if (manPageDir.exists()) {
                 IOUtils.copy(resourceAsStream,
                         new FileOutputStream(file));

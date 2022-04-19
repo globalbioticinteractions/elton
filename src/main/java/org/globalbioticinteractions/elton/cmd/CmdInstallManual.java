@@ -23,7 +23,7 @@ public class CmdInstallManual implements Runnable {
     public void run() {
         File manPageDir = new File("/usr/local/share/man/man1/");
         File file = new File(manPageDir, "preston.1");
-        try (InputStream resourceAsStream = getClass().getResourceAsStream("/bio/guoda/preston/docs/manpage/preston.1")) {
+        try (InputStream resourceAsStream = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/docs/manpage/elton.1")) {
             if (manPageDir.exists()) {
                 IOUtils.copy(resourceAsStream,
                         new FileOutputStream(file));

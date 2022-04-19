@@ -7,6 +7,7 @@ package org.globalbioticinteractions.elton;
 import org.apache.commons.lang.StringUtils;
 import org.globalbioticinteractions.elton.cmd.CmdDatasets;
 import org.globalbioticinteractions.elton.cmd.CmdInit;
+import org.globalbioticinteractions.elton.cmd.CmdInstallManual;
 import org.globalbioticinteractions.elton.cmd.CmdInteractions;
 import org.globalbioticinteractions.elton.cmd.CmdList;
 import org.globalbioticinteractions.elton.cmd.CmdNames;
@@ -33,6 +34,7 @@ import static java.lang.System.exit;
                 CmdNanoPubs.class,
                 CmdList.class,
                 CmdUpdate.class,
+                CmdInstallManual.class,
                 ManPageGenerator.class,
                 CommandLine.HelpCommand.class
         },

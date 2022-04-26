@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.store;
 
+import bio.guoda.preston.HashType;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo1LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
@@ -46,10 +47,14 @@ public class CachePullThroughPrestonStoreTest {
 
         assertFalse(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
-        BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(new KeyValueStoreLocalFileSystem(
-                folder.getRoot(),
-                new KeyTo1LevelPath(folder.getRoot().toURI()),
-                new KeyValueStoreLocalFileSystem.KeyValueStreamFactorySHA256Values()));
+        BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
+                new KeyValueStoreLocalFileSystem(
+                        folder.getRoot(),
+                        new KeyTo1LevelPath(folder.getRoot().toURI(), HashType.sha256),
+                        new KeyValueStoreLocalFileSystem.KeyValueStreamFactoryValues(HashType.sha256)
+                ),
+                true,
+                HashType.sha256);
 
         assertFalse(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 

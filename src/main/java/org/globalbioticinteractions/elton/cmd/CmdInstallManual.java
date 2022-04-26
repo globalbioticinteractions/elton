@@ -26,7 +26,7 @@ public class CmdInstallManual implements Runnable {
         installManPage(Elton.class);
     }
 
-    private static void installManPage(Class<Elton> programClass) {
+    private static void installManPage(Class programClass) {
         File manPageDir = new File("/usr/local/share/man/man1/");
         String programName = StringUtils.lowerCase(programClass.getSimpleName());
         File file = new File(manPageDir, programName + ".1");

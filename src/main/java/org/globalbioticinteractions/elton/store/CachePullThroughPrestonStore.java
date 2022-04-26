@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.store;
 
+import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.Dereferencer;
@@ -38,13 +39,16 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         CacheUtil.findOrMakeCacheDirForNamespace(cachePath, namespace);
 
         File cacheDir = new File(cachePath, namespace);
-        KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(cacheDir.toURI());
+        KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(cacheDir.toURI(), HashType.sha256);
         BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
                 new KeyValueStoreLocalFileSystem(
                         cacheDir,
                         keyToPath,
-                        new KeyValueStoreLocalFileSystem.KeyValueStreamFactorySHA256Values()
-                )
+                        new KeyValueStoreLocalFileSystem.KeyValueStreamFactoryValues(HashType.sha256)
+                ),
+                true,
+                HashType.sha256
+
         );
 
         Dereferencer<InputStream> deref

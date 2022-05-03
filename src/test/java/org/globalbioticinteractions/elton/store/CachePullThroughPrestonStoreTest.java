@@ -6,6 +6,7 @@ import bio.guoda.preston.store.KeyTo1LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.rdf.api.IRI;
+import org.eol.globi.util.ResourceServiceLocal;
 import org.globalbioticinteractions.cache.Cache;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
@@ -13,8 +14,10 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
@@ -27,14 +30,14 @@ public class CachePullThroughPrestonStoreTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-
     @Test
     public void testPrestonStore() throws IOException, URISyntaxException {
 
         Cache cache = new CachePullThroughPrestonStore(
                 "some/namespace"
                 , folder.getRoot().getAbsolutePath()
-                , in -> in);
+                , new ResourceServiceLocal(in -> in)
+        );
 
         File namespaceDir = new File(folder.getRoot(), "some/namespace");
         assertFalse(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
@@ -67,6 +70,23 @@ public class CachePullThroughPrestonStoreTest {
         assertThat(IOUtils.toString(inputStream, StandardCharsets.UTF_8.name()), Is.is("hello"));
 
         assertTrue(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
+    }
+
+
+    @Test(expected = FileNotFoundException.class)
+    public void testMissingFromPrestonStore() throws IOException, URISyntaxException {
+
+        Cache cache = new CachePullThroughPrestonStore(
+                "some/namespace"
+                , folder.getRoot().getAbsolutePath()
+                , new ResourceServiceLocal(in -> in)
+        );
+
+        File namespaceDir = new File(folder.getRoot(), "some/namespace");
+        assertFalse(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
+
+        URI resourceName = getClass().getResource("hello.txt").toURI();
+        cache.retrieve(new URI(resourceName.toString().replace("hello.txt", "this_file_does_not_exist.txt")));
     }
 
 }

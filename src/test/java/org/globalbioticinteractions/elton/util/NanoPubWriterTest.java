@@ -5,6 +5,7 @@ import org.eol.globi.domain.InteractType;
 import org.eol.globi.domain.LocationImpl;
 import org.eol.globi.domain.StudyImpl;
 import org.eol.globi.domain.TaxonImpl;
+import org.eol.globi.util.ResourceServiceLocal;
 import org.globalbioticinteractions.dataset.DatasetImpl;
 import org.junit.Test;
 
@@ -14,8 +15,8 @@ import java.net.URI;
 import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 public class NanoPubWriterTest {
 
@@ -24,9 +25,17 @@ public class NanoPubWriterTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         NanoPubWriter nanoPubWriter = new NanoPubWriter(new PrintStream(out), () -> "1");
 
-        DatasetImpl dataset = new DatasetImpl("some/namespace", URI.create("some:uri"), inStream -> inStream);
+        DatasetImpl dataset = new DatasetImpl(
+                "some/namespace",
+                new ResourceServiceLocal(is -> is),
+                URI.create("some:uri")
+        );
+
+
         StudyImpl study = new StudyImpl("some study");
-        SpecimenImpl specimen = new SpecimenImpl(dataset, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123"));
+        SpecimenImpl specimen = new SpecimenImpl(
+                dataset, study, nanoPubWriter, new TaxonImpl("some taxon", "boo:123")
+        );
         specimen.setEventDate(new Date(0));
         LocationImpl location = new LocationImpl(12.2d, 1.2d, 2d, null);
         location.setLocality("some locality");
@@ -61,19 +70,37 @@ public class NanoPubWriterTest {
 
     @Test
     public void extractDatasetURIGitHub() {
-        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("https://github.com/hurlbertlab/dietdatabase/archive/f98e5b3dc7480c92a468433400a725d71c2ad51c.zip"), inStream -> inStream));
+        String datasetURI = NanoPubWriter.extractDatasetURI(
+                new DatasetImpl(
+                        "some/namespace",
+                        new ResourceServiceLocal(is -> is),
+                        URI.create("https://github.com/hurlbertlab/dietdatabase/archive/f98e5b3dc7480c92a468433400a725d71c2ad51c.zip")
+                )
+        );
         assertThat(datasetURI, is("https://github.com/hurlbertlab/dietdatabase"));
     }
 
     @Test
     public void extractDatasetURIDOI() {
-        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("https://doi.org/10.123"), inStream -> inStream));
+        String datasetURI = NanoPubWriter.extractDatasetURI(
+                new DatasetImpl(
+                        "some/namespace",
+                        new ResourceServiceLocal(is -> is),
+                        URI.create("https://doi.org/10.123")
+                )
+        );
         assertThat(datasetURI, is("https://doi.org/10.123"));
     }
 
     @Test
     public void extractDatasetURISomeNamespace() {
-        String datasetURI = NanoPubWriter.extractDatasetURI(new DatasetImpl("some/namespace", URI.create("some:namespace"), inStream -> inStream));
+        String datasetURI = NanoPubWriter.extractDatasetURI(
+                new DatasetImpl(
+                        "some/namespace",
+                        new ResourceServiceLocal(is -> is),
+                        URI.create("some:namespace")
+                )
+        );
         assertThat(datasetURI, is("some:namespace"));
     }
 

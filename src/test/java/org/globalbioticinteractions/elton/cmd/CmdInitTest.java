@@ -116,7 +116,7 @@ public class CmdInitTest {
     @Test
     public void inferColumnNamesCSV() throws IOException {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.csv";
-        List<String> firstTwoLines = CmdInit.firstTwoLines(urlString);
+        List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is);
         List<String> columnNames = inferColumnNamesCSV(IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8));
 
         assertEquals(columnNames, Arrays.asList("header1", "header2", "header3"));
@@ -125,7 +125,7 @@ public class CmdInitTest {
     @Test
     public void inferColumnNamesTSV() throws IOException {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.tsv";
-        List<String> columnNames = CmdInit.inferColumnNamesTSV(CmdInit.firstTwoLines(urlString));
+        List<String> columnNames = CmdInit.inferColumnNamesTSV(CmdInit.firstTwoLines(urlString, is -> is));
 
         assertEquals(columnNames, Arrays.asList("header1", "header2", "header3"));
 
@@ -171,7 +171,7 @@ public class CmdInitTest {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.csv";
         String citation = "some citation";
 
-        String actualConfig = CmdInit.generateConfig(urlString, citation);
+        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is);
         assertThat(actualConfig, Is.is(expectedConfig));
     }
 
@@ -214,7 +214,7 @@ public class CmdInitTest {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.tsv";
         String citation = "some citation";
 
-        String actualConfig = CmdInit.generateConfig(urlString, citation);
+        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is);
         assertThat(actualConfig, Is.is(expectedConfig));
     }
 
@@ -224,7 +224,7 @@ public class CmdInitTest {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.txt";
         String citation = "some citation";
 
-        String actualConfig = CmdInit.generateConfig(urlString, citation);
+        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is);
         assertThat(actualConfig, Is.is("{\"format\":\"unknown\",\"citation\":\"some citation\",\"url\":\"classpath:/org/globalbioticinteractions/elton/cmd/data.txt\"}"));
     }
 

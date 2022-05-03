@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.lang.StringUtils;
+import org.eol.globi.util.ResourceServiceRemote;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
@@ -29,9 +30,16 @@ public class CmdList extends CmdOnlineParams {
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
         DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), inputStreamFactory);
-        DatasetRegistry registry = isOnline()
-                ? new DatasetRegistryProxy(Arrays.asList(new DatasetRegistryZenodo(inputStreamFactory), new DatasetRegistryGitHubArchive(inputStreamFactory), registryLocal))
-                : registryLocal;
+
+        List<DatasetRegistry> registries =
+                isOnline()
+                ? Arrays.asList(
+                new DatasetRegistryZenodo(new ResourceServiceRemote(inputStreamFactory)),
+                new DatasetRegistryGitHubArchive(new ResourceServiceRemote(inputStreamFactory)),
+                registryLocal)
+                : Arrays.asList(registryLocal);
+
+        DatasetRegistry registry = new DatasetRegistryProxy(registries);
         try {
             List<String> namespaces = registry.findNamespaces()
                     .stream()
@@ -40,7 +48,8 @@ public class CmdList extends CmdOnlineParams {
                     .sorted()
                     .collect(Collectors.toList());
             out.println(StringUtils.join(namespaces, "\n"));
-        } catch (DatasetRegistryException e) {
+        } catch (
+                DatasetRegistryException e) {
             throw new RuntimeException(e);
         }
     }

@@ -9,7 +9,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.util.CSVTSVUtil;
-import org.eol.globi.util.ResourceUtil;
+import org.eol.globi.util.InputStreamFactory;
+import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -51,7 +52,7 @@ public class CmdInit extends CmdDefaultParams {
                 write(generateReadme(getDataCitation(), namespace), "README.md");
                 getStderr().println(" done.");
                 getStderr().print("generating [globi.json]...");
-                write(generateConfig(getDataUrl(), getDataCitation()), "globi.json");
+                write(generateConfig(getDataUrl(), getDataCitation(), is -> is), "globi.json");
                 getStderr().println(" done.");
                 getStderr().print("generating [.travis.yml]...");
                 InputStream travis = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/.travis.yml");
@@ -82,8 +83,8 @@ public class CmdInit extends CmdDefaultParams {
                 citation;
     }
 
-    static List<String> firstTwoLines(String urlString) throws IOException {
-        try (InputStream inputStream = asInputStream(urlString)) {
+    static List<String> firstTwoLines(String urlString, InputStreamFactory inputStreamFactory) throws IOException {
+        try (InputStream inputStream = new ResourceServiceLocalAndRemote(inputStreamFactory).retrieve(URI.create(urlString))) {
             BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(inputStream));
 
             String candidateHeader = inputStreamReader.readLine();
@@ -93,16 +94,6 @@ public class CmdInit extends CmdDefaultParams {
 
         }
 
-    }
-
-    private static InputStream asInputStream(String urlString) throws IOException {
-        InputStream is;
-        if (StringUtils.startsWith(urlString, "http")) {
-            is = URI.create(urlString).toURL().openStream();
-        } else {
-            is = ResourceUtil.asInputStream(urlString);
-        }
-        return is;
     }
 
     static List<String> inferColumnNamesTSV(List<String> firstTwoLines) {
@@ -122,8 +113,8 @@ public class CmdInit extends CmdDefaultParams {
         return columnNames;
     }
 
-    static String generateConfig(String urlString, String citation) throws IOException {
-        List<String> firstTwoLines = firstTwoLines(urlString);
+    static String generateConfig(String urlString, String citation, InputStreamFactory inputStreamFactory) throws IOException {
+        List<String> firstTwoLines = firstTwoLines(urlString, inputStreamFactory);
 
         String actualConfig;
         List<String> columnNames = extractColumnNamesCSV(firstTwoLines);

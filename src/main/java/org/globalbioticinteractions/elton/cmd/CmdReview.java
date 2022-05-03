@@ -23,6 +23,9 @@ import org.eol.globi.util.CSVTSVUtil;
 import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.InputStreamFactory;
+import org.eol.globi.util.ResourceServiceLocal;
+import org.eol.globi.util.ResourceServiceLocalAndRemote;
+import org.eol.globi.util.ResourceServiceRemote;
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetConstant;
@@ -105,7 +108,13 @@ public class CmdReview extends CmdTabularWriterParams {
             InputStreamFactory factory = createInputStreamFactory();
 
             for (URI localNamespace : localNamespaces) {
-                reviewLocal(localNamespace, factory);
+                DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
+                        localNamespace,
+                        getCacheDir(),
+                        new ResourceServiceLocalAndRemote(factory)
+                );
+
+                review("local", registryLocal, factory);
             }
 
             reviewCachedOrRemote(remoteNamespaces, factory);
@@ -117,20 +126,15 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private void reviewCachedOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         for (String namespace : namespaces) {
-            review(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), inputStreamFactory), inputStreamFactory);
+            review(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), new ResourceServiceLocal(inputStreamFactory)), inputStreamFactory);
         }
-    }
-
-    private void reviewLocal(URI workDir, InputStreamFactory inputStreamFactory) throws StudyImporterException {
-        DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(workDir, getCacheDir(), inputStreamFactory);
-        review("local", registryLocal, inputStreamFactory);
     }
 
     private void review(String repoName, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         final AtomicLong noteCounter = new AtomicLong(0);
         final AtomicLong infoCounter = new AtomicLong(0);
 
-        ParserFactoryLocal parserFactory = new ParserFactoryLocal();
+        ParserFactoryLocal parserFactory = new ParserFactoryLocal(getClass());
         AtomicInteger interactionCounter = new AtomicInteger(0);
         ReviewReportLogger reviewReportLogger = createReviewReportLogger(repoName, noteCounter, infoCounter);
 

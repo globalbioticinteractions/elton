@@ -9,9 +9,8 @@ import bio.guoda.preston.store.KeyTo1LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
+import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.DateUtil;
-import org.eol.globi.util.InputStreamFactory;
-import org.eol.globi.util.ResourceUtil;
 import org.globalbioticinteractions.cache.CachePullThrough;
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.cache.ContentProvenance;
@@ -26,13 +25,18 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
 
     private final String namespace;
     private final String cachePath;
-    private final InputStreamFactory inputStreamFactory;
+    private final ResourceService remote;
 
-    public CachePullThroughPrestonStore(String namespace, String cachePath, InputStreamFactory inputStreamFactory) {
-        super(namespace, cachePath, inputStreamFactory);
+    public CachePullThroughPrestonStore(
+            String namespace,
+            String cachePath,
+            ResourceService resourceService
+    ) {
+        super(namespace, cachePath,
+                resourceService);
         this.namespace = namespace;
         this.cachePath = cachePath;
-        this.inputStreamFactory = inputStreamFactory;
+        this.remote = resourceService;
     }
 
     public InputStream retrieve(URI resourceURI) throws IOException {
@@ -52,7 +56,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         );
 
         Dereferencer<InputStream> deref
-                = iri -> ResourceUtil.asInputStream(iri.getIRIString(), inputStreamFactory);
+                = iri -> remote.retrieve(URI.create(iri.getIRIString()));
 
         DereferencerContentAddressed derefCas = new DereferencerContentAddressed(deref, blobStore);
 

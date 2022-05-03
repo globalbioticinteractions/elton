@@ -1,7 +1,9 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.collections4.MapUtils;
+import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
+import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -9,6 +11,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.util.DatasetRegistrySingleDir;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -41,16 +44,17 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
             throw new DatasetRegistryException("failed to create registry for [" + name + "]: not supported");
         }
         try {
-            Class<?>[] paramTypes = {URI.class, String.class, InputStreamFactory.class};
+            Class<?>[] paramTypes = {URI.class, String.class, ResourceService.class};
             Optional<Constructor<? extends DatasetRegistry>> constructor = constructorFor(registryClass, paramTypes);
+            ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory);
             if (!constructor.isPresent()) {
-                Class<?>[] paramTypesShort = {InputStreamFactory.class};
+                Class<?>[] paramTypesShort = {ResourceService.class};
                 Optional<Constructor<? extends DatasetRegistry>> constructor2 = constructorFor(registryClass, paramTypesShort);
                 return constructor2
                         .orElseThrow(() -> new DatasetRegistryException("failed to create registry for [" + name + "]")
-                        ).newInstance(inputStreamFactory);
+                        ).newInstance(resourceService);
             } else {
-                return constructor.get().newInstance(getWorkDir(), getCacheDir(), inputStreamFactory);
+                return constructor.get().newInstance(getWorkDir(), getCacheDir(), resourceService);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new DatasetRegistryException("failed to create registry for [" + name + "]", e);

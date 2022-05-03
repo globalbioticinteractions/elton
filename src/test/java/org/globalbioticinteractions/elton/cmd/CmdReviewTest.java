@@ -122,7 +122,11 @@ public class CmdReviewTest {
         runCheck(localTestPath, errOs, outOs, maxLines, Arrays.asList(ReviewCommentType.values()));
     }
 
-    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines, List<ReviewCommentType> commentTypes) throws IOException {
+    private void runCheck(String localTestPath,
+                          ByteArrayOutputStream errOs,
+                          ByteArrayOutputStream outOs,
+                          int maxLines,
+                          List<ReviewCommentType> commentTypes) throws IOException {
         PrintStream err = new PrintStream(errOs);
         cmdReview.setStderr(err);
         PrintStream out = new PrintStream(outOs);

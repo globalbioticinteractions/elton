@@ -1,6 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
-import org.eol.globi.util.InputStreamFactory;
+import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -14,13 +14,15 @@ import java.util.Collections;
 
 public class DatasetRegistrySingleDir implements DatasetRegistry {
     private final URI localArchiveDir;
-    private final InputStreamFactory streamFactory;
     private final String cacheDir;
+    private ResourceService resourceService;
 
-    public DatasetRegistrySingleDir(URI localArchiveDir, String cacheDir, InputStreamFactory streamFactory) {
+    public DatasetRegistrySingleDir(URI localArchiveDir,
+                                    String cacheDir,
+                                    ResourceService resourceService) {
         this.localArchiveDir = localArchiveDir;
         this.cacheDir = cacheDir;
-        this.streamFactory = streamFactory;
+        this.resourceService = resourceService;
     }
 
     @Override
@@ -32,15 +34,15 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
     public Dataset datasetFor(String namespace) throws DatasetRegistryException {
         DatasetImpl local = new DatasetImpl(
                 DatasetRegistryUtil.NAMESPACE_LOCAL,
-                localArchiveDir,
-                streamFactory
+                resourceService,
+                localArchiveDir
         );
 
         return new DatasetWithCache(local,
                 new CachePullThroughPrestonStore(
                         DatasetRegistryUtil.NAMESPACE_LOCAL,
                         cacheDir,
-                        streamFactory
+                        this.resourceService
                 )
         );
     }

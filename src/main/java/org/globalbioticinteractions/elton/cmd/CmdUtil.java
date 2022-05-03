@@ -6,8 +6,11 @@ import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.GeoNamesService;
+import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.InputStreamFactory;
+import org.eol.globi.util.ResourceServiceLocal;
+import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
@@ -34,7 +37,9 @@ import java.util.stream.Collectors;
 public class CmdUtil {
     private static final Logger LOG = LoggerFactory.getLogger(CmdUtil.class);
 
-    static void handleNamespaces(DatasetRegistry registry, NamespaceHandler handler, List<String> namespaces) throws DatasetRegistryException {
+    static void handleNamespaces(DatasetRegistry registry,
+                                 NamespaceHandler handler,
+                                 List<String> namespaces) throws DatasetRegistryException {
         List<String> selectedNamespaces = new ArrayList<>(namespaces);
         if (selectedNamespaces.isEmpty()) {
             selectedNamespaces = new ArrayList<>(registry.findNamespaces());
@@ -51,8 +56,10 @@ public class CmdUtil {
 
     static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry registry, String namespace, String cacheDir, InputStreamFactory factory) {
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, cacheDir), dataset -> {
-            Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, factory);
-            CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, factory);
+            ResourceService remote = new ResourceServiceLocalAndRemote(factory);
+            ResourceService local = new ResourceServiceLocal(factory);
+            Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, remote);
+            CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, local);
             return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
         });
     }

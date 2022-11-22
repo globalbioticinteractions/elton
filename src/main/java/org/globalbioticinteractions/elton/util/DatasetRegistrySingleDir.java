@@ -11,6 +11,7 @@ import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.function.Consumer;
 
 public class DatasetRegistrySingleDir implements DatasetRegistry {
     private final URI localArchiveDir;
@@ -26,8 +27,13 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
     }
 
     @Override
-    public Collection<String> findNamespaces() throws DatasetRegistryException {
+    public Iterable<String> findNamespaces() throws DatasetRegistryException {
         return Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL);
+    }
+
+    @Override
+    public void findNamespaces(Consumer<String> consumer) throws DatasetRegistryException {
+        findNamespaces().forEach(consumer);
     }
 
     @Override

@@ -47,8 +47,7 @@ public class DatasetRegistryUtil {
 
     private static boolean isEmpty(DatasetRegistry registry) {
         try {
-            Collection<String> namespaces = registry.findNamespaces();
-            return namespaces.isEmpty();
+            return !registry.findNamespaces().iterator().hasNext();
         } catch (DatasetRegistryException e) {
             return false;
         }

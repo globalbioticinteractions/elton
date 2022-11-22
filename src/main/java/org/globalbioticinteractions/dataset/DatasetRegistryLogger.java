@@ -7,8 +7,8 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
+import java.util.function.Consumer;
 
 public class DatasetRegistryLogger implements DatasetRegistry {
     private final DatasetRegistry registry;
@@ -20,8 +20,13 @@ public class DatasetRegistryLogger implements DatasetRegistry {
         this.cacheDir = cacheDir;
     }
 
-    public Collection<String> findNamespaces() throws DatasetRegistryException {
+    public Iterable<String> findNamespaces() throws DatasetRegistryException {
         return this.getRegistry().findNamespaces();
+    }
+
+    @Override
+    public void findNamespaces(Consumer<String> consumer) throws DatasetRegistryException {
+        this.getRegistry().findNamespaces(consumer);
     }
 
     public Dataset datasetFor(String namespace) throws DatasetRegistryException {

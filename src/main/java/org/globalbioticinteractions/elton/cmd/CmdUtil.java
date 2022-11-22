@@ -40,9 +40,9 @@ public class CmdUtil {
     static void handleNamespaces(DatasetRegistry registry,
                                  NamespaceHandler handler,
                                  List<String> namespaces) throws DatasetRegistryException {
-        List<String> selectedNamespaces = new ArrayList<>(namespaces);
-        if (selectedNamespaces.isEmpty()) {
-            selectedNamespaces = new ArrayList<>(registry.findNamespaces());
+        Iterable<String> selectedNamespaces = new ArrayList<>(namespaces);
+        if (!selectedNamespaces.iterator().hasNext()) {
+            selectedNamespaces = registry.findNamespaces();
         }
 
         for (String namespace : selectedNamespaces) {

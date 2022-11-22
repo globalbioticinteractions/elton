@@ -41,8 +41,7 @@ public class CmdList extends CmdOnlineParams {
 
         DatasetRegistry registry = new DatasetRegistryProxy(registries);
         try {
-            registry.findNamespaces()
-                    .forEach(out::println);
+            registry.findNamespaces(out::println);
         } catch (
                 DatasetRegistryException e) {
             throw new RuntimeException(e);

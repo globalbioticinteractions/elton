@@ -21,7 +21,8 @@
 
 ## Install
 
-Elton needs Java 8+ to run. 
+Elton needs Java 8+ to run.[Why OpenJDK 8?](https://adoptopenjdk.net/support.html). Because OpenJDK 8 is Long Term Supported (LTS), and (at time of writing Nov 2021) supported until at least May 2026, longer than any of the newer OpenJDK versions.
+
 
 ### Official releases
 

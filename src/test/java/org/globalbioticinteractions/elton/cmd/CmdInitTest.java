@@ -77,7 +77,6 @@ public class CmdInitTest {
 
         assertTrue(new File(tempFile, "README.md").exists());
         assertTrue(new File(tempFile, "globi.json").exists());
-        assertTrue(new File(tempFile, ".travis.yml").exists());
         assertTrue(new File(tempFile, ".gitignore").exists());
         assertTrue(new File(tempFile, ".github/workflows/review.yml").exists());
     }
@@ -87,9 +86,7 @@ public class CmdInitTest {
         String citation = "the parasite-host records in collection of the University of Michigan Museum of Zoology Division of Insects";
         String namespace = "globalbioticinteractions/ummzi";
 
-        String expectedReadme = "[![Review](https://github.com/globalbioticinteractions/ummzi/actions/workflows/review.yml/badge.svg)](https://github.com/globalbioticinteractions/ummzi/actions)" +
-                " [![Build Status](https://app.travis-ci.com/globalbioticinteractions/ummzi.svg)](https://app.travis-ci.com/globalbioticinteractions/ummzi)" +
-                " [![GloBI](https://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:globalbioticinteractions/ummzi&refutes=true&refutes=false)](https://globalbioticinteractions.org/?accordingTo=globi:globalbioticinteractions/ummzi)\n" +
+        String expectedReadme = "[![GloBI Review by Elton](../../actions/workflows/review.yml/badge.svg)](../../actions/workflows/review.yml) [![GloBI](https://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:globalbioticinteractions/ummzi&refutes=true&refutes=false)](https://globalbioticinteractions.org/?accordingTo=globi:globalbioticinteractions/ummzi)\n" +
                 "\n" +
                 "Configuration to help Global Biotic Interactions (GloBI, https://globalbioticinteractions.org) index: \n" +
                 "\n" +

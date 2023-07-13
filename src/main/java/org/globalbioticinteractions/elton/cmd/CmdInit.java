@@ -54,10 +54,6 @@ public class CmdInit extends CmdDefaultParams {
                 getStderr().print("generating [globi.json]...");
                 write(generateConfig(getDataUrl(), getDataCitation(), is -> is), "globi.json");
                 getStderr().println(" done.");
-                getStderr().print("generating [.travis.yml]...");
-                InputStream travis = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/.travis.yml");
-                IOUtils.copy(travis, getFileOutputStream(".travis.yml"));
-                getStderr().println(" done.");
                 getStderr().print("generating [.gitignore]...");
                 InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");
                 IOUtils.copy(gitIgnore, getFileOutputStream(".gitignore"));
@@ -75,8 +71,7 @@ public class CmdInit extends CmdDefaultParams {
 
 
     static String generateReadme(String citation, String namespace) {
-        return "[![Review](https://github.com/" + namespace + "/actions/workflows/review.yml/badge.svg)](https://github.com/" + namespace + "/actions)" +
-                " [![Build Status](https://app.travis-ci.com/" + namespace + ".svg)](https://app.travis-ci.com/" + namespace + ")" +
+        return "[![GloBI Review by Elton](../../actions/workflows/review.yml/badge.svg)](../../actions/workflows/review.yml)" +
                 " [![GloBI](https://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:" + namespace + "&refutes=true&refutes=false)](https://globalbioticinteractions.org/?accordingTo=globi:" + namespace + ")\n" +
                 "\n" +
                 "Configuration to help Global Biotic Interactions (GloBI, https://globalbioticinteractions.org) index: \n\n" +

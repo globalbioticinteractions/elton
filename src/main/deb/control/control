@@ -1,0 +1,9 @@
+Package: [[name]]
+Version: [[version]]
+Section: misc
+Priority: low
+Architecture: all
+Description: [[description]]
+Maintainer: jhpoelen+elton@jhpoelen.nl
+Website: https://github.com/globalbioticinteractions/elton
+Depends: openjdk-8-jdk-headless | openjdk-11-jdk-headless

@@ -15,11 +15,14 @@
         <picocli.version>4.6.3</picocli.version>
         <asciidoctor-maven-plugin.version>2.2.2</asciidoctor-maven-plugin.version>
         <asciidoctorj.version>2.5.3</asciidoctorj.version>
-        <generated.docs.dir>${project.build.outputDirectory}/org/globalbioticinteractions/elton/docs</generated.docs.dir>
+        <generated.docs.dir>${project.build.outputDirectory}/org/globalbioticinteractions/elton/docs
+        </generated.docs.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.build.testResourceEncoding>UTF-8</project.build.testResourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
+        <cmd.class>org.globalbioticinteractions.elton.Elton</cmd.class>
     </properties>
 
     <dependencies>
@@ -164,17 +167,21 @@
                     <finalName>elton-app</finalName>
                     <shadedArtifactAttached>false</shadedArtifactAttached>
                     <transformers>
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>org.globalbioticinteractions.elton.Elton</mainClass>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>${cmd.class}</mainClass>
                             <manifestEntries>
                                 <Implementation-Version>${project.version}</Implementation-Version>
                                 <Project-Version>${project.version}</Project-Version>
                                 <Multi-Release>true</Multi-Release>
                             </manifestEntries>
                         </transformer>
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
                             <addHeader>false</addHeader>
                         </transformer>
                     </transformers>
@@ -205,27 +212,49 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
+                <version>${exec-maven-plugin.version}</version>
                 <executions>
                     <execution>
+                        <id>generate-manpages</id>
                         <phase>process-classes</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <classpath/>
+                                <argument>${cmd.class}</argument>
+                                <argument>gen-manpage</argument>
+                                <argument>--outdir</argument>
+                                <argument>${generated.docs.dir}/adoc</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-completion</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Dpicocli.autocomplete.systemExitOnError</argument>
+                                <argument>-cp</argument>
+                                <classpath/>
+                                <argument>picocli.AutoComplete</argument>
+                                <argument>--force</argument><!-- overwrite if exists -->
+                                <argument>--completionScript</argument>
+                                <argument>${project.build.directory}/${project.artifactId}_completion</argument>
+                                <argument>${cmd.class}</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <executable>java</executable>
-                    <arguments>
-                        <argument>-classpath</argument>
-                        <classpath/>
-                        <argument>org.globalbioticinteractions.elton.Elton</argument>
-                        <argument>gen-manpage</argument>
-                        <argument>--outdir</argument>
-                        <argument>${generated.docs.dir}/adoc</argument>
-                    </arguments>
-                </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
@@ -247,6 +276,125 @@
                         <configuration>
                             <backend>manpage</backend>
                             <sourceDocumentName>${project.artifactId}.adoc</sourceDocumentName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <includeScope>compile</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>jdeb</artifactId>
+                <groupId>org.vafer</groupId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                        <configuration>
+                            <verbose>true</verbose>
+                            <controlDir>${basedir}/src/main/deb/control</controlDir>
+                            <dataSet>
+
+                                <data>
+                                    <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/${project.artifactId}/lib</prefix>
+                                        <filemode>644</filemode>
+                                        <user>${project.artifactId}</user>
+                                        <group>${project.artifactId}</group>
+                                    </mapper>
+                                </data>
+
+                                <data>
+                                    <src>${project.basedir}/src/main/deb/bin/${project.artifactId}</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/${project.artifactId}/bin</prefix>
+                                        <filemode>755</filemode>
+                                        <user>${project.artifactId}</user>
+                                        <group>${project.artifactId}</group>
+                                    </mapper>
+                                </data>
+
+                                <data>
+                                    <src>${project.build.directory}/${project.artifactId}_completion</src>
+                                    <type>file</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/etc/bash_completion.d/</prefix>
+                                        <filemode>755</filemode>
+                                        <user>${project.artifactId}</user>
+                                        <group>${project.artifactId}</group>
+                                    </mapper>
+                                </data>
+
+                                <data>
+                                    <src>${project.build.directory}/lib</src>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/${project.artifactId}/lib</prefix>
+                                        <filemode>644</filemode>
+                                        <user>${project.artifactId}</user>
+                                        <group>${project.artifactId}</group>
+                                    </mapper>
+                                </data>
+
+                                <data>
+                                    <src>${generated.docs.dir}/manpage</src>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/local/share/man/man1/</prefix>
+                                        <filemode>644</filemode>
+                                        <user>${project.artifactId}</user>
+                                        <group>${project.artifactId}</group>
+                                    </mapper>
+                                </data>
+
+                                <data>
+                                    <type>template</type>
+                                    <paths>
+                                        <path>etc/${project.artifactId}</path>
+                                        <path>var/lib/${project.artifactId}</path>
+                                        <path>var/log/${project.artifactId}</path>
+                                        <path>var/run/${project.artifactId}</path>
+                                    </paths>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <filemode>750</filemode>
+                                        <user>${project.artifactId}</user>
+                                        <group>${project.artifactId}</group>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <type>link</type>
+                                    <symlink>true</symlink>
+                                    <linkName>/usr/local/bin/${project.artifactId}</linkName>
+                                    <linkTarget>/usr/share/${project.artifactId}/bin/${project.artifactId}</linkTarget>
+                                </data>
+                            </dataSet>
                         </configuration>
                     </execution>
                 </executions>

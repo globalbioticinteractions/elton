@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Launches Elton in JVM
+#
+
+java -Xmx4G -XX:+UseG1GC -cp "/usr/share/elton/lib/*" org.globalbioticinteractions.elton.Elton $@

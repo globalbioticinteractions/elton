@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 public class CmdUpdateIT {
 
     @Rule
-    private TemporaryFolder tmpDir = new TemporaryFolder();
+    public TemporaryFolder tmpDir = new TemporaryFolder();
 
 
     @Test
@@ -35,6 +35,34 @@ public class CmdUpdateIT {
         cmd.run();
 
         File file = new File(file1,"globalbioticinteractions/template-dataset/access.tsv");
+        assertThat(file.exists(), is(true));
+        String[] jarUrls = FileUtils.readFileToString(file, StandardCharsets.UTF_8).split("jar:file:");
+        assertTrue(jarUrls.length > 1);
+        String localJarUrl = jarUrls[1].split("\t")[0];
+        assertNotNull(new URL("jar:file:" + localJarUrl).openStream());
+
+        int numberOfLogEntries = getNumberOfLogEntries();
+        assertThat(getNumberOfLogEntries() > 3, is(true));
+        int numberOfCacheFiles = getNumberOfCacheFiles();
+
+        // rerun
+        cmd.run();
+        assertThat("should update regardless or preexisting entries in cache", getNumberOfLogEntries() + 3 > numberOfLogEntries, is(true));
+        assertThat("number of cached files should not have changed after update", numberOfCacheFiles, is(getNumberOfCacheFiles()));
+    }
+
+    @Test
+    public void updateKnowledgePixels() throws IOException {
+
+        CmdUpdate cmd = new CmdUpdate();
+        File file1 = tmpDir.newFolder();
+        String absolutePath = file1.getAbsolutePath();
+        cmd.setCacheDir(absolutePath);
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/knowledgepixels"));
+
+        cmd.run();
+
+        File file = new File(file1,"globalbioticinteractions/knowledgepixels/access.tsv");
         assertThat(file.exists(), is(true));
         String[] jarUrls = FileUtils.readFileToString(file, StandardCharsets.UTF_8).split("jar:file:");
         assertTrue(jarUrls.length > 1);

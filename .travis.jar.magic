@@ -7,5 +7,5 @@ exit
 
 :BOF
 @echo off
-java -Xmx4G -XX:+UseG1GC %JAVA_OPTS% -cp "%~dpnx0" org.globalbioticinteractions.elton.Elton %*
+java -Xmx8G -XX:+UseG1GC %JAVA_OPTS% -cp "%~dpnx0" org.globalbioticinteractions.elton.Elton %*
 exit /B %errorlevel%

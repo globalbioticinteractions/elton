@@ -7,6 +7,7 @@ import bio.guoda.preston.store.Dereferencer;
 import bio.guoda.preston.store.DereferencerContentAddressed;
 import bio.guoda.preston.store.KeyTo1LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
+import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
@@ -43,12 +44,12 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         CacheUtil.findOrMakeCacheDirForNamespace(cachePath, namespace);
 
         File cacheDir = new File(cachePath, namespace);
-        KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(cacheDir.toURI(), HashType.sha256);
+        KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(cacheDir.toURI());
         BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
                 new KeyValueStoreLocalFileSystem(
                         cacheDir,
                         keyToPath,
-                        new KeyValueStoreLocalFileSystem.KeyValueStreamFactoryValues(HashType.sha256)
+                        new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
                 true,
                 HashType.sha256

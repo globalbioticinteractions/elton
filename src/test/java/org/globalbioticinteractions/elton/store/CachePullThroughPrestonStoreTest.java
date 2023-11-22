@@ -4,6 +4,7 @@ import bio.guoda.preston.HashType;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo1LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
+import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.util.ResourceServiceLocal;
@@ -53,8 +54,8 @@ public class CachePullThroughPrestonStoreTest {
         BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
                 new KeyValueStoreLocalFileSystem(
                         folder.getRoot(),
-                        new KeyTo1LevelPath(folder.getRoot().toURI(), HashType.sha256),
-                        new KeyValueStoreLocalFileSystem.KeyValueStreamFactoryValues(HashType.sha256)
+                        new KeyTo1LevelPath(folder.getRoot().toURI()),
+                        new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
                 true,
                 HashType.sha256);

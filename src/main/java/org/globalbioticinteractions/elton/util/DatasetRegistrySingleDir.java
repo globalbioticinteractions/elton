@@ -9,7 +9,6 @@ import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Consumer;
 

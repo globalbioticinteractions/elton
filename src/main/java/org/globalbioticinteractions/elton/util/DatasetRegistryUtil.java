@@ -4,7 +4,6 @@ import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
-import org.eol.globi.util.ResourceServiceRemote;
 import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -12,7 +11,6 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
 
 import java.net.URI;
-import java.util.Collection;
 
 public class DatasetRegistryUtil {
 

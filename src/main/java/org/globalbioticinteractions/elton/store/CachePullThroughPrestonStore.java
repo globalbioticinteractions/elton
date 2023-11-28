@@ -1,7 +1,9 @@
 package org.globalbioticinteractions.elton.store;
 
 import bio.guoda.preston.HashType;
+import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
+import bio.guoda.preston.process.StatementListener;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.Dereferencer;
 import bio.guoda.preston.store.DereferencerContentAddressed;
@@ -10,6 +12,7 @@ import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.DateUtil;
 import org.globalbioticinteractions.cache.CachePullThrough;
@@ -27,17 +30,33 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
     private final String namespace;
     private final String cachePath;
     private final ResourceService remote;
+    private final StatementListener listener;
 
     public CachePullThroughPrestonStore(
             String namespace,
             String cachePath,
             ResourceService resourceService
     ) {
+        this(namespace, cachePath, resourceService, new StatementListener() {
+            @Override
+            public void on(Quad quad) {
+                // do nothing
+            }
+        });
+    }
+
+    public CachePullThroughPrestonStore(
+            String namespace,
+            String cachePath,
+            ResourceService resourceService,
+            StatementListener listener
+    ) {
         super(namespace, cachePath,
                 resourceService);
         this.namespace = namespace;
         this.cachePath = cachePath;
         this.remote = resourceService;
+        this.listener = listener;
     }
 
     public InputStream retrieve(URI resourceURI) throws IOException {
@@ -64,6 +83,21 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
 
         IRI dereferenced = derefCas.get(RefNodeFactory.toIRI(resourceURI));
 
+        streamProvenance(resourceURI, dereferenced, listener);
+        recordProvenance(resourceURI, keyToPath, dereferenced);
+        return blobStore.get(dereferenced);
+    }
+
+    private void streamProvenance(URI resourceURI, IRI dereferenced, StatementListener statementListener) {
+        Quad quad = RefNodeFactory.toStatement(
+                RefNodeFactory.toIRI(resourceURI),
+                RefNodeConstants.HAS_VERSION,
+                dereferenced
+        );
+        statementListener.on(quad);
+    }
+
+    private void recordProvenance(URI resourceURI, KeyTo1LevelPath keyToPath, IRI dereferenced) throws IOException {
         URI localPathURI = keyToPath.toPath(dereferenced);
         ContentProvenance contentProvenanceWithNamespace
                 = new ContentProvenance(namespace,
@@ -76,7 +110,6 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                 new File(cachePath),
                 contentProvenanceWithNamespace
         );
-        return blobStore.get(dereferenced);
     }
 
 

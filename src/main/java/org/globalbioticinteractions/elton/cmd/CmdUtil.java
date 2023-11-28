@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
@@ -54,11 +56,21 @@ public class CmdUtil {
         }
     }
 
-    static DatasetRegistry createDataFinderLoggingCaching(DatasetRegistry registry, String namespace, String cacheDir, InputStreamFactory factory) {
+    static DatasetRegistry createDataFinderLoggingCaching(
+            DatasetRegistry registry,
+            String namespace,
+            String cacheDir,
+            InputStreamFactory factory) {
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, cacheDir), dataset -> {
             ResourceService remote = new ResourceServiceLocalAndRemote(factory);
             ResourceService local = new ResourceServiceLocal(factory);
-            Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, remote);
+            Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, remote, new StatementListener() {
+
+                @Override
+                public void on(Quad quad) {
+                    // ignore printing quads for now
+                }
+            });
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, local);
             return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
         });

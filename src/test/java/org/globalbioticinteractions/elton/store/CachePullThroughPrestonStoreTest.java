@@ -7,6 +7,7 @@ import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.globalbioticinteractions.cache.Cache;
 import org.hamcrest.core.Is;
@@ -21,8 +22,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 
@@ -33,12 +36,16 @@ public class CachePullThroughPrestonStoreTest {
 
     @Test
     public void testPrestonStore() throws IOException, URISyntaxException {
+        ArrayList<Quad> quads = new ArrayList<>();
 
         Cache cache = new CachePullThroughPrestonStore(
                 "some/namespace"
                 , folder.getRoot().getAbsolutePath()
                 , new ResourceServiceLocal(in -> in)
+                , quads::add
         );
+
+        assertThat(quads.size(), Is.is(0));
 
         File namespaceDir = new File(folder.getRoot(), "some/namespace");
         assertFalse(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
@@ -47,7 +54,10 @@ public class CachePullThroughPrestonStoreTest {
         assertTrue(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
         assertThat(IOUtils.toString(is, StandardCharsets.UTF_8.name()), Is.is("hello"));
-
+        assertThat(quads.size(), Is.is(1));
+        assertThat(quads.get(0).getSubject().toString(), endsWith("org/globalbioticinteractions/elton/store/hello.txt>"));
+        assertThat(quads.get(0).getPredicate().toString(), Is.is("<http://purl.org/pav/hasVersion>"));
+        assertThat(quads.get(0).getObject().toString(), Is.is("<hash://sha256/2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824>"));
 
         assertFalse(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
@@ -71,6 +81,7 @@ public class CachePullThroughPrestonStoreTest {
         assertThat(IOUtils.toString(inputStream, StandardCharsets.UTF_8.name()), Is.is("hello"));
 
         assertTrue(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
+        assertThat(quads.size(), Is.is(1));
     }
 
 

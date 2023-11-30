@@ -6,10 +6,12 @@ package org.globalbioticinteractions.elton;
 
 import org.apache.commons.lang.StringUtils;
 import org.globalbioticinteractions.elton.cmd.CmdDatasets;
+import org.globalbioticinteractions.elton.cmd.CmdGet;
 import org.globalbioticinteractions.elton.cmd.CmdInit;
 import org.globalbioticinteractions.elton.cmd.CmdInstallManual;
 import org.globalbioticinteractions.elton.cmd.CmdInteractions;
 import org.globalbioticinteractions.elton.cmd.CmdList;
+import org.globalbioticinteractions.elton.cmd.CmdLog;
 import org.globalbioticinteractions.elton.cmd.CmdNames;
 import org.globalbioticinteractions.elton.cmd.CmdNanoPubs;
 import org.globalbioticinteractions.elton.cmd.CmdReview;
@@ -26,6 +28,8 @@ import static java.lang.System.exit;
         subcommands = {
                 CmdInit.class,
                 CmdInteractions.class,
+                CmdLog.class,
+                CmdGet.class,
                 CmdNames.class,
                 CmdReview.class,
                 CmdDatasets.class,

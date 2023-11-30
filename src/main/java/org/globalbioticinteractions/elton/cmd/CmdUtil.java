@@ -111,7 +111,8 @@ public class CmdUtil {
     }
 
     private static void handleSingleNamespace(DatasetRegistry registry,
-                                              NodeFactory nodeFactory, String namespace,
+                                              NodeFactory nodeFactory,
+                                              String namespace,
                                               ImportLogger logger) throws DatasetRegistryException, StudyImporterException {
         Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
 

@@ -5,6 +5,7 @@ import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursorRotating;
 import picocli.CommandLine;
 
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.file.Paths;
@@ -38,6 +39,7 @@ abstract class CmdDefaultParams implements Runnable {
 
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
+    private InputStream stdin = System.in;
 
     final private ProgressCursorFactory cursorFactory = new ProgressCursorFactory() {
         private final ProgressCursor cursor = new ProgressCursorRotating(stderr);
@@ -65,6 +67,14 @@ abstract class CmdDefaultParams implements Runnable {
 
     public void setStdout(PrintStream out) {
         this.stdout = out;
+    }
+
+    public void setStdin(InputStream stdin) {
+        this.stdin = stdin;
+    }
+
+    public InputStream getStdin() {
+        return this.stdin;
     }
 
     public URI getWorkDir() {

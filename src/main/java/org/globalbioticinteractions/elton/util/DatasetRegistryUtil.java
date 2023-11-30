@@ -36,7 +36,7 @@ public class DatasetRegistryUtil {
     }
 
     public static DatasetRegistry forCacheDir(String cacheDir,
-                                              ResourceServiceLocal resourceServiceLocal) {
+                                              ResourceService resourceServiceLocal) {
         return new DatasetRegistryLocal(
                 cacheDir,
                 getCacheFactoryLocal(cacheDir, resourceServiceLocal),
@@ -52,12 +52,16 @@ public class DatasetRegistryUtil {
     }
 
     public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, InputStreamFactory streamFactory) {
-        DatasetRegistry registry = forCacheDir(cacheDir, new ResourceServiceLocal(streamFactory));
+        return forCacheDirOrLocalDir(cacheDir, workDir, new ResourceServiceLocal(streamFactory), new ResourceServiceLocalAndRemote(streamFactory));
+    }
+
+    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, ResourceService resourceServiceLocal, ResourceService resourceServiceRemote) {
+        DatasetRegistry registry = forCacheDir(cacheDir, resourceServiceLocal);
         if (isEmpty(registry)) {
             registry = forLocalDir(
                     workDir,
                     cacheDir,
-                    new ResourceServiceLocalAndRemote(streamFactory)
+                    resourceServiceRemote
             );
         }
         return registry;

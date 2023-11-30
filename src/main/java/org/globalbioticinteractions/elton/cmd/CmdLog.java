@@ -4,17 +4,13 @@ import bio.guoda.preston.HashType;
 import bio.guoda.preston.Hasher;
 import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullAppendable;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Quad;
-import org.apache.jena.tdb.store.Hash;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.tool.NullImportLogger;
-import org.eol.globi.util.ResourceServiceLocal;
-import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import org.eol.globi.util.ResourceUtil;
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
@@ -23,12 +19,10 @@ import org.globalbioticinteractions.dataset.DatasetProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
-import org.globalbioticinteractions.dataset.DatasetUtil;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import picocli.CommandLine;
 
-import javax.validation.constraints.Null;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -36,7 +30,6 @@ import java.net.URI;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,6 +40,13 @@ import java.util.concurrent.atomic.AtomicReference;
         description = "lists provenance of original resources"
 )
 public class CmdLog extends CmdDefaultParams {
+
+    @CommandLine.Option(
+            names = {"--hash-algorithm", "--algo", "-a"},
+            description = "Hash algorithm used to generate primary content identifiers. Supported values: ${COMPLETION-CANDIDATES}."
+    )
+    private HashType hashType = HashType.sha256;
+
 
     @Override
     public void run() {
@@ -64,15 +64,13 @@ public class CmdLog extends CmdDefaultParams {
             public Dataset datasetFor(String namespace) throws DatasetRegistryException {
                 Dataset dataset = super.datasetFor(namespace);
                 return new DatasetProxy(dataset) {
-                    ResourceService service = new LoggingResourceService(out, dataset);
+                    ResourceService service = new LoggingResourceService(out, dataset, hashType);
 
                     public InputStream retrieve(URI resourcePath) throws IOException {
                         return service.retrieve(resourcePath);
                     }
                 };
             }
-
-            ;
         };
 
         NodeFactory nodeFactory = new NodeFactoryNull();
@@ -87,14 +85,14 @@ public class CmdLog extends CmdDefaultParams {
 
     private static class LoggingResourceService implements ResourceService {
         private final PrintStream out;
-        private HashType sha256;
+        private HashType hashType;
         private final ResourceService local;
         private final AtomicReference<IRI> archiveContentId = new AtomicReference<>(null);
 
-        public LoggingResourceService(PrintStream out, ResourceService resourceService) {
+        public LoggingResourceService(PrintStream out, ResourceService resourceService, HashType hashType) {
             this.out = out;
             this.local = resourceService;
-            sha256 = HashType.sha256;
+            this.hashType = hashType;
         }
 
         @Override
@@ -104,7 +102,7 @@ public class CmdLog extends CmdDefaultParams {
 
         private InputStream logVersion(URI uri, InputStream retrieve) throws IOException {
             try {
-                final MessageDigest md = MessageDigest.getInstance(sha256.getAlgorithm());
+                final MessageDigest md = MessageDigest.getInstance(hashType.getAlgorithm());
                 final URI resource = local instanceof Dataset
                         ? getLocationInDataset(uri, (Dataset) local) : uri;
 
@@ -122,7 +120,11 @@ public class CmdLog extends CmdDefaultParams {
                     resourceLocation = ResourceUtil.getAbsoluteResourceURI(archiveURI, uri);
                 } else {
                     if (this.archiveContentId.get() == null) {
-                        IRI archiveContentId = Hasher.calcHashIRI(local.retrieve(archiveURI), NullOutputStream.NULL_OUTPUT_STREAM, sha256);
+                        IRI archiveContentId = Hasher.calcHashIRI(
+                                local.retrieve(archiveURI),
+                                NullOutputStream.NULL_OUTPUT_STREAM,
+                                hashType
+                        );
                         this.archiveContentId.set(archiveContentId);
                         Quad quad = RefNodeFactory.toStatement(
                                 RefNodeFactory.toIRI(archiveURI),
@@ -177,7 +179,7 @@ public class CmdLog extends CmdDefaultParams {
                 Quad quad = RefNodeFactory.toStatement(
                         RefNodeFactory.toIRI(resourceLocation),
                         RefNodeConstants.HAS_VERSION,
-                        Hasher.toHashIRI(md, HashType.sha256)
+                        Hasher.toHashIRI(md, hashType)
                 );
                 if (isEOF.get() && !hasLogged.get()) {
                     out.println(quad.toString());
@@ -186,6 +188,11 @@ public class CmdLog extends CmdDefaultParams {
             }
         }
     }
+
+    public void setHashType(HashType hashType) {
+        this.hashType = hashType;
+    }
+
 }
 
 

@@ -30,7 +30,7 @@ Elton needs Java 8+ to run.[Why OpenJDK 8?](https://adoptopenjdk.net/support.htm
 On linux/mac, you can run the following to install a copy of elton:
 
 ```bash
-sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.12.13/elton.jar) > /usr/local/bin/elton && chmod +x /usr/local/bin/elton' && elton version
+sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.13.0/elton.jar) > /usr/local/bin/elton && chmod +x /usr/local/bin/elton' && elton version
 ```
 Configuration to help Global Biotic Interactions (GloBI, https://globalbioticinteractions.org) index: 
 
@@ -41,7 +41,7 @@ You can also install Elton by manually downloading `elton.jar` from one of the [
 To install elton as a debian package use:
 
 ```bash
-curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.12.13/elton.deb\
+curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.13.0/elton.deb\
  > elton.deb 
 sudo apt install ./elton.deb
 ```

@@ -39,6 +39,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @CommandLine.Command(
         name = "log",
@@ -88,6 +89,7 @@ public class CmdLog extends CmdDefaultParams {
         private final PrintStream out;
         private HashType sha256;
         private final ResourceService local;
+        private final AtomicReference<IRI> archiveContentId = new AtomicReference<>(null);
 
         public LoggingResourceService(PrintStream out, ResourceService resourceService) {
             this.out = out;
@@ -119,17 +121,20 @@ public class CmdLog extends CmdDefaultParams {
                 if (CacheUtil.isLocalDir(archiveURI)) {
                     resourceLocation = ResourceUtil.getAbsoluteResourceURI(archiveURI, uri);
                 } else {
-                    IRI archiveContentId = Hasher.calcHashIRI(local.retrieve(archiveURI), NullOutputStream.NULL_OUTPUT_STREAM, sha256);
-                    Quad quad = RefNodeFactory.toStatement(
-                            RefNodeFactory.toIRI(archiveURI),
-                            RefNodeConstants.HAS_VERSION,
-                            archiveContentId
-                    );
-                    out.println(quad.toString());
+                    if (this.archiveContentId.get() == null) {
+                        IRI archiveContentId = Hasher.calcHashIRI(local.retrieve(archiveURI), NullOutputStream.NULL_OUTPUT_STREAM, sha256);
+                        this.archiveContentId.set(archiveContentId);
+                        Quad quad = RefNodeFactory.toStatement(
+                                RefNodeFactory.toIRI(archiveURI),
+                                RefNodeConstants.HAS_VERSION,
+                                archiveContentId
+                        );
+                        out.println(quad.toString());
+                    }
 
                     String localDatasetRoot = DatasetFinderUtil.getLocalDatasetURIRoot(local.retrieve(archiveURI));
 
-                    URI localArchiveRoot = URI.create("zip:" + archiveContentId.getIRIString() + "!/" + localDatasetRoot);
+                    URI localArchiveRoot = URI.create("zip:" + archiveContentId.get().getIRIString() + "!/" + localDatasetRoot);
                     resourceLocation = ResourceUtil.getAbsoluteResourceURI(localArchiveRoot, uri);
                 }
             }

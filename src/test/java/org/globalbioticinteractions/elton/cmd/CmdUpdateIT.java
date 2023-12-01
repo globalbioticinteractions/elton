@@ -22,76 +22,68 @@ public class CmdUpdateIT {
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
 
-
     @Test
-    public void runUpdate() throws IOException {
-
-        CmdUpdate cmd = new CmdUpdate();
-        File file1 = tmpDir.newFolder();
-        String absolutePath = file1.getAbsolutePath();
-        cmd.setCacheDir(absolutePath);
-        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
-
-        cmd.run();
-
-        File file = new File(file1,"globalbioticinteractions/template-dataset/access.tsv");
-        assertThat(file.exists(), is(true));
-        String[] jarUrls = FileUtils.readFileToString(file, StandardCharsets.UTF_8).split("jar:file:");
-        assertTrue(jarUrls.length > 1);
-        String localJarUrl = jarUrls[1].split("\t")[0];
-        assertNotNull(new URL("jar:file:" + localJarUrl).openStream());
-
-        int numberOfLogEntries = getNumberOfLogEntries();
-        assertThat(getNumberOfLogEntries() > 3, is(true));
-        int numberOfCacheFiles = getNumberOfCacheFiles();
-
-        // rerun
-        cmd.run();
-        assertThat("should update regardless or preexisting entries in cache", getNumberOfLogEntries() + 3 > numberOfLogEntries, is(true));
-        assertThat("number of cached files should not have changed after update", numberOfCacheFiles, is(getNumberOfCacheFiles()));
+    public void runDwCA() throws IOException {
+        assertAccessLogForNamespace("seltmann/taxonomy-darwin-core");
     }
 
     @Test
     public void updateKnowledgePixels() throws IOException {
+        assertAccessLogForNamespace("globalbioticinteractions/knowledgepixels");
+    }
 
+    @Test
+    public void runUpdate() throws IOException {
+        assertAccessLogForNamespace("globalbioticinteractions/template-dataset");
+    }
+
+    private void assertAccessLogForNamespace(String namespace) throws IOException {
         CmdUpdate cmd = new CmdUpdate();
         File file1 = tmpDir.newFolder();
         String absolutePath = file1.getAbsolutePath();
         cmd.setCacheDir(absolutePath);
-        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/knowledgepixels"));
+        cmd.setNamespaces(Collections.singletonList(namespace));
 
         cmd.run();
 
-        File file = new File(file1,"globalbioticinteractions/knowledgepixels/access.tsv");
+        File datasetDir = assertAccessLog(namespace, file1);
+
+        int numberOfLogEntries = getNumberOfLogEntries(datasetDir);
+        assertThat(getNumberOfLogEntries(datasetDir) > 3, is(true));
+        int numberOfCacheFiles = getNumberOfCacheFiles(datasetDir);
+
+        // rerun
+        cmd.run();
+        assertThat("should update regardless or preexisting entries in cache", getNumberOfLogEntries(datasetDir) + 3 > numberOfLogEntries, is(true));
+        assertThat("number of cached files should not have changed after update", numberOfCacheFiles, is(getNumberOfCacheFiles(datasetDir)));
+    }
+
+    private File assertAccessLog(String namespace, File file1) throws IOException {
+        File datasetDir = new File(file1, namespace);
+        File file = new File(datasetDir,"access.tsv");
         assertThat(file.exists(), is(true));
         String[] jarUrls = FileUtils.readFileToString(file, StandardCharsets.UTF_8).split("jar:file:");
         assertTrue(jarUrls.length > 1);
         String localJarUrl = jarUrls[1].split("\t")[0];
         assertNotNull(new URL("jar:file:" + localJarUrl).openStream());
-
-        int numberOfLogEntries = getNumberOfLogEntries();
-        assertThat(getNumberOfLogEntries() > 3, is(true));
-        int numberOfCacheFiles = getNumberOfCacheFiles();
-
-        // rerun
-        cmd.run();
-        assertThat("should update regardless or preexisting entries in cache", getNumberOfLogEntries() + 3 > numberOfLogEntries, is(true));
-        assertThat("number of cached files should not have changed after update", numberOfCacheFiles, is(getNumberOfCacheFiles()));
+        return datasetDir;
     }
 
-    private int getNumberOfCacheFiles() {
-        return FileUtils.listFiles(new File(getDatasetCacheDir()), null, false).size();
+
+    private int getNumberOfCacheFiles(File datasetCacheDir) {
+        return FileUtils.listFiles(datasetCacheDir, null, false).size();
     }
 
-    private int getNumberOfLogEntries() throws IOException {
-        String accessLog = getDatasetCacheDir() + "access.tsv";
-        File accessLogFile = new File(accessLog);
+    private int getNumberOfLogEntries(File dir) throws IOException {
+        File accessLogFile = new File(dir,"access.tsv");
         assertThat(accessLogFile.exists(), is(true));
         return IOUtils.toString(accessLogFile.toURI(), StandardCharsets.UTF_8).split("\n").length;
     }
 
     private String getDatasetCacheDir() {
-        return "target/tmp-dataset/globalbioticinteractions/template-dataset/";
+        return tmpDir + "/globalbioticinteractions/template-dataset/";
     }
+
+
 
 }

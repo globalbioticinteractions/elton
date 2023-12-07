@@ -19,4 +19,5 @@ final class CmdTestUtil {
         assertThat(accessURL, is(notNullValue()));
         return new File(accessURL.toURI()).getParentFile().getParentFile().getParentFile().getAbsolutePath();
     }
+
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<rss version="2.0"
+     xmlns:ipt="http://ipt.gbif.org/"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+    <channel>
+        <item>
+            <title>MSB Parasite Collection (Arctos) - Version 32.28</title>
+            <description>[The MSB Division of Parasitology is a collection of primarily metazoan endoparasites, especially helminths, including the personal collection of Robert L. Rausch and Virginia R. Rausch. The Rausch material, plus specimens from the Beringian Coevolution Project, make this an important aggregation of western arctic and subarctic parasites. It vouchers an active program in global schistosome diversity, as well as Long-Term Ecological Research at the Sevilleta National Wildife Refuge.]</description>
+            <author>larussell@vertnet.org (Laura Russell)</author>
+            <ipt:eml>http://example.org/eml.xml</ipt:eml>
+            <ipt:dwca>dwca.zip</ipt:dwca>
+            <pubDate>Mon, 08 Jul 2019 23:42:46 +0000</pubDate>
+            <guid isPermaLink="false">78ff8409-15b9-456f-9793-291b030190a7/v32.28</guid>
+        </item>
+    </channel>
+</rss>

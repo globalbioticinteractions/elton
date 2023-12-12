@@ -176,12 +176,13 @@ public class CmdLog extends CmdDefaultParams {
 
             public void close() throws IOException {
                 this.in.close();
-                Quad quad = RefNodeFactory.toStatement(
-                        RefNodeFactory.toIRI(resourceLocation),
-                        RefNodeConstants.HAS_VERSION,
-                        Hasher.toHashIRI(md, hashType)
-                );
+
                 if (isEOF.get() && !hasLogged.get()) {
+                    Quad quad = RefNodeFactory.toStatement(
+                            RefNodeFactory.toIRI(resourceLocation),
+                            RefNodeConstants.HAS_VERSION,
+                            Hasher.toHashIRI(md, hashType)
+                    );
                     out.println(quad.toString());
                     hasLogged.set(true);
                 }

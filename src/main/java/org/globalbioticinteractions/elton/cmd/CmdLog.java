@@ -1,9 +1,11 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.HashType;
+import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
 import org.apache.commons.io.output.NullAppendable;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.tool.NullImportLogger;
@@ -12,6 +14,7 @@ import org.globalbioticinteractions.dataset.DatasetProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
+import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import picocli.CommandLine;
@@ -45,6 +48,15 @@ public class CmdLog extends CmdDefaultParams {
                 getWorkDir(),
                 createInputStreamFactory()
         );
+
+        IRI softwareAgent = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");
+        emitter.emit(ActivityUtil.generateSoftwareAgentProcessDescription(
+                ctx,
+                softwareAgent,
+                softwareAgent,
+                "Jorrit Poelen, Tobias Kuhn & Katrin Leinweber. (2023). globalbioticinteractions/elton: " + Elton.getVersionString() + ". Zenodo. " + softwareAgent.getIRIString(),
+                "Elton helps to access, review and index existing species interaction datasets."));
+
 
         DatasetRegistry proxy = new DatasetRegistryProxy(Collections.singletonList(registry)) {
             public Dataset datasetFor(String namespace) throws DatasetRegistryException {

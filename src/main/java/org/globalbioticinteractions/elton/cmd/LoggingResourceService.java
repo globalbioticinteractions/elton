@@ -33,7 +33,6 @@ public class LoggingResourceService implements ResourceService {
     private HashType hashType;
     private final ResourceService local;
     private final AtomicReference<IRI> archiveContentId = new AtomicReference<>(null);
-    private final AtomicBoolean loggedActivity = new AtomicBoolean(false);
 
     public LoggingResourceService(ResourceService resourceService,
                                   HashType hashType,
@@ -45,13 +44,11 @@ public class LoggingResourceService implements ResourceService {
         this.activityEmitter = new StatementsEmitter() {
             @Override
             public void emit(List<Quad> statement) {
-                logActivityIfNeeded(emitter);
                 emitter.emit(statement);
             }
 
             @Override
             public void emit(Quad statement) {
-                logActivityIfNeeded(emitter);
                 emitter.emit(statement);
             }
         };
@@ -70,7 +67,7 @@ public class LoggingResourceService implements ResourceService {
 
             return new DigestLoggingInputStream(retrieve, md, resource);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("cannot calculate sha256 hashes", e);
+            throw new RuntimeException("algorithm [" + hashType.getAlgorithm() + "] not supported", e);
         }
     }
 
@@ -102,18 +99,6 @@ public class LoggingResourceService implements ResourceService {
             }
         }
         return resourceLocation;
-    }
-
-    private void logActivityIfNeeded(StatementsEmitter emitter) {
-        if (!loggedActivity.get()) {
-            IRI softwareAgent = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");
-            emitter.emit(ActivityUtil.generateSoftwareAgentProcessDescription(
-                    ctx,
-                    softwareAgent,
-                    softwareAgent,
-                    "Jorrit Poelen, Tobias Kuhn & Katrin Leinweber. (2023). globalbioticinteractions/elton: " + Elton.getVersionString() + ". Zenodo. " + softwareAgent.getIRIString(),
-                    "Elton helps to access, review and index existing species interaction datasets."));
-        }
     }
 
     public class DigestLoggingInputStream extends DigestInputStream {

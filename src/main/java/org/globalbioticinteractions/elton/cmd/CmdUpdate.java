@@ -19,7 +19,7 @@ import java.util.List;
 
 @CommandLine.Command(
         name = "sync",
-        aliases = {"pull", "update"},
+        aliases = {"pull", "update", "track"},
         description = "Update Local Datasets With Remote Sources"
 )
 
@@ -58,7 +58,7 @@ public class CmdUpdate extends CmdDefaultParams {
 
         DatasetRegistry registryProxy = new DatasetRegistryProxy(registries);
         NamespaceHandler namespaceHandler = namespace -> {
-            getStderr().print("updating [" + namespace + "]... ");
+            getStderr().print("tracking [" + namespace + "]... ");
 
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
                     registryProxy,
@@ -79,7 +79,7 @@ public class CmdUpdate extends CmdDefaultParams {
                         null);
                 getStderr().println("done.");
             } catch (StudyImporterException ex) {
-                LOG.error("update of [" + namespace + "] failed.", ex);
+                LOG.error("tracking of [" + namespace + "] failed.", ex);
                 getStderr().println("failed with [ " + ex.getMessage() + "].");
             }
         };

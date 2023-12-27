@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml packageId="drucker.3.11" system="knb" xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" "> <access authSystem="knb" order="allowFirst"> <allow> <principal>public</principal>
+ <permission>read</permission>
+ </allow>
+ <allow> <principal>cn=datamanagers,o=BR-LTER,dc=ecoinformatics,dc=org</principal>
+ <permission>all</permission>
+ </allow>
+ </access>
+ <dataset> <title>Abundância e Distribuição de Ervas Terrestres em Parcelas Ripárias na Reserva Ducke: Variação Lateral</title>
+ <creator id="1312386756228"> <individualName> <givenName>Debora</givenName>
+ <surName>Drucker</surName>
+ </individualName>
+ <organizationName>Instituto Nacional de Pesquisas da Amazônia – INPA</organizationName>
+ <address> <deliveryPoint>Coordenação de Pesquisas em Ecologia – CPEC</deliveryPoint>
+ <deliveryPoint>Avenida Efigênio Sales, 2239, Aleixo, CEP 69011-970</deliveryPoint>
+ <city>Manaus</city>
+ <administrativeArea>Amazonas</administrativeArea>
+ <postalCode>478</postalCode>
+ <country>Brasil</country>
+ </address>
+ <phone phonetype="voice">+ 55 92 3643 1834</phone>
+ <electronicMailAddress>deboradrucker@gmail.com</electronicMailAddress>
+ <onlineUrl>http://lattes.cnpq.br/6782891501006399</onlineUrl>
+ </creator>
+ <associatedParty id="1312387003910"> <individualName> <givenName>Debora</givenName>
+ <surName>Drucker</surName>
+ </individualName>
+ <organizationName>Universidade Estadual de Campinas - UNICAMP</organizationName>
+ <address> <deliveryPoint>Nucleo de Estudos e Pesquisas Ambientais - NEPAM</deliveryPoint>
+ <deliveryPoint>Rua dos Flamboyants, 155, CEP 13083-867</deliveryPoint>
+ <city>Campinas</city>
+ <administrativeArea>São Paulo</administrativeArea>
+ <country>Brasil</country>
+ </address>
+ <phone phonetype="voice">+55 19 3211 6200</phone>
+ <phone phonetype="fax">+55 19 3211 6222</phone>
+ <electronicMailAddress>deboradrucker@gmail.com</electronicMailAddress>
+ <onlineUrl>http://lattes.cnpq.br/6782891501006399</onlineUrl>
+ <role>Custodian/Steward</role>
+ </associatedParty>
+ <abstract> <para>Os dados aqui disponibilizados são produto do trabalho realizado por Debora Drucker durante seu curso de mestrado. O objetivo central foi investigar a abundância e distribuição espacial de ervas terrestres (apenas as espécies que germinam e passam todo o seu ciclo de vida no solo, sensu Poulsen (1996)) em 20 Parcelas ripárias paralelas aos igarapés na Reserva Florestal Adolpho Ducke.
+Referência:
+Poulsen, A. D. 1996. Species richness and density of ground herbs within a plot of lowland rainforest in north-west Borneo. Journal of Tropical Ecology 12: 177-190.</para>
+ </abstract>
+ <keywordSet> <keyword>Ervas</keyword>
+ <keyword>Parcelas Ripárias</keyword>
+ <keyword>Reserva Ducke</keyword>
+ <keyword>Floresta de Terra Firme</keyword>
+ <keyword>PELD-PPBio</keyword>
+ </keywordSet>
+ <intellectualRights> <para>Todos os dados do PPBio serão publicados no máximo 1 ano após sua coleta, desde que creditados os responsáveis pela mesma e disponibilização dos dados em qualquer publicação que os utilizem. Recomendamos aos interessados em utilizar os dados entrar em contato com os responsáveis e assim discutir o interesse de uso e possibilidade de participação no corpo de autores. A política de dados do PPBio está disponível no seguinte link: &lt;http://ppbio.inpa.gov.br/Port/docsinternos/politica_dou.pdf&gt;. MSc. Debora Pignatari Drucker foi responsável pela coleta destes dados, disponíveis para download a partir desta página</para>
+ </intellectualRights>
+ <coverage> <geographicCoverage> <geographicDescription>Os dados foram coletados na Reserva Florestal Adolpho Ducke, que cobre 10.000 ha de floresta tropical úmida na periferia de Manaus, AM, Brasil</geographicDescription>
+ <boundingCoordinates> <westBoundingCoordinate>-59.59</westBoundingCoordinate>
+ <eastBoundingCoordinate>-59.53</eastBoundingCoordinate>
+ <northBoundingCoordinate>-2.55</northBoundingCoordinate>
+ <southBoundingCoordinate>-3.01</southBoundingCoordinate>
+ </boundingCoordinates>
+ </geographicCoverage>
+ <temporalCoverage> <rangeOfDates> <beginDate> <calendarDate>2003-11-01</calendarDate>
+ </beginDate>
+ <endDate> <calendarDate>2004-08-31</calendarDate>
+ </endDate>
+ </rangeOfDates>
+ </temporalCoverage>
+ <taxonomicCoverage> <taxonomicClassification> <taxonRankName>Kingdom</taxonRankName>
+ <taxonRankValue>Plantae</taxonRankValue>
+ </taxonomicClassification>
+ </taxonomicCoverage>
+ </coverage>
+ <contact> <references>1312386756228</references>
+ </contact>
+ <methods> <methodStep> <description> <section> <title>Métodos de Coleta dos Dados</title>
+ <para>As coletas foram realizadas em 20 parcelas ripárias de 100 x 2 m (0,02 ha), totalizando 4000 m2 (0,4 ha) amostrados. As parcelas foram instaladas em diferentes faixas de distância lateral dos igarapés ao longo dos baixios. Cada parcela foi instalada com o auxílio de um clinômetro, para que fosse uniformemente mantido em uma mesma curva de nível. As faixas de distância do igarapé foram estabelecidas em termos de porcentagem da largura total do baixio: 0, 25, 50, 75 e 100%. Em cada parcela, todos os indivíduos acima de 5 cm de altura foram contados e identificados. A identificação das espécies foi facilitada pelo uso de um guia florístico produzido para a RFAD baseado quase que essencialmente em caracteres vegetativos (Ribeiro et al., 1999). Amostras botânicas férteis foram coletadas e depositadas no Herbário do INPA. Material botânico vegetativo foi coletado como testemunha quando não foi possível coletar em estado fértil.</para>
+ </section>
+ </description>
+ </methodStep>
+ <methodStep> <description> <section> <title>Referência</title>
+ <para>Ribeiro, J. E. L. da S., M. J. G. Hopkins, A. Vicentini, C. A. Sothers, M. A. S. Costa, J. M. Brito, M. A. D. Souza, L. H. P. Martins, L. G. Lohmann, P. A. C. L. Assunção, E. C. Pereira, C. F. Silva, M. R. Mesquita, e L. C. Procópio. 1999. Flora da Reserva Ducke: Guia de identificação das plantas vasculares de uma floresta de terra-firme na Amazônia Central. INPA/DFID, Manaus, Br</para>
+ </section>
+ </description>
+ </methodStep>
+ </methods>
+ <project> <title>PELD Sítio 1</title>
+ <personnel id="1312387111986"> <individualName> <givenName>Flávio J.</givenName>
+ <surName>Luizão</surName>
+ </individualName>
+ <organizationName>Instituto Nacional de Pesquisas da Amazônia - INPA</organizationName>
+ <address> <deliveryPoint>Coordenação de Pesquisas em Ecologia – CPEC</deliveryPoint>
+ <deliveryPoint>Avenida Efigênio Sales, 2239, Aleixo, CEP 69011-970</deliveryPoint>
+ <city>Manaus</city>
+ <administrativeArea>Amazonas</administrativeArea>
+ <postalCode>478</postalCode>
+ <country>Brasil</country>
+ </address>
+ <phone phonetype="voice">+55 92 3643 1911</phone>
+ <electronicMailAddress>fluizao@inpa.gov.br</electronicMailAddress>
+ <onlineUrl>http://lattes.cnpq.br/5212730639831062</onlineUrl>
+ <role>Principal Investigator - CNPq/ PELD 520039/98-0</role>
+ </personnel>
+ <personnel id="1312387135977"> <individualName> <givenName>William E.</givenName>
+ <surName>Magnusson</surName>
+ </individualName>
+ <organizationName>Instituto Nacional de Pesquisas da Amazônia – INPA</organizationName>
+ <address> <deliveryPoint>Coordenação de Pesquisas em Ecologia – CPEC</deliveryPoint>
+ <deliveryPoint>Avenida Efigênio Sales, 2239, Aleixo, CEP 69011-970</deliveryPoint>
+ <city>Manaus</city>
+ <administrativeArea>Amazonas</administrativeArea>
+ <postalCode>478</postalCode>
+ <country>Brasil</country>
+ </address>
+ <phone phonetype="voice">+55 92 3643 1834</phone>
+ <electronicMailAddress>bill@inpa.gov.br</electronicMailAddress>
+ <onlineUrl>http://lattes.cnpq.br/1973878827354750</onlineUrl>
+ <role>Principal Investigator - CNPq/ 472799/03-7</role>
+ </personnel>
+ <funding> <para>1. CNPq/ PELD 520039/98-0/ 2. CNPq/ 472799/03-7/ 3. CNPq - Bolsa de mestrado concedida a Debora Drucker</para>
+ </funding>
+ </project>
+ <dataTable id="1312391667091"> <entityName>ervasnomelat.txt</entityName>
+ <physical id="1312391525534"> <objectName>ervasnomelat.txt</objectName>
+ <size unit="byte">2973</size>
+ <dataFormat> <textFormat> <numHeaderLines>1</numHeaderLines>
+ <recordDelimiter>#x0A</recordDelimiter>
+ <attributeOrientation>column</attributeOrientation>
+ <simpleDelimited> <fieldDelimiter>#x09</fieldDelimiter>
+ </simpleDelimited>
+ </textFormat>
+ </dataFormat>
+ <distribution> <online> <url>ecogrid://knb/menger.23.1</url>
+ </online>
+ </distribution>
+ </physical>
+ <attributeList> <attribute id="1312391667092"> <attributeName>codigo</attributeName>
+ <attributeDefinition>Código identificador da espécie utilizado nos arquivos ervasablat.pdf/ ervasablat.csv</attributeDefinition>
+ <measurementScale> <nominal> <nonNumericDomain> <textDomain> <definition>Código identificador da espécie utilizado nos arquivos ervasablat.pdf/ ervasablat.csv</definition>
+ </textDomain>
+ </nonNumericDomain>
+ </nominal>
+ </measurementScale>
+ </attribute>
+ <attribute id="1312391667093"> <attributeName>familia</attributeName>
+ <attributeDefinition>Nome da Família</attributeDefinition>
+ <measurementScale> <nominal> <nonNumericDomain> <textDomain> <definition>Nome da Família</definition>
+ </textDomain>
+ </nonNumericDomain>
+ </nominal>
+ </measurementScale>
+ </attribute>
+ <attribute id="1312391667094"> <attributeName>nome</attributeName>
+ <attributeDefinition>Nome da Espécie</attributeDefinition>
+ <measurementScale> <nominal> <nonNumericDomain> <textDomain> <definition>Nome da Espécie</definition>
+ </textDomain>
+ </nonNumericDomain>
+ </nominal>
+ </measurementScale>
+ </attribute>
+ <attribute id="1312391667095"> <attributeName>autor</attributeName>
+ <attributeDefinition>Nome do Autor do Nome da Espécie</attributeDefinition>
+ <measurementScale> <nominal> <nonNumericDomain> <textDomain> <definition>Nome do Autor do Nome da Espécie</definition>
+ </textDomain>
+ </nonNumericDomain>
+ </nominal>
+ </measurementScale>
+ </attribute>
+ </attributeList>
+ <numberOfRecords>57</numberOfRecords>
+ </dataTable>
+ <dataTable id="1340138776296"> <entityName>idrucker.3_ervaslateral.txt</entityName>
+ <physical id="1340138690331"> <objectName>idrucker.3_ervaslateral - ok.txt</objectName>
+ <size unit="byte">9396</size>
+ <dataFormat> <textFormat> <numHeaderLines>1</numHeaderLines>
+ <recordDelimiter>#x0A</recordDelimiter>
+ <attributeOrientation>column</attributeOrientation>
+ <simpleDelimited> <fieldDelimiter>#x09</fieldDelimiter>
+ </simpleDelimited>
+ </textFormat>
+ </dataFormat>
+ <distribution> <online> <url>ecogrid://knb/fecosta.201.1</url>
+ </online>
+ </distribution>
+ </physical>
+ <attributeList> <attribute id="1340138776297"> <attributeName>sitio</attributeName>
+ <attributeDefinition>Sítio de coleta.</attributeDefinition>
+ <measurementScale> <nominal> <nonNumericDomain> <textDomain> <definition>Sítio de coleta.</definition>
+ </textDomain>
+ </nonNumericDomain>
+ </nominal>
+ </measurementScale>
+ </attribute>
+ <attribute id="1340138776298"> <attributeName>trilha</attributeName>
+ <attributeDefinition>Trilha de acesso (LO = leste - oeste).</attributeDefinition>
+ <measurementScale> <nominal> <nonNumericDomain> <textDomain> <definition>Trilha de acesso (LO = leste - oeste).</definition>
+ </textDomain>
+ </nonNumericDomain>
+ </nominal>
+ </measurementScale>
+ </attribute>
+ <attribute id="1340138776299"> <attributeName>parcela</attributeName>
+ <attributeDefinition>Parcela de coleta.</attributeDefinition>
+ <measurementScale> <nominal> <nonNumericDomain> <textDomain> <definition>Parcela de coleta.</definition>
+ </textDomain>
+ </nonNumericDomain>
+ </nominal>
+ </measurementScale>
+ </attribute>
+ <attribute id="1340138776300"> <attributeName>especie</attributeName>
+ <attributeDefinition>Código da espécie amostrada.</attributeDefinition>
+ <measurementScale> <nominal> <nonNumericDomain> <textDomain> <definition>Código da espécie amostrada.</definition>
+ </textDomain>
+ </nonNumericDomain>
+ </nominal>
+ </measurementScale>
+ </attribute>
+ <attribute id="1340138776301"> <attributeName>abundancia</attributeName>
+ <attributeDefinition>Número de individuos de cada espécie amostrada.</attributeDefinition>
+ <measurementScale> <ratio> <unit> <standardUnit>dimensionless</standardUnit>
+ </unit>
+ <numericDomain> <numberType>natural</numberType>
+ </numericDomain>
+ </ratio>
+ </measurementScale>
+ </attribute>
+ </attributeList>
+ <numberOfRecords>353</numberOfRecords>
+ </dataTable>
+ </dataset>
+ <additionalMetadata> <describes>1340138690331</describes>
+ <metadata> <consecutiveDelimiters>true</consecutiveDelimiters>
+ </metadata>
+ </additionalMetadata>
+ </eml:eml>

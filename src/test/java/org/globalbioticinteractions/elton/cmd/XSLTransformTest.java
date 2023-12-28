@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import javax.xml.transform.Transformer;
@@ -15,7 +14,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -48,8 +46,6 @@ public class XSLTransformTest {
         transformer.transform(ss, sr);
 
         String htmlRendered = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
-
-        FileUtils.writeStringToFile(new File("/tmp/bla.html"), htmlRendered, StandardCharsets.UTF_8);
 
         assertThat(htmlRendered, startsWith("<!DOCTYPE html"));
     }

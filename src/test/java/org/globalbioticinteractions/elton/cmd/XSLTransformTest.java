@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.core.Is;
 import org.junit.Test;
@@ -35,8 +36,7 @@ public class XSLTransformTest {
 
         StreamSource xslSource =
                 new StreamSource(new File(resource.toURI()));
-        // Create a stylesheet from the system id that was found
-        TransformerFactory tFactory = TransformerFactory.newInstance();
+        TransformerFactory tFactory = TransformerFactory.newInstance("org.apache.xalan.processor.TransformerFactoryImpl",null);
         Transformer transformer = tFactory.newTransformer(xslSource);
 
 
@@ -48,7 +48,7 @@ public class XSLTransformTest {
 
         String htmlRendered = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
         String htmlExpected = IOUtils.toString(getClass().getResourceAsStream(expectedResourceTransformed), StandardCharsets.UTF_8);
-
+        
         assertThat(htmlRendered, Is.is(htmlExpected));
     }
 

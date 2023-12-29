@@ -49,8 +49,6 @@ public class XSLTransformTest {
         String htmlRendered = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
         String htmlExpected = IOUtils.toString(getClass().getResourceAsStream(expectedResourceTransformed), StandardCharsets.UTF_8);
 
-        FileUtils.writeStringToFile(new File("/tmp/bla.html"), htmlRendered, StandardCharsets.UTF_8);
-
         assertThat(htmlRendered, Is.is(htmlExpected));
     }
 

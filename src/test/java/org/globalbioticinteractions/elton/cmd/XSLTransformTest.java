@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.core.Is;
 import org.junit.Test;

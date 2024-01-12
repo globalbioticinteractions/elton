@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.taxon.XmlUtil;
 import org.eol.globi.util.DateUtil;
+import org.eol.globi.util.ResourceUtil;
 import org.hamcrest.core.Is;
 import org.jbibtex.BibTeXDatabase;
 import org.jbibtex.BibTeXEntry;
@@ -12,6 +13,7 @@ import org.jbibtex.BibTeXFormatter;
 import org.jbibtex.BibTeXParser;
 import org.jbibtex.Key;
 import org.jbibtex.KeyValue;
+import org.jbibtex.StringValue;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.w3c.dom.Node;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -65,14 +68,19 @@ public class EML2BibTeXTest {
         assertThat(entry.getField(BibTeXEntry.KEY_YEAR).toUserString(), Is.is("2023"));
         assertThat(entry.getField(BibTeXEntry.KEY_PUBLISHER).toUserString(), Is.is("Ecdysis Portal"));
         assertThat(entry.getField(ABSTRACT).toUserString(), Is.is("University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088."));
+        assertThat(entry.getField(BibTeXEntry.KEY_URL).toUserString(), Is.is("https://ecdysis.org/collections/misc/collprofiles.php?collid=38"));
+
+
 
         BibTeXDatabase database = new BibTeXDatabase();
         database.addObject(entry);
+
         assertThat(toBibTeXString(database), Is.is("@misc{zip:hash://sha256/f5d8f67c1eca34cbba1abac12f353585c78bb053bc8ce7ee7e7a78846e1bfc4a!/eml.xml,\n" +
-                "\tauthor = Katja Seltmann,\n" +
-                "\tpublisher = Ecdysis Portal,\n" +
-                "\ttitle = University of California Santa Barbara Invertebrate Zoology Collection,\n" +
-                "\tabstract = University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088.,\n" +
+                "\tauthor = \"Katja Seltmann\",\n" +
+                "\tpublisher = \"Ecdysis Portal\",\n" +
+                "\ttitle = \"University of California Santa Barbara Invertebrate Zoology Collection\",\n" +
+                "\turl = \"https://ecdysis.org/collections/misc/collprofiles.php?collid=38\",\n" +
+                "\tabstract = \"University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088.\",\n" +
                 "\tyear = 2023\n" +
                 "}"));
 
@@ -96,8 +104,21 @@ public class EML2BibTeXTest {
         addCreators(entry, dataset);
         addPublisher(entry, dataset);
         addTitle(entry, dataset);
+        addURL(entry, dataset);
         addAbstract(entry, dataset);
         addPubDate(entry, dataset);
+    }
+
+    private void addURL(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
+        String urlStringCandidate = (String) XmlUtil.applyXPath(dataset, "alternateIdentifier", XPathConstants.STRING);
+        if (StringUtils.startsWith(urlStringCandidate, "http")) {
+            try {
+                new URI(urlStringCandidate);
+                entry.addField(BibTeXEntry.KEY_URL, new StringValue(StringUtils.trim(urlStringCandidate), StringValue.Style.QUOTED));
+            } catch (URISyntaxException e) {
+               //
+            }
+        }
     }
 
     private void addCreators(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
@@ -107,7 +128,7 @@ public class EML2BibTeXTest {
         NodeList associated = (NodeList) XmlUtil.applyXPath(dataset, "associatedParty", XPathConstants.NODESET);
         appendAuthors(associated, authorStrings);
 
-        entry.addField(BibTeXEntry.KEY_AUTHOR, new KeyValue(StringUtils.join(authorStrings, " and ")));
+        entry.addField(BibTeXEntry.KEY_AUTHOR, new StringValue(StringUtils.join(authorStrings, " and "), StringValue.Style.QUOTED));
     }
 
     private void addPublisher(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
@@ -121,18 +142,18 @@ public class EML2BibTeXTest {
 
         }
 
-        entry.addField(BibTeXEntry.KEY_PUBLISHER, new KeyValue(StringUtils.join(orgStrings, " and ")));
+        entry.addField(BibTeXEntry.KEY_PUBLISHER, new StringValue(StringUtils.join(orgStrings, " and "), StringValue.Style.QUOTED));
     }
 
     private void addTitle(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
         String title = (String) XmlUtil.applyXPath(dataset, "title", XPathConstants.STRING);
-        entry.addField(BibTeXEntry.KEY_TITLE, new KeyValue(StringUtils.trim(title)));
+        entry.addField(BibTeXEntry.KEY_TITLE, new StringValue(StringUtils.trim(title), StringValue.Style.QUOTED));
     }
 
     private void addAbstract(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
         String title = (String) XmlUtil.applyXPath(dataset, "abstract//*", XPathConstants.STRING);
         String abstractString = StringUtils.replace(StringUtils.trim(title), "\n", " ");
-        entry.addField(ABSTRACT, new KeyValue(RegExUtils.replaceAll(abstractString, "[ ]+", " ")));
+        entry.addField(ABSTRACT, new StringValue(RegExUtils.replaceAll(abstractString, "[ ]+", " "), StringValue.Style.QUOTED));
     }
 
     private void addPubDate(BibTeXEntry entry, Node dataset) throws XPathExpressionException {

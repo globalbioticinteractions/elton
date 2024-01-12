@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.taxon.XmlUtil;
+import org.eol.globi.util.DateUtil;
 import org.hamcrest.core.Is;
 import org.jbibtex.BibTeXDatabase;
 import org.jbibtex.BibTeXEntry;
@@ -11,6 +12,7 @@ import org.jbibtex.BibTeXFormatter;
 import org.jbibtex.BibTeXParser;
 import org.jbibtex.Key;
 import org.jbibtex.KeyValue;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,7 +49,22 @@ public class EML2BibTeXTest {
 
         assertThat(entry.getField(BibTeXEntry.KEY_AUTHOR).toUserString(), Is.is("Debora Drucker"));
         assertThat(entry.getField(BibTeXEntry.KEY_TITLE).toUserString(), Is.is("Abundância e Distribuição de Ervas Terrestres em Parcelas Ripárias na Reserva Ducke: Variação Lateral"));
+        assertThat(entry.getField(BibTeXEntry.KEY_PUBLISHER).toUserString(), Is.is("Instituto Nacional de Pesquisas da Amazônia – INPA"));
         assertThat(entry.getField(ABSTRACT).toUserString(), Is.is("Os dados aqui disponibilizados são produto do trabalho realizado por Debora Drucker durante seu curso de mestrado. O objetivo central foi investigar a abundância e distribuição espacial de ervas terrestres (apenas as espécies que germinam e passam todo o seu ciclo de vida no solo, sensu Poulsen (1996)) em 20 Parcelas ripárias paralelas aos igarapés na Reserva Florestal Adolpho Ducke. Referência: Poulsen, A. D. 1996. Species richness and density of ground herbs within a plot of lowland rainforest in north-west Borneo. Journal of Tropical Ecology 12: 177-190."));
+    }
+
+    @Test
+    public void transformUCSBIZCToBibTex() throws TransformerException, URISyntaxException, IOException, XPathExpressionException, SAXException, ParserConfigurationException {
+        InputStream is = getClass().getResourceAsStream("eml-ucsb-izc.xml");
+        BibTeXEntry entry = new BibTeXEntry(BibTeXEntry.TYPE_MISC, new Key("carvalheiro2023"));
+
+        populateDatasetCitation(is, entry);
+
+        assertThat(entry.getField(BibTeXEntry.KEY_AUTHOR).toUserString(), Is.is("Katja Seltmann"));
+        assertThat(entry.getField(BibTeXEntry.KEY_TITLE).toUserString(), Is.is("University of California Santa Barbara Invertebrate Zoology Collection"));
+        assertThat(entry.getField(BibTeXEntry.KEY_YEAR).toUserString(), Is.is("2023"));
+        assertThat(entry.getField(BibTeXEntry.KEY_PUBLISHER).toUserString(), Is.is("Ecdysis Portal"));
+        assertThat(entry.getField(ABSTRACT).toUserString(), Is.is("University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088."));
     }
 
     @Test
@@ -59,20 +76,41 @@ public class EML2BibTeXTest {
 
         assertThat(entry.getField(BibTeXEntry.KEY_AUTHOR).toUserString(), Is.is("Luisa Carvalheiro and José A. Salim"));
         assertThat(entry.getField(BibTeXEntry.KEY_TITLE).toUserString(), Is.is("WorldFAIR pilot data from: VisitationData_Luisa_Carvalheiro"));
+        assertThat(entry.getField(BibTeXEntry.KEY_PUBLISHER).toUserString(), Is.is("University of Goias and University of Sao Paulo"));
         assertThat(entry.getField(ABSTRACT).toUserString(), Is.is("Note: This is an example of the data included in a large database of data on plant-flower visitor interactions, where datasets were only inlcuded when quantitative information on visitation rate is available at species level, and inofmration on flower anundance and sampling effort is available for each flowering species present in the study site."));
     }
 
     private void populateDatasetCitation(InputStream is, BibTeXEntry entry) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
         Node dataset = (Node) XmlUtil.applyXPath(is, "//dataset", XPathConstants.NODE);
         addCreators(entry, dataset);
+        addPublisher(entry, dataset);
         addTitle(entry, dataset);
         addAbstract(entry, dataset);
+        addPubDate(entry, dataset);
     }
 
     private void addCreators(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
         NodeList creators = (NodeList) XmlUtil.applyXPath(dataset, "creator", XPathConstants.NODESET);
-        String author = parseAuthor(creators);
-        entry.addField(BibTeXEntry.KEY_AUTHOR, new KeyValue(author));
+        ArrayList<String> authorStrings = new ArrayList<>();
+        appendAuthors(creators, authorStrings);
+        NodeList associated = (NodeList) XmlUtil.applyXPath(dataset, "associatedParty", XPathConstants.NODESET);
+        appendAuthors(associated, authorStrings);
+
+        entry.addField(BibTeXEntry.KEY_AUTHOR, new KeyValue(StringUtils.join(authorStrings, " and ")));
+    }
+
+    private void addPublisher(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
+        NodeList organizations = (NodeList) XmlUtil.applyXPath(dataset, "creator/organizationName", XPathConstants.NODESET);
+        List<String> orgStrings = new ArrayList<>();
+        for (int j = 0; j < organizations.getLength(); j++) {
+            String organization = organizations.item(j).getTextContent();
+            if (!orgStrings.contains(organization)) {
+                orgStrings.add(organization);
+            }
+
+        }
+
+        entry.addField(BibTeXEntry.KEY_PUBLISHER, new KeyValue(StringUtils.join(orgStrings, " and ")));
     }
 
     private void addTitle(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
@@ -86,8 +124,19 @@ public class EML2BibTeXTest {
         entry.addField(ABSTRACT, new KeyValue(RegExUtils.replaceAll(abstractString, "[ ]+", " ")));
     }
 
-    private String parseAuthor(NodeList creators) throws XPathExpressionException {
-        List<String> authorStrings = new ArrayList<>();
+    private void addPubDate(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
+        String pubDate = (String) XmlUtil.applyXPath(dataset, "pubDate", XPathConstants.STRING);
+        try {
+            DateTime dateTime = DateUtil.parseDateUTC(pubDate);
+            if (dateTime != null) {
+                entry.addField(BibTeXEntry.KEY_YEAR, new KeyValue(Integer.toString(dateTime.getYear())));
+            }
+        } catch (IllegalArgumentException ex) {
+            // ignore
+        }
+    }
+
+    private void appendAuthors(NodeList creators, List<String> authorStrings) throws XPathExpressionException {
         for (int j = 0; j < creators.getLength(); j++) {
             Node item = creators.item(j);
 
@@ -97,15 +146,21 @@ public class EML2BibTeXTest {
             List<String> creatorNames = new ArrayList<>();
             append(firstNames, creatorNames);
             append(lastName, creatorNames);
-            authorStrings.add(StringUtils.join(creatorNames, " "));
+            if (creatorNames.size() > 0) {
+                String authorString = StringUtils.join(creatorNames, " ");
+                if (!authorStrings.contains(authorString)) {
+                    authorStrings.add(authorString);
+                }
+            }
         }
-
-        return StringUtils.join(authorStrings, " and ");
     }
 
     private void append(NodeList firstNames, List<String> firstNameStrings) {
         for (int i = 0; i < firstNames.getLength(); i++) {
-            firstNameStrings.add(firstNames.item(i).getTextContent());
+            String textContent = firstNames.item(i).getTextContent();
+            if (StringUtils.isNotBlank(textContent)) {
+                firstNameStrings.add(textContent);
+            }
         }
     }
 

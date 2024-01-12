@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.0.1/eml.xsd"
+         packageId="e72ca2af-ee21-4147-812d-24e6a15b27f8" system="https://symbiota.org" scope="system" xml:lang="eng">
+    <dataset>
+        <alternateIdentifier>https://ecdysis.org/collections/misc/collprofiles.php?collid=38</alternateIdentifier>
+        <title xml:lang="eng">University of California Santa Barbara Invertebrate Zoology Collection</title>
+        <creator id="b925ff4c-8eba-495c-b5ed-852c7affb2ea">
+            <organizationName>Ecdysis Portal</organizationName>
+            <electronicMailAddress>ajohnston@asu.edu</electronicMailAddress>
+            <onlineUrl>https://ecdysis.org/index.php</onlineUrl>
+        </creator>
+        <metadataProvider>
+            <organizationName>Ecdysis Portal</organizationName>
+            <electronicMailAddress>ajohnston@asu.edu</electronicMailAddress>
+            <onlineUrl>https://ecdysis.org/index.php</onlineUrl>
+        </metadataProvider>
+        <pubDate>2023-11-30</pubDate>
+        <language>eng</language>
+        <abstract>
+            <para>University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for
+                Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan
+                (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach
+                Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088.&#13;
+            </para>
+        </abstract>
+        <contact>
+            <organizationName>University of California Santa Barbara Invertebrate Zoology Collection</organizationName>
+            <electronicMailAddress>seltmann@ucsb.edu</electronicMailAddress>
+            <userId>https://orcid.org/0000-0001-5354-6048</userId>
+            <onlineUrl>https://www.ccber.ucsb.edu/collections/zoological/arthropods</onlineUrl>
+            <addr>
+                <city>Santa Barbara</city>
+                <administrativeArea>CA</administrativeArea>
+                <postalCode>93106</postalCode>
+                <country>United States</country>
+            </addr>
+        </contact>
+        <associatedParty>
+            <individualName>
+                <surName>Seltmann</surName>
+                <givenName>Katja</givenName>
+            </individualName>
+            <electronicMailAddress>seltmann@ucsb.edu</electronicMailAddress>
+            <positionName>Director</positionName>
+            <userId>https://orcid.org/0000-0001-5354-6048</userId>
+            <role>contentProvider</role>
+        </associatedParty>
+        <intellectualRights>
+            <para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated
+                them to the
+                <ulink url="http://creativecommons.org/publicdomain/zero/1.0/">
+                    <citetitle></citetitle>
+                </ulink>
+            </para>
+        </intellectualRights>
+    </dataset>
+    <additionalMetadata>
+        <metadata>
+            <symbiota id="b925ff4c-8eba-495c-b5ed-852c7affb2ea">
+                <dateStamp>2023-11-30T10:18:22-07:00</dateStamp>
+                <citation identifier="e30ef242-e880-438e-bf53-11c2ee09c570">Ecdysis Portal -
+                    e30ef242-e880-438e-bf53-11c2ee09c570
+                </citation>
+                <physical>
+                    <characterEncoding>UTF-8</characterEncoding>
+                    <dataFormat>
+                        <externallyDefinedFormat>
+                            <formatName>Darwin Core Archive</formatName>
+                        </externallyDefinedFormat>
+                    </dataFormat>
+                </physical>
+                <collection identifier="b03a3f0c-bfa5-4e02-b5d3-56ff38626302" id="38">
+                    <alternateIdentifier>https://ecdysis.org/collections/misc/collprofiles.php?collid=38
+                    </alternateIdentifier>
+                    <parentCollectionIdentifier>UCSB</parentCollectionIdentifier>
+                    <collectionIdentifier>IZC</collectionIdentifier>
+                    <collectionName>University of California Santa Barbara Invertebrate Zoology Collection
+                    </collectionName>
+                    <resourceLogoUrl>https://serv.biokic.asu.edu/ecdysis/content/collicon/ucsb-izc.png</resourceLogoUrl>
+                    <onlineUrl>https://www.ccber.ucsb.edu/collections/zoological/arthropods</onlineUrl>
+                    <intellectualRights>http://creativecommons.org/publicdomain/zero/1.0/</intellectualRights>
+                    <additionalInfo>The Regents of the University of California</additionalInfo>
+                    <associatedParty>
+                        <individualName>
+                            <surName>Seltmann</surName>
+                            <givenName>Katja</givenName>
+                        </individualName>
+                        <electronicMailAddress>seltmann@ucsb.edu</electronicMailAddress>
+                        <positionName>Director</positionName>
+                        <userId>https://orcid.org/0000-0001-5354-6048</userId>
+                    </associatedParty>
+                    <abstract>
+                        <para>&lt;p&gt;University of California Santa Barbara Invertebrate Zoology Collection, Cheadle
+                            Center for Biodiversity and Ecological Restoration. Contributions to data in this collection
+                            come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm
+                            (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at &lt;a
+                            href="https://doi.org/10.5281/zenodo.5660088"&gt;https://doi.org/10.5281/zenodo.5660088&lt;/a&gt;.&lt;/p&gt;&#13;
+                            &lt;p&gt;&lt;a href="https://doi.org/10.5281/zenodo.5660088"&gt;&lt;img
+                            src="https://zenodo.org/badge/DOI/10.5281/zenodo.5660088.svg" alt="DOI" /&gt;&lt;/a&gt; &lt;a
+                            href="http://globalbioticinteractions.org/?accordingTo=globi:globalbioticinteractions/ucsb-izc"&gt;&lt;img
+                            src="http://api.globalbioticinteractions.org/interaction.svg?accordingTo=globi:globalbioticinteractions/ucsb-izc"
+                            alt="GloBI Index Status" /&gt;&lt;/a&gt; &lt;a
+                            href="https://depot.globalbioticinteractions.org/reviews/globalbioticinteractions/ucsb-izc/index.pdf"&gt;&lt;img
+                            src="https://depot.globalbioticinteractions.org/reviews/globalbioticinteractions/ucsb-izc/review.svg"
+                            alt="GloBI Review Report" /&gt;&lt;/a&gt;&lt;/p&gt;
+                        </para>
+                    </abstract>
+                </collection>
+            </symbiota>
+        </metadata>
+    </additionalMetadata>
+</eml:eml>

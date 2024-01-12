@@ -54,9 +54,9 @@ public class EML2BibTeXTest {
     }
 
     @Test
-    public void transformUCSBIZCToBibTex() throws TransformerException, URISyntaxException, IOException, XPathExpressionException, SAXException, ParserConfigurationException {
+    public void transformUCSBIZCToBibTex() throws IOException, XPathExpressionException, SAXException, ParserConfigurationException {
         InputStream is = getClass().getResourceAsStream("eml-ucsb-izc.xml");
-        BibTeXEntry entry = new BibTeXEntry(BibTeXEntry.TYPE_MISC, new Key("carvalheiro2023"));
+        BibTeXEntry entry = new BibTeXEntry(BibTeXEntry.TYPE_MISC, new Key("zip:hash://sha256/f5d8f67c1eca34cbba1abac12f353585c78bb053bc8ce7ee7e7a78846e1bfc4a!/eml.xml"));
 
         populateDatasetCitation(is, entry);
 
@@ -65,6 +65,17 @@ public class EML2BibTeXTest {
         assertThat(entry.getField(BibTeXEntry.KEY_YEAR).toUserString(), Is.is("2023"));
         assertThat(entry.getField(BibTeXEntry.KEY_PUBLISHER).toUserString(), Is.is("Ecdysis Portal"));
         assertThat(entry.getField(ABSTRACT).toUserString(), Is.is("University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088."));
+
+        BibTeXDatabase database = new BibTeXDatabase();
+        database.addObject(entry);
+        assertThat(toBibTeXString(database), Is.is("@misc{zip:hash://sha256/f5d8f67c1eca34cbba1abac12f353585c78bb053bc8ce7ee7e7a78846e1bfc4a!/eml.xml,\n" +
+                "\tauthor = Katja Seltmann,\n" +
+                "\tpublisher = Ecdysis Portal,\n" +
+                "\ttitle = University of California Santa Barbara Invertebrate Zoology Collection,\n" +
+                "\tabstract = University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088.,\n" +
+                "\tyear = 2023\n" +
+                "}"));
+
     }
 
     @Test
@@ -193,12 +204,15 @@ public class EML2BibTeXTest {
 
         assertThat(bibTeXEntry.getField(BibTeXEntry.KEY_JOURNAL).toUserString(), Is.is("Proceedings of the National Academy of Sciences"));
 
+        String bibTeX = toBibTeXString(database);
+        assertThat(bibTeX, Is.is(bibTex));
+    }
+
+    private static String toBibTeXString(BibTeXDatabase database) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         BibTeXFormatter bibTeXFormatter = new BibTeXFormatter();
         bibTeXFormatter.format(database, new OutputStreamWriter(os, StandardCharsets.UTF_8));
-
-        assertThat(new String(os.toByteArray(), StandardCharsets.UTF_8), Is.is(bibTex));
+        return new String(os.toByteArray(), StandardCharsets.UTF_8);
     }
-
 
 }

@@ -76,11 +76,11 @@ public class EML2BibTeXTest {
         database.addObject(entry);
 
         assertThat(toBibTeXString(database), Is.is("@misc{zip:hash://sha256/f5d8f67c1eca34cbba1abac12f353585c78bb053bc8ce7ee7e7a78846e1bfc4a!/eml.xml,\n" +
-                "\tauthor = \"Katja Seltmann\",\n" +
-                "\tpublisher = \"Ecdysis Portal\",\n" +
-                "\ttitle = \"University of California Santa Barbara Invertebrate Zoology Collection\",\n" +
-                "\turl = \"https://ecdysis.org/collections/misc/collprofiles.php?collid=38\",\n" +
-                "\tabstract = \"University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088.\",\n" +
+                "\tauthor = {Katja Seltmann},\n" +
+                "\tpublisher = {Ecdysis Portal},\n" +
+                "\ttitle = {University of California Santa Barbara Invertebrate Zoology Collection},\n" +
+                "\turl = {https://ecdysis.org/collections/misc/collprofiles.php?collid=38},\n" +
+                "\tabstract = {University of California Santa Barbara Invertebrate Zoology Collection, Cheadle Center for Biodiversity and Ecological Restoration. Contributions to data in this collection come from Elaine Tan (https://orcid.org/0000-0002-0504-4067), Rachel Behm (https://orcid.org/0000-0001-7264-3492) and Zach Brown. The data is archived at https://doi.org/10.5281/zenodo.5660088.},\n" +
                 "\tyear = 2023\n" +
                 "}"));
 
@@ -114,7 +114,7 @@ public class EML2BibTeXTest {
         if (StringUtils.startsWith(urlStringCandidate, "http")) {
             try {
                 new URI(urlStringCandidate);
-                entry.addField(BibTeXEntry.KEY_URL, new StringValue(StringUtils.trim(urlStringCandidate), StringValue.Style.QUOTED));
+                entry.addField(BibTeXEntry.KEY_URL, new StringValue(StringUtils.trim(urlStringCandidate), StringValue.Style.BRACED));
             } catch (URISyntaxException e) {
                //
             }
@@ -128,7 +128,7 @@ public class EML2BibTeXTest {
         NodeList associated = (NodeList) XmlUtil.applyXPath(dataset, "associatedParty", XPathConstants.NODESET);
         appendAuthors(associated, authorStrings);
 
-        entry.addField(BibTeXEntry.KEY_AUTHOR, new StringValue(StringUtils.join(authorStrings, " and "), StringValue.Style.QUOTED));
+        entry.addField(BibTeXEntry.KEY_AUTHOR, new StringValue(StringUtils.join(authorStrings, " and "), StringValue.Style.BRACED));
     }
 
     private void addPublisher(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
@@ -142,18 +142,18 @@ public class EML2BibTeXTest {
 
         }
 
-        entry.addField(BibTeXEntry.KEY_PUBLISHER, new StringValue(StringUtils.join(orgStrings, " and "), StringValue.Style.QUOTED));
+        entry.addField(BibTeXEntry.KEY_PUBLISHER, new StringValue(StringUtils.join(orgStrings, " and "), StringValue.Style.BRACED));
     }
 
     private void addTitle(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
         String title = (String) XmlUtil.applyXPath(dataset, "title", XPathConstants.STRING);
-        entry.addField(BibTeXEntry.KEY_TITLE, new StringValue(StringUtils.trim(title), StringValue.Style.QUOTED));
+        entry.addField(BibTeXEntry.KEY_TITLE, new StringValue(StringUtils.trim(title), StringValue.Style.BRACED));
     }
 
     private void addAbstract(BibTeXEntry entry, Node dataset) throws XPathExpressionException {
         String title = (String) XmlUtil.applyXPath(dataset, "abstract//*", XPathConstants.STRING);
         String abstractString = StringUtils.replace(StringUtils.trim(title), "\n", " ");
-        entry.addField(ABSTRACT, new StringValue(RegExUtils.replaceAll(abstractString, "[ ]+", " "), StringValue.Style.QUOTED));
+        entry.addField(ABSTRACT, new StringValue(RegExUtils.replaceAll(abstractString, "[ ]+", " "), StringValue.Style.BRACED));
     }
 
     private void addPubDate(BibTeXEntry entry, Node dataset) throws XPathExpressionException {

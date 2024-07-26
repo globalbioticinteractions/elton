@@ -14,6 +14,7 @@ import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import org.globalbioticinteractions.cache.Cache;
+import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
 import org.globalbioticinteractions.dataset.Dataset;
@@ -61,19 +62,24 @@ public class CmdUtil {
             String namespace,
             String cacheDir,
             InputStreamFactory factory) {
-        return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, cacheDir), dataset -> {
-            ResourceService remote = new ResourceServiceLocalAndRemote(factory);
-            ResourceService local = new ResourceServiceLocal(factory);
-            Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, remote, new StatementListener() {
+        CacheFactory cacheFactory = createCacheFactory(namespace, cacheDir, factory);
+        return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, cacheDir), cacheFactory);
+    }
 
-                @Override
-                public void on(Quad quad) {
-                    // ignore printing quads for now
-                }
-            });
-            CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, local);
-            return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
-        });
+    public static CacheFactory createCacheFactory(String namespace, String cacheDir, InputStreamFactory factory) {
+        return dataset -> {
+                ResourceService remote = new ResourceServiceLocalAndRemote(factory);
+                ResourceService local = new ResourceServiceLocal(factory);
+                Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, remote, new StatementListener() {
+
+                    @Override
+                    public void on(Quad quad) {
+                        // ignore printing quads for now
+                    }
+                });
+                CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, local);
+                return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
+            };
     }
 
     public static List<String> datasetInfo(Dataset dataset) {

@@ -80,12 +80,15 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
 
         DereferencerContentAddressed derefCas = new DereferencerContentAddressed(deref, blobStore);
 
+        try {
+            IRI dereferenced = derefCas.get(RefNodeFactory.toIRI(resourceURI));
 
-        IRI dereferenced = derefCas.get(RefNodeFactory.toIRI(resourceURI));
-
-        streamProvenance(resourceURI, dereferenced, listener);
-        recordProvenance(resourceURI, keyToPath, dereferenced);
-        return blobStore.get(dereferenced);
+            streamProvenance(resourceURI, dereferenced, listener);
+            recordProvenance(resourceURI, keyToPath, dereferenced);
+            return blobStore.get(dereferenced);
+        } catch (IOException ex) {
+            throw new IOException("failed to retrieve [" + resourceURI + "]", ex);
+        }
     }
 
     private void streamProvenance(URI resourceURI, IRI dereferenced, StatementListener statementListener) {

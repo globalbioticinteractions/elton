@@ -83,7 +83,7 @@ import static org.eol.globi.service.TaxonUtil.TARGET_TAXON_RANK;
 )
 public class CmdInteractions extends CmdTabularWriterParams {
 
-    public class TsvWriter implements InteractionWriter, TabularWriter {
+    public static class TsvWriter implements InteractionWriter, TabularWriter {
         private final PrintStream out;
 
         TsvWriter(PrintStream out) {
@@ -92,6 +92,12 @@ public class CmdInteractions extends CmdTabularWriterParams {
 
         @Override
         public void write(SpecimenImpl source, InteractType type, SpecimenImpl target, Study study, Dataset dataset) {
+            Stream<String> valueStream = getValues(source, type, target, study, dataset);
+            String row = StreamUtil.tsvRowOf(valueStream);
+            out.println(row);
+        }
+
+        private static Stream<String> getValues(SpecimenImpl source, InteractType type, SpecimenImpl target, Study study, Dataset dataset) {
             Stream<String> interactStream = Stream.of(type.getIRI(), type.getLabel());
 
             String sourceOccurrenceId = valueOrEmpty(source, OCCURRENCE_ID);
@@ -106,7 +112,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
             String targetCollectionId = valueOrEmpty(target, COLLECTION_ID);
             String targetInstitutionCode = valueOrEmpty(target, INSTITUTION_CODE);
 
-            Stream<String> rowStream = Stream.of(
+            return Stream.of(
                     Stream.of(source.isSupportingClaim() ? PropertyAndValueDictionary.SUPPORTS : PropertyAndValueDictionary.REFUTES),
                     Stream.of(sourceOccurrenceId, sourceCatalogNumber, sourceCollectionCode, sourceCollectionId, sourceInstitutionCode),
                     StreamUtil.streamOf(source.taxon),
@@ -120,67 +126,70 @@ public class CmdInteractions extends CmdTabularWriterParams {
                     StreamUtil.streamOf(target.getSampleLocation()),
                     StreamUtil.streamOf(study),
                     CmdUtil.datasetInfo(dataset).stream()).flatMap(x -> x);
-            String row = StreamUtil.tsvRowOf(rowStream);
-            out.println(row);
         }
 
-        private String valueOrEmpty(SpecimenImpl source, String key) {
+        private static String valueOrEmpty(SpecimenImpl source, String key) {
             String value = source.getProperty(key);
             return StringUtils.isBlank(value) ? "" : value;
         }
 
         @Override
         public void writeHeader() {
-            out.println(StreamUtil.tsvRowOf(Stream.concat(Stream.of(
-                    ARGUMENT_TYPE_ID,
-                    SOURCE_OCCURRENCE_ID,
-                    SOURCE_CATALOG_NUMBER,
-                    SOURCE_COLLECTION_CODE,
-                    SOURCE_COLLECTION_ID,
-                    SOURCE_INSTITUTION_CODE,
-                    SOURCE_TAXON_ID,
-                    SOURCE_TAXON_NAME,
-                    SOURCE_TAXON_RANK,
-                    SOURCE_TAXON_PATH_IDS,
-                    SOURCE_TAXON_PATH,
-                    SOURCE_TAXON_PATH_NAMES,
-                    SOURCE_BODY_PART_ID,
-                    SOURCE_BODY_PART_NAME,
-                    SOURCE_LIFE_STAGE_ID,
-                    SOURCE_LIFE_STAGE_NAME,
-                    SOURCE_SEX_ID,
-                    SOURCE_SEX_NAME,
-                    INTERACTION_TYPE_ID,
-                    INTERACTION_TYPE_NAME,
-                    TARGET_OCCURRENCE_ID,
-                    TARGET_CATALOG_NUMBER,
-                    TARGET_COLLECTION_CODE,
-                    TARGET_COLLECTION_ID,
-                    TARGET_INSTITUTION_CODE,
-                    TARGET_TAXON_ID,
-                    TARGET_TAXON_NAME,
-                    TARGET_TAXON_RANK,
-                    TARGET_TAXON_PATH_IDS,
-                    TARGET_TAXON_PATH,
-                    TARGET_TAXON_PATH_NAMES,
-                    TARGET_BODY_PART_ID,
-                    TARGET_BODY_PART_NAME,
-                    TARGET_LIFE_STAGE_ID,
-                    TARGET_LIFE_STAGE_NAME,
-                    TARGET_SEX_ID,
-                    TARGET_SEX_NAME,
-                    BASIS_OF_RECORD_ID,
-                    BASIS_OF_RECORD_NAME,
-                    EVENT_DATE,
-                    DECIMAL_LATITUDE,
-                    DECIMAL_LONGITUDE,
-                    LOCALITY_ID,
-                    LOCALITY_NAME,
-                    REFERENCE_DOI,
-                    REFERENCE_URL,
-                    REFERENCE_CITATION
+            Stream<String> keys = getKeys();
+            out.println(StreamUtil.tsvRowOf(keys));
+        }
 
-            ), StreamUtil.datasetHeaderFields())));
+        private static Stream<String> getKeys() {
+            return Stream.concat(Stream.of(
+                            ARGUMENT_TYPE_ID,
+                            SOURCE_OCCURRENCE_ID,
+                            SOURCE_CATALOG_NUMBER,
+                            SOURCE_COLLECTION_CODE,
+                            SOURCE_COLLECTION_ID,
+                            SOURCE_INSTITUTION_CODE,
+                            SOURCE_TAXON_ID,
+                            SOURCE_TAXON_NAME,
+                            SOURCE_TAXON_RANK,
+                            SOURCE_TAXON_PATH_IDS,
+                            SOURCE_TAXON_PATH,
+                            SOURCE_TAXON_PATH_NAMES,
+                            SOURCE_BODY_PART_ID,
+                            SOURCE_BODY_PART_NAME,
+                            SOURCE_LIFE_STAGE_ID,
+                            SOURCE_LIFE_STAGE_NAME,
+                            SOURCE_SEX_ID,
+                            SOURCE_SEX_NAME,
+                            INTERACTION_TYPE_ID,
+                            INTERACTION_TYPE_NAME,
+                            TARGET_OCCURRENCE_ID,
+                            TARGET_CATALOG_NUMBER,
+                            TARGET_COLLECTION_CODE,
+                            TARGET_COLLECTION_ID,
+                            TARGET_INSTITUTION_CODE,
+                            TARGET_TAXON_ID,
+                            TARGET_TAXON_NAME,
+                            TARGET_TAXON_RANK,
+                            TARGET_TAXON_PATH_IDS,
+                            TARGET_TAXON_PATH,
+                            TARGET_TAXON_PATH_NAMES,
+                            TARGET_BODY_PART_ID,
+                            TARGET_BODY_PART_NAME,
+                            TARGET_LIFE_STAGE_ID,
+                            TARGET_LIFE_STAGE_NAME,
+                            TARGET_SEX_ID,
+                            TARGET_SEX_NAME,
+                            BASIS_OF_RECORD_ID,
+                            BASIS_OF_RECORD_NAME,
+                            EVENT_DATE,
+                            DECIMAL_LATITUDE,
+                            DECIMAL_LONGITUDE,
+                            LOCALITY_ID,
+                            LOCALITY_NAME,
+                            REFERENCE_DOI,
+                            REFERENCE_URL,
+                            REFERENCE_CITATION
+
+                    ), StreamUtil.datasetHeaderFields());
         }
     }
 

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.util.CSVTSVUtil;
 import org.eol.globi.util.InputStreamFactory;
@@ -80,7 +81,8 @@ public class CmdInit extends CmdDefaultParams {
 
     static List<String> firstTwoLines(String urlString, InputStreamFactory inputStreamFactory) throws IOException {
         try (InputStream inputStream = new ResourceServiceLocalAndRemote(inputStreamFactory).retrieve(URI.create(urlString))) {
-            BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(inputStream));
+            BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(new BOMInputStream(inputStream)));
+
 
             String candidateHeader = inputStreamReader.readLine();
             String candidateValues = inputStreamReader.readLine();

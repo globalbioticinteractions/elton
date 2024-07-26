@@ -120,6 +120,14 @@ public class CmdInitTest {
     }
 
     @Test
+    public void inferColumnNamesCSVWithBOM() throws IOException {
+        String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/dataWithBOM.csv";
+        List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is);
+        List<String> columnNames = inferColumnNamesCSV(IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8));
+        assertEquals(columnNames, Arrays.asList("Prey Highest", "Prey Higher", "Prey Phylum", "Prey Class", "Prey Order", "Prey Family", "Prey Genus", "Prey Species", "Prey Species Current", "Prey Species ID #", "Prey Count", "Snake Species", "Snake Subspecies", "FullSpName", "Snake Species ID #", "Snake Age Class", "Snake SVL(mm)", "Snake Sex", "Location", "Latitude", "Longitude", "Citation", "Full Citation", "Reference DOI"));
+    }
+
+    @Test
     public void inferColumnNamesTSV() throws IOException {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.tsv";
         List<String> columnNames = CmdInit.inferColumnNamesTSV(CmdInit.firstTwoLines(urlString, is -> is));

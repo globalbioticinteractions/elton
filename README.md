@@ -1,6 +1,6 @@
 # elton
 
-[![Build Status](https://app.travis-ci.com/globalbioticinteractions/elton.svg)](https://app.travis-ci.com/globalbioticinteractions/elton) [![Java CI](https://github.com/globalbioticinteractions/elton/actions/workflows/main.yml/badge.svg)](https://github.com/globalbioticinteractions/elton/actions/workflows/main.yml) [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![Java CI](https://github.com/globalbioticinteractions/elton/actions/workflows/main.yml/badge.svg)](https://github.com/globalbioticinteractions/elton/actions/workflows/main.yml) [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![DOI](https://zenodo.org/badge/103732996.svg)](https://zenodo.org/badge/latestdoi/103732996)
 
 Elton helps to access, review and index existing species interaction datasets.
@@ -32,7 +32,7 @@ Elton needs Java 8+ to run.[Why OpenJDK 8?](https://adoptopenjdk.net/support.htm
 On linux/mac, you can run the following to install a copy of elton:
 
 ```bash
-sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.13.4/elton.jar) > /usr/local/bin/elton && chmod +x /usr/local/bin/elton' && elton version
+sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.13.6/elton.jar) > /usr/local/bin/elton && chmod +x /usr/local/bin/elton' && elton version
 ```
 Configuration to help Global Biotic Interactions (GloBI, https://globalbioticinteractions.org) index: 
 
@@ -43,7 +43,7 @@ You can also install Elton by manually downloading `elton.jar` from one of the [
 To install elton as a debian package use:
 
 ```bash
-curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.13.4/elton.deb\
+curl -L https://github.com/globalbioticinteractions/elton/releases/download/0.13.6/elton.deb\
  > elton.deb 
 sudo apt install ./elton.deb
 ```

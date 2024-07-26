@@ -45,7 +45,7 @@ class StreamingNamespaceConfigHandler implements NamespaceHandler {
 
     @Override
     public void onNamespace(String namespace) throws Exception {
-        stderr.println("tracking [" + namespace + "]...");
+        stderr.print("tracking [" + namespace + "]...");
         CacheFactory cacheFactory = CmdUtil.createCacheFactory(
                 namespace,
                 cacheDir,

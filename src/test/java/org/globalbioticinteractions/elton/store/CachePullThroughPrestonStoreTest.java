@@ -85,7 +85,7 @@ public class CachePullThroughPrestonStoreTest {
     }
 
 
-    @Test(expected = FileNotFoundException.class)
+    @Test(expected = IOException.class)
     public void testMissingFromPrestonStore() throws IOException, URISyntaxException {
 
         Cache cache = new CachePullThroughPrestonStore(

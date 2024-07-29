@@ -52,7 +52,6 @@ import java.util.Map;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -130,18 +129,8 @@ public class CmdReview extends CmdTabularWriterParams {
     }
 
     private void review(String namespace, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
-        final AtomicLong noteCounter = new AtomicLong(0);
-        final AtomicLong infoCounter = new AtomicLong(0);
-        final AtomicLong interactionCounter = new AtomicLong(0);
-        AtomicLong lineCount = new AtomicLong(0);
-
-        String reviewId = CmdReview.this.reviewId;
-        String reviewerName = CmdReview.this.getReviewerName();
-        DateFactory dateFactory = CmdReview.this.dateFactory;
-
-        ReviewReport report = new ReviewReport(infoCounter, noteCounter, namespace, desiredReviewCommentTypes, lineCount,
-                reviewId, dateFactory, reviewerName, interactionCounter);
-        ReviewReportLogger reviewReportLogger = new ReviewReportLogger(report);
+        ReviewReport report = createReport(namespace, CmdReview.this.reviewId, CmdReview.this.getReviewerName(), CmdReview.this.dateFactory);
+        ReviewReportLogger reviewReportLogger = new ReviewReportLogger(report, CmdReview.this.getStdout());
 
         try {
             Dataset dataset = new DatasetFactory(
@@ -154,7 +143,7 @@ public class CmdReview extends CmdTabularWriterParams {
                     && StringUtils.endsWith(citationString, ">")) {
                 reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
-            NodeFactoryReview nodeFactory = new NodeFactoryReview(interactionCounter, reviewReportLogger);
+            NodeFactoryReview nodeFactory = new NodeFactoryReview(report.getInteractionCounter(), reviewReportLogger);
             nodeFactory.getOrCreateDataset(dataset);
             getStderr().print("creating review [" + namespace + "]... ");
             if (!shouldSkipHeader()) {
@@ -172,7 +161,7 @@ public class CmdReview extends CmdTabularWriterParams {
                     studyImporter.getGeoNamesService()
             );
 
-            if (interactionCounter.get() == 0) {
+            if (report.interactionCounter.get() == 0) {
                 reviewReportLogger.warn(null, "no interactions found");
             }
             getStderr().println("done.");
@@ -188,13 +177,23 @@ public class CmdReview extends CmdTabularWriterParams {
             reviewReportLogger.severe(null, new String(out.toByteArray()));
             throw new StudyImporterException(e);
         } finally {
-            log(null, interactionCounter.get() + " interaction(s)", ReviewCommentType.summary, reviewReportLogger.report, reviewReportLogger.stdout);
-            log(null, noteCounter.get() + " note(s)", ReviewCommentType.summary, reviewReportLogger.report, reviewReportLogger.stdout);
-            log(null, infoCounter.get() + " info(s)", ReviewCommentType.summary, reviewReportLogger.report, reviewReportLogger.stdout);
+            log(null, report.getInteractionCounter().get() + " interaction(s)", ReviewCommentType.summary, report, reviewReportLogger.stdout);
+            log(null, report.getNoteCounter().get() + " note(s)", ReviewCommentType.summary, report, reviewReportLogger.stdout);
+            log(null, report.getInfoCounter().get() + " info(s)", ReviewCommentType.summary, report, reviewReportLogger.stdout);
         }
-        if (interactionCounter.get() == 0) {
+        if (report.interactionCounter.get() == 0) {
             throw new StudyImporterException("No interactions found, nothing to review. Please check logs.");
         }
+    }
+
+    private ReviewReport createReport(String namespace, String reviewId1, String reviewerName1, DateFactory dateFactory1) {
+        final AtomicLong noteCounter = new AtomicLong(0);
+        final AtomicLong infoCounter = new AtomicLong(0);
+        final AtomicLong interactionCounter = new AtomicLong(0);
+        AtomicLong lineCount = new AtomicLong(0);
+
+        return new ReviewReport(infoCounter, noteCounter, namespace, desiredReviewCommentTypes, lineCount,
+                reviewId1, dateFactory1, reviewerName1, interactionCounter);
     }
 
     private void logHeader(PrintStream out) {
@@ -232,11 +231,11 @@ public class CmdReview extends CmdTabularWriterParams {
 
 
     public static void log(LogContext ctx, String msg, ReviewCommentType commentType, ReviewReport report, PrintStream stdout) {
-        if (report.desiredReviewCommentTypes.contains(commentType)) {
+        if (report.getDesiredReviewCommentTypes().contains(commentType)) {
             if (ctx == null) {
-                CmdReview.log(msg, report.namespace, stdout, commentType.getLabel(), report.reviewId, report.dateFactory, report.reviewerName);
+                CmdReview.log(msg, report.getNamespace(), stdout, commentType.getLabel(), report.getReviewId(), report.getDateFactory(), report.getReviewerName());
             } else {
-                logWithContext(ctx, msg, commentType, report.reviewId, report.dateFactory, report.namespace, report.reviewerName, stdout);
+                logWithContext(ctx, msg, commentType, report.getReviewId(), report.getDateFactory(), report.getNamespace(), report.getReviewerName(), stdout);
             }
         }
     }
@@ -371,9 +370,46 @@ public class CmdReview extends CmdTabularWriterParams {
         return dataContextSorted;
     }
 
-    private class ReviewReport {
+    public class ReviewReport {
         private final AtomicLong infoCounter;
         private final AtomicLong noteCounter;
+
+        public AtomicLong getInfoCounter() {
+            return infoCounter;
+        }
+
+        public AtomicLong getNoteCounter() {
+            return noteCounter;
+        }
+
+        public AtomicLong getInteractionCounter() {
+            return interactionCounter;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public List<ReviewCommentType> getDesiredReviewCommentTypes() {
+            return desiredReviewCommentTypes;
+        }
+
+        public AtomicLong getLineCount() {
+            return lineCount;
+        }
+
+        public String getReviewId() {
+            return reviewId;
+        }
+
+        public DateFactory getDateFactory() {
+            return dateFactory;
+        }
+
+        public String getReviewerName() {
+            return reviewerName;
+        }
+
         private final AtomicLong interactionCounter;
         private final String namespace;
         private final List<ReviewCommentType> desiredReviewCommentTypes;
@@ -399,38 +435,38 @@ public class CmdReview extends CmdTabularWriterParams {
         private final ReviewReport report;
         private final PrintStream stdout;
 
-        public ReviewReportLogger(ReviewReport report) {
+        public ReviewReportLogger(ReviewReport report, PrintStream stdout) {
             this.report = report;
-            this.stdout = CmdReview.this.getStdout();
+            this.stdout = stdout;
         }
 
 
         @Override
         public void info(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.info);
-            report.infoCounter.incrementAndGet();
+            logWithCounter(ctx, message, ReviewCommentType.info, this.report, stdout);
+            report.getInfoCounter().incrementAndGet();
         }
 
         @Override
         public void warn(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.note);
-            report.noteCounter.incrementAndGet();
+            logWithCounter(ctx, message, ReviewCommentType.note, this.report, stdout);
+            report.getNoteCounter().incrementAndGet();
         }
 
         @Override
         public void severe(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.note);
-            report.noteCounter.incrementAndGet();
+            logWithCounter(ctx, message, ReviewCommentType.note, this.report, stdout);
+            report.getNoteCounter().incrementAndGet();
         }
 
-        private void logWithCounter(LogContext ctx, String message, ReviewCommentType commentType) {
+        private void logWithCounter(LogContext ctx, String message, ReviewCommentType commentType, ReviewReport report, PrintStream stdout) {
             Integer maxLines = getMaxLines();
 
-            if (maxLines == null || report.lineCount.get() < maxLines) {
-                log(ctx, message, commentType, this.report, stdout);
+            if (maxLines == null || this.report.lineCount.get() < maxLines) {
+                log(ctx, message, commentType, report, stdout);
             }
 
-            long l = report.lineCount.incrementAndGet();
+            long l = this.report.getLineCount().incrementAndGet();
             if (l % ProgressUtil.LOG_ACTIVITY_PROGRESS_BATCH_SIZE == 0) {
                 getProgressCursorFactory().createProgressCursor().increment();
             }

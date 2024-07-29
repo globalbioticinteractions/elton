@@ -28,15 +28,15 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     private final JsonNode config;
     private NodeFactorFactory nodeFactorFactory;
 
-    public StreamingDatasetsHandler(JsonNode jsonNode,
-                                    InputStreamFactory inputStreamFactory,
+    public StreamingDatasetsHandler(JsonNode config,
                                     String cacheDir,
                                     PrintStream stderr,
+                                    InputStreamFactory inputStreamFactory,
                                     NodeFactorFactory nodeFactorFactory) {
         this.factory = inputStreamFactory;
         this.cacheDir = cacheDir;
         this.stderr = stderr;
-        this.config = jsonNode;
+        this.config = config;
         this.nodeFactorFactory = nodeFactorFactory;
 
     }
@@ -59,10 +59,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
         Cache cache = cacheFactory.cacheFor(dataset);
         DatasetWithCache datasetWithCache = new DatasetWithCache(dataset, cache);
 
-        NodeFactorFactory nodeFactorFactory = this.nodeFactorFactory;
-
-
-        NodeFactory nodeFactory = nodeFactorFactory.createNodeFactory();
+        NodeFactory nodeFactory = this.nodeFactorFactory.createNodeFactory();
         nodeFactory.getOrCreateDataset(dataset);
         try {
             DatasetImportUtil.importDataset(
@@ -80,6 +77,4 @@ class StreamingDatasetsHandler implements NamespaceHandler {
         IOUtils.write("wrote [" + namespace + "]\n", stderr, StandardCharsets.UTF_8);
     }
 
-    public void setShouldWriteHeader(boolean shouldWriteHeader) {
-    }
 }

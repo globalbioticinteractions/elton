@@ -34,7 +34,6 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
-import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 import picocli.CommandLine;
@@ -131,7 +130,7 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private void review(String namespace, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         ReviewReport report = createReport(namespace, CmdReview.this.reviewId, CmdReview.this.getReviewerName(), CmdReview.this.dateFactory);
-        ReviewReportLogger reviewReportLogger = new ReviewReportLogger(report, CmdReview.this.getStdout(), getMaxLines(), getProgressCursorFactory());
+        ReviewReportLogger reviewReportLogger = new ReviewReportLogger(report, getStdout(), getMaxLines(), getProgressCursorFactory());
 
         try {
             Dataset dataset = new DatasetFactory(
@@ -166,7 +165,7 @@ public class CmdReview extends CmdTabularWriterParams {
                 reviewReportLogger.warn(null, "no interactions found");
             }
             getStderr().println("done.");
-            log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary, reviewReportLogger.report, reviewReportLogger.stdout);
+            log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary, report, getStdout());
         } catch (DatasetRegistryException e) {
             reviewReportLogger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
             getStderr().println("failed.");
@@ -178,9 +177,9 @@ public class CmdReview extends CmdTabularWriterParams {
             reviewReportLogger.severe(null, new String(out.toByteArray()));
             throw new StudyImporterException(e);
         } finally {
-            log(null, report.getInteractionCounter().get() + " interaction(s)", ReviewCommentType.summary, report, reviewReportLogger.stdout);
-            log(null, report.getNoteCounter().get() + " note(s)", ReviewCommentType.summary, report, reviewReportLogger.stdout);
-            log(null, report.getInfoCounter().get() + " info(s)", ReviewCommentType.summary, report, reviewReportLogger.stdout);
+            log(null, report.getInteractionCounter().get() + " interaction(s)", ReviewCommentType.summary, report, getStdout());
+            log(null, report.getNoteCounter().get() + " note(s)", ReviewCommentType.summary, report, getStdout());
+            log(null, report.getInfoCounter().get() + " info(s)", ReviewCommentType.summary, report, getStdout());
         }
         if (report.getInteractionCounter().get() == 0) {
             throw new StudyImporterException("No interactions found, nothing to review. Please check logs.");
@@ -371,51 +370,4 @@ public class CmdReview extends CmdTabularWriterParams {
         return dataContextSorted;
     }
 
-    private class ReviewReportLogger implements ImportLogger {
-        private final ReviewReport report;
-        private final PrintStream stdout;
-        private final Long maxLines;
-        private final ProgressCursorFactory factory;
-
-        public ReviewReportLogger(ReviewReport report, PrintStream stdout, Long maxLines, ProgressCursorFactory factory) {
-            this.report = report;
-            this.stdout = stdout;
-            this.maxLines = maxLines;
-            this.factory = factory;
-        }
-
-
-        @Override
-        public void info(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.info);
-            report.getInfoCounter().incrementAndGet();
-        }
-
-        @Override
-        public void warn(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.note);
-            report.getNoteCounter().incrementAndGet();
-        }
-
-        @Override
-        public void severe(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.note);
-            report.getNoteCounter().incrementAndGet();
-        }
-
-        private void logWithCounter(LogContext ctx, String message, ReviewCommentType commentType) {
-            if (maxLines == null || report.getLineCount().get() < maxLines) {
-                log(ctx, message, commentType, report, stdout);
-            }
-
-            long l = report.getLineCount().incrementAndGet();
-            if (l % ProgressUtil.LOG_ACTIVITY_PROGRESS_BATCH_SIZE == 0) {
-                factory.createProgressCursor().increment();
-            }
-        }
-
-
-
-
-    }
 }

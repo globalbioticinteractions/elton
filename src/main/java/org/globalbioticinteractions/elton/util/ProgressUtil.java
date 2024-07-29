@@ -10,7 +10,7 @@ public class ProgressUtil {
     public static final int BYTE_TRANSFER_PROGRESS_BATCH_SIZE = 1024 * 128;
     public static final int SPECIMEN_CREATED_PROGRESS_BATCH_SIZE = 100;
 
-    public static void logProgress(int reportBatchSize, int count, ProgressCursor cursor) {
+    public static void logProgress(int reportBatchSize, long count, ProgressCursor cursor) {
         if (count % reportBatchSize == 0) {
             cursor.increment();
         }

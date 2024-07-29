@@ -132,9 +132,16 @@ public class CmdReview extends CmdTabularWriterParams {
     private void review(String namespace, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         final AtomicLong noteCounter = new AtomicLong(0);
         final AtomicLong infoCounter = new AtomicLong(0);
-        AtomicInteger interactionCounter = new AtomicInteger(0);
+        final AtomicLong interactionCounter = new AtomicLong(0);
+        AtomicLong lineCount = new AtomicLong(0);
 
-        ReviewReportLogger reviewReportLogger = createReviewReportLogger(namespace, noteCounter, infoCounter);
+        String reviewId = CmdReview.this.reviewId;
+        String reviewerName = CmdReview.this.getReviewerName();
+        DateFactory dateFactory = CmdReview.this.dateFactory;
+
+        ReviewReport report = new ReviewReport(infoCounter, noteCounter, namespace, desiredReviewCommentTypes, lineCount,
+                reviewId, dateFactory, reviewerName, interactionCounter);
+        ReviewReportLogger reviewReportLogger = new ReviewReportLogger(report);
 
         try {
             Dataset dataset = new DatasetFactory(
@@ -147,7 +154,7 @@ public class CmdReview extends CmdTabularWriterParams {
                     && StringUtils.endsWith(citationString, ">")) {
                 reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
-            NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, reviewReportLogger);
+            NodeFactoryReview nodeFactory = new NodeFactoryReview(interactionCounter, reviewReportLogger);
             nodeFactory.getOrCreateDataset(dataset);
             getStderr().print("creating review [" + namespace + "]... ");
             if (!shouldSkipHeader()) {
@@ -169,7 +176,7 @@ public class CmdReview extends CmdTabularWriterParams {
                 reviewReportLogger.warn(null, "no interactions found");
             }
             getStderr().println("done.");
-            reviewReportLogger.log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary);
+            log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary, reviewReportLogger.report, reviewReportLogger.stdout);
         } catch (DatasetRegistryException e) {
             reviewReportLogger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
             getStderr().println("failed.");
@@ -181,9 +188,9 @@ public class CmdReview extends CmdTabularWriterParams {
             reviewReportLogger.severe(null, new String(out.toByteArray()));
             throw new StudyImporterException(e);
         } finally {
-            reviewReportLogger.log(null, interactionCounter.get() + " interaction(s)", ReviewCommentType.summary);
-            reviewReportLogger.log(null, noteCounter.get() + " note(s)", ReviewCommentType.summary);
-            reviewReportLogger.log(null, infoCounter.get() + " info(s)", ReviewCommentType.summary);
+            log(null, interactionCounter.get() + " interaction(s)", ReviewCommentType.summary, reviewReportLogger.report, reviewReportLogger.stdout);
+            log(null, noteCounter.get() + " note(s)", ReviewCommentType.summary, reviewReportLogger.report, reviewReportLogger.stdout);
+            log(null, infoCounter.get() + " info(s)", ReviewCommentType.summary, reviewReportLogger.report, reviewReportLogger.stdout);
         }
         if (interactionCounter.get() == 0) {
             throw new StudyImporterException("No interactions found, nothing to review. Please check logs.");
@@ -194,9 +201,46 @@ public class CmdReview extends CmdTabularWriterParams {
         logReviewComment(out, "reviewId", "reviewDate", "reviewer", "namespace", "reviewCommentType", "reviewComment", "archiveURI", "referenceUrl", "institutionCode", "collectionCode", "collectionId", "catalogNumber", "occurrenceId", "sourceCitation", "dataContext");
     }
 
-    private ReviewReportLogger createReviewReportLogger(final String repoName, AtomicLong noteCounter, AtomicLong infoCounter) {
-        return new ReviewReportLogger(infoCounter, noteCounter, repoName, desiredReviewCommentTypes);
+    private static void logWithContext(LogContext ctx, String msg, ReviewCommentType commentType, String reviewId, DateFactory dateFactory, String namespace, String reviewerName, PrintStream stdout) {
+        try {
+            String contextString = ctx.toString();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode dataContext = parseAndSortContext(contextString);
+            ObjectNode review = mapper.createObjectNode();
+            review.put("reviewId", reviewId);
+            review.put("reviewDate", DateUtil.printDate(dateFactory.getDate()));
+            review.put("reviewerName", reviewerName);
+            review.put("reviewCommentType", commentType.getLabel());
+            review.put("reviewComment", msg);
+            review.put("namespace", namespace);
+            review.set("context", dataContext);
+
+            String reviewJsonString = mapper.writeValueAsString(review);
+            String archiveURI = getFindTermValueOrEmptyString(dataContext, DatasetConstant.ARCHIVE_URI);
+            String catalogNumber = getFindTermValueOrEmptyString(dataContext, SOURCE_CATALOG_NUMBER);
+            String collectionCode = getFindTermValueOrEmptyString(dataContext, SOURCE_COLLECTION_CODE);
+            String collectionId = getFindTermValueOrEmptyString(dataContext, SOURCE_COLLECTION_ID);
+            String institutionCode = getFindTermValueOrEmptyString(dataContext, SOURCE_INSTITUTION_CODE);
+            String occurrenceId = getFindTermValueOrEmptyString(dataContext, SOURCE_OCCURRENCE_ID);
+            String referenceUrl = getFindTermValueOrEmptyString(dataContext, "referenceUrl");
+            String sourceCitation = getFindTermValueOrEmptyString(dataContext, DatasetImporterForTSV.STUDY_SOURCE_CITATION);
+            logReviewCommentWithReviewerInfo(stdout, reviewId, dateFactory, reviewerName, namespace, commentType.getLabel(), msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
+        } catch (IOException e) {
+            CmdReview.log(e.getMessage(), namespace, stdout, ReviewCommentType.note.getLabel(), reviewId, dateFactory, reviewerName);
+        }
     }
+
+
+    public static void log(LogContext ctx, String msg, ReviewCommentType commentType, ReviewReport report, PrintStream stdout) {
+        if (report.desiredReviewCommentTypes.contains(commentType)) {
+            if (ctx == null) {
+                CmdReview.log(msg, report.namespace, stdout, commentType.getLabel(), report.reviewId, report.dateFactory, report.reviewerName);
+            } else {
+                logWithContext(ctx, msg, commentType, report.reviewId, report.dateFactory, report.namespace, report.reviewerName, stdout);
+            }
+        }
+    }
+
 
     private static void log(String msg, String namespace, PrintStream stdout, String label, String reviewId, DateFactory dateFactory, String reviewerName) {
         logReviewCommentWithReviewerInfo(
@@ -249,11 +293,11 @@ public class CmdReview extends CmdTabularWriterParams {
         desiredReviewCommentTypes = commentTypes;
     }
 
-    private class NodeFactoryLogging extends NodeFactoryNull {
-        final AtomicInteger counter;
+    private class NodeFactoryReview extends NodeFactoryNull {
+        final AtomicLong counter;
         final ImportLogger importLogger;
 
-        public NodeFactoryLogging(AtomicInteger counter, ImportLogger importLogger) {
+        public NodeFactoryReview(AtomicLong counter, ImportLogger importLogger) {
             this.counter = counter;
             this.importLogger = importLogger;
         }
@@ -261,7 +305,7 @@ public class CmdReview extends CmdTabularWriterParams {
         final Specimen specimen = new SpecimenNull() {
             @Override
             public void interactsWith(Specimen target, InteractType type, Location centroid) {
-                int count = counter.get();
+                long count = counter.get();
                 ProgressUtil.logProgress(ProgressUtil.SPECIMEN_CREATED_PROGRESS_BATCH_SIZE, count, getProgressCursorFactory().createProgressCursor());
                 counter.getAndIncrement();
             }
@@ -327,94 +371,72 @@ public class CmdReview extends CmdTabularWriterParams {
         return dataContextSorted;
     }
 
-    private class ReviewReportLogger implements ImportLogger {
+    private class ReviewReport {
         private final AtomicLong infoCounter;
         private final AtomicLong noteCounter;
+        private final AtomicLong interactionCounter;
         private final String namespace;
         private final List<ReviewCommentType> desiredReviewCommentTypes;
-        private AtomicLong lineCount;
+        private final AtomicLong lineCount;
+        private final String reviewId;
+        private final DateFactory dateFactory;
+        private final String reviewerName;
 
-        public ReviewReportLogger(AtomicLong infoCounter,
-                                  AtomicLong noteCounter,
-                                  String namespace,
-                                  List<ReviewCommentType> desiredReviewCommentTypes) {
+        private ReviewReport(AtomicLong infoCounter, AtomicLong noteCounter, String namespace, List<ReviewCommentType> desiredReviewCommentTypes, AtomicLong lineCount, String reviewId, DateFactory dateFactory, String reviewerName, AtomicLong interactionCounter) {
             this.infoCounter = infoCounter;
             this.noteCounter = noteCounter;
+            this.interactionCounter = interactionCounter;
             this.namespace = namespace;
-            this.lineCount = new AtomicLong(0);
             this.desiredReviewCommentTypes = desiredReviewCommentTypes;
+            this.lineCount = lineCount;
+            this.dateFactory = dateFactory;
+            this.reviewId = reviewId;
+            this.reviewerName = reviewerName;
+        }
+    }
+
+    private class ReviewReportLogger implements ImportLogger {
+        private final ReviewReport report;
+        private final PrintStream stdout;
+
+        public ReviewReportLogger(ReviewReport report) {
+            this.report = report;
+            this.stdout = CmdReview.this.getStdout();
         }
 
 
         @Override
         public void info(LogContext ctx, String message) {
             logWithCounter(ctx, message, ReviewCommentType.info);
-            infoCounter.incrementAndGet();
+            report.infoCounter.incrementAndGet();
         }
 
         @Override
         public void warn(LogContext ctx, String message) {
             logWithCounter(ctx, message, ReviewCommentType.note);
-            noteCounter.incrementAndGet();
+            report.noteCounter.incrementAndGet();
         }
 
         @Override
         public void severe(LogContext ctx, String message) {
             logWithCounter(ctx, message, ReviewCommentType.note);
-            noteCounter.incrementAndGet();
+            report.noteCounter.incrementAndGet();
         }
 
         private void logWithCounter(LogContext ctx, String message, ReviewCommentType commentType) {
             Integer maxLines = getMaxLines();
 
-            if (maxLines == null || lineCount.get() < maxLines) {
-                log(ctx, message, commentType);
+            if (maxLines == null || report.lineCount.get() < maxLines) {
+                log(ctx, message, commentType, this.report, stdout);
             }
 
-            long l = lineCount.incrementAndGet();
+            long l = report.lineCount.incrementAndGet();
             if (l % ProgressUtil.LOG_ACTIVITY_PROGRESS_BATCH_SIZE == 0) {
                 getProgressCursorFactory().createProgressCursor().increment();
             }
         }
 
-        public void log(LogContext ctx, String msg, ReviewCommentType commentType) {
-            if (this.desiredReviewCommentTypes.contains(commentType)) {
-                if (ctx == null) {
-                    CmdReview.log(msg, namespace, getStdout(), commentType.getLabel(), CmdReview.this.reviewId, CmdReview.this.dateFactory, CmdReview.this.getReviewerName());
-                } else {
-                    logWithContext(ctx, msg, commentType);
-                }
-            }
-        }
 
-        private void logWithContext(LogContext ctx, String msg, ReviewCommentType commentType) {
-            try {
-                String contextString = ctx.toString();
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode dataContext = parseAndSortContext(contextString);
-                ObjectNode review = mapper.createObjectNode();
-                review.put("reviewId", reviewId);
-                review.put("reviewDate", DateUtil.printDate(dateFactory.getDate()));
-                review.put("reviewerName", getReviewerName());
-                review.put("reviewCommentType", commentType.getLabel());
-                review.put("reviewComment", msg);
-                review.put("namespace", namespace);
-                review.set("context", dataContext);
-
-                String reviewJsonString = mapper.writeValueAsString(review);
-                String archiveURI = getFindTermValueOrEmptyString(dataContext, DatasetConstant.ARCHIVE_URI);
-                String catalogNumber = getFindTermValueOrEmptyString(dataContext, SOURCE_CATALOG_NUMBER);
-                String collectionCode = getFindTermValueOrEmptyString(dataContext, SOURCE_COLLECTION_CODE);
-                String collectionId = getFindTermValueOrEmptyString(dataContext, SOURCE_COLLECTION_ID);
-                String institutionCode = getFindTermValueOrEmptyString(dataContext, SOURCE_INSTITUTION_CODE);
-                String occurrenceId = getFindTermValueOrEmptyString(dataContext, SOURCE_OCCURRENCE_ID);
-                String referenceUrl = getFindTermValueOrEmptyString(dataContext, "referenceUrl");
-                String sourceCitation = getFindTermValueOrEmptyString(dataContext, DatasetImporterForTSV.STUDY_SOURCE_CITATION);
-                logReviewCommentWithReviewerInfo(getStdout(), CmdReview.this.reviewId, CmdReview.this.dateFactory, CmdReview.this.getReviewerName(), namespace, commentType.getLabel(), msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
-            } catch (IOException e) {
-                CmdReview.log(e.getMessage(), namespace, getStdout(), ReviewCommentType.note.getLabel(), CmdReview.this.reviewId, CmdReview.this.dateFactory, CmdReview.this.getReviewerName());
-            }
-        }
 
 
     }

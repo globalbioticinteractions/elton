@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eol.globi.data.NodeFactory;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,10 @@ public class CmdStream extends CmdDefaultParams {
 
     private final static Logger LOG = LoggerFactory.getLogger(CmdStream.class);
 
+    @CommandLine.Option(names = {"--record-type"},
+            description = "record types (e.g., interaction, name, review)"
+    )
+    private String recordType = "interaction";
 
     @Override
     public void run() {
@@ -43,14 +48,14 @@ public class CmdStream extends CmdDefaultParams {
                     String namespace = jsonNode.at("/namespace").asText(DatasetRegistryUtil.NAMESPACE_LOCAL);
                     if (StringUtils.isNotBlank(namespace)) {
                         try {
-                            StreamingNamespaceConfigHandler namespaceHandler = new StreamingNamespaceConfigHandler(
+                            boolean shouldWriteHeader = isFirst.get();
+                            StreamingDatasetsHandler namespaceHandler = new StreamingDatasetsHandler(
                                     jsonNode,
                                     this.createInputStreamFactory(),
                                     this.getCacheDir(),
                                     this.getStderr(),
-                                    this.getStdout()
+                                    new NodeFactorFactoryImpl(shouldWriteHeader)
                             );
-                            namespaceHandler.setShouldWriteHeader(isFirst.get());
                             namespaceHandler.onNamespace(namespace);
                             isFirst.set(false);
                         } catch (Exception e) {
@@ -69,4 +74,20 @@ public class CmdStream extends CmdDefaultParams {
 
     }
 
+    public class NodeFactorFactoryImpl implements NodeFactorFactory {
+
+        private final boolean shouldWriteHeader;
+
+        public NodeFactorFactoryImpl(boolean shouldWriteHeader) {
+            this.shouldWriteHeader = shouldWriteHeader;
+        }
+
+        @Override
+        public NodeFactory createNodeFactory() {
+
+            return StringUtils.equals("name", recordType)
+                    ? WriterUtil.nodeFactoryForWritingInteractions(shouldWriteHeader, getStdout())
+                    : WriterUtil.nodeFactoryForTaxonWriting(shouldWriteHeader, getStdout());
+        }
+    }
 }

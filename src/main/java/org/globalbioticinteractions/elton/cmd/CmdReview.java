@@ -25,7 +25,6 @@ import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
-import org.eol.globi.util.ResourceServiceRemote;
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetConstant;
@@ -133,14 +132,9 @@ public class CmdReview extends CmdTabularWriterParams {
     private void review(String repoName, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         final AtomicLong noteCounter = new AtomicLong(0);
         final AtomicLong infoCounter = new AtomicLong(0);
-
-        ParserFactoryLocal parserFactory = new ParserFactoryLocal(getClass());
         AtomicInteger interactionCounter = new AtomicInteger(0);
-        ReviewReportLogger reviewReportLogger = createReviewReportLogger(repoName, noteCounter, infoCounter);
 
-        NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, reviewReportLogger);
-        DatasetImporterForRegistry studyImporter = new DatasetImporterForRegistry(parserFactory, nodeFactory, registry);
-        studyImporter.setLogger(reviewReportLogger);
+        ReviewReportLogger reviewReportLogger = createReviewReportLogger(repoName, noteCounter, infoCounter);
 
         try {
             Dataset dataset = new DatasetFactory(
@@ -153,12 +147,16 @@ public class CmdReview extends CmdTabularWriterParams {
                     && StringUtils.endsWith(citationString, ">")) {
                 reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
             }
+            NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, reviewReportLogger);
             nodeFactory.getOrCreateDataset(dataset);
             getStderr().print("creating review [" + repoName + "]... ");
             if (!shouldSkipHeader()) {
                 logHeader(getStdout());
             }
 
+            ParserFactoryLocal parserFactory = new ParserFactoryLocal(getClass());
+            DatasetImporterForRegistry studyImporter = new DatasetImporterForRegistry(parserFactory, nodeFactory, registry);
+            studyImporter.setLogger(reviewReportLogger);
             DatasetImportUtil.importDataset(
                     null,
                     dataset,

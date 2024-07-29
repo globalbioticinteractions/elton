@@ -11,9 +11,7 @@ import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
-import org.globalbioticinteractions.elton.util.DatasetProcessorForTSV;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
-import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,26 +19,26 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-class StreamingNamespaceConfigHandler implements NamespaceHandler {
-    private final static Logger LOG = LoggerFactory.getLogger(StreamingNamespaceConfigHandler.class);
+class StreamingDatasetsHandler implements NamespaceHandler {
+    private final static Logger LOG = LoggerFactory.getLogger(StreamingDatasetsHandler.class);
     private final String cacheDir;
     private final PrintStream stderr;
-    private final PrintStream stdout;
 
     private InputStreamFactory factory;
     private final JsonNode config;
-    private boolean shouldWriteHeader;
+    private NodeFactorFactory nodeFactorFactory;
 
-    public StreamingNamespaceConfigHandler(JsonNode jsonNode,
-                                           InputStreamFactoryLogging inputStreamFactory,
-                                           String cacheDir,
-                                           PrintStream stderr,
-                                           PrintStream stdout) {
+    public StreamingDatasetsHandler(JsonNode jsonNode,
+                                    InputStreamFactory inputStreamFactory,
+                                    String cacheDir,
+                                    PrintStream stderr,
+                                    NodeFactorFactory nodeFactorFactory) {
         this.factory = inputStreamFactory;
         this.cacheDir = cacheDir;
         this.stderr = stderr;
-        this.stdout = stdout;
         this.config = jsonNode;
+        this.nodeFactorFactory = nodeFactorFactory;
+
     }
 
     @Override
@@ -61,19 +59,16 @@ class StreamingNamespaceConfigHandler implements NamespaceHandler {
         Cache cache = cacheFactory.cacheFor(dataset);
         DatasetWithCache datasetWithCache = new DatasetWithCache(dataset, cache);
 
-        CmdInteractions.TsvWriter writer = new CmdInteractions.TsvWriter(stdout);
-        if (shouldWriteHeader) {
-            writer.writeHeader();
-        }
+        NodeFactorFactory nodeFactorFactory = this.nodeFactorFactory;
 
-        NodeFactory factory = new NodeFactoryForDataset(writer, new DatasetProcessorForTSV());
 
-        factory.getOrCreateDataset(dataset);
+        NodeFactory nodeFactory = nodeFactorFactory.createNodeFactory();
+        nodeFactory.getOrCreateDataset(dataset);
         try {
             DatasetImportUtil.importDataset(
                     null,
                     datasetWithCache,
-                    factory,
+                    nodeFactory,
                     null);
             stderr.println("done.");
         } catch (StudyImporterException ex) {
@@ -86,6 +81,5 @@ class StreamingNamespaceConfigHandler implements NamespaceHandler {
     }
 
     public void setShouldWriteHeader(boolean shouldWriteHeader) {
-        this.shouldWriteHeader = shouldWriteHeader;
     }
 }

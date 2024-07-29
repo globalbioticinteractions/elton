@@ -10,6 +10,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.util.DatasetRegistrySingleDir;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Constructor;
@@ -22,9 +23,9 @@ import java.util.TreeMap;
 
 public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
     private static final Map<String, Class<? extends DatasetRegistry>> REGISTRY_LOOKUP = MapUtils.unmodifiableMap(new TreeMap<String, Class<? extends DatasetRegistry>>() {{
-        put("local", DatasetRegistrySingleDir.class);
-        put("zenodo", DatasetRegistryZenodo.class);
-        put("github", DatasetRegistryGitHubArchive.class);
+        put(DatasetRegistryUtil.NAMESPACE_LOCAL, DatasetRegistrySingleDir.class);
+        put(DatasetRegistryUtil.NAMESPACE_ZENODO, DatasetRegistryZenodo.class);
+        put(DatasetRegistryUtil.NAMESPACE_GITHUB, DatasetRegistryGitHubArchive.class);
     }});
 
     private final InputStreamFactory inputStreamFactory;

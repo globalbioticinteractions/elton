@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -39,25 +40,23 @@ public class CmdStream extends CmdDefaultParams {
             while ((line = reader.readLine()) != null) {
                 try {
                     JsonNode jsonNode = new ObjectMapper().readTree(line);
-                    if (jsonNode.has("namespace")) {
-                        String namespace = jsonNode.get("namespace").asText();
-                        if (StringUtils.isNotBlank(namespace)) {
-                            try {
-                                StreamingNamespaceConfigHandler namespaceHandler = new StreamingNamespaceConfigHandler(
-                                        jsonNode,
-                                        this.createInputStreamFactory(),
-                                        this.getCacheDir(),
-                                        this.getStderr(),
-                                        this.getStdout()
-                                );
-                                namespaceHandler.setShouldWriteHeader(isFirst.get());
-                                namespaceHandler.onNamespace(namespace);
-                                isFirst.set(false);
-                            } catch (Exception e) {
-                                LOG.error("failed to add dataset associated with namespace [" + namespace + "]", e);
-                            } finally {
-                                FileUtils.forceDelete(new File(this.getCacheDir()));
-                            }
+                    String namespace = jsonNode.at("/namespace").asText(DatasetRegistryUtil.NAMESPACE_LOCAL);
+                    if (StringUtils.isNotBlank(namespace)) {
+                        try {
+                            StreamingNamespaceConfigHandler namespaceHandler = new StreamingNamespaceConfigHandler(
+                                    jsonNode,
+                                    this.createInputStreamFactory(),
+                                    this.getCacheDir(),
+                                    this.getStderr(),
+                                    this.getStdout()
+                            );
+                            namespaceHandler.setShouldWriteHeader(isFirst.get());
+                            namespaceHandler.onNamespace(namespace);
+                            isFirst.set(false);
+                        } catch (Exception e) {
+                            LOG.error("failed to add dataset associated with namespace [" + namespace + "]", e);
+                        } finally {
+                            FileUtils.forceDelete(new File(this.getCacheDir()));
                         }
                     }
                 } catch (JsonProcessingException e) {

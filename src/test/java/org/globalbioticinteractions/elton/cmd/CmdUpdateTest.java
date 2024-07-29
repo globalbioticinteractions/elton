@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -36,12 +37,12 @@ public class CmdUpdateTest {
         File file = tmpDir.newFolder();
         cmd.setCacheDir(file.getAbsolutePath());
         cmd.setWorkDir(localWorkDir.getAbsolutePath());
-        cmd.setRegistryNames(Arrays.asList("local"));
-        cmd.setNamespaces(Collections.singletonList("local"));
+        cmd.setRegistryNames(Arrays.asList(DatasetRegistryUtil.NAMESPACE_LOCAL));
+        cmd.setNamespaces(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
 
         cmd.run();
 
-        File local = new File(file, "local");
+        File local = new File(file, DatasetRegistryUtil.NAMESPACE_LOCAL);
         assertThat(local.exists(), is(true));
 
         File provenanceLog = new File(local, "access.tsv");

@@ -114,7 +114,7 @@ public class CmdReview extends CmdTabularWriterParams {
                         new ResourceServiceLocalAndRemote(factory)
                 );
 
-                review("local", registryLocal, factory);
+                review(DatasetRegistryUtil.NAMESPACE_LOCAL, registryLocal, factory);
             }
 
             reviewCachedOrRemote(remoteNamespaces, factory);

@@ -15,6 +15,8 @@ import java.net.URI;
 public class DatasetRegistryUtil {
 
     public static final String NAMESPACE_LOCAL = "local";
+    public static final String NAMESPACE_ZENODO = "zenodo";
+    public static final String NAMESPACE_GITHUB = "github";
 
     public static DatasetRegistry forLocalDir(final URI localArchiveDir,
                                               final String cacheDir,

@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -50,12 +51,12 @@ public class CmdLogTest {
         CmdUpdate pull = new CmdUpdate();
         pull.setCacheDir(cacheDir);
         pull.setWorkDir(new File(getClass().getResource("/dataset-rss-cache/globi.json").toURI()).getParent());
-        pull.setRegistryNames(Collections.singletonList("local"));
+        pull.setRegistryNames(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         pull.run();
 
         CmdLog cmd = new CmdLog();
         cmd.setCacheDir(cacheDir);
-        cmd.setNamespaces(Collections.singletonList("local"));
+        cmd.setNamespaces(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);

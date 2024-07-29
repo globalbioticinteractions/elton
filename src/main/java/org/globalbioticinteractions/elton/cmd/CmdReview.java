@@ -34,6 +34,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 import picocli.CommandLine;
@@ -72,7 +73,7 @@ public class CmdReview extends CmdTabularWriterParams {
     public static final long LOG_NUMBER_OF_FIELDS = Arrays.stream(LOG_FORMAT_STRING.split("\t")).filter(x -> x.equals("%s")).count();
 
     @CommandLine.Option(names = {"-n", "--lines"}, description = "print first n number of lines")
-    private Integer maxLines = null;
+    private Long maxLines = null;
 
     @CommandLine.Option(names = {"--type"}, description = "select desired review comments types: info,note,summary")
 
@@ -130,7 +131,7 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private void review(String namespace, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         ReviewReport report = createReport(namespace, CmdReview.this.reviewId, CmdReview.this.getReviewerName(), CmdReview.this.dateFactory);
-        ReviewReportLogger reviewReportLogger = new ReviewReportLogger(report, CmdReview.this.getStdout());
+        ReviewReportLogger reviewReportLogger = new ReviewReportLogger(report, CmdReview.this.getStdout(), getMaxLines(), getProgressCursorFactory());
 
         try {
             Dataset dataset = new DatasetFactory(
@@ -161,7 +162,7 @@ public class CmdReview extends CmdTabularWriterParams {
                     studyImporter.getGeoNamesService()
             );
 
-            if (report.interactionCounter.get() == 0) {
+            if (report.getInteractionCounter().get() == 0) {
                 reviewReportLogger.warn(null, "no interactions found");
             }
             getStderr().println("done.");
@@ -181,7 +182,7 @@ public class CmdReview extends CmdTabularWriterParams {
             log(null, report.getNoteCounter().get() + " note(s)", ReviewCommentType.summary, report, reviewReportLogger.stdout);
             log(null, report.getInfoCounter().get() + " info(s)", ReviewCommentType.summary, report, reviewReportLogger.stdout);
         }
-        if (report.interactionCounter.get() == 0) {
+        if (report.getInteractionCounter().get() == 0) {
             throw new StudyImporterException("No interactions found, nothing to review. Please check logs.");
         }
     }
@@ -276,11 +277,11 @@ public class CmdReview extends CmdTabularWriterParams {
         out.print(String.format(LOG_FORMAT_STRING, Stream.of(fields).map(x -> x == null ? "" : CSVTSVUtil.escapeTSV(x.toString())).toArray()));
     }
 
-    public Integer getMaxLines() {
+    public Long getMaxLines() {
         return maxLines;
     }
 
-    public void setMaxLines(Integer maxLines) {
+    public void setMaxLines(Long maxLines) {
         this.maxLines = maxLines;
     }
 
@@ -370,105 +371,46 @@ public class CmdReview extends CmdTabularWriterParams {
         return dataContextSorted;
     }
 
-    public class ReviewReport {
-        private final AtomicLong infoCounter;
-        private final AtomicLong noteCounter;
-
-        public AtomicLong getInfoCounter() {
-            return infoCounter;
-        }
-
-        public AtomicLong getNoteCounter() {
-            return noteCounter;
-        }
-
-        public AtomicLong getInteractionCounter() {
-            return interactionCounter;
-        }
-
-        public String getNamespace() {
-            return namespace;
-        }
-
-        public List<ReviewCommentType> getDesiredReviewCommentTypes() {
-            return desiredReviewCommentTypes;
-        }
-
-        public AtomicLong getLineCount() {
-            return lineCount;
-        }
-
-        public String getReviewId() {
-            return reviewId;
-        }
-
-        public DateFactory getDateFactory() {
-            return dateFactory;
-        }
-
-        public String getReviewerName() {
-            return reviewerName;
-        }
-
-        private final AtomicLong interactionCounter;
-        private final String namespace;
-        private final List<ReviewCommentType> desiredReviewCommentTypes;
-        private final AtomicLong lineCount;
-        private final String reviewId;
-        private final DateFactory dateFactory;
-        private final String reviewerName;
-
-        private ReviewReport(AtomicLong infoCounter, AtomicLong noteCounter, String namespace, List<ReviewCommentType> desiredReviewCommentTypes, AtomicLong lineCount, String reviewId, DateFactory dateFactory, String reviewerName, AtomicLong interactionCounter) {
-            this.infoCounter = infoCounter;
-            this.noteCounter = noteCounter;
-            this.interactionCounter = interactionCounter;
-            this.namespace = namespace;
-            this.desiredReviewCommentTypes = desiredReviewCommentTypes;
-            this.lineCount = lineCount;
-            this.dateFactory = dateFactory;
-            this.reviewId = reviewId;
-            this.reviewerName = reviewerName;
-        }
-    }
-
     private class ReviewReportLogger implements ImportLogger {
         private final ReviewReport report;
         private final PrintStream stdout;
+        private final Long maxLines;
+        private final ProgressCursorFactory factory;
 
-        public ReviewReportLogger(ReviewReport report, PrintStream stdout) {
+        public ReviewReportLogger(ReviewReport report, PrintStream stdout, Long maxLines, ProgressCursorFactory factory) {
             this.report = report;
             this.stdout = stdout;
+            this.maxLines = maxLines;
+            this.factory = factory;
         }
 
 
         @Override
         public void info(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.info, this.report, stdout);
+            logWithCounter(ctx, message, ReviewCommentType.info);
             report.getInfoCounter().incrementAndGet();
         }
 
         @Override
         public void warn(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.note, this.report, stdout);
+            logWithCounter(ctx, message, ReviewCommentType.note);
             report.getNoteCounter().incrementAndGet();
         }
 
         @Override
         public void severe(LogContext ctx, String message) {
-            logWithCounter(ctx, message, ReviewCommentType.note, this.report, stdout);
+            logWithCounter(ctx, message, ReviewCommentType.note);
             report.getNoteCounter().incrementAndGet();
         }
 
-        private void logWithCounter(LogContext ctx, String message, ReviewCommentType commentType, ReviewReport report, PrintStream stdout) {
-            Integer maxLines = getMaxLines();
-
-            if (maxLines == null || this.report.lineCount.get() < maxLines) {
+        private void logWithCounter(LogContext ctx, String message, ReviewCommentType commentType) {
+            if (maxLines == null || report.getLineCount().get() < maxLines) {
                 log(ctx, message, commentType, report, stdout);
             }
 
-            long l = this.report.getLineCount().incrementAndGet();
+            long l = report.getLineCount().incrementAndGet();
             if (l % ProgressUtil.LOG_ACTIVITY_PROGRESS_BATCH_SIZE == 0) {
-                getProgressCursorFactory().createProgressCursor().increment();
+                factory.createProgressCursor().increment();
             }
         }
 

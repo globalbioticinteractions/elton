@@ -72,7 +72,7 @@ public class CmdReviewTest {
         String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
-        runCheck(localTestPath, errOs, outOs, 100);
+        runCheck(localTestPath, errOs, outOs, 100L);
 
         assertThat(errOs.toString(), containsString("creating review [local]..."));
         assertThat(errOs.toString(), endsWith("done.\n"));
@@ -118,14 +118,14 @@ public class CmdReviewTest {
         assertThat(lines[lines.length - 3], is(thirdToLast));
     }
 
-    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, int maxLines) throws IOException {
+    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, long maxLines) throws IOException {
         runCheck(localTestPath, errOs, outOs, maxLines, Arrays.asList(ReviewCommentType.values()));
     }
 
     private void runCheck(String localTestPath,
                           ByteArrayOutputStream errOs,
                           ByteArrayOutputStream outOs,
-                          int maxLines,
+                          long maxLines,
                           List<ReviewCommentType> commentTypes) throws IOException {
         PrintStream err = new PrintStream(errOs);
         cmdReview.setStderr(err);

@@ -15,7 +15,7 @@ import org.globalbioticinteractions.elton.util.TaxonWriter;
 import java.io.PrintStream;
 
 public class WriterUtil {
-    static NodeFactory nodeFactoryForWritingInteractions(boolean shouldWriteHeader, PrintStream stdout) {
+    static NodeFactory nodeFactoryForInteractionWriting(boolean shouldWriteHeader, PrintStream stdout) {
         WriterInteractionsTSV writer = new WriterInteractionsTSV(stdout);
         if (shouldWriteHeader) {
             writer.writeHeader();

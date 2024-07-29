@@ -129,18 +129,18 @@ public class CmdReview extends CmdTabularWriterParams {
         }
     }
 
-    private void review(String repoName, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
+    private void review(String namespace, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         final AtomicLong noteCounter = new AtomicLong(0);
         final AtomicLong infoCounter = new AtomicLong(0);
         AtomicInteger interactionCounter = new AtomicInteger(0);
 
-        ReviewReportLogger reviewReportLogger = createReviewReportLogger(repoName, noteCounter, infoCounter);
+        ReviewReportLogger reviewReportLogger = createReviewReportLogger(namespace, noteCounter, infoCounter);
 
         try {
             Dataset dataset = new DatasetFactory(
                     registry,
                     inputStreamFactory)
-                    .datasetFor(repoName);
+                    .datasetFor(namespace);
 
             String citationString = CitationUtil.citationFor(dataset);
             if (StringUtils.startsWith(citationString, "<")
@@ -149,7 +149,7 @@ public class CmdReview extends CmdTabularWriterParams {
             }
             NodeFactoryLogging nodeFactory = new NodeFactoryLogging(interactionCounter, reviewReportLogger);
             nodeFactory.getOrCreateDataset(dataset);
-            getStderr().print("creating review [" + repoName + "]... ");
+            getStderr().print("creating review [" + namespace + "]... ");
             if (!shouldSkipHeader()) {
                 logHeader(getStdout());
             }

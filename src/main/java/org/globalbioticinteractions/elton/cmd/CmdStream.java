@@ -54,7 +54,7 @@ public class CmdStream extends CmdDefaultParams {
                                     this.createInputStreamFactory(),
                                     this.getCacheDir(),
                                     this.getStderr(),
-                                    new NodeFactorFactoryImpl(shouldWriteHeader)
+                                    new NodeFactoryFactoryImpl(shouldWriteHeader)
                             );
                             namespaceHandler.onNamespace(namespace);
                             isFirst.set(false);
@@ -74,11 +74,11 @@ public class CmdStream extends CmdDefaultParams {
 
     }
 
-    public class NodeFactorFactoryImpl implements NodeFactorFactory {
+    public class NodeFactoryFactoryImpl implements NodeFactorFactory {
 
         private final boolean shouldWriteHeader;
 
-        public NodeFactorFactoryImpl(boolean shouldWriteHeader) {
+        public NodeFactoryFactoryImpl(boolean shouldWriteHeader) {
             this.shouldWriteHeader = shouldWriteHeader;
         }
 
@@ -86,7 +86,7 @@ public class CmdStream extends CmdDefaultParams {
         public NodeFactory createNodeFactory() {
 
             return StringUtils.equals("name", recordType)
-                    ? WriterUtil.nodeFactoryForWritingInteractions(shouldWriteHeader, getStdout())
+                    ? WriterUtil.nodeFactoryForInteractionWriting(shouldWriteHeader, getStdout())
                     : WriterUtil.nodeFactoryForTaxonWriting(shouldWriteHeader, getStdout());
         }
     }

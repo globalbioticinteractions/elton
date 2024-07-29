@@ -30,7 +30,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 getWorkDir(),
                 createInputStreamFactory());
 
-        NodeFactory nodeFactory = WriterUtil.nodeFactoryForWritingInteractions(!shouldSkipHeader(), out);
+        NodeFactory nodeFactory = WriterUtil.nodeFactoryForInteractionWriting(!shouldSkipHeader(), out);
 
         CmdUtil.handleNamespaces(
                 registry,

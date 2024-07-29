@@ -27,17 +27,20 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     private InputStreamFactory factory;
     private final JsonNode config;
     private NodeFactorFactory nodeFactorFactory;
+    private ImportLoggerFactory loggerFactory;
 
     public StreamingDatasetsHandler(JsonNode config,
                                     String cacheDir,
                                     PrintStream stderr,
                                     InputStreamFactory inputStreamFactory,
-                                    NodeFactorFactory nodeFactorFactory) {
+                                    NodeFactorFactory nodeFactorFactory,
+                                    ImportLoggerFactory loggerFactory) {
         this.factory = inputStreamFactory;
         this.cacheDir = cacheDir;
         this.stderr = stderr;
         this.config = config;
         this.nodeFactorFactory = nodeFactorFactory;
+        this.loggerFactory = loggerFactory;
 
     }
 
@@ -66,7 +69,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                     null,
                     datasetWithCache,
                     nodeFactory,
-                    null);
+                    loggerFactory.createImportLogger());
             stderr.println("done.");
         } catch (StudyImporterException ex) {
             LOG.error("tracking of [" + namespace + "] failed.", ex);

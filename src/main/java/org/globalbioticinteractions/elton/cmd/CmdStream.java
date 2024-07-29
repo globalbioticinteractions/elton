@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.slf4j.Logger;
@@ -52,7 +53,12 @@ public class CmdStream extends CmdDefaultParams {
                             StreamingDatasetsHandler namespaceHandler = new StreamingDatasetsHandler(
                                     jsonNode,
                                     this.getCacheDir(), this.getStderr(), this.createInputStreamFactory(),
-                                    new NodeFactoryFactoryImpl(shouldWriteHeader)
+                                    new NodeFactoryFactoryImpl(shouldWriteHeader), new ImportLoggerFactory() {
+                                        @Override
+                                        public ImportLogger createImportLogger() {
+                                            return null;
+                                        }
+                                    }
                             );
                             namespaceHandler.onNamespace(namespace);
                             isFirst.set(false);

@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
+import org.eol.globi.tool.NullImportLogger;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @CommandLine.Command(
@@ -52,13 +55,11 @@ public class CmdStream extends CmdDefaultParams {
                             boolean shouldWriteHeader = isFirst.get();
                             StreamingDatasetsHandler namespaceHandler = new StreamingDatasetsHandler(
                                     jsonNode,
-                                    this.getCacheDir(), this.getStderr(), this.createInputStreamFactory(),
-                                    new NodeFactoryFactoryImpl(shouldWriteHeader), new ImportLoggerFactory() {
-                                        @Override
-                                        public ImportLogger createImportLogger() {
-                                            return null;
-                                        }
-                                    }
+                                    this.getCacheDir(),
+                                    this.getStderr(),
+                                    this.createInputStreamFactory(),
+                                    new NodeFactoryFactoryImpl(shouldWriteHeader, recordType),
+                                    new ImportLoggerFactoryImpl(recordType)
                             );
                             namespaceHandler.onNamespace(namespace);
                             isFirst.set(false);
@@ -78,20 +79,47 @@ public class CmdStream extends CmdDefaultParams {
 
     }
 
+    public static class ImportLoggerFactoryImpl implements ImportLoggerFactory {
+        private final String recordType;
+
+        public ImportLoggerFactoryImpl(String recordType) {
+            this.recordType = recordType;
+        }
+
+        @Override
+        public ImportLogger createImportLogger() {
+            ImportLogger logger;
+            if (Arrays.asList("name", "interaction").contains(recordType)) {
+                logger = new NullImportLogger();
+            } else {
+                throw new NotImplementedException("no import logger for [" + recordType + "] available yet.");
+            }
+
+            return logger;
+        }
+    }
+
     public class NodeFactoryFactoryImpl implements NodeFactorFactory {
 
         private final boolean shouldWriteHeader;
+        private final String recordType;
 
-        public NodeFactoryFactoryImpl(boolean shouldWriteHeader) {
+        public NodeFactoryFactoryImpl(boolean shouldWriteHeader, String recordType) {
             this.shouldWriteHeader = shouldWriteHeader;
+            this.recordType = recordType;
         }
 
         @Override
         public NodeFactory createNodeFactory() {
-
-            return StringUtils.equals("name", recordType)
-                    ? WriterUtil.nodeFactoryForInteractionWriting(shouldWriteHeader, getStdout())
-                    : WriterUtil.nodeFactoryForTaxonWriting(shouldWriteHeader, getStdout());
+            NodeFactory factory;
+            if (StringUtils.equals("interaction", recordType)) {
+                factory = WriterUtil.nodeFactoryForInteractionWriting(shouldWriteHeader, getStdout());
+            } else if (StringUtils.equals("name", recordType)) {
+                factory = WriterUtil.nodeFactoryForTaxonWriting(shouldWriteHeader, getStdout());
+            } else {
+                throw new NotImplementedException("no node factory for [" + recordType + "] available yet.");
+            }
+            return factory;
         }
     }
 }

@@ -34,6 +34,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
+import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 import picocli.CommandLine;
@@ -70,6 +71,7 @@ import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_OCCURRENCE_ID;
 public class CmdReview extends CmdTabularWriterParams {
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
     public static final long LOG_NUMBER_OF_FIELDS = Arrays.stream(LOG_FORMAT_STRING.split("\t")).filter(x -> x.equals("%s")).count();
+    public static final String REVIEWER_DEFAULT = "GloBI automated reviewer (elton-" + Elton.getVersionString() + ")";
 
     @CommandLine.Option(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Long maxLines = null;
@@ -80,7 +82,7 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private DateFactory dateFactory = Date::new;
 
-    private String reviewerName = "GloBI automated reviewer (elton-" + Elton.getVersionString() + ")";
+    private String reviewerName = REVIEWER_DEFAULT;
 
     private String reviewId = UUID.randomUUID().toString();
 
@@ -112,7 +114,7 @@ public class CmdReview extends CmdTabularWriterParams {
                         new ResourceServiceLocalAndRemote(factory)
                 );
 
-                review(DatasetRegistryUtil.NAMESPACE_LOCAL, registryLocal, factory);
+                review(DatasetRegistryUtil.NAMESPACE_LOCAL, registryLocal, factory, shouldSkipHeader());
             }
 
             reviewCachedOrRemote(remoteNamespaces, factory);
@@ -124,35 +126,35 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private void reviewCachedOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         for (String namespace : namespaces) {
-            review(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), new ResourceServiceLocal(inputStreamFactory)), inputStreamFactory);
+            review(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), new ResourceServiceLocal(inputStreamFactory)), inputStreamFactory, shouldSkipHeader());
         }
     }
 
-    private void review(String namespace, DatasetRegistry registry, InputStreamFactory inputStreamFactory) throws StudyImporterException {
+    private void review(String namespace, DatasetRegistry registry, InputStreamFactory inputStreamFactory, boolean shouldSkipHeader) throws StudyImporterException {
         ReviewReport report = createReport(namespace, CmdReview.this.reviewId, CmdReview.this.getReviewerName(), CmdReview.this.dateFactory);
-        ReviewReportLogger reviewReportLogger = new ReviewReportLogger(report, getStdout(), getMaxLines(), getProgressCursorFactory());
+        ReviewReportLogger logger = new ReviewReportLogger(report, getStdout(), getMaxLines(), getProgressCursorFactory());
 
         try {
+            getStderr().print("creating review [" + namespace + "]... ");
+
             Dataset dataset = new DatasetFactory(
                     registry,
                     inputStreamFactory)
                     .datasetFor(namespace);
 
-            String citationString = CitationUtil.citationFor(dataset);
-            if (StringUtils.startsWith(citationString, "<")
-                    && StringUtils.endsWith(citationString, ">")) {
-                reviewReportLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
+            if (!shouldSkipHeader) {
+                logReviewHeader(getStdout());
             }
-            NodeFactoryReview nodeFactory = new NodeFactoryReview(report.getInteractionCounter(), reviewReportLogger);
-            nodeFactory.getOrCreateDataset(dataset);
-            getStderr().print("creating review [" + namespace + "]... ");
-            if (!shouldSkipHeader()) {
-                logHeader(getStdout());
-            }
+
+            NodeFactoryReview nodeFactory = new NodeFactoryReview(
+                    report.getInteractionCounter(),
+                    logger,
+                    getProgressCursorFactory()
+            );
 
             ParserFactoryLocal parserFactory = new ParserFactoryLocal(getClass());
             DatasetImporterForRegistry studyImporter = new DatasetImporterForRegistry(parserFactory, nodeFactory, registry);
-            studyImporter.setLogger(reviewReportLogger);
+            studyImporter.setLogger(logger);
             DatasetImportUtil.importDataset(
                     null,
                     dataset,
@@ -162,19 +164,19 @@ public class CmdReview extends CmdTabularWriterParams {
             );
 
             if (report.getInteractionCounter().get() == 0) {
-                reviewReportLogger.warn(null, "no interactions found");
+                logger.warn(null, "no interactions found");
             }
             getStderr().println("done.");
             log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary, report, getStdout());
         } catch (DatasetRegistryException e) {
-            reviewReportLogger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
+            logger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
             getStderr().println("failed.");
             throw new StudyImporterException(e);
         } catch (Throwable e) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             e.printStackTrace(new PrintWriter(out));
             e.printStackTrace();
-            reviewReportLogger.severe(null, new String(out.toByteArray()));
+            logger.severe(null, new String(out.toByteArray()));
             throw new StudyImporterException(e);
         } finally {
             log(null, report.getInteractionCounter().get() + " interaction(s)", ReviewCommentType.summary, report, getStdout());
@@ -196,7 +198,7 @@ public class CmdReview extends CmdTabularWriterParams {
                 reviewId1, dateFactory1, reviewerName1, interactionCounter);
     }
 
-    private void logHeader(PrintStream out) {
+    public static void logReviewHeader(PrintStream out) {
         logReviewComment(out, "reviewId", "reviewDate", "reviewer", "namespace", "reviewCommentType", "reviewComment", "archiveURI", "referenceUrl", "institutionCode", "collectionCode", "collectionId", "catalogNumber", "occurrenceId", "sourceCitation", "dataContext");
     }
 
@@ -292,23 +294,39 @@ public class CmdReview extends CmdTabularWriterParams {
         desiredReviewCommentTypes = commentTypes;
     }
 
-    private class NodeFactoryReview extends NodeFactoryNull {
+    public static class NodeFactoryReview extends NodeFactoryNull {
         final AtomicLong counter;
         final ImportLogger importLogger;
 
         public NodeFactoryReview(AtomicLong counter, ImportLogger importLogger) {
-            this.counter = counter;
-            this.importLogger = importLogger;
+            this(counter, importLogger, new ProgressCursorFactoryNoop());
         }
 
+        public NodeFactoryReview(AtomicLong counter, ImportLogger importLogger, ProgressCursorFactory progressCursorFactory) {
+            this.counter = counter;
+            this.importLogger = importLogger;
+            this.progressCursorFactory = progressCursorFactory;
+        }
+
+        private ProgressCursorFactory progressCursorFactory;
         final Specimen specimen = new SpecimenNull() {
             @Override
             public void interactsWith(Specimen target, InteractType type, Location centroid) {
                 long count = counter.get();
-                ProgressUtil.logProgress(ProgressUtil.SPECIMEN_CREATED_PROGRESS_BATCH_SIZE, count, getProgressCursorFactory().createProgressCursor());
+                ProgressUtil.logProgress(ProgressUtil.SPECIMEN_CREATED_PROGRESS_BATCH_SIZE, count, progressCursorFactory.createProgressCursor());
                 counter.getAndIncrement();
             }
         };
+
+        @Override
+        public Dataset getOrCreateDataset(Dataset dataset) {
+            String citationString = CitationUtil.citationFor(dataset);
+            if (StringUtils.startsWith(citationString, "<")
+                    && StringUtils.endsWith(citationString, ">")) {
+                importLogger.warn(null, "no citation found for dataset at [" + dataset.getArchiveURI() + "]");
+            }
+            return super.getOrCreateDataset(dataset);
+        }
 
 
         @Override

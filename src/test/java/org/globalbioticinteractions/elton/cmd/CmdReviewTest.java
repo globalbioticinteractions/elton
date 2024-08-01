@@ -244,7 +244,7 @@ public class CmdReviewTest {
         try {
             cmdReview.run();
         } finally {
-            assertThat(errOs.toString(), is("failed.\n"));
+            assertThat(errOs.toString(), is("creating review [local]... failed.\n"));
         }
 
     }

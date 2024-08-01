@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ReviewReport {
@@ -14,6 +16,18 @@ public class ReviewReport {
     private final String reviewId;
     private final DateFactory dateFactory;
     private final String reviewerName;
+
+    ReviewReport(String namespace, List<ReviewCommentType> desiredReviewCommentTypes) {
+        this.infoCounter = new AtomicLong(0);
+        this.noteCounter = new AtomicLong(0);
+        this.interactionCounter = new AtomicLong(0);
+        this.namespace = namespace;
+        this.desiredReviewCommentTypes = desiredReviewCommentTypes;
+        this.lineCount = new AtomicLong(0);
+        this.dateFactory = () -> new Date();
+        this.reviewId = UUID.randomUUID().toString();
+        this.reviewerName = CmdReview.REVIEWER_DEFAULT;
+    }
 
     ReviewReport(AtomicLong infoCounter, AtomicLong noteCounter, String namespace, List<ReviewCommentType> desiredReviewCommentTypes, AtomicLong lineCount, String reviewId, DateFactory dateFactory, String reviewerName, AtomicLong interactionCounter) {
         this.infoCounter = infoCounter;

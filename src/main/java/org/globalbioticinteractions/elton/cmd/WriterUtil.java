@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.NodeFactoryException;
 import org.eol.globi.domain.Interaction;
@@ -13,6 +14,7 @@ import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.TaxonWriter;
 
 import java.io.PrintStream;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class WriterUtil {
     static NodeFactory nodeFactoryForInteractionWriting(boolean shouldWriteHeader, PrintStream stdout) {
@@ -55,4 +57,14 @@ public class WriterUtil {
             }
         };
     }
+
+    public static NodeFactory nodeFactoryForReviewWriting(boolean shouldWriteHeader,
+                                                          PrintStream out,
+                                                          ImportLogger importLogger) {
+        if (shouldWriteHeader) {
+            CmdReview.logReviewHeader(out);
+        }
+        return new CmdReview.NodeFactoryReview(new AtomicLong(0), importLogger);
+    }
+
 }

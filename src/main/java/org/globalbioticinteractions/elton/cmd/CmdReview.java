@@ -153,14 +153,21 @@ public class CmdReview extends CmdTabularWriterParams {
             );
 
             ParserFactoryLocal parserFactory = new ParserFactoryLocal(getClass());
-            DatasetImporterForRegistry studyImporter = new DatasetImporterForRegistry(parserFactory, nodeFactory, registry);
+            DatasetImporterForRegistry studyImporter = new DatasetImporterForRegistry(
+                    parserFactory,
+                    nodeFactory,
+                    registry
+            );
             studyImporter.setLogger(logger);
+            File workDir = new File(getWorkDir());
+            studyImporter.setWorkDir(workDir);
             DatasetImportUtil.importDataset(
                     null,
                     dataset,
                     nodeFactory,
                     studyImporter.getLogger(),
-                    studyImporter.getGeoNamesService()
+                    studyImporter.getGeoNamesService(),
+                    workDir
             );
 
             if (report.getInteractionCounter().get() == 0) {

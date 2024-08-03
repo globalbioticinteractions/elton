@@ -29,6 +29,7 @@ import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,7 +87,13 @@ public class CmdUtil {
         return StreamUtil.streamOf(dataset).collect(Collectors.toList());
     }
 
-    public static void handleNamespaces(DatasetRegistry registry, NodeFactory nodeFactory, List<String> namespaces, String msgPrefix, Appendable out, ImportLogger logger) {
+    public static void handleNamespaces(DatasetRegistry registry,
+                                        NodeFactory nodeFactory,
+                                        List<String> namespaces,
+                                        String msgPrefix,
+                                        Appendable out,
+                                        ImportLogger logger,
+                                        File workDir) {
         try {
             List<String> failedNamespaces = Collections.synchronizedList(new ArrayList<>());
             final AtomicReference<Throwable> firstException = new AtomicReference<>();
@@ -96,7 +103,7 @@ public class CmdUtil {
                         .append(namespace)
                         .append("]... ");
                 try {
-                    handleSingleNamespace(registry, nodeFactory, namespace, logger);
+                    handleSingleNamespace(registry, nodeFactory, namespace, logger, workDir);
                     out.append("done.\n");
                 } catch (StudyImporterException | DatasetRegistryException ex) {
                     failedNamespaces.add(namespace);
@@ -119,7 +126,8 @@ public class CmdUtil {
     private static void handleSingleNamespace(DatasetRegistry registry,
                                               NodeFactory nodeFactory,
                                               String namespace,
-                                              ImportLogger logger) throws DatasetRegistryException, StudyImporterException {
+                                              ImportLogger logger,
+                                              File workDir) throws DatasetRegistryException, StudyImporterException {
         Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
 
         DatasetImportUtil.importDataset(
@@ -127,7 +135,8 @@ public class CmdUtil {
                 dataset,
                 nodeFactory,
                 logger,
-                createDummyGeoNamesService()
+                createDummyGeoNamesService(),
+                workDir
         );
     }
 

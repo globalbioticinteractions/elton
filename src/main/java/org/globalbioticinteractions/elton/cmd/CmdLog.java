@@ -19,6 +19,7 @@ import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -79,7 +80,8 @@ public class CmdLog extends CmdDefaultParams {
                 getNamespaces(),
                 "logging provenance",
                 NullAppendable.INSTANCE,
-                new NullImportLogger());
+                new NullImportLogger(), new File(getWorkDir())
+        );
     }
 
     public void setHashType(HashType hashType) {

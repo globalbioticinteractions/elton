@@ -10,6 +10,7 @@ import org.globalbioticinteractions.elton.util.NodeFactoryForDataset;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.util.UUID;
 
@@ -53,7 +54,9 @@ public class CmdNanoPubs extends CmdDefaultParams {
                 , getNamespaces()
                 , "listing nanopubs",
                 getStderr(),
-                new NullImportLogger());
+                new NullImportLogger(),
+                new File(getWorkDir())
+        );
     }
 
 }

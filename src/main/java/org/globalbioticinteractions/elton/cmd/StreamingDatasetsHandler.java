@@ -15,6 +15,7 @@ import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -69,7 +70,9 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                     null,
                     datasetWithCache,
                     nodeFactory,
-                    loggerFactory.createImportLogger());
+                    loggerFactory.createImportLogger(),
+                    new File(cacheDir)
+            );
             stderr.println("done.");
         } catch (StudyImporterException ex) {
             LOG.error("tracking of [" + namespace + "] failed.", ex);

@@ -6,6 +6,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.io.PrintStream;
 
 @CommandLine.Command(
@@ -26,7 +27,14 @@ public class CmdNames extends CmdTabularWriterParams {
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForTaxonWriting(!shouldSkipHeader(), out);
 
-        CmdUtil.handleNamespaces(registry, nodeFactory, getNamespaces(), "listing taxa", getStderr(), new NullImportLogger());
+        CmdUtil.handleNamespaces(registry,
+                nodeFactory,
+                getNamespaces(),
+                "listing taxa",
+                getStderr(),
+                new NullImportLogger(),
+                new File(getWorkDir())
+        );
     }
 
 }

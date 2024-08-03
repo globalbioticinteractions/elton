@@ -8,6 +8,7 @@ import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -60,7 +61,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
                             getProgressCursorFactory().createProgressCursor().increment();
                         }
                     }
-                });
+                }, new File(getWorkDir()));
     }
 }
 

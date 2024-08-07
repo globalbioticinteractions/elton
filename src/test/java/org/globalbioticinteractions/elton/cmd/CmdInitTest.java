@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CmdInitTest {
 
@@ -113,7 +113,7 @@ public class CmdInitTest {
     @Test
     public void inferColumnNamesCSV() throws IOException {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.csv";
-        List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is);
+        List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is, folder.newFolder());
         List<String> columnNames = inferColumnNamesCSV(IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8));
 
         assertEquals(columnNames, Arrays.asList("header1", "header2", "header3"));
@@ -122,7 +122,7 @@ public class CmdInitTest {
     @Test
     public void inferColumnNamesCSVWithBOM() throws IOException {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/dataWithBOM.csv";
-        List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is);
+        List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is, folder.newFolder());
         List<String> columnNames = inferColumnNamesCSV(IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8));
         assertEquals(columnNames, Arrays.asList("Prey Highest", "Prey Higher", "Prey Phylum", "Prey Class", "Prey Order", "Prey Family", "Prey Genus", "Prey Species", "Prey Species Current", "Prey Species ID #", "Prey Count", "Snake Species", "Snake Subspecies", "FullSpName", "Snake Species ID #", "Snake Age Class", "Snake SVL(mm)", "Snake Sex", "Location", "Latitude", "Longitude", "Citation", "Full Citation", "Reference DOI"));
     }
@@ -130,7 +130,7 @@ public class CmdInitTest {
     @Test
     public void inferColumnNamesTSV() throws IOException {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.tsv";
-        List<String> columnNames = CmdInit.inferColumnNamesTSV(CmdInit.firstTwoLines(urlString, is -> is));
+        List<String> columnNames = CmdInit.inferColumnNamesTSV(CmdInit.firstTwoLines(urlString, is -> is, folder.newFolder()));
 
         assertEquals(columnNames, Arrays.asList("header1", "header2", "header3"));
 
@@ -176,7 +176,7 @@ public class CmdInitTest {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.csv";
         String citation = "some citation";
 
-        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is);
+        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is, folder.newFolder());
         assertThat(actualConfig, Is.is(expectedConfig));
     }
 
@@ -219,7 +219,7 @@ public class CmdInitTest {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.tsv";
         String citation = "some citation";
 
-        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is);
+        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is, folder.newFolder());
         assertThat(actualConfig, Is.is(expectedConfig));
     }
 
@@ -229,7 +229,7 @@ public class CmdInitTest {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.txt";
         String citation = "some citation";
 
-        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is);
+        String actualConfig = CmdInit.generateConfig(urlString, citation, is -> is, folder.newFolder());
         assertThat(actualConfig, Is.is("{\"format\":\"unknown\",\"citation\":\"some citation\",\"url\":\"classpath:/org/globalbioticinteractions/elton/cmd/data.txt\"}"));
     }
 

@@ -10,6 +10,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
 
+import java.io.File;
 import java.net.URI;
 
 public class DatasetRegistryUtil {
@@ -54,7 +55,7 @@ public class DatasetRegistryUtil {
     }
 
     public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, InputStreamFactory streamFactory) {
-        return forCacheDirOrLocalDir(cacheDir, workDir, new ResourceServiceLocal(streamFactory), new ResourceServiceLocalAndRemote(streamFactory));
+        return forCacheDirOrLocalDir(cacheDir, workDir, new ResourceServiceLocal(streamFactory), new ResourceServiceLocalAndRemote(streamFactory, new File(cacheDir)));
     }
 
     public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, ResourceService resourceServiceLocal, ResourceService resourceServiceRemote) {

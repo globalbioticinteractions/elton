@@ -111,7 +111,7 @@ public class CmdReview extends CmdTabularWriterParams {
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
                         localNamespace,
                         getCacheDir(),
-                        new ResourceServiceLocalAndRemote(factory)
+                        new ResourceServiceLocalAndRemote(factory, new File(getCacheDir()))
                 );
 
                 review(DatasetRegistryUtil.NAMESPACE_LOCAL, registryLocal, factory, shouldSkipHeader());
@@ -126,7 +126,14 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private void reviewCachedOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         for (String namespace : namespaces) {
-            review(namespace, DatasetRegistryUtil.forCacheDir(getCacheDir(), new ResourceServiceLocal(inputStreamFactory)), inputStreamFactory, shouldSkipHeader());
+            review(namespace,
+                    DatasetRegistryUtil.forCacheDir(
+                            getCacheDir(),
+                            new ResourceServiceLocal(inputStreamFactory)
+                    ),
+                    inputStreamFactory,
+                    shouldSkipHeader()
+            );
         }
     }
 

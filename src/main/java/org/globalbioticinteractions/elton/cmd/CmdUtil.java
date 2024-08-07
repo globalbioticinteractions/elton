@@ -69,7 +69,7 @@ public class CmdUtil {
 
     public static CacheFactory createCacheFactory(String namespace, String cacheDir, InputStreamFactory factory) {
         return dataset -> {
-                ResourceService remote = new ResourceServiceLocalAndRemote(factory);
+                ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(cacheDir));
                 ResourceService local = new ResourceServiceLocal(factory);
                 Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, remote, new StatementListener() {
 

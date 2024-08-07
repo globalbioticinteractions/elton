@@ -13,6 +13,7 @@ import org.globalbioticinteractions.elton.util.DatasetRegistrySingleDir;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -47,7 +48,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
         try {
             Class<?>[] paramTypes = {URI.class, String.class, ResourceService.class};
             Optional<Constructor<? extends DatasetRegistry>> constructor = constructorFor(registryClass, paramTypes);
-            ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory);
+            ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory, new File(cacheDir));
             if (!constructor.isPresent()) {
                 Class<?>[] paramTypesShort = {ResourceService.class};
                 Optional<Constructor<? extends DatasetRegistry>> constructor2 = constructorFor(registryClass, paramTypesShort);

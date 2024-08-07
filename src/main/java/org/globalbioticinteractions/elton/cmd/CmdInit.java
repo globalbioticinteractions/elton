@@ -53,7 +53,7 @@ public class CmdInit extends CmdDefaultParams {
                 write(generateReadme(getDataCitation(), namespace), "README.md");
                 getStderr().println(" done.");
                 getStderr().print("generating [globi.json]...");
-                write(generateConfig(getDataUrl(), getDataCitation(), is -> is), "globi.json");
+                write(generateConfig(getDataUrl(), getDataCitation(), is -> is, new File(getCacheDir())), "globi.json");
                 getStderr().println(" done.");
                 getStderr().print("generating [.gitignore]...");
                 InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");
@@ -79,8 +79,10 @@ public class CmdInit extends CmdDefaultParams {
                 citation;
     }
 
-    static List<String> firstTwoLines(String urlString, InputStreamFactory inputStreamFactory) throws IOException {
-        try (InputStream inputStream = new ResourceServiceLocalAndRemote(inputStreamFactory).retrieve(URI.create(urlString))) {
+    static List<String> firstTwoLines(String urlString, InputStreamFactory inputStreamFactory, File cacheDir) throws IOException {
+        try (InputStream inputStream =
+                     new ResourceServiceLocalAndRemote(inputStreamFactory, cacheDir)
+                             .retrieve(URI.create(urlString))) {
             BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(new BOMInputStream(inputStream)));
 
 
@@ -110,8 +112,11 @@ public class CmdInit extends CmdDefaultParams {
         return columnNames;
     }
 
-    static String generateConfig(String urlString, String citation, InputStreamFactory inputStreamFactory) throws IOException {
-        List<String> firstTwoLines = firstTwoLines(urlString, inputStreamFactory);
+    static String generateConfig(String urlString,
+                                 String citation,
+                                 InputStreamFactory inputStreamFactory,
+                                 File cacheDir) throws IOException {
+        List<String> firstTwoLines = firstTwoLines(urlString, inputStreamFactory, cacheDir);
 
         String actualConfig;
         List<String> columnNames = extractColumnNamesCSV(firstTwoLines);

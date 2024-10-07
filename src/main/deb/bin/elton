@@ -3,4 +3,4 @@
 # Launches Elton in JVM
 #
 
-java -Xmx8G -XX:+UseG1GC -cp "/usr/share/elton/lib/*" org.globalbioticinteractions.elton.Elton $@
+java -Xmx8G -XX:+UseG1GC -cp "/usr/share/elton/lib/*" org.globalbioticinteractions.elton.Elton "$@"

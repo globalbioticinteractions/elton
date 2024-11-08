@@ -1,5 +1,9 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.globalbioticinteractions.cache.ContentPathFactory;
+import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
+import org.globalbioticinteractions.cache.ProvenancePathFactory;
+import org.globalbioticinteractions.cache.ProvenancePathFactoryImpl;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursorRotating;
@@ -13,29 +17,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract class CmdDefaultParams implements Runnable {
-    @CommandLine.Option (names = {"--cache-dir", "-c"},
+    @CommandLine.Option(names = {"--cache-dir", "-c"},
             description = "Cache directory"
     )
     private String cacheDir = "./datasets";
 
-    @CommandLine.Option (names = {"--work-dir", "-w"},
+    @CommandLine.Option(names = {"--work-dir", "-w"},
             description = "Work directory"
     )
     private String workDir = ".";
 
-    @CommandLine.Option (names = {"--no-progress"},
+    @CommandLine.Option(names = {"--no-progress"},
             description = "Do not show progress indicator"
     )
     private boolean noProgress = false;
+
 
     public void setNamespaces(List<String> namespaces) {
         this.namespaces = namespaces;
     }
 
-    @CommandLine.Parameters (
+    @CommandLine.Parameters(
             description = "[namespace1] [namespace2] ..."
     )
     private List<String> namespaces = new ArrayList<>();
+
+    private ContentPathFactory contentPathFactory = new ContentPathFactoryDepth0();
+    private ProvenancePathFactory provenancePathFactory = new ProvenancePathFactoryImpl();
 
     private PrintStream stderr = System.err;
     private PrintStream stdout = System.out;
@@ -43,6 +51,7 @@ abstract class CmdDefaultParams implements Runnable {
 
     final private ProgressCursorFactory cursorFactory = new ProgressCursorFactory() {
         private final ProgressCursor cursor = new ProgressCursorRotating(stderr);
+
         @Override
         public ProgressCursor createProgressCursor() {
             return cursor;
@@ -92,14 +101,21 @@ abstract class CmdDefaultParams implements Runnable {
         this.cacheDir = cacheDir;
     }
 
+
+    public ContentPathFactory getContentPathFactory() {
+        return (this.contentPathFactory);
+    }
+
+
     public void setWorkDir(String workingDir) {
         this.workDir = workingDir;
     }
 
     public ProgressCursorFactory getProgressCursorFactory() {
         return noProgress
-                ? () -> () -> {}
-                 : cursorFactory;
+                ? () -> () -> {
+        }
+                : cursorFactory;
     }
 
     public InputStreamFactoryLogging createInputStreamFactory() {
@@ -107,4 +123,7 @@ abstract class CmdDefaultParams implements Runnable {
     }
 
 
+    public ProvenancePathFactory getProvenancePathFactory() {
+        return provenancePathFactory;
+    }
 }

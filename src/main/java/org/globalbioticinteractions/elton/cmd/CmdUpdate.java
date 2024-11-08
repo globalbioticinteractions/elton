@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
+
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -65,11 +66,15 @@ public class CmdUpdate extends CmdDefaultParams {
                     registryProxy,
                     namespace,
                     getCacheDir(),
-                    inputStreamFactory);
+                    inputStreamFactory,
+                    getContentPathFactory(),
+                    getProvenancePathFactory()
+            );
 
             Dataset dataset =
                     new DatasetFactory(registry, createInputStreamFactory())
                             .datasetFor(namespace);
+
             NodeFactory factory = new NodeFactoryNull();
             factory.getOrCreateDataset(dataset);
             try {

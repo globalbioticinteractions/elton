@@ -6,6 +6,9 @@ import org.eol.globi.util.ResourceServiceLocal;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
+import org.globalbioticinteractions.cache.ContentPathFactory;
+import org.globalbioticinteractions.cache.ProvenancePathFactory;
+
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
@@ -21,28 +24,36 @@ public class DatasetRegistryUtil {
 
     public static DatasetRegistry forLocalDir(final URI localArchiveDir,
                                               final String cacheDir,
-                                              ResourceService resourceServiceRemote) {
+                                              ResourceService resourceServiceRemote,
+                                              ContentPathFactory contentPathFactory) {
         return new DatasetRegistrySingleDir(
                 localArchiveDir,
                 cacheDir,
-                resourceServiceRemote
+                resourceServiceRemote,
+                contentPathFactory
         );
     }
 
     private static CacheFactory getCacheFactoryLocal(String cacheDir,
-                                                     ResourceService resourceServiceLocal) {
+                                                     ResourceService resourceServiceLocal,
+                                                     ContentPathFactory contentPathFactory,
+                                                     ProvenancePathFactory provenancePathFactory) {
         return dataset -> new CacheLocalReadonly(
                 dataset.getNamespace(),
                 cacheDir,
-                resourceServiceLocal
+                resourceServiceLocal,
+                contentPathFactory,
+                provenancePathFactory
         );
     }
 
     public static DatasetRegistry forCacheDir(String cacheDir,
-                                              ResourceService resourceServiceLocal) {
+                                              ResourceService resourceServiceLocal,
+                                              ContentPathFactory contentPathFactory,
+                                              ProvenancePathFactory provenancePathFactory) {
         return new DatasetRegistryLocal(
                 cacheDir,
-                getCacheFactoryLocal(cacheDir, resourceServiceLocal),
+                getCacheFactoryLocal(cacheDir, resourceServiceLocal, contentPathFactory, provenancePathFactory),
                 resourceServiceLocal);
     }
 
@@ -54,17 +65,37 @@ public class DatasetRegistryUtil {
         }
     }
 
-    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, InputStreamFactory streamFactory) {
-        return forCacheDirOrLocalDir(cacheDir, workDir, new ResourceServiceLocal(streamFactory), new ResourceServiceLocalAndRemote(streamFactory, new File(cacheDir)));
+    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir,
+                                                        URI workDir,
+                                                        InputStreamFactory streamFactory,
+                                                        ContentPathFactory contentPathFactory,
+                                                        ProvenancePathFactory provenancePathFactory) {
+        return forCacheDirOrLocalDir(cacheDir,
+                workDir,
+                new ResourceServiceLocal(streamFactory),
+                new ResourceServiceLocalAndRemote(streamFactory, new File(cacheDir)),
+                contentPathFactory,
+                provenancePathFactory);
     }
 
-    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir, URI workDir, ResourceService resourceServiceLocal, ResourceService resourceServiceRemote) {
-        DatasetRegistry registry = forCacheDir(cacheDir, resourceServiceLocal);
+    public static DatasetRegistry forCacheDirOrLocalDir(String cacheDir,
+                                                        URI workDir,
+                                                        ResourceService resourceServiceLocal,
+                                                        ResourceService resourceServiceRemote,
+                                                        ContentPathFactory contentPathFactory,
+                                                        ProvenancePathFactory provenancePathFactory) {
+        DatasetRegistry registry = forCacheDir(
+                cacheDir,
+                resourceServiceLocal,
+                contentPathFactory,
+                provenancePathFactory
+        );
         if (isEmpty(registry)) {
             registry = forLocalDir(
                     workDir,
                     cacheDir,
-                    resourceServiceRemote
+                    resourceServiceRemote,
+                    contentPathFactory
             );
         }
         return registry;

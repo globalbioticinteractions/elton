@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.tool.NullImportLogger;
+
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import picocli.CommandLine;
@@ -23,7 +24,7 @@ public class CmdNames extends CmdTabularWriterParams {
 
     void run(PrintStream out) {
 
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), createInputStreamFactory());
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), createInputStreamFactory(), getContentPathFactory(), getProvenancePathFactory());
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForTaxonWriting(!shouldSkipHeader(), out);
 

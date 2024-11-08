@@ -9,6 +9,7 @@ import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.tool.NullImportLogger;
+
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -47,7 +48,8 @@ public class CmdLog extends CmdDefaultParams {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
                 getWorkDir(),
-                createInputStreamFactory()
+                createInputStreamFactory(),
+                getContentPathFactory(), getProvenancePathFactory()
         );
 
         IRI softwareAgent = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");

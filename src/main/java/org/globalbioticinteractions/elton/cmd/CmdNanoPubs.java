@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.eol.globi.tool.NullImportLogger;
+
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.IdGenerator;
@@ -43,7 +44,8 @@ public class CmdNanoPubs extends CmdDefaultParams {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
                 getWorkDir(),
-                createInputStreamFactory());
+                createInputStreamFactory(),
+                getContentPathFactory(), getProvenancePathFactory());
 
         InteractionWriter serializer = createSerializer(out);
 

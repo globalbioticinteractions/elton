@@ -11,6 +11,7 @@ import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.tool.NullImportLogger;
+
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
@@ -69,7 +70,9 @@ public class CmdStream extends CmdDefaultParams {
                                     this.getStderr(),
                                     this.createInputStreamFactory(),
                                     new NodeFactoryFactoryImpl(shouldWriteHeader, recordType, loggerFactory.createImportLogger()),
-                                    loggerFactory
+                                    loggerFactory,
+                                    getContentPathFactory(),
+                                    getProvenancePathFactory()
                             );
                             namespaceHandler.onNamespace(namespace);
                             isFirst.set(false);

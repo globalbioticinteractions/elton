@@ -8,6 +8,9 @@ import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheFactory;
+import org.globalbioticinteractions.cache.ContentPathFactory;
+import org.globalbioticinteractions.cache.ProvenancePathFactory;
+
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
@@ -29,20 +32,25 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     private final JsonNode config;
     private NodeFactorFactory nodeFactorFactory;
     private ImportLoggerFactory loggerFactory;
+    private ContentPathFactory contentPathFactory;
+    private ProvenancePathFactory provenancePathFactory;
 
     public StreamingDatasetsHandler(JsonNode config,
                                     String cacheDir,
                                     PrintStream stderr,
                                     InputStreamFactory inputStreamFactory,
                                     NodeFactorFactory nodeFactorFactory,
-                                    ImportLoggerFactory loggerFactory) {
+                                    ImportLoggerFactory loggerFactory,
+                                    ContentPathFactory contentPathFactory,
+                                    ProvenancePathFactory provenancePathFactory) {
         this.factory = inputStreamFactory;
         this.cacheDir = cacheDir;
         this.stderr = stderr;
         this.config = config;
         this.nodeFactorFactory = nodeFactorFactory;
         this.loggerFactory = loggerFactory;
-
+        this.contentPathFactory = contentPathFactory;
+        this.provenancePathFactory = provenancePathFactory;
     }
 
     @Override
@@ -51,7 +59,9 @@ class StreamingDatasetsHandler implements NamespaceHandler {
         CacheFactory cacheFactory = CmdUtil.createCacheFactory(
                 namespace,
                 cacheDir,
-                factory
+                factory,
+                contentPathFactory,
+                provenancePathFactory
         );
 
         Dataset dataset = new DatasetWithResourceMapping(

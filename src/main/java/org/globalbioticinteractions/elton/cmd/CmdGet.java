@@ -1,43 +1,23 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.HashType;
-import bio.guoda.preston.Hasher;
-import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
-import org.apache.commons.rdf.api.Quad;
-import org.eol.globi.data.NodeFactory;
-import org.eol.globi.service.CacheService;
-import org.eol.globi.service.ResourceService;
-import org.eol.globi.tool.NullImportLogger;
-import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetProxy;
+
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
-import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
-import org.globalbioticinteractions.elton.util.NamespaceHandler;
-import org.globalbioticinteractions.elton.util.NodeFactoryNull;
-import org.nanopub.Run;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.net.URI;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,7 +41,9 @@ public class CmdGet extends CmdDefaultParams {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
                 getWorkDir(),
-                createInputStreamFactory()
+                createInputStreamFactory(),
+                getContentPathFactory(),
+                getProvenancePathFactory()
         );
 
         final List<String> actualNamespaces = new ArrayList<>();

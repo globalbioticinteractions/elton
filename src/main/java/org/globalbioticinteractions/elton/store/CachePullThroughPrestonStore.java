@@ -17,6 +17,7 @@ import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.DateUtil;
 import org.globalbioticinteractions.cache.CachePullThrough;
 import org.globalbioticinteractions.cache.CacheUtil;
+import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ContentProvenance;
 import org.globalbioticinteractions.cache.ProvenanceLog;
 
@@ -35,24 +36,29 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
     public CachePullThroughPrestonStore(
             String namespace,
             String cachePath,
-            ResourceService resourceService
+            ResourceService resourceService,
+            ContentPathFactory contentPathFactory
     ) {
         this(namespace, cachePath, resourceService, new StatementListener() {
             @Override
             public void on(Quad quad) {
                 // do nothing
             }
-        });
+        }, contentPathFactory);
     }
 
     public CachePullThroughPrestonStore(
             String namespace,
             String cachePath,
             ResourceService resourceService,
-            StatementListener listener
+            StatementListener listener,
+            ContentPathFactory contentPathFactory
     ) {
-        super(namespace, cachePath,
-                resourceService);
+        super(namespace,
+                cachePath,
+                resourceService,
+                contentPathFactory
+        );
         this.namespace = namespace;
         this.cachePath = cachePath;
         this.remote = resourceService;

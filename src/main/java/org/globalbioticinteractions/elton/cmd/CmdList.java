@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.eol.globi.util.ResourceServiceRemote;
+
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
@@ -28,7 +29,7 @@ public class CmdList extends CmdOnlineParams {
 
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
-        DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), inputStreamFactory);
+        DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), inputStreamFactory, getContentPathFactory(), getProvenancePathFactory());
 
         File cacheDir = new File(getCacheDir());
         List<DatasetRegistry> registries =

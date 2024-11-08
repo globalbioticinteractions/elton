@@ -10,13 +10,13 @@ import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.globalbioticinteractions.cache.Cache;
+import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -42,7 +42,7 @@ public class CachePullThroughPrestonStoreTest {
                 "some/namespace"
                 , folder.getRoot().getAbsolutePath()
                 , new ResourceServiceLocal(in -> in)
-                , quads::add
+                , quads::add, new ContentPathFactoryDepth0()
         );
 
         assertThat(quads.size(), Is.is(0));
@@ -91,7 +91,7 @@ public class CachePullThroughPrestonStoreTest {
         Cache cache = new CachePullThroughPrestonStore(
                 "some/namespace"
                 , folder.getRoot().getAbsolutePath()
-                , new ResourceServiceLocal(in -> in)
+                , new ResourceServiceLocal(in -> in), new ContentPathFactoryDepth0()
         );
 
         File namespaceDir = new File(folder.getRoot(), "some/namespace");

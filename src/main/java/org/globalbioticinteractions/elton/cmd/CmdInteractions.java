@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
+
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
@@ -29,7 +30,9 @@ public class CmdInteractions extends CmdTabularWriterParams {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
                 getWorkDir(),
-                createInputStreamFactory());
+                createInputStreamFactory(),
+                getContentPathFactory(),
+                getProvenancePathFactory());
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForInteractionWriting(!shouldSkipHeader(), out);
 

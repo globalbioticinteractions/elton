@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.util;
 
 import org.eol.globi.service.ResourceService;
+import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -16,13 +17,16 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
     private final URI localArchiveDir;
     private final String cacheDir;
     private ResourceService resourceService;
+    private ContentPathFactory contentPathFactory;
 
     public DatasetRegistrySingleDir(URI localArchiveDir,
                                     String cacheDir,
-                                    ResourceService resourceService) {
+                                    ResourceService resourceService,
+                                    ContentPathFactory contentPathFactory) {
         this.localArchiveDir = localArchiveDir;
         this.cacheDir = cacheDir;
         this.resourceService = resourceService;
+        this.contentPathFactory = contentPathFactory;
     }
 
     @Override
@@ -47,7 +51,8 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
                 new CachePullThroughPrestonStore(
                         DatasetRegistryUtil.NAMESPACE_LOCAL,
                         cacheDir,
-                        this.resourceService
+                        this.resourceService,
+                        contentPathFactory
                 )
         );
     }

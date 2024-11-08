@@ -25,6 +25,7 @@ import org.eol.globi.util.DateUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
+
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetConstant;
@@ -87,6 +88,7 @@ public class CmdReview extends CmdTabularWriterParams {
     private String reviewId = UUID.randomUUID().toString();
 
 
+
     @Override
     public void run() {
         try {
@@ -111,7 +113,8 @@ public class CmdReview extends CmdTabularWriterParams {
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
                         localNamespace,
                         getCacheDir(),
-                        new ResourceServiceLocalAndRemote(factory, new File(getCacheDir()))
+                        new ResourceServiceLocalAndRemote(factory, new File(getCacheDir())),
+                        getContentPathFactory()
                 );
 
                 review(DatasetRegistryUtil.NAMESPACE_LOCAL, registryLocal, factory, shouldSkipHeader());
@@ -129,7 +132,9 @@ public class CmdReview extends CmdTabularWriterParams {
             review(namespace,
                     DatasetRegistryUtil.forCacheDir(
                             getCacheDir(),
-                            new ResourceServiceLocal(inputStreamFactory)
+                            new ResourceServiceLocal(inputStreamFactory),
+                            getContentPathFactory(),
+                            getProvenancePathFactory()
                     ),
                     inputStreamFactory,
                     shouldSkipHeader()

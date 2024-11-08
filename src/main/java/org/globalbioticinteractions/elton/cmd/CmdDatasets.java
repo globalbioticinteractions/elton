@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -51,7 +52,9 @@ public class CmdDatasets extends CmdTabularWriterParams {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
                 getWorkDir(),
-                createInputStreamFactory());
+                createInputStreamFactory(),
+                getContentPathFactory(),
+                getProvenancePathFactory());
 
         try {
             CmdUtil.handleNamespaces(registry,

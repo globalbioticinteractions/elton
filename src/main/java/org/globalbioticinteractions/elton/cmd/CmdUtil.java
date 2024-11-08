@@ -1,8 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
@@ -17,6 +15,9 @@ import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
+import org.globalbioticinteractions.cache.ContentPathFactory;
+import org.globalbioticinteractions.cache.ProvenancePathFactory;
+
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -62,25 +63,46 @@ public class CmdUtil {
             DatasetRegistry registry,
             String namespace,
             String cacheDir,
-            InputStreamFactory factory) {
-        CacheFactory cacheFactory = createCacheFactory(namespace, cacheDir, factory);
+            InputStreamFactory factory,
+            ContentPathFactory contentPathFactory,
+            ProvenancePathFactory provenancePathFactory) {
+
+        CacheFactory cacheFactory = createCacheFactory(
+                namespace,
+                cacheDir,
+                factory,
+                contentPathFactory,
+                provenancePathFactory
+        );
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, cacheDir), cacheFactory);
     }
 
-    public static CacheFactory createCacheFactory(String namespace, String cacheDir, InputStreamFactory factory) {
+    public static CacheFactory createCacheFactory(String namespace,
+                                                  String cacheDir,
+                                                  InputStreamFactory factory,
+                                                  ContentPathFactory contentPathFactory,
+                                                  ProvenancePathFactory provenancePathFactory) {
         return dataset -> {
-                ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(cacheDir));
-                ResourceService local = new ResourceServiceLocal(factory);
-                Cache pullThroughCache = new CachePullThroughPrestonStore(namespace, cacheDir, remote, new StatementListener() {
-
-                    @Override
-                    public void on(Quad quad) {
+            ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(cacheDir));
+            ResourceService local = new ResourceServiceLocal(factory);
+            Cache pullThroughCache = new CachePullThroughPrestonStore(
+                    namespace,
+                    cacheDir,
+                    remote,
+                    quad -> {
                         // ignore printing quads for now
-                    }
-                });
-                CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(namespace, cacheDir, local);
-                return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
-            };
+                    },
+                    contentPathFactory);
+
+            CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(
+                    namespace,
+                    cacheDir,
+                    local,
+                    contentPathFactory,
+                    provenancePathFactory
+            );
+            return new CacheProxy(Arrays.asList(pullThroughCache, readOnlyCache));
+        };
     }
 
     public static List<String> datasetInfo(Dataset dataset) {
@@ -142,15 +164,15 @@ public class CmdUtil {
 
     private static GeoNamesService createDummyGeoNamesService() {
         return new GeoNamesService() {
-                @Override
-                public boolean hasTermForLocale(String locality) {
-                    return false;
-                }
+            @Override
+            public boolean hasTermForLocale(String locality) {
+                return false;
+            }
 
-                @Override
-                public LatLng findLatLng(String locality) throws IOException {
-                    return null;
-                }
-            };
+            @Override
+            public LatLng findLatLng(String locality) throws IOException {
+                return null;
+            }
+        };
     }
 }

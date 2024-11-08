@@ -4,6 +4,8 @@ import org.apache.commons.collections4.MapUtils;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
+import org.globalbioticinteractions.cache.ContentPathFactory;
+import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -46,20 +48,20 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
             throw new DatasetRegistryException("failed to create registry for [" + name + "]: not supported");
         }
         try {
-            Class<?>[] paramTypes = {URI.class, String.class, ResourceService.class};
+            Class<?>[] paramTypes = {URI.class, String.class, ResourceService.class, ContentPathFactory.class};
             Optional<Constructor<? extends DatasetRegistry>> constructor = constructorFor(registryClass, paramTypes);
             ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory, new File(cacheDir));
             if (!constructor.isPresent()) {
                 Class<?>[] paramTypesShort = {ResourceService.class};
                 Optional<Constructor<? extends DatasetRegistry>> constructor2 = constructorFor(registryClass, paramTypesShort);
                 return constructor2
-                        .orElseThrow(() -> new DatasetRegistryException("failed to create registry for [" + name + "]")
+                        .orElseThrow(() -> new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]")
                         ).newInstance(resourceService);
             } else {
-                return constructor.get().newInstance(getWorkDir(), getCacheDir(), resourceService);
+                return constructor.get().newInstance(getWorkDir(), getCacheDir(), resourceService, new ContentPathFactoryDepth0());
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new DatasetRegistryException("failed to create registry for [" + name + "]", e);
+            throw new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]", e);
         }
     }
 

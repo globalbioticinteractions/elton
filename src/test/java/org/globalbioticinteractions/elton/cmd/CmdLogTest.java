@@ -32,6 +32,7 @@ public class CmdLogTest {
     public void logTemplate() throws URISyntaxException {
         CmdLog cmd = new CmdLog();
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
@@ -50,12 +51,14 @@ public class CmdLogTest {
         String cacheDir = folder.newFolder().getAbsolutePath();
         CmdUpdate pull = new CmdUpdate();
         pull.setCacheDir(cacheDir);
+        pull.setProvDir(cacheDir);
         pull.setWorkDir(new File(getClass().getResource("/dataset-rss-cache/globi.json").toURI()).getParent());
         pull.setRegistryNames(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         pull.run();
 
         CmdLog cmd = new CmdLog();
         cmd.setCacheDir(cacheDir);
+        cmd.setProvDir(cacheDir);
         cmd.setNamespaces(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
@@ -77,6 +80,7 @@ public class CmdLogTest {
         CmdLog cmd = new CmdLog();
         cmd.setHashType(HashType.sha1);
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
@@ -99,6 +103,7 @@ public class CmdLogTest {
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.run();
         List<String> versionStatements = toVersionStatements(out1);

@@ -26,12 +26,12 @@ public class CmdInteractionsTest {
 
     @Test
     public void interactionsNoHeader() throws URISyntaxException {
-
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
 
         CmdInteractions cmd = new CmdInteractions();
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setSkipHeader(true);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.run(out);
@@ -46,6 +46,7 @@ public class CmdInteractionsTest {
 
         CmdInteractions cmd = new CmdInteractions();
         cmd.setCacheDir(dataDir.getAbsolutePath());
+        cmd.setProvDir(dataDir.getAbsolutePath());
         cmd.setWorkDir(dataDir.getParentFile().getAbsolutePath());
         cmd.setSkipHeader(true);
 
@@ -60,6 +61,7 @@ public class CmdInteractionsTest {
     public void interactionsWithHeader() throws URISyntaxException {
         CmdInteractions cmd = new CmdInteractions();
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
@@ -81,7 +83,9 @@ public class CmdInteractionsTest {
         File workDir = file.getParentFile();
 
         CmdInteractions cmd = new CmdInteractions();
-        cmd.setCacheDir(tmpFolder.newFolder().getAbsolutePath());
+        String cacheDir = tmpFolder.newFolder().getAbsolutePath();
+        cmd.setCacheDir(cacheDir);
+        cmd.setProvDir(cacheDir);
         cmd.setWorkDir(workDir.getAbsolutePath());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 

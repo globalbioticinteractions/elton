@@ -106,6 +106,10 @@ abstract class CmdDefaultParams implements Runnable {
         return provDir;
     }
 
+    public void setProvDir(String provDir) {
+        this.provDir = provDir;
+    }
+
     public void setCacheDir(String cacheDir) {
         this.cacheDir = cacheDir;
     }

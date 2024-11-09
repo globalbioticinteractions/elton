@@ -18,6 +18,7 @@ public class CmdNanoPubsTest {
     public void interactions() throws URISyntaxException {
         CmdNanoPubs cmd = new CmdNanoPubs();
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.setIdGenerator(() -> "1");
 

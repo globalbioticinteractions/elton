@@ -16,6 +16,7 @@ public class CmdDatasetsTest {
     public void interactionsNoHeader() throws URISyntaxException {
         CmdDatasets cmd = new CmdDatasets();
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setSkipHeader(true);
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
@@ -28,6 +29,7 @@ public class CmdDatasetsTest {
     public void interactionsWithHeader() throws URISyntaxException {
         CmdDatasets cmd = new CmdDatasets();
         cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setProvDir(CmdTestUtil.cacheDirTest());
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);

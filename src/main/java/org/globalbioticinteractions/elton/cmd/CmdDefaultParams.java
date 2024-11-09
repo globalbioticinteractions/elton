@@ -22,6 +22,11 @@ abstract class CmdDefaultParams implements Runnable {
     )
     private String cacheDir = "./datasets";
 
+    @CommandLine.Option(names = {"--prov-dir"},
+            description = "Provenance directory"
+    )
+    private String provDir = "./datasets";
+
     @CommandLine.Option(names = {"--work-dir", "-w"},
             description = "Work directory"
     )
@@ -95,6 +100,10 @@ abstract class CmdDefaultParams implements Runnable {
 
     public String getCacheDir() {
         return cacheDir;
+    }
+
+    public String getProvDir() {
+        return provDir;
     }
 
     public void setCacheDir(String cacheDir) {

@@ -66,6 +66,7 @@ public class CmdUpdate extends CmdDefaultParams {
                     registryProxy,
                     namespace,
                     getCacheDir(),
+                    getProvDir(),
                     inputStreamFactory,
                     getContentPathFactory(),
                     getProvenancePathFactory()

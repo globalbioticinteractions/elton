@@ -34,9 +34,11 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     private ImportLoggerFactory loggerFactory;
     private ContentPathFactory contentPathFactory;
     private ProvenancePathFactory provenancePathFactory;
+    private final String provDir;
 
     public StreamingDatasetsHandler(JsonNode config,
                                     String cacheDir,
+                                    String provDir,
                                     PrintStream stderr,
                                     InputStreamFactory inputStreamFactory,
                                     NodeFactorFactory nodeFactorFactory,
@@ -45,6 +47,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                                     ProvenancePathFactory provenancePathFactory) {
         this.factory = inputStreamFactory;
         this.cacheDir = cacheDir;
+        this.provDir = provDir;
         this.stderr = stderr;
         this.config = config;
         this.nodeFactorFactory = nodeFactorFactory;
@@ -59,6 +62,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
         CacheFactory cacheFactory = CmdUtil.createCacheFactory(
                 namespace,
                 cacheDir,
+                provDir,
                 factory,
                 contentPathFactory,
                 provenancePathFactory

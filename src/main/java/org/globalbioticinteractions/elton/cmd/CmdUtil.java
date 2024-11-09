@@ -63,6 +63,7 @@ public class CmdUtil {
             DatasetRegistry registry,
             String namespace,
             String cacheDir,
+            String provDir,
             InputStreamFactory factory,
             ContentPathFactory contentPathFactory,
             ProvenancePathFactory provenancePathFactory) {
@@ -70,6 +71,7 @@ public class CmdUtil {
         CacheFactory cacheFactory = createCacheFactory(
                 namespace,
                 cacheDir,
+                provDir,
                 factory,
                 contentPathFactory,
                 provenancePathFactory
@@ -79,6 +81,7 @@ public class CmdUtil {
 
     public static CacheFactory createCacheFactory(String namespace,
                                                   String cacheDir,
+                                                  String provDir,
                                                   InputStreamFactory factory,
                                                   ContentPathFactory contentPathFactory,
                                                   ProvenancePathFactory provenancePathFactory) {
@@ -97,6 +100,7 @@ public class CmdUtil {
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(
                     namespace,
                     cacheDir,
+                    provDir,
                     local,
                     contentPathFactory,
                     provenancePathFactory

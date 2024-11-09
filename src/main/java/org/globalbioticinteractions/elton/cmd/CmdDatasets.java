@@ -51,10 +51,12 @@ public class CmdDatasets extends CmdTabularWriterParams {
 
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
+                getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),
                 getContentPathFactory(),
-                getProvenancePathFactory());
+                getProvenancePathFactory()
+        );
 
         try {
             CmdUtil.handleNamespaces(registry,

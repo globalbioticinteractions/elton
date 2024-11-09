@@ -29,16 +29,23 @@ public class CmdList extends CmdOnlineParams {
 
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
-        DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(getCacheDir(), getWorkDir(), inputStreamFactory, getContentPathFactory(), getProvenancePathFactory());
+        DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(
+                getCacheDir(),
+                getProvDir(),
+                getWorkDir(),
+                inputStreamFactory,
+                getContentPathFactory(),
+                getProvenancePathFactory()
+        );
 
         File cacheDir = new File(getCacheDir());
         List<DatasetRegistry> registries =
                 isOnline()
-                ? Arrays.asList(
-                new DatasetRegistryZenodo(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
-                new DatasetRegistryGitHubArchive(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
-                registryLocal)
-                : Arrays.asList(registryLocal);
+                        ? Arrays.asList(
+                        new DatasetRegistryZenodo(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
+                        new DatasetRegistryGitHubArchive(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
+                        registryLocal)
+                        : Arrays.asList(registryLocal);
 
         DatasetRegistry registry = new DatasetRegistryProxy(registries);
         try {

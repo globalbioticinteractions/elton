@@ -66,9 +66,10 @@ public class CmdStream extends CmdDefaultParams {
                             boolean shouldWriteHeader = isFirst.get();
                             StreamingDatasetsHandler namespaceHandler = new StreamingDatasetsHandler(
                                     jsonNode,
-                                    this.getCacheDir(),
-                                    this.getStderr(),
-                                    this.createInputStreamFactory(),
+                                    getCacheDir(),
+                                    getProvDir(),
+                                    getStderr(),
+                                    createInputStreamFactory(),
                                     new NodeFactoryFactoryImpl(shouldWriteHeader, recordType, loggerFactory.createImportLogger()),
                                     loggerFactory,
                                     getContentPathFactory(),

@@ -40,6 +40,7 @@ public class CmdGet extends CmdDefaultParams {
     void run(PrintStream out) {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
+                getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),
                 getContentPathFactory(),

@@ -47,9 +47,11 @@ public class CmdLog extends CmdDefaultParams {
     public void run() {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
                 getCacheDir(),
+                getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),
-                getContentPathFactory(), getProvenancePathFactory()
+                getContentPathFactory(),
+                getProvenancePathFactory()
         );
 
         IRI softwareAgent = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");

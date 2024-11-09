@@ -132,6 +132,7 @@ public class CmdReview extends CmdTabularWriterParams {
             review(namespace,
                     DatasetRegistryUtil.forCacheDir(
                             getCacheDir(),
+                            getProvDir(),
                             new ResourceServiceLocal(inputStreamFactory),
                             getContentPathFactory(),
                             getProvenancePathFactory()

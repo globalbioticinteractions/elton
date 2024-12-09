@@ -31,7 +31,7 @@ public class CmdGetTest {
 
         get.setCacheDir(cacheDir.getAbsolutePath());
         get.setStdin(IOUtils.toInputStream("<bla> <http://purl.org/pav/hasVersion> <hash://sha256/1cc8eff62af0e6bb3e7771666e2e4109f351b7dfc6fc1dc8314e5671a8eecb80> .", StandardCharsets.UTF_8));
-        get.setStdout(new NullPrintStream());
+        get.setStdout(NullPrintStream.INSTANCE);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         get.run(new PrintStream(outputStream));

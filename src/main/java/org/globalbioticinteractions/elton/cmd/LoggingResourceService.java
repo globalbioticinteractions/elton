@@ -81,7 +81,7 @@ public class LoggingResourceService implements ResourceService {
                 if (this.archiveContentId.get() == null) {
                     IRI archiveContentId = Hasher.calcHashIRI(
                             local.retrieve(archiveURI),
-                            NullOutputStream.NULL_OUTPUT_STREAM,
+                            NullOutputStream.INSTANCE,
                             hashType
                     );
                     this.archiveContentId.set(archiveContentId);

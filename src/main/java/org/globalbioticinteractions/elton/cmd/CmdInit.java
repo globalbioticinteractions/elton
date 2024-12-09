@@ -83,7 +83,7 @@ public class CmdInit extends CmdDefaultParams {
         try (InputStream inputStream =
                      new ResourceServiceLocalAndRemote(inputStreamFactory, cacheDir)
                              .retrieve(URI.create(urlString))) {
-            BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(new BOMInputStream(inputStream)));
+            BufferedReader inputStreamReader = new BufferedReader(new InputStreamReader(BOMInputStream.builder().setInputStream(inputStream).get()));
 
 
             String candidateHeader = inputStreamReader.readLine();

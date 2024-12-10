@@ -50,7 +50,7 @@ public class CmdDatasets extends CmdTabularWriterParams {
         }
 
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
-                getCacheDir(),
+                getDataDir(),
                 getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),

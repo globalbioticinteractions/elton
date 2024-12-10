@@ -30,7 +30,7 @@ public class CmdList extends CmdOnlineParams {
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
         DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(
-                getCacheDir(),
+                getDataDir(),
                 getProvDir(),
                 getWorkDir(),
                 inputStreamFactory,
@@ -38,7 +38,7 @@ public class CmdList extends CmdOnlineParams {
                 getProvenancePathFactory()
         );
 
-        File cacheDir = new File(getCacheDir());
+        File cacheDir = new File(getDataDir());
         List<DatasetRegistry> registries =
                 isOnline()
                         ? Arrays.asList(

@@ -14,7 +14,6 @@ import org.eol.globi.util.ResourceUtil;
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFinderUtil;
-import org.globalbioticinteractions.elton.Elton;
 
 import java.io.IOException;
 import java.io.InputStream;

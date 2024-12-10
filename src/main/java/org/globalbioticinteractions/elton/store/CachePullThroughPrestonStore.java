@@ -29,9 +29,10 @@ import java.net.URI;
 public class CachePullThroughPrestonStore extends CachePullThrough {
 
     private final String namespace;
-    private final String cachePath;
     private final ResourceService remote;
     private final StatementListener listener;
+    private final String dataDir;
+    private final String provDir;
 
     public CachePullThroughPrestonStore(
             String namespace,
@@ -44,7 +45,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
             public void on(Quad quad) {
                 // do nothing
             }
-        }, contentPathFactory);
+        }, contentPathFactory, cachePath, cachePath);
     }
 
     public CachePullThroughPrestonStore(
@@ -52,7 +53,9 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
             String cachePath,
             ResourceService resourceService,
             StatementListener listener,
-            ContentPathFactory contentPathFactory
+            ContentPathFactory contentPathFactory,
+            String dataDir,
+            String provDir
     ) {
         super(namespace,
                 cachePath,
@@ -60,19 +63,20 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                 contentPathFactory
         );
         this.namespace = namespace;
-        this.cachePath = cachePath;
+        this.dataDir = dataDir;
+        this.provDir = provDir;
         this.remote = resourceService;
         this.listener = listener;
     }
 
     public InputStream retrieve(URI resourceURI) throws IOException {
-        CacheUtil.findOrMakeCacheDirForNamespace(cachePath, namespace);
+        CacheUtil.findOrMakeCacheDirForNamespace(dataDir, namespace);
 
-        File cacheDir = new File(cachePath, namespace);
-        KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(cacheDir.toURI());
+        File dataFolder = new File(dataDir, namespace);
+        KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(dataFolder.toURI());
         BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
                 new KeyValueStoreLocalFileSystem(
-                        cacheDir,
+                        dataFolder,
                         keyToPath,
                         new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
@@ -116,7 +120,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                 DateUtil.nowDateString());
 
         ProvenanceLog.appendProvenanceLog(
-                new File(cachePath),
+                new File(provDir),
                 contentProvenanceWithNamespace
         );
     }

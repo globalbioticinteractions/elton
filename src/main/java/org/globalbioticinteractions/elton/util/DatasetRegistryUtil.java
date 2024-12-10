@@ -74,8 +74,10 @@ public class DatasetRegistryUtil {
                                                         InputStreamFactory streamFactory,
                                                         ContentPathFactory contentPathFactory,
                                                         ProvenancePathFactory provenancePathFactory) {
-        return forCacheDirOrLocalDir(cacheDir,
-                provDir, workDir,
+        return forCacheDirOrLocalDir(
+                cacheDir,
+                provDir,
+                workDir,
                 new ResourceServiceLocal(streamFactory),
                 new ResourceServiceLocalAndRemote(streamFactory, new File(cacheDir)),
                 contentPathFactory,
@@ -91,7 +93,8 @@ public class DatasetRegistryUtil {
                                                         ProvenancePathFactory provenancePathFactory) {
         DatasetRegistry registry = forCacheDir(
                 cacheDir,
-                provDir, resourceServiceLocal,
+                provDir,
+                resourceServiceLocal,
                 contentPathFactory,
                 provenancePathFactory
         );

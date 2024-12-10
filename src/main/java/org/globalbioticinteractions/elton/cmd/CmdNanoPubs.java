@@ -42,7 +42,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
 
     void run(PrintStream out) {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
-                getCacheDir(),
+                getDataDir(),
                 getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),

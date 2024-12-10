@@ -49,7 +49,7 @@ public class CmdUpdate extends CmdDefaultParams {
         for (String registryName : registryNames) {
             DatasetRegistryFactoryImpl datasetRegistryFactory
                     = new DatasetRegistryFactoryImpl(
-                            getWorkDir(), getCacheDir(), inputStreamFactory);
+                            getWorkDir(), getDataDir(), inputStreamFactory);
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);
@@ -65,7 +65,7 @@ public class CmdUpdate extends CmdDefaultParams {
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
                     registryProxy,
                     namespace,
-                    getCacheDir(),
+                    getDataDir(),
                     getProvDir(),
                     inputStreamFactory,
                     getContentPathFactory(),

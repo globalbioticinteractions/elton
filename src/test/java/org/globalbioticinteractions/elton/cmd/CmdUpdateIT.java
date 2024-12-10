@@ -41,7 +41,7 @@ public class CmdUpdateIT {
         CmdUpdate cmd = new CmdUpdate();
         File file1 = tmpDir.newFolder();
         String absolutePath = file1.getAbsolutePath();
-        cmd.setCacheDir(absolutePath);
+        cmd.setDataDir(absolutePath);
         cmd.setNamespaces(Collections.singletonList(namespace));
 
         cmd.run();

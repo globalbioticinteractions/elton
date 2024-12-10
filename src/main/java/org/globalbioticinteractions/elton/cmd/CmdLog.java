@@ -46,7 +46,7 @@ public class CmdLog extends CmdDefaultParams {
     @Override
     public void run() {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
-                getCacheDir(),
+                getDataDir(),
                 getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),

@@ -53,7 +53,7 @@ public class CmdInit extends CmdDefaultParams {
                 write(generateReadme(getDataCitation(), namespace), "README.md");
                 getStderr().println(" done.");
                 getStderr().print("generating [globi.json]...");
-                write(generateConfig(getDataUrl(), getDataCitation(), is -> is, new File(getCacheDir())), "globi.json");
+                write(generateConfig(getDataUrl(), getDataCitation(), is -> is, new File(getDataDir())), "globi.json");
                 getStderr().println(" done.");
                 getStderr().print("generating [.gitignore]...");
                 InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");

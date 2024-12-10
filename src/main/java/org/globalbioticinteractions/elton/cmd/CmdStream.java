@@ -66,7 +66,7 @@ public class CmdStream extends CmdDefaultParams {
                             boolean shouldWriteHeader = isFirst.get();
                             StreamingDatasetsHandler namespaceHandler = new StreamingDatasetsHandler(
                                     jsonNode,
-                                    getCacheDir(),
+                                    getDataDir(),
                                     getProvDir(),
                                     getStderr(),
                                     createInputStreamFactory(),
@@ -87,7 +87,7 @@ public class CmdStream extends CmdDefaultParams {
                             }, msg);
                             LOG.error(msg, e);
                         } finally {
-                            FileUtils.forceDelete(new File(this.getCacheDir()));
+                            FileUtils.forceDelete(new File(this.getDataDir()));
                         }
                     }
                 } catch (JsonProcessingException e) {

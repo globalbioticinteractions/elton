@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract class CmdDefaultParams implements Runnable {
-    @CommandLine.Option(names = {"--cache-dir", "-c"},
-            description = "Cache directory (default: ${DEFAULT-VALUE})")
-    private String cacheDir = "./datasets";
+    @CommandLine.Option(names = {"--cache-dir", "--data-dir", "-c"},
+            description = "Data directory (default: ${DEFAULT-VALUE})")
+    private String dataDir = "./datasets";
 
     @CommandLine.Option(names = {"--prov-dir"},
             description = "Provenance directory (default: ${DEFAULT-VALUE})"
@@ -97,8 +97,8 @@ abstract class CmdDefaultParams implements Runnable {
 
     }
 
-    public String getCacheDir() {
-        return cacheDir;
+    public String getDataDir() {
+        return dataDir;
     }
 
     public String getProvDir() {
@@ -109,8 +109,8 @@ abstract class CmdDefaultParams implements Runnable {
         this.provDir = provDir;
     }
 
-    public void setCacheDir(String cacheDir) {
-        this.cacheDir = cacheDir;
+    public void setDataDir(String dataDir) {
+        this.dataDir = dataDir;
     }
 
 

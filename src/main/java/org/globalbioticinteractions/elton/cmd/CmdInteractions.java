@@ -28,7 +28,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
     void run(PrintStream out) {
 
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
-                getCacheDir(),
+                getDataDir(),
                 getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),

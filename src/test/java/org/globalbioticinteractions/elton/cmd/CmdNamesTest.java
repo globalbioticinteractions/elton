@@ -17,7 +17,7 @@ public class CmdNamesTest {
     @Test
     public void namesNoHeader() throws URISyntaxException {
         CmdNames cmd = new CmdNames();
-        cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setDataDir(CmdTestUtil.cacheDirTest());
         cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setSkipHeader(true);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
@@ -31,7 +31,7 @@ public class CmdNamesTest {
     @Test
     public void namesWithHeader() throws URISyntaxException {
         CmdNames cmdNames = new CmdNames();
-        cmdNames.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmdNames.setDataDir(CmdTestUtil.cacheDirTest());
         cmdNames.setProvDir(CmdTestUtil.cacheDirTest());
         cmdNames.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 
@@ -49,7 +49,7 @@ public class CmdNamesTest {
     public void namesWithHeaderEmpty() throws URISyntaxException {
         CmdNames cmd = new CmdNames();
         String cacheDir = CmdTestUtil.cacheDirTestFor("/dataset-cache-empty/globalbioticinteractions/template-dataset/access.tsv");
-        cmd.setCacheDir(cacheDir);
+        cmd.setDataDir(cacheDir);
         cmd.setProvDir(cacheDir);
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();

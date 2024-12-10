@@ -31,7 +31,7 @@ public class CmdLogTest {
     @Test
     public void logTemplate() throws URISyntaxException {
         CmdLog cmd = new CmdLog();
-        cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setDataDir(CmdTestUtil.cacheDirTest());
         cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
@@ -50,14 +50,14 @@ public class CmdLogTest {
     public void logRSSTemplate() throws URISyntaxException, IOException {
         String cacheDir = folder.newFolder().getAbsolutePath();
         CmdUpdate pull = new CmdUpdate();
-        pull.setCacheDir(cacheDir);
+        pull.setDataDir(cacheDir);
         pull.setProvDir(cacheDir);
         pull.setWorkDir(new File(getClass().getResource("/dataset-rss-cache/globi.json").toURI()).getParent());
         pull.setRegistryNames(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         pull.run();
 
         CmdLog cmd = new CmdLog();
-        cmd.setCacheDir(cacheDir);
+        cmd.setDataDir(cacheDir);
         cmd.setProvDir(cacheDir);
         cmd.setNamespaces(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
@@ -79,7 +79,7 @@ public class CmdLogTest {
     public void logTemplateSha1() throws URISyntaxException {
         CmdLog cmd = new CmdLog();
         cmd.setHashType(HashType.sha1);
-        cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setDataDir(CmdTestUtil.cacheDirTest());
         cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
@@ -102,7 +102,7 @@ public class CmdLogTest {
         cmd.setHashType(HashType.md5);
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);
-        cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setDataDir(CmdTestUtil.cacheDirTest());
         cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.run();

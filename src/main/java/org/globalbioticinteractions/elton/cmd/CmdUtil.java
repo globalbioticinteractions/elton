@@ -62,7 +62,7 @@ public class CmdUtil {
     static DatasetRegistry createDataFinderLoggingCaching(
             DatasetRegistry registry,
             String namespace,
-            String cacheDir,
+            String dataDir,
             String provDir,
             InputStreamFactory factory,
             ContentPathFactory contentPathFactory,
@@ -70,36 +70,36 @@ public class CmdUtil {
 
         CacheFactory cacheFactory = createCacheFactory(
                 namespace,
-                cacheDir,
+                dataDir,
                 provDir,
                 factory,
                 contentPathFactory,
                 provenancePathFactory
         );
-        return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, cacheDir), cacheFactory);
+        return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, dataDir), cacheFactory);
     }
 
     public static CacheFactory createCacheFactory(String namespace,
-                                                  String cacheDir,
+                                                  String dataDir,
                                                   String provDir,
                                                   InputStreamFactory factory,
                                                   ContentPathFactory contentPathFactory,
                                                   ProvenancePathFactory provenancePathFactory) {
         return dataset -> {
-            ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(cacheDir));
+            ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(dataDir));
             ResourceService local = new ResourceServiceLocal(factory);
             Cache pullThroughCache = new CachePullThroughPrestonStore(
                     namespace,
-                    cacheDir,
+                    dataDir,
                     remote,
                     quad -> {
                         // ignore printing quads for now
                     },
-                    contentPathFactory);
+                    contentPathFactory, dataDir, dataDir);
 
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(
                     namespace,
-                    cacheDir,
+                    dataDir,
                     provDir,
                     local,
                     contentPathFactory,

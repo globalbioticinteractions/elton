@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,7 +16,7 @@ public class CmdNanoPubsTest {
     @Test
     public void interactions() throws URISyntaxException {
         CmdNanoPubs cmd = new CmdNanoPubs();
-        cmd.setCacheDir(CmdTestUtil.cacheDirTest());
+        cmd.setDataDir(CmdTestUtil.cacheDirTest());
         cmd.setProvDir(CmdTestUtil.cacheDirTest());
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.setIdGenerator(() -> "1");

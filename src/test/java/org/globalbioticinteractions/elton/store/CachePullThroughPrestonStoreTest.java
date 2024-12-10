@@ -42,7 +42,10 @@ public class CachePullThroughPrestonStoreTest {
                 "some/namespace"
                 , folder.getRoot().getAbsolutePath()
                 , new ResourceServiceLocal(in -> in)
-                , quads::add, new ContentPathFactoryDepth0()
+                , quads::add,
+                new ContentPathFactoryDepth0(),
+                folder.getRoot().getAbsolutePath(),
+                folder.getRoot().getAbsolutePath()
         );
 
         assertThat(quads.size(), Is.is(0));

@@ -48,7 +48,7 @@ public class CmdReviewTest {
     public void init() throws IOException {
         this.cmdReview = new CmdReview();
         cmdReview.setDateFactory(() -> new Date(0));
-        cmdReview.setCacheDir(tmpDir.newFolder().getAbsolutePath());
+        cmdReview.setDataDir(tmpDir.newFolder().getAbsolutePath());
         cmdReview.setReviewerName("elton-dev");
         cmdReview.setReviewId("6a550a42-8951-416a-a187-34edbd3f87d0");
     }
@@ -132,7 +132,7 @@ public class CmdReviewTest {
         PrintStream out = new PrintStream(outOs);
         cmdReview.setStdout(out);
         cmdReview.setWorkDir(Paths.get(localTestPath).toAbsolutePath().toString());
-        cmdReview.setCacheDir(tmpDir.newFolder().getAbsolutePath());
+        cmdReview.setDataDir(tmpDir.newFolder().getAbsolutePath());
         cmdReview.setMaxLines(maxLines);
         cmdReview.setDesiredReviewCommentTypes(commentTypes);
         cmdReview.run();

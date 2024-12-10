@@ -112,8 +112,8 @@ public class CmdReview extends CmdTabularWriterParams {
             for (URI localNamespace : localNamespaces) {
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
                         localNamespace,
-                        getCacheDir(),
-                        new ResourceServiceLocalAndRemote(factory, new File(getCacheDir())),
+                        getDataDir(),
+                        new ResourceServiceLocalAndRemote(factory, new File(getDataDir())),
                         getContentPathFactory()
                 );
 
@@ -131,7 +131,7 @@ public class CmdReview extends CmdTabularWriterParams {
         for (String namespace : namespaces) {
             review(namespace,
                     DatasetRegistryUtil.forCacheDir(
-                            getCacheDir(),
+                            getDataDir(),
                             getProvDir(),
                             new ResourceServiceLocal(inputStreamFactory),
                             getContentPathFactory(),

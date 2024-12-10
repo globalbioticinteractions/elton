@@ -39,7 +39,7 @@ public class CmdGet extends CmdDefaultParams {
 
     void run(PrintStream out) {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
-                getCacheDir(),
+                getDataDir(),
                 getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),
@@ -63,7 +63,7 @@ public class CmdGet extends CmdDefaultParams {
                     IRI contentId = RefNodeFactory.toIRI(matcher.group("obj"));
                     File file = null;
                     for (String namespace : actualNamespaces) {
-                        File namespaceDir = new File(getCacheDir(), namespace);
+                        File namespaceDir = new File(getDataDir(), namespace);
                         File fileCandidate = new File(namespaceDir, StringUtils.substring(contentId.getIRIString(), "hash://sha256/".length()));
                         if (fileCandidate.exists()) {
                             file = fileCandidate;

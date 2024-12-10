@@ -36,20 +36,6 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
 
     public CachePullThroughPrestonStore(
             String namespace,
-            String cachePath,
-            ResourceService resourceService,
-            ContentPathFactory contentPathFactory
-    ) {
-        this(namespace, resourceService, new StatementListener() {
-            @Override
-            public void on(Quad quad) {
-                // do nothing
-            }
-        }, contentPathFactory, cachePath, cachePath);
-    }
-
-    public CachePullThroughPrestonStore(
-            String namespace,
             ResourceService resourceService,
             ContentPathFactory contentPathFactory,
             String dataDir,

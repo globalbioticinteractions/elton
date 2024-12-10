@@ -94,7 +94,9 @@ public class CmdUtil {
                     quad -> {
                         // ignore printing quads for now
                     },
-                    contentPathFactory, dataDir, dataDir);
+                    contentPathFactory,
+                    dataDir,
+                    provDir);
 
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(
                     namespace,

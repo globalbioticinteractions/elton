@@ -92,10 +92,14 @@ public class CachePullThroughPrestonStoreTest {
     @Test(expected = IOException.class)
     public void testMissingFromPrestonStore() throws IOException, URISyntaxException {
 
+        String dataDir = folder.getRoot().getAbsolutePath();
+        String provDir = folder.getRoot().getAbsolutePath();
         Cache cache = new CachePullThroughPrestonStore(
                 "some/namespace"
-                , folder.getRoot().getAbsolutePath()
-                , new ResourceServiceLocal(in -> in), new ContentPathFactoryDepth0()
+                , new ResourceServiceLocal(in -> in),
+                new ContentPathFactoryDepth0(),
+                dataDir,
+                provDir
         );
 
         File namespaceDir = new File(folder.getRoot(), "some/namespace");

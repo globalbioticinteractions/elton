@@ -70,6 +70,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         this.listener = listener;
     }
 
+    @Override
     public InputStream retrieve(URI resourceURI) throws IOException {
         CacheUtil.findOrMakeProvOrDataDirForNamespace(dataDir, namespace);
 

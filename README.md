@@ -5,7 +5,7 @@
 
 Elton helps to access, review and index existing species interaction datasets.
 
- A commandline tool for [GloBI](https://globalbioticinteraction.org) named after ecologist [Charles S. Elton](https://en.wikipedia.org/wiki/Charles_Sutherland_Elton), author of [Animal Ecology](https://doi.org/10.5962/bhl.title.7435). 
+ A commandline tool for [GloBI](https://globalbioticinteractions.org) named after ecologist [Charles S. Elton](https://en.wikipedia.org/wiki/Charles_Sutherland_Elton), author of [Animal Ecology](https://doi.org/10.5962/bhl.title.7435). 
 
 <a href="http://globalbioticinteractions.org/">
   <img src="http://www.globalbioticinteractions.org/assets/globi.svg" height="120">

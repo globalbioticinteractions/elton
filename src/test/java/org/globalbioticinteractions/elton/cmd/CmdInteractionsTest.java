@@ -40,7 +40,6 @@ public class CmdInteractionsTest {
         assertThat(out1.toString().split("\n")[0], is("https://en.wiktionary.org/wiki/support\t\t\t\t\t\t\tLeptoconchus incycloseris\t\t\t\t\t\t\t\t\t\t\thttp://purl.obolibrary.org/obo/RO_0002444\tparasiteOf\t\t\t\t\t\t\tFungia (Cycloseris) costulata\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t10.1007/s13127-011-0039-1\thttps://doi.org/10.1007/s13127-011-0039-1\tGittenberger, A., Gittenberger, E. (2011). Cryptic, adaptive radiation of endoparasitic snails: sibling species of Leptoconchus (Gastropoda: Coralliophilidae) in corals. Org Divers Evol, 11(1), 21–41. doi:10.1007/s13127-011-0039-1\tglobalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f\tdev"));
     }
 
-    @Ignore
     @Test
     public void interactionsNoHeaderSeparateProvDir() throws URISyntaxException {
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
@@ -54,8 +53,6 @@ public class CmdInteractionsTest {
         String provDir = new File(baseDir, "prov").getAbsolutePath();
         String dataDir = new File(baseDir, "data").getAbsolutePath();
 
-        System.out.println(dataDir);
-
         assertThat(new File(dataDir + "/globalbioticinteractions/template-dataset", "631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f").exists(), is(true));
         assertThat(new File(provDir + "/globalbioticinteractions/template-dataset", "access.tsv").exists(), is(true));
 
@@ -67,7 +64,6 @@ public class CmdInteractionsTest {
         assertThat(out1.toString().split("\n")[0], is("https://en.wiktionary.org/wiki/support\t\t\t\t\t\t\tLeptoconchus incycloseris\t\t\t\t\t\t\t\t\t\t\thttp://purl.obolibrary.org/obo/RO_0002444\tparasiteOf\t\t\t\t\t\t\tFungia (Cycloseris) costulata\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t10.1007/s13127-011-0039-1\thttps://doi.org/10.1007/s13127-011-0039-1\tGittenberger, A., Gittenberger, E. (2011). Cryptic, adaptive radiation of endoparasitic snails: sibling species of Leptoconchus (Gastropoda: Coralliophilidae) in corals. Org Divers Evol, 11(1), 21–41. doi:10.1007/s13127-011-0039-1\tglobalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f\tdev"));
     }
 
-    @Ignore
     @Test
     public void interactionsLocalWithCache() throws URISyntaxException {
         URL resource = getClass().getResource("/dataset-local-with-cache/data/local/access.tsv");

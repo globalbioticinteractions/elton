@@ -24,7 +24,7 @@ public class CmdNames extends CmdTabularWriterParams {
 
     void run(PrintStream out) {
 
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheDirOrLocalDir(
+        DatasetRegistry registry = DatasetRegistryUtil.forCacheOrLocalDir(
                 getDataDir(),
                 getProvDir(),
                 getWorkDir(),

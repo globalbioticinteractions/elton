@@ -15,7 +15,8 @@ import java.util.function.Consumer;
 
 public class DatasetRegistrySingleDir implements DatasetRegistry {
     private final URI localArchiveDir;
-    private final String cacheDir;
+    private final String provDir;
+    private final String dataDir;
     private ResourceService resourceService;
     private ContentPathFactory contentPathFactory;
 
@@ -24,9 +25,10 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
                                     ResourceService resourceService,
                                     ContentPathFactory contentPathFactory) {
         this.localArchiveDir = localArchiveDir;
-        this.cacheDir = cacheDir;
         this.resourceService = resourceService;
         this.contentPathFactory = contentPathFactory;
+        this.dataDir = cacheDir;
+        this.provDir = cacheDir;
     }
 
     @Override
@@ -50,9 +52,10 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
         return new DatasetWithCache(local,
                 new CachePullThroughPrestonStore(
                         DatasetRegistryUtil.NAMESPACE_LOCAL,
-                        cacheDir,
                         this.resourceService,
-                        contentPathFactory
+                        contentPathFactory,
+                        dataDir,
+                        provDir
                 )
         );
     }

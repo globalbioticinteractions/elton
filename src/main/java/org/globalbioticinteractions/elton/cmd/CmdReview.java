@@ -130,7 +130,7 @@ public class CmdReview extends CmdTabularWriterParams {
     private void reviewCachedOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
         for (String namespace : namespaces) {
             review(namespace,
-                    DatasetRegistryUtil.forCacheDir(
+                    DatasetRegistryUtil.forCache(
                             getDataDir(),
                             getProvDir(),
                             new ResourceServiceLocal(inputStreamFactory),

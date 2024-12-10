@@ -40,7 +40,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
             ResourceService resourceService,
             ContentPathFactory contentPathFactory
     ) {
-        this(namespace, cachePath, resourceService, new StatementListener() {
+        this(namespace, resourceService, new StatementListener() {
             @Override
             public void on(Quad quad) {
                 // do nothing
@@ -50,7 +50,21 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
 
     public CachePullThroughPrestonStore(
             String namespace,
-            String cachePath,
+            ResourceService resourceService,
+            ContentPathFactory contentPathFactory,
+            String dataDir,
+            String provDir
+    ) {
+        this(namespace, resourceService, new StatementListener() {
+            @Override
+            public void on(Quad quad) {
+                // do nothing
+            }
+        }, contentPathFactory, dataDir, provDir);
+    }
+
+    public CachePullThroughPrestonStore(
+            String namespace,
             ResourceService resourceService,
             StatementListener listener,
             ContentPathFactory contentPathFactory,
@@ -58,9 +72,10 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
             String provDir
     ) {
         super(namespace,
-                cachePath,
                 resourceService,
-                contentPathFactory
+                contentPathFactory,
+                dataDir,
+                provDir
         );
         this.namespace = namespace;
         this.dataDir = dataDir;
@@ -70,7 +85,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
     }
 
     public InputStream retrieve(URI resourceURI) throws IOException {
-        CacheUtil.findOrMakeCacheDirForNamespace(dataDir, namespace);
+        CacheUtil.findOrMakeProvOrDataDirForNamespace(dataDir, namespace);
 
         File dataFolder = new File(dataDir, namespace);
         KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(dataFolder.toURI());

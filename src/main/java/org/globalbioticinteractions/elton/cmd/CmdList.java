@@ -29,7 +29,7 @@ public class CmdList extends CmdOnlineParams {
 
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
-        DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheDirOrLocalDir(
+        DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheOrLocalDir(
                 getDataDir(),
                 getProvDir(),
                 getWorkDir(),

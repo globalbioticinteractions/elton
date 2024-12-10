@@ -38,14 +38,15 @@ public class CachePullThroughPrestonStoreTest {
     public void testPrestonStore() throws IOException, URISyntaxException {
         ArrayList<Quad> quads = new ArrayList<>();
 
+        String dataDir = folder.getRoot().getAbsolutePath();
+        String provDir = folder.getRoot().getAbsolutePath();
         Cache cache = new CachePullThroughPrestonStore(
                 "some/namespace"
-                , folder.getRoot().getAbsolutePath()
                 , new ResourceServiceLocal(in -> in)
                 , quads::add,
                 new ContentPathFactoryDepth0(),
-                folder.getRoot().getAbsolutePath(),
-                folder.getRoot().getAbsolutePath()
+                dataDir,
+                provDir
         );
 
         assertThat(quads.size(), Is.is(0));

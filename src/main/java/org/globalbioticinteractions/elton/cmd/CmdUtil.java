@@ -90,7 +90,6 @@ public class CmdUtil {
             ResourceService local = new ResourceServiceLocal(factory);
             Cache pullThroughCache = new CachePullThroughPrestonStore(
                     namespace,
-                    dataDir,
                     remote,
                     quad -> {
                         // ignore printing quads for now

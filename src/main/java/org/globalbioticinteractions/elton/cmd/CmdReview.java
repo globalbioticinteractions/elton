@@ -112,9 +112,10 @@ public class CmdReview extends CmdTabularWriterParams {
             for (URI localNamespace : localNamespaces) {
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
                         localNamespace,
-                        getDataDir(),
                         new ResourceServiceLocalAndRemote(factory, new File(getDataDir())),
-                        getContentPathFactory()
+                        getContentPathFactory(),
+                        getDataDir(),
+                        getProvDir()
                 );
 
                 review(DatasetRegistryUtil.NAMESPACE_LOCAL, registryLocal, factory, shouldSkipHeader());

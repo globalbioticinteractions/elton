@@ -23,14 +23,16 @@ public class DatasetRegistryUtil {
     public static final String NAMESPACE_GITHUB = "github";
 
     public static DatasetRegistry forLocalDir(final URI localArchiveDir,
-                                              final String cacheDir,
                                               ResourceService resourceServiceRemote,
-                                              ContentPathFactory contentPathFactory) {
+                                              ContentPathFactory contentPathFactory,
+                                              String dataDir,
+                                              String provDir) {
         return new DatasetRegistrySingleDir(
                 localArchiveDir,
-                cacheDir,
                 resourceServiceRemote,
-                contentPathFactory
+                contentPathFactory,
+                dataDir,
+                provDir
         );
     }
 
@@ -101,9 +103,10 @@ public class DatasetRegistryUtil {
         if (isEmpty(registry)) {
             registry = forLocalDir(
                     workDir,
-                    dataDir,
                     resourceServiceRemote,
-                    contentPathFactory
+                    contentPathFactory,
+                    dataDir,
+                    provDir
             );
         }
         return registry;

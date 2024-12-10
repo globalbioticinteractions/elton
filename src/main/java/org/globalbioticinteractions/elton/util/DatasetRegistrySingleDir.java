@@ -21,14 +21,15 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
     private ContentPathFactory contentPathFactory;
 
     public DatasetRegistrySingleDir(URI localArchiveDir,
-                                    String cacheDir,
                                     ResourceService resourceService,
-                                    ContentPathFactory contentPathFactory) {
+                                    ContentPathFactory contentPathFactory,
+                                    String dataDir,
+                                    String provDir) {
         this.localArchiveDir = localArchiveDir;
         this.resourceService = resourceService;
         this.contentPathFactory = contentPathFactory;
-        this.dataDir = cacheDir;
-        this.provDir = cacheDir;
+        this.dataDir = dataDir;
+        this.provDir = provDir;
     }
 
     @Override

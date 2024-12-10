@@ -20,7 +20,7 @@ public class DatasetRegistryFactoryImplTest {
         Set<String> supportedRegistries = DatasetRegistryFactoryImpl.getSupportedRegistries();
         for (String supportedRegistry : supportedRegistries) {
             DatasetRegistry registry = new DatasetRegistryFactoryImpl(
-                    URI.create("some:uri"), "someCacheDir", in -> in)
+                    URI.create("some:uri"), "someCacheDir", in -> in, "someDataDir", "someProvDir")
                     .createRegistryByName(supportedRegistry);
             registries.add(registry);
         }

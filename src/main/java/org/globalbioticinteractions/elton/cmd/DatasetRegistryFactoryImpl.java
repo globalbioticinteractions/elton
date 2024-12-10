@@ -8,13 +8,11 @@ import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.util.DatasetRegistrySingleDir;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -33,12 +31,15 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
 
     private final InputStreamFactory inputStreamFactory;
     private final URI workDir;
-    private final String cacheDir;
+    private final String dataDir;
 
-    public DatasetRegistryFactoryImpl(URI workDir, String cacheDir, InputStreamFactory inputStreamFactory) {
+    private final String provDir;
+
+    public DatasetRegistryFactoryImpl(URI workDir, String cacheDir, InputStreamFactory inputStreamFactory, String dataDir, String provDir) {
         this.workDir = workDir;
-        this.cacheDir = cacheDir;
         this.inputStreamFactory = inputStreamFactory;
+        this.dataDir = dataDir;
+        this.provDir = provDir;
     }
 
     @Override
@@ -48,9 +49,9 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
             throw new DatasetRegistryException("failed to create registry for [" + name + "]: not supported");
         }
         try {
-            Class<?>[] paramTypes = {URI.class, String.class, ResourceService.class, ContentPathFactory.class};
+            Class<?>[] paramTypes = {URI.class, ResourceService.class, ContentPathFactory.class, String.class, String.class};
             Optional<Constructor<? extends DatasetRegistry>> constructor = constructorFor(registryClass, paramTypes);
-            ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory, new File(cacheDir));
+            ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory, new File(getDataDir()));
             if (!constructor.isPresent()) {
                 Class<?>[] paramTypesShort = {ResourceService.class};
                 Optional<Constructor<? extends DatasetRegistry>> constructor2 = constructorFor(registryClass, paramTypesShort);
@@ -58,7 +59,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
                         .orElseThrow(() -> new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]")
                         ).newInstance(resourceService);
             } else {
-                return constructor.get().newInstance(getWorkDir(), getCacheDir(), resourceService, new ContentPathFactoryDepth0());
+                return constructor.get().newInstance(getWorkDir(), resourceService, new ContentPathFactoryDepth0(), getDataDir(), getProvDir());
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]", e);
@@ -69,7 +70,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
         try {
             Constructor<? extends DatasetRegistry> constructor = registryClass.getConstructor(paramTypes);
             return Optional.of(constructor);
-        } catch(NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             return Optional.empty();
         }
     }
@@ -82,7 +83,12 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
         return workDir;
     }
 
-    public String getCacheDir() {
-        return cacheDir;
+    public String getDataDir() {
+        return dataDir;
     }
+
+    public String getProvDir() {
+        return provDir;
+    }
+
 }

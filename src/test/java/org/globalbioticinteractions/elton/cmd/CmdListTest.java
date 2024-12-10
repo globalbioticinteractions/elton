@@ -32,7 +32,7 @@ public class CmdListTest {
     private ByteArrayOutputStream runCmd(String cacheDir) {
         CmdList cmd = new CmdList();
         cmd.setDataDir(cacheDir);
-
+        cmd.setProvDir(cacheDir);
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);

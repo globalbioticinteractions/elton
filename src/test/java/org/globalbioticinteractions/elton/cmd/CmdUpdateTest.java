@@ -36,6 +36,7 @@ public class CmdUpdateTest {
         CmdUpdate cmd = new CmdUpdate();
         File file = tmpDir.newFolder();
         cmd.setDataDir(file.getAbsolutePath());
+        cmd.setProvDir(file.getAbsolutePath());
         cmd.setWorkDir(localWorkDir.getAbsolutePath());
         cmd.setRegistryNames(Arrays.asList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         cmd.setNamespaces(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));

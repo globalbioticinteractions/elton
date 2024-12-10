@@ -18,22 +18,21 @@ import java.util.List;
 
 abstract class CmdDefaultParams implements Runnable {
     @CommandLine.Option(names = {"--cache-dir", "-c"},
-            description = "Cache directory"
-    )
+            description = "Cache directory (default: ${DEFAULT-VALUE})")
     private String cacheDir = "./datasets";
 
     @CommandLine.Option(names = {"--prov-dir"},
-            description = "Provenance directory"
+            description = "Provenance directory (default: ${DEFAULT-VALUE})"
     )
     private String provDir = "./datasets";
 
     @CommandLine.Option(names = {"--work-dir", "-w"},
-            description = "Work directory"
+            description = "Work directory (default: ${DEFAULT-VALUE})"
     )
     private String workDir = ".";
 
     @CommandLine.Option(names = {"--no-progress", "--silent"},
-            description = "Do not show progress indicator"
+            description = "Do not show progress indicator (default: ${DEFAULT-VALUE})"
     )
     private boolean noProgress = false;
 

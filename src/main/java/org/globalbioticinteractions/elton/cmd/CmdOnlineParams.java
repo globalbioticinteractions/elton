@@ -6,7 +6,7 @@ abstract class CmdOnlineParams extends CmdDefaultParams {
 
     @CommandLine.Option(
             names = {"--online", "-o"},
-            description = "use online data registries"
+            description = "use online data registries (default: ${DEFAULT-VALUE})"
     )
     private boolean online = false;
 

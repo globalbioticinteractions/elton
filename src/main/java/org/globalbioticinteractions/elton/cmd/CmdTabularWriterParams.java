@@ -7,7 +7,7 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
 
     @CommandLine.Option(
             names = {"--skip-header", "-s", "--no-header"},
-            description = "Skip header"
+            description = "Skip header (default: ${DEFAULT-VALUE})"
     )
 
     private boolean skipHeader = false;

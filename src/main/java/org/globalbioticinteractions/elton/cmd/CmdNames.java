@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.tool.NullImportLogger;
 
@@ -13,13 +15,20 @@ import java.io.PrintStream;
 @CommandLine.Command(
         name = "names",
         aliases = {"taxa", "taxon", "name"},
-        description = "List taxa"
+        description = CmdNames.DESCRIPTION
 )
 public class CmdNames extends CmdTabularWriterParams {
 
+    public static final String DESCRIPTION = "List taxa";
+
     @Override
-    public void run() {
+    public void doRun() {
         run(System.out);
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     void run(PrintStream out) {
@@ -30,7 +39,8 @@ public class CmdNames extends CmdTabularWriterParams {
                 getWorkDir(),
                 createInputStreamFactory(),
                 getContentPathFactory(),
-                getProvenancePathFactory()
+                getProvenancePathFactory(),
+                getStatementListener()
         );
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForTaxonWriting(!shouldSkipHeader(), out);

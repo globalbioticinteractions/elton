@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.util.ResourceServiceRemote;
 
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -18,13 +20,20 @@ import java.util.List;
 @CommandLine.Command(
         name = "list",
         aliases = "ls",
-        description = "List Available Datasets"
+        description = CmdList.DESCRIPTION
 )
 public class CmdList extends CmdOnlineParams {
 
+    public static final String DESCRIPTION = "List Available Datasets";
+
     @Override
-    public void run() {
+    public void doRun() {
         run(getStdout());
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     public void run(PrintStream out) {
@@ -35,7 +44,8 @@ public class CmdList extends CmdOnlineParams {
                 getWorkDir(),
                 inputStreamFactory,
                 getContentPathFactory(),
-                getProvenancePathFactory()
+                getProvenancePathFactory(),
+                getStatementListener()
         );
 
         File cacheDir = new File(getDataDir());

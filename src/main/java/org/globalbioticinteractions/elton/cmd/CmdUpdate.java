@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
@@ -22,12 +23,13 @@ import java.util.List;
 @CommandLine.Command(
         name = "sync",
         aliases = {"pull", "update", "track"},
-        description = "Update Local Datasets With Remote Sources"
+        description = CmdUpdate.DESCRIPTION
 )
 
 public class CmdUpdate extends CmdDefaultParams {
 
     private final static Logger LOG = LoggerFactory.getLogger(CmdUpdate.class);
+    public static final String DESCRIPTION = "Update Local Datasets With Remote Sources";
 
     public void setRegistryNames(List<String> registryNames) {
         this.registryNames = registryNames;
@@ -42,7 +44,12 @@ public class CmdUpdate extends CmdDefaultParams {
     }};
 
     @Override
-    public void run() {
+    public String getDescription() {
+        return DESCRIPTION;
+    }
+
+    @Override
+    protected void doRun() {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
 
         List<DatasetRegistry> registries = new ArrayList<>();
@@ -54,7 +61,7 @@ public class CmdUpdate extends CmdDefaultParams {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);
             } catch (DatasetRegistryException e) {
-                throw new RuntimeException("unsupported registry with name [" + registryName + "]");
+                throw new RuntimeException("unsupported registry with name [" + registryName + "]", e);
             }
         }
 
@@ -69,7 +76,8 @@ public class CmdUpdate extends CmdDefaultParams {
                     getProvDir(),
                     inputStreamFactory,
                     getContentPathFactory(),
-                    getProvenancePathFactory()
+                    getProvenancePathFactory(),
+                    getStatementListener()
             );
 
             Dataset dataset =

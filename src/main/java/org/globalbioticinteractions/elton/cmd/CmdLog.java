@@ -4,8 +4,10 @@ import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
+import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.io.output.NullAppendable;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.tool.NullImportLogger;
@@ -29,10 +31,11 @@ import java.util.Collections;
 @CommandLine.Command(
         name = "log",
         aliases = {"prov"},
-        description = "lists provenance of original resources"
+        description = CmdLog.DESCRIPTION
 )
 public class CmdLog extends CmdDefaultParams {
 
+    public static final String DESCRIPTION = "lists provenance of original resources";
     @CommandLine.Option(
             names = {"--hash-algorithm", "--algo", "-a"},
             description = "Hash algorithm used to generate primary content identifiers. Supported values: ${COMPLETION-CANDIDATES}."
@@ -44,14 +47,15 @@ public class CmdLog extends CmdDefaultParams {
     private final LoggingEmitter emitter = new LoggingEmitter(this);
 
     @Override
-    public void run() {
+    public void doRun() {
         DatasetRegistry registry = DatasetRegistryUtil.forCacheOrLocalDir(
                 getDataDir(),
                 getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),
                 getContentPathFactory(),
-                getProvenancePathFactory()
+                getProvenancePathFactory(),
+                getStatementListener()
         );
 
         IRI softwareAgent = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");
@@ -86,6 +90,11 @@ public class CmdLog extends CmdDefaultParams {
                 NullAppendable.INSTANCE,
                 new NullImportLogger(), new File(getWorkDir())
         );
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     public void setHashType(HashType hashType) {

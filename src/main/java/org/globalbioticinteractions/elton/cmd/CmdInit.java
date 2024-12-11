@@ -29,10 +29,11 @@ import java.util.List;
 
 @CommandLine.Command(
         name = "init",
-        description = "Initialize a GloBI indexed dataset configuration"
+        description = CmdInit.DESCRIPTION
 )
 public class CmdInit extends CmdDefaultParams {
 
+    public static final String DESCRIPTION = "Initialize a GloBI indexed dataset configuration";
     @CommandLine.Option(names = {"--data-url"}, description = "data url", required = true)
     private String dataUrl;
 
@@ -40,7 +41,7 @@ public class CmdInit extends CmdDefaultParams {
     private String dataCitation;
 
     @Override
-    public void run() {
+    public void doRun() {
         if (getNamespaces().size() == 0) {
             throw new RuntimeException("no dataset namespace found: please provide one and only one dataset namespace");
         } else if (getNamespaces().size() > 1) {
@@ -68,6 +69,11 @@ public class CmdInit extends CmdDefaultParams {
             }
         }
 
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
 

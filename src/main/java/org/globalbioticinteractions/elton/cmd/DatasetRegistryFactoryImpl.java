@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
@@ -34,12 +36,19 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
     private final String dataDir;
 
     private final String provDir;
+    private final StatementListener statementListener;
 
     public DatasetRegistryFactoryImpl(URI workDir, InputStreamFactory inputStreamFactory, String dataDir, String provDir) {
         this.workDir = workDir;
         this.inputStreamFactory = inputStreamFactory;
         this.dataDir = dataDir;
         this.provDir = provDir;
+        this.statementListener = new StatementListener() {
+            @Override
+            public void on(Quad quad) {
+
+            }
+        };
     }
 
     @Override
@@ -49,7 +58,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
             throw new DatasetRegistryException("failed to create registry for [" + name + "]: not supported");
         }
         try {
-            Class<?>[] paramTypes = {URI.class, ResourceService.class, ContentPathFactory.class, String.class, String.class};
+            Class<?>[] paramTypes = {URI.class, ResourceService.class, ContentPathFactory.class, String.class, String.class, StatementListener.class};
             Optional<Constructor<? extends DatasetRegistry>> constructor = constructorFor(registryClass, paramTypes);
             ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory, new File(getDataDir()));
             if (!constructor.isPresent()) {
@@ -59,7 +68,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
                         .orElseThrow(() -> new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]")
                         ).newInstance(resourceService);
             } else {
-                return constructor.get().newInstance(getWorkDir(), resourceService, new ContentPathFactoryDepth0(), getDataDir(), getProvDir());
+                return constructor.get().newInstance(getWorkDir(), resourceService, new ContentPathFactoryDepth0(), getDataDir(), getProvDir(), getStatementListener());
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]", e);
@@ -91,4 +100,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
         return provDir;
     }
 
+    public StatementListener getStatementListener() {
+        return statementListener;
+    }
 }

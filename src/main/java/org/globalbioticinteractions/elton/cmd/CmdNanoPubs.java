@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.tool.NullImportLogger;
 
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -17,10 +19,11 @@ import java.util.UUID;
 
 @CommandLine.Command(
         name = "nanopubs",
-        description = "List Interaction Nanopubs, see http://nanopub.org"
+        description = CmdNanoPubs.DESCRIPTION
 )
 public class CmdNanoPubs extends CmdDefaultParams {
 
+    public static final String DESCRIPTION = "List Interaction Nanopubs, see https://nanopub.net";
     private IdGenerator idGenerator = () -> UUID.randomUUID().toString().replaceAll("-", "");
 
     public void setIdGenerator(IdGenerator idGenerator) {
@@ -32,8 +35,13 @@ public class CmdNanoPubs extends CmdDefaultParams {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         run(System.out);
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     private InteractionWriter createSerializer(PrintStream out) {
@@ -46,7 +54,9 @@ public class CmdNanoPubs extends CmdDefaultParams {
                 getProvDir(),
                 getWorkDir(),
                 createInputStreamFactory(),
-                getContentPathFactory(), getProvenancePathFactory()
+                getContentPathFactory(),
+                getProvenancePathFactory(),
+                getStatementListener()
         );
 
         InteractionWriter serializer = createSerializer(out);

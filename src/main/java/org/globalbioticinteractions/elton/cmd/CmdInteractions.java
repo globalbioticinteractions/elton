@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
@@ -16,13 +18,20 @@ import java.util.concurrent.atomic.AtomicLong;
 @CommandLine.Command(
         name = "interactions",
         aliases = {"interaction", "interact"},
-        description = "List Interactions"
+        description = CmdInteractions.DESCRIPTION
 )
 public class CmdInteractions extends CmdTabularWriterParams {
 
+    public static final String DESCRIPTION = "List Interactions";
+
     @Override
-    public void run() {
+    public void doRun() {
         run(System.out);
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     void run(PrintStream out) {
@@ -33,7 +42,9 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 getWorkDir(),
                 createInputStreamFactory(),
                 getContentPathFactory(),
-                getProvenancePathFactory());
+                getProvenancePathFactory(),
+                getStatementListener()
+        );
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForInteractionWriting(!shouldSkipHeader(), out);
 
@@ -42,8 +53,10 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 nodeFactory,
                 getNamespaces(),
                 "listing interactions",
-                getStderr(), new ImportLogger() {
+                getStderr(),
+                new ImportLogger() {
                     final AtomicLong lineCounter = new AtomicLong(0);
+
                     @Override
                     public void warn(LogContext ctx, String message) {
                         reportProgress();
@@ -65,7 +78,9 @@ public class CmdInteractions extends CmdTabularWriterParams {
                             getProgressCursorFactory().createProgressCursor().increment();
                         }
                     }
-                }, new File(getWorkDir()));
+                },
+                new File(getWorkDir())
+        );
     }
 }
 

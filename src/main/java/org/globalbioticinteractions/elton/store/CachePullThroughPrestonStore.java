@@ -37,21 +37,6 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
     public CachePullThroughPrestonStore(
             String namespace,
             ResourceService resourceService,
-            ContentPathFactory contentPathFactory,
-            String dataDir,
-            String provDir
-    ) {
-        this(namespace, resourceService, new StatementListener() {
-            @Override
-            public void on(Quad quad) {
-                // do nothing
-            }
-        }, contentPathFactory, dataDir, provDir);
-    }
-
-    public CachePullThroughPrestonStore(
-            String namespace,
-            ResourceService resourceService,
             StatementListener listener,
             ContentPathFactory contentPathFactory,
             String dataDir,
@@ -104,12 +89,14 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
     }
 
     private void streamProvenance(URI resourceURI, IRI dereferenced, StatementListener statementListener) {
-        Quad quad = RefNodeFactory.toStatement(
-                RefNodeFactory.toIRI(resourceURI),
-                RefNodeConstants.HAS_VERSION,
-                dereferenced
-        );
-        statementListener.on(quad);
+        if (statementListener != null) {
+            Quad quad = RefNodeFactory.toStatement(
+                    RefNodeFactory.toIRI(resourceURI),
+                    RefNodeConstants.HAS_VERSION,
+                    dereferenced
+            );
+            statementListener.on(quad);
+        }
     }
 
     private void recordProvenance(URI resourceURI, KeyTo1LevelPath keyToPath, IRI dereferenced) throws IOException {

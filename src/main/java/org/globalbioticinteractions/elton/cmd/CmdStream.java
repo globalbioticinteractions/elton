@@ -31,14 +31,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @CommandLine.Command(
         name = "stream",
-        description = "stream interactions associated with dataset configuration provided by globi.json line-json as input.\n" +
-                "example input:" +
-                "{ \"namespace\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\", \"citation\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\", \"format\": \"dwca\", \"url\": \"https://linker.bio/hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\" }\n"
+        description = CmdStream.DESCRIPTION
 )
 
 public class CmdStream extends CmdDefaultParams {
 
     private final static Logger LOG = LoggerFactory.getLogger(CmdStream.class);
+    public static final String DESCRIPTION = "stream interactions associated with dataset configuration provided by globi.json line-json as input.\n" +
+            "example input:" +
+            "{ \"namespace\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\", \"citation\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\", \"format\": \"dwca\", \"url\": \"https://linker.bio/hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\" }\n";
 
     public void setRecordType(String recordType) {
         this.recordType = recordType;
@@ -50,7 +51,7 @@ public class CmdStream extends CmdDefaultParams {
     private String recordType = "interaction";
 
     @Override
-    public void run() {
+    public void doRun() {
 
         BufferedReader reader = IOUtils.buffer(new InputStreamReader(getStdin(), StandardCharsets.UTF_8));
         AtomicBoolean isFirst = new AtomicBoolean(true);
@@ -98,6 +99,11 @@ public class CmdStream extends CmdDefaultParams {
             LOG.error("failed to read from stdin", ex);
         }
 
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     public static class ImportLoggerFactoryImpl implements ImportLoggerFactory {

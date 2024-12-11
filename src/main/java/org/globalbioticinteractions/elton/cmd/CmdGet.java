@@ -1,10 +1,12 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.RefNodeFactory;
+import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
 
+import org.apache.commons.rdf.api.Quad;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
@@ -26,15 +28,21 @@ import static bio.guoda.preston.RefNodeConstants.HAS_VERSION;
 @CommandLine.Command(
         name = "cat",
         aliases = {"get"},
-        description = "gets resource by hash uri"
+        description = CmdGet.DESCRIPTION
 )
 public class CmdGet extends CmdDefaultParams {
 
     private static final Pattern PATTERN_OBJECT_NEWER = Pattern.compile(".* (" + HAS_VERSION.toString() + ") <(?<obj>[^>]*)>(.*) [.]$");
+    static final String DESCRIPTION = "gets resource by hash uri";
 
     @Override
-    public void run() {
+    public void doRun() {
         run(getStdout());
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     void run(PrintStream out) {
@@ -44,7 +52,8 @@ public class CmdGet extends CmdDefaultParams {
                 getWorkDir(),
                 createInputStreamFactory(),
                 getContentPathFactory(),
-                getProvenancePathFactory()
+                getProvenancePathFactory(),
+                getStatementListener()
         );
 
         final List<String> actualNamespaces = new ArrayList<>();

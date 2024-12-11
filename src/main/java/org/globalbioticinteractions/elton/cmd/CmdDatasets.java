@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
 
+import bio.guoda.preston.process.StatementListener;
+import org.apache.commons.rdf.api.Quad;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -14,9 +16,11 @@ import java.util.stream.Stream;
 
 @CommandLine.Command(
         name = "datasets",
-        description = "List Datasets Details"
+        description = CmdDatasets.DESCRIPTION
 )
 public class CmdDatasets extends CmdTabularWriterParams {
+
+    public static final String DESCRIPTION = "List Datasets Details";
 
     public class TsvDatasetWriter implements TabularWriter {
         private final PrintStream out;
@@ -39,8 +43,13 @@ public class CmdDatasets extends CmdTabularWriterParams {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         run(System.out);
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     void run(PrintStream out) {
@@ -55,7 +64,8 @@ public class CmdDatasets extends CmdTabularWriterParams {
                 getWorkDir(),
                 createInputStreamFactory(),
                 getContentPathFactory(),
-                getProvenancePathFactory()
+                getProvenancePathFactory(),
+                getStatementListener()
         );
 
         try {

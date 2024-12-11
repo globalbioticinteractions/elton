@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.store;
 
 import bio.guoda.preston.HashType;
+import bio.guoda.preston.process.StatementListener;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo1LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
@@ -97,7 +98,12 @@ public class CachePullThroughPrestonStoreTest {
         Cache cache = new CachePullThroughPrestonStore(
                 "some/namespace"
                 , new ResourceServiceLocal(in -> in),
-                new ContentPathFactoryDepth0(),
+                new StatementListener() {
+                    @Override
+                    public void on(Quad quad) {
+                        // do nothing
+                    }
+                }, new ContentPathFactoryDepth0(),
                 dataDir,
                 provDir
         );

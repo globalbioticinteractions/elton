@@ -1,9 +1,11 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.CharsetConstant;
 import org.eol.globi.data.DatasetImporterForRegistry;
 import org.eol.globi.data.DatasetImporterForTSV;
@@ -67,12 +69,13 @@ import static org.eol.globi.data.DatasetImporterForTSV.SOURCE_OCCURRENCE_ID;
 @CommandLine.Command(
         name = "review",
         aliases = {"test", "check"},
-        description = "Review Datasets. If no namespace is provided the local workdir is used."
+        description = CmdReview.DESCRIPTION
 )
 public class CmdReview extends CmdTabularWriterParams {
     public static final String LOG_FORMAT_STRING = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s";
     public static final long LOG_NUMBER_OF_FIELDS = Arrays.stream(LOG_FORMAT_STRING.split("\t")).filter(x -> x.equals("%s")).count();
     public static final String REVIEWER_DEFAULT = "GloBI automated reviewer (elton-" + Elton.getVersionString() + ")";
+    public static final String DESCRIPTION = "Review Datasets. If no namespace is provided the local workdir is used.";
 
     @CommandLine.Option(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Long maxLines = null;
@@ -90,7 +93,7 @@ public class CmdReview extends CmdTabularWriterParams {
 
 
     @Override
-    public void run() {
+    public void doRun() {
         try {
             List<URI> localNamespaces = new ArrayList<>();
             List<String> remoteNamespaces = new ArrayList<>();
@@ -115,7 +118,8 @@ public class CmdReview extends CmdTabularWriterParams {
                         new ResourceServiceLocalAndRemote(factory, new File(getDataDir())),
                         getContentPathFactory(),
                         getDataDir(),
-                        getProvDir()
+                        getProvDir(),
+                        getStatementListener()
                 );
 
                 review(DatasetRegistryUtil.NAMESPACE_LOCAL, registryLocal, factory, shouldSkipHeader());
@@ -126,6 +130,11 @@ public class CmdReview extends CmdTabularWriterParams {
         } catch (StudyImporterException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
     }
 
     private void reviewCachedOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {

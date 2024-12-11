@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
@@ -66,7 +67,8 @@ public class CmdUtil {
             String provDir,
             InputStreamFactory factory,
             ContentPathFactory contentPathFactory,
-            ProvenancePathFactory provenancePathFactory) {
+            ProvenancePathFactory provenancePathFactory,
+            StatementListener statementListener) {
 
         CacheFactory cacheFactory = createCacheFactory(
                 namespace,
@@ -74,7 +76,7 @@ public class CmdUtil {
                 provDir,
                 factory,
                 contentPathFactory,
-                provenancePathFactory
+                provenancePathFactory, statementListener
         );
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, dataDir), cacheFactory);
     }
@@ -84,16 +86,15 @@ public class CmdUtil {
                                                   String provDir,
                                                   InputStreamFactory factory,
                                                   ContentPathFactory contentPathFactory,
-                                                  ProvenancePathFactory provenancePathFactory) {
+                                                  ProvenancePathFactory provenancePathFactory,
+                                                  StatementListener statementListener) {
         return dataset -> {
             ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(dataDir));
             ResourceService local = new ResourceServiceLocal(factory);
             Cache pullThroughCache = new CachePullThroughPrestonStore(
                     namespace,
                     remote,
-                    quad -> {
-                        // ignore printing quads for now
-                    },
+                    statementListener,
                     contentPathFactory,
                     dataDir,
                     provDir);

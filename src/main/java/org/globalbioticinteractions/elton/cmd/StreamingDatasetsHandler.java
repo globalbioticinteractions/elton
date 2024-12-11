@@ -65,7 +65,11 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                 provDir,
                 factory,
                 contentPathFactory,
-                provenancePathFactory
+                provenancePathFactory, quad -> {
+                    if (quad != null) {
+                        System.out.println(quad.toString());
+                    }
+                }
         );
 
         Dataset dataset = new DatasetWithResourceMapping(

@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
+import bio.guoda.preston.process.StatementListener;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocal;
@@ -26,13 +27,15 @@ public class DatasetRegistryUtil {
                                               ResourceService resourceServiceRemote,
                                               ContentPathFactory contentPathFactory,
                                               String dataDir,
-                                              String provDir) {
+                                              String provDir,
+                                              StatementListener listener) {
         return new DatasetRegistrySingleDir(
                 localArchiveDir,
                 resourceServiceRemote,
                 contentPathFactory,
                 dataDir,
-                provDir
+                provDir,
+                listener
         );
     }
 
@@ -75,7 +78,8 @@ public class DatasetRegistryUtil {
                                                      URI workDir,
                                                      InputStreamFactory streamFactory,
                                                      ContentPathFactory contentPathFactory,
-                                                     ProvenancePathFactory provenancePathFactory) {
+                                                     ProvenancePathFactory provenancePathFactory,
+                                                     StatementListener listener) {
         return forCacheOrLocalDir(
                 dataDir,
                 provDir,
@@ -83,7 +87,8 @@ public class DatasetRegistryUtil {
                 new ResourceServiceLocal(streamFactory),
                 new ResourceServiceLocalAndRemote(streamFactory, new File(dataDir)),
                 contentPathFactory,
-                provenancePathFactory);
+                provenancePathFactory,
+                listener);
     }
 
     public static DatasetRegistry forCacheOrLocalDir(String dataDir,
@@ -92,7 +97,8 @@ public class DatasetRegistryUtil {
                                                      ResourceService resourceServiceLocal,
                                                      ResourceService resourceServiceRemote,
                                                      ContentPathFactory contentPathFactory,
-                                                     ProvenancePathFactory provenancePathFactory) {
+                                                     ProvenancePathFactory provenancePathFactory,
+                                                     StatementListener listener) {
         DatasetRegistry registry = forCache(
                 dataDir,
                 provDir,
@@ -106,7 +112,8 @@ public class DatasetRegistryUtil {
                     resourceServiceRemote,
                     contentPathFactory,
                     dataDir,
-                    provDir
+                    provDir,
+                    listener
             );
         }
         return registry;

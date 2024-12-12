@@ -16,7 +16,6 @@ import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.DateUtil;
 import org.globalbioticinteractions.cache.CachePullThrough;
-import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ContentProvenance;
 import org.globalbioticinteractions.cache.ProvenanceLog;
@@ -57,9 +56,6 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
 
     @Override
     public InputStream retrieve(URI resourceURI) throws IOException {
-        CacheUtil.findOrMakeProvOrDataDirForNamespace(dataDir, namespace);
-        CacheUtil.findOrMakeProvOrDataDirForNamespace(provDir, namespace);
-
         File dataFolder = new File(dataDir, namespace);
         KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(dataFolder.toURI());
         BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(

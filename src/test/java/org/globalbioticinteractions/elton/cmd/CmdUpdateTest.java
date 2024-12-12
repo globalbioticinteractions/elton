@@ -35,6 +35,24 @@ public class CmdUpdateTest {
 
         CmdUpdate cmd = new CmdUpdate();
         File file = tmpDir.newFolder();
+        assertUpdate(localWorkDir, cmd, file);
+    }
+
+    @Test
+    public void updateNonExistentDirectoriesLocalDataset() throws IOException, URISyntaxException {
+
+        URL localDataset = getClass().getResource("/dataset-local-test/globi.json");
+
+        File localWorkDir = new File(localDataset.toURI()).getParentFile();
+
+        File file = tmpDir.newFolder();
+        file.delete();
+
+        CmdUpdate cmd = new CmdUpdate();
+        assertUpdate(localWorkDir, cmd, file);
+    }
+
+    private void assertUpdate(File localWorkDir, CmdUpdate cmd, File file) throws IOException {
         cmd.setDataDir(file.getAbsolutePath());
         cmd.setProvDir(file.getAbsolutePath());
         cmd.setWorkDir(localWorkDir.getAbsolutePath());

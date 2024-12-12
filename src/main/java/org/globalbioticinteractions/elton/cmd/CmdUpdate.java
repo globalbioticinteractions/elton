@@ -73,8 +73,9 @@ public class CmdUpdate extends CmdDefaultParams {
         NamespaceHandler namespaceHandler = namespace -> {
             getStderr().print("tracking [" + namespace + "]... ");
 
-            CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
+            CacheUtil.findOrMakeProvOrDataDirForNamespace(new File(getWorkDir()), namespace);
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getProvDir(), namespace);
+            CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
 
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
                     registryProxy,

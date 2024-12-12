@@ -58,6 +58,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
     @Override
     public InputStream retrieve(URI resourceURI) throws IOException {
         CacheUtil.findOrMakeProvOrDataDirForNamespace(dataDir, namespace);
+        CacheUtil.findOrMakeProvOrDataDirForNamespace(provDir, namespace);
 
         File dataFolder = new File(dataDir, namespace);
         KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(dataFolder.toURI());

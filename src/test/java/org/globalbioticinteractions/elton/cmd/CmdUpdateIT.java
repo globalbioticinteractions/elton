@@ -37,16 +37,29 @@ public class CmdUpdateIT {
         assertAccessLogForNamespace("globalbioticinteractions/template-dataset");
     }
 
+    @Test
+    public void runUpdateNonExistingDataProvFolders() throws IOException {
+        CmdUpdate cmd = new CmdUpdate();
+        File dataProvFolder = tmpDir.newFolder();
+        dataProvFolder.delete();
+        doUpdate("globalbioticinteractions/template-dataset", cmd, dataProvFolder);
+    }
+
     private void assertAccessLogForNamespace(String namespace) throws IOException {
         CmdUpdate cmd = new CmdUpdate();
         File file1 = tmpDir.newFolder();
-        String absolutePath = file1.getAbsolutePath();
+        doUpdate(namespace, cmd, file1);
+    }
+
+    private void doUpdate(String namespace, CmdUpdate cmd, File dataProvFolder) throws IOException {
+        String absolutePath = dataProvFolder.getAbsolutePath();
         cmd.setDataDir(absolutePath);
+        cmd.setProvDir(absolutePath);
         cmd.setNamespaces(Collections.singletonList(namespace));
 
         cmd.run();
 
-        File datasetDir = assertAccessLog(namespace, file1);
+        File datasetDir = assertAccessLog(namespace, dataProvFolder);
 
         int numberOfLogEntries = getNumberOfLogEntries(datasetDir);
         assertThat(getNumberOfLogEntries(datasetDir) > 3, is(true));

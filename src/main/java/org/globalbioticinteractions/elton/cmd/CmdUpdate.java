@@ -1,10 +1,12 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.process.StatementListener;
+import org.apache.commons.io.FileUtils;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
 
+import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -52,11 +54,13 @@ public class CmdUpdate extends CmdDefaultParams {
     protected void doRun() {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
 
+
+
         List<DatasetRegistry> registries = new ArrayList<>();
         for (String registryName : registryNames) {
             DatasetRegistryFactoryImpl datasetRegistryFactory
                     = new DatasetRegistryFactoryImpl(
-                            getWorkDir(), inputStreamFactory, getDataDir(), getDataDir());
+                            getWorkDir(), inputStreamFactory, getDataDir(), getProvDir());
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);
@@ -68,6 +72,9 @@ public class CmdUpdate extends CmdDefaultParams {
         DatasetRegistry registryProxy = new DatasetRegistryProxy(registries);
         NamespaceHandler namespaceHandler = namespace -> {
             getStderr().print("tracking [" + namespace + "]... ");
+
+            CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
+            CacheUtil.findOrMakeProvOrDataDirForNamespace(getProvDir(), namespace);
 
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
                     registryProxy,

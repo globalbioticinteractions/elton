@@ -88,7 +88,6 @@ public class CachePullThroughPrestonStoreTest {
                 provDir, new DeferenceListener(
                 "some/namespace",
                 listener,
-                dataDir,
                 provDir
         )
         );
@@ -149,7 +148,6 @@ public class CachePullThroughPrestonStoreTest {
                 new DeferenceListener(
                         namespace,
                         quads::add,
-                        dataDir,
                         provDir
                 )
         );

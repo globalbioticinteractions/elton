@@ -51,9 +51,10 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
     public InputStream retrieve(URI resourceURI) throws IOException {
         File dataFolder = new File(dataDir, namespace);
         KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(dataFolder.toURI());
+        File tmpDir = dataFolder;
         BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
                 new KeyValueStoreLocalFileSystem(
-                        dataFolder,
+                        tmpDir,
                         keyToPath,
                         new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
@@ -72,7 +73,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
             UUID activityId = UUID.randomUUID();
             dereferenceListener.onStarted(activityId, request);
             IRI response = derefCas.get(request);
-            dereferenceListener.onCompleted(activityId, request, response);
+            dereferenceListener.onCompleted(activityId, request, response, keyToPath.toPath(response));
 
             return blobStore.get(response);
         } catch (IOException ex) {

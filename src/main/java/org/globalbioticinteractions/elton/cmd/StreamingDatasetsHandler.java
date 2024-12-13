@@ -67,7 +67,6 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                         System.out.println(quad.toString());
                     }
                 },
-                cacheDir,
                 provDir
         );
 

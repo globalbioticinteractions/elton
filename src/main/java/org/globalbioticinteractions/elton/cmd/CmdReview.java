@@ -115,7 +115,6 @@ public class CmdReview extends CmdTabularWriterParams {
             ActivityListener dereferenceListener = new DeferenceListener(
                     DatasetRegistryUtil.NAMESPACE_LOCAL,
                     getStatementListener(),
-                    getDataDir(),
                     getProvDir()
             );
 

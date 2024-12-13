@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
@@ -10,6 +11,7 @@ import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
+import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.DeferenceListener;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
@@ -18,8 +20,10 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @CommandLine.Command(
         name = "sync",
@@ -59,7 +63,18 @@ public class CmdUpdate extends CmdDefaultParams {
         for (String registryName : registryNames) {
             DatasetRegistryFactoryImpl datasetRegistryFactory
                     = new DatasetRegistryFactoryImpl(
-                            getWorkDir(), inputStreamFactory, getDataDir(), getProvDir());
+                            getWorkDir(), inputStreamFactory, getDataDir(), getProvDir(), new ActivityListener() {
+
+                                @Override
+                                public void onStarted(UUID activityId, IRI request) {
+
+                                }
+
+                                @Override
+                                public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
+
+                                }
+                            });
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);
@@ -79,7 +94,6 @@ public class CmdUpdate extends CmdDefaultParams {
             DeferenceListener dereferenceListener = new DeferenceListener(
                     namespace,
                     getStatementListener(),
-                    getDataDir(),
                     getProvDir()
             );
 

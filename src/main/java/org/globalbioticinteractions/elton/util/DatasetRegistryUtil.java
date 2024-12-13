@@ -118,7 +118,6 @@ public class DatasetRegistryUtil {
                     new DeferenceListener(
                             NAMESPACE_LOCAL,
                             listener,
-                            dataDir,
                             provDir
                     )
             );

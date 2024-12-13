@@ -17,22 +17,14 @@ import java.net.URI;
 import java.util.UUID;
 
 public class DeferenceListener implements ActivityListener {
-    private final KeyTo1LevelPath keyToPath;
     private final String namespace;
     private final StatementListener listener;
     private final String provDir;
 
-    public DeferenceListener(String namespace, StatementListener listener, String dataDir, String provDir) {
-        File dataFolder = new File(dataDir, namespace);
-        this.keyToPath = new KeyTo1LevelPath(dataFolder.toURI());
+    public DeferenceListener(String namespace, StatementListener listener, String provDir) {
         this.namespace = namespace;
         this.listener = listener;
         this.provDir = provDir;
-    }
-
-    public static KeyTo1LevelPath getKeyTo1LevelPath(String namespace, String dataDir) {
-        File dataFolder = new File(dataDir, namespace);
-        return new KeyTo1LevelPath(dataFolder.toURI());
     }
 
     @Override
@@ -41,10 +33,10 @@ public class DeferenceListener implements ActivityListener {
     }
 
     @Override
-    public void onCompleted(UUID activityId, IRI request, IRI response) {
+    public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
         streamProvenance(request, response, listener);
         try {
-            recordProvenance(URI.create(request.getIRIString()), response, keyToPath);
+            recordProvenance(URI.create(request.getIRIString()), response, localPathOfResponseData);
         } catch (IOException e) {
             throw new RuntimeException("failed to record provenance", e);
         }
@@ -62,8 +54,8 @@ public class DeferenceListener implements ActivityListener {
         }
     }
 
-    private void recordProvenance(URI resourceURI, IRI dereferenced, KeyTo1LevelPath keyToPath) throws IOException {
-        URI localPathURI = keyToPath.toPath(dereferenced);
+    private void recordProvenance(URI resourceURI, IRI dereferenced, URI localPathURI1) throws IOException {
+        URI localPathURI = localPathURI1;
         ContentProvenance contentProvenanceWithNamespace
                 = new ContentProvenance(namespace,
                 resourceURI,

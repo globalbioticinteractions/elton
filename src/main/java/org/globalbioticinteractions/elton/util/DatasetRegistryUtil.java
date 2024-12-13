@@ -13,6 +13,8 @@ import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
+import org.globalbioticinteractions.elton.store.ActivityListener;
+import org.globalbioticinteractions.elton.store.DeferenceListener;
 
 import java.io.File;
 import java.net.URI;
@@ -28,14 +30,14 @@ public class DatasetRegistryUtil {
                                               ContentPathFactory contentPathFactory,
                                               String dataDir,
                                               String provDir,
-                                              StatementListener listener) {
+                                              ActivityListener dereferenceListener) {
         return new DatasetRegistrySingleDir(
                 localArchiveDir,
                 resourceServiceRemote,
                 contentPathFactory,
                 dataDir,
                 provDir,
-                listener
+                dereferenceListener
         );
     }
 
@@ -113,7 +115,12 @@ public class DatasetRegistryUtil {
                     contentPathFactory,
                     dataDir,
                     provDir,
-                    listener
+                    new DeferenceListener(
+                            NAMESPACE_LOCAL,
+                            listener,
+                            dataDir,
+                            provDir
+                    )
             );
         }
         return registry;

@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.util;
 
-import bio.guoda.preston.process.StatementListener;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.dataset.Dataset;
@@ -8,7 +7,9 @@ import org.globalbioticinteractions.dataset.DatasetImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
+import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
+import org.globalbioticinteractions.elton.store.DeferenceListener;
 
 import java.net.URI;
 import java.util.Collections;
@@ -20,20 +21,21 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
     private final String dataDir;
     private ResourceService resourceService;
     private ContentPathFactory contentPathFactory;
-    private final StatementListener listener;
+    private ActivityListener dereferenceListener;
 
     public DatasetRegistrySingleDir(URI localArchiveDir,
                                     ResourceService resourceService,
                                     ContentPathFactory contentPathFactory,
                                     String dataDir,
                                     String provDir,
-                                    StatementListener listener) {
+                                    ActivityListener dereferenceListener) {
         this.localArchiveDir = localArchiveDir;
         this.resourceService = resourceService;
         this.contentPathFactory = contentPathFactory;
         this.dataDir = dataDir;
         this.provDir = provDir;
-        this.listener = listener;
+        this.dereferenceListener = dereferenceListener;
+
     }
 
     @Override
@@ -58,10 +60,10 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
                 new CachePullThroughPrestonStore(
                         DatasetRegistryUtil.NAMESPACE_LOCAL,
                         this.resourceService,
-                        listener,
                         contentPathFactory,
                         dataDir,
-                        provDir
+                        provDir,
+                        dereferenceListener
                 )
         );
     }

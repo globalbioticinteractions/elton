@@ -1,7 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.process.StatementListener;
-import org.apache.commons.io.FileUtils;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
@@ -12,6 +10,7 @@ import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
+import org.globalbioticinteractions.elton.store.DeferenceListener;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.slf4j.Logger;
@@ -77,6 +76,13 @@ public class CmdUpdate extends CmdDefaultParams {
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getProvDir(), namespace);
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
 
+            DeferenceListener dereferenceListener = new DeferenceListener(
+                    namespace,
+                    getStatementListener(),
+                    getDataDir(),
+                    getProvDir()
+            );
+
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
                     registryProxy,
                     namespace,
@@ -85,7 +91,7 @@ public class CmdUpdate extends CmdDefaultParams {
                     inputStreamFactory,
                     getContentPathFactory(),
                     getProvenancePathFactory(),
-                    getStatementListener()
+                    dereferenceListener
             );
 
             Dataset dataset =

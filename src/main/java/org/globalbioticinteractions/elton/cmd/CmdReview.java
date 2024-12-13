@@ -1,11 +1,9 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.process.StatementListener;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.CharsetConstant;
 import org.eol.globi.data.DatasetImporterForRegistry;
 import org.eol.globi.data.DatasetImporterForTSV;
@@ -35,6 +33,8 @@ import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.Elton;
+import org.globalbioticinteractions.elton.store.ActivityListener;
+import org.globalbioticinteractions.elton.store.DeferenceListener;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
@@ -112,6 +112,13 @@ public class CmdReview extends CmdTabularWriterParams {
 
             InputStreamFactory factory = createInputStreamFactory();
 
+            ActivityListener dereferenceListener = new DeferenceListener(
+                    DatasetRegistryUtil.NAMESPACE_LOCAL,
+                    getStatementListener(),
+                    getDataDir(),
+                    getProvDir()
+            );
+
             for (URI localNamespace : localNamespaces) {
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
                         localNamespace,
@@ -119,7 +126,7 @@ public class CmdReview extends CmdTabularWriterParams {
                         getContentPathFactory(),
                         getDataDir(),
                         getProvDir(),
-                        getStatementListener()
+                        dereferenceListener
                 );
 
                 review(DatasetRegistryUtil.NAMESPACE_LOCAL, registryLocal, factory, shouldSkipHeader());

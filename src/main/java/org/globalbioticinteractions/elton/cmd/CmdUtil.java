@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
@@ -25,7 +24,9 @@ import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLogger;
 import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
+import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
+import org.globalbioticinteractions.elton.store.DeferenceListener;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class CmdUtil {
             InputStreamFactory factory,
             ContentPathFactory contentPathFactory,
             ProvenancePathFactory provenancePathFactory,
-            StatementListener statementListener) {
+            ActivityListener dereferenceListener) {
 
         CacheFactory cacheFactory = createCacheFactory(
                 namespace,
@@ -76,7 +77,8 @@ public class CmdUtil {
                 provDir,
                 factory,
                 contentPathFactory,
-                provenancePathFactory, statementListener
+                provenancePathFactory,
+                dereferenceListener
         );
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, dataDir), cacheFactory);
     }
@@ -87,17 +89,17 @@ public class CmdUtil {
                                                   InputStreamFactory factory,
                                                   ContentPathFactory contentPathFactory,
                                                   ProvenancePathFactory provenancePathFactory,
-                                                  StatementListener statementListener) {
+                                                  ActivityListener dereferenceListener) {
         return dataset -> {
             ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(dataDir));
             ResourceService local = new ResourceServiceLocal(factory);
             Cache pullThroughCache = new CachePullThroughPrestonStore(
                     namespace,
                     remote,
-                    statementListener,
                     contentPathFactory,
                     dataDir,
-                    provDir);
+                    provDir,
+                    dereferenceListener);
 
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(
                     namespace,

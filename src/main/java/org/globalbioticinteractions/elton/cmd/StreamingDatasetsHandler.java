@@ -14,6 +14,7 @@ import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
+import org.globalbioticinteractions.elton.store.DeferenceListener;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,17 +60,25 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     @Override
     public void onNamespace(String namespace) throws Exception {
         stderr.print("tracking [" + namespace + "]...");
+        DeferenceListener dereferenceListener = new DeferenceListener(
+                namespace,
+                quad -> {
+                    if (quad != null) {
+                        System.out.println(quad.toString());
+                    }
+                },
+                cacheDir,
+                provDir
+        );
+
         CacheFactory cacheFactory = CmdUtil.createCacheFactory(
                 namespace,
                 cacheDir,
                 provDir,
                 factory,
                 contentPathFactory,
-                provenancePathFactory, quad -> {
-                    if (quad != null) {
-                        System.out.println(quad.toString());
-                    }
-                }
+                provenancePathFactory,
+                dereferenceListener
         );
 
         Dataset dataset = new DatasetWithResourceMapping(

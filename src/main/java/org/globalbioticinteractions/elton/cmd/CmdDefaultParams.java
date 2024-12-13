@@ -166,11 +166,7 @@ abstract class CmdDefaultParams implements Runnable {
         return quad -> {
             if (enableProvenanceLogging && quad != null) {
                 Quad quadInActivity = RefNodeFactory.toStatement(RefNodeFactory.toIRI(getActivityId()), quad);
-                try (OutputStream outputStream = new FileOutputStream(new File(provDir, "prov.nq"), true)) {
-                    new PrintStream(outputStream).println(quadInActivity.toString());
-                    } catch (IOException e) {
-                    //
-                }
+                getStdout().println(quadInActivity);
             }
         };
     }

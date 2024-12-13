@@ -6,7 +6,6 @@ import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo1LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Quad;
@@ -25,7 +24,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.endsWith;
@@ -76,17 +74,23 @@ public class CachePullThroughPrestonStoreTest {
 
         String dataDir = folder.getRoot().getAbsolutePath();
         String provDir = folder.getRoot().getAbsolutePath();
+        final StatementListener listener = new StatementListener() {
+            @Override
+            public void on(Quad quad) {
+                // do nothing
+            }
+        };
         Cache cache = new CachePullThroughPrestonStore(
                 "some/namespace"
                 , new ResourceServiceLocal(in -> in),
-                new StatementListener() {
-                    @Override
-                    public void on(Quad quad) {
-                        // do nothing
-                    }
-                }, new ContentPathFactoryDepth0(),
+                new ContentPathFactoryDepth0(),
+                dataDir,
+                provDir, new DeferenceListener(
+                "some/namespace",
+                listener,
                 dataDir,
                 provDir
+        )
         );
 
         File namespaceDir = new File(folder.getRoot(), "some/namespace");
@@ -135,18 +139,24 @@ public class CachePullThroughPrestonStoreTest {
     }
 
     private void pullResource(ArrayList<Quad> quads, String dataDir, String provDir) throws IOException, URISyntaxException {
+        String namespace = "some/namespace";
         Cache cache = new CachePullThroughPrestonStore(
-                "some/namespace"
-                , new ResourceServiceLocal(in -> in)
-                , quads::add,
+                namespace,
+                new ResourceServiceLocal(in -> in),
                 new ContentPathFactoryDepth0(),
                 dataDir,
-                provDir
+                provDir,
+                new DeferenceListener(
+                        namespace,
+                        quads::add,
+                        dataDir,
+                        provDir
+                )
         );
 
         assertThat(quads.size(), Is.is(0));
 
-        File namespaceDir = new File(dataDir, "some/namespace");
+        File namespaceDir = new File(dataDir, namespace);
         assertFalse(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
         InputStream is = cache.retrieve(getClass().getResource("hello.txt").toURI());

@@ -1,45 +1,38 @@
 package org.globalbioticinteractions.elton.store;
 
 import bio.guoda.preston.HashType;
-import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
-import bio.guoda.preston.process.StatementListener;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.Dereferencer;
 import bio.guoda.preston.store.DereferencerContentAddressed;
 import bio.guoda.preston.store.KeyTo1LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
-import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.service.ResourceService;
-import org.eol.globi.util.DateUtil;
 import org.globalbioticinteractions.cache.CachePullThrough;
 import org.globalbioticinteractions.cache.ContentPathFactory;
-import org.globalbioticinteractions.cache.ContentProvenance;
-import org.globalbioticinteractions.cache.ProvenanceLog;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.UUID;
 
 public class CachePullThroughPrestonStore extends CachePullThrough {
 
     private final String namespace;
     private final ResourceService remote;
-    private final StatementListener listener;
     private final String dataDir;
-    private final String provDir;
+    private ActivityListener dereferenceListener;
 
     public CachePullThroughPrestonStore(
             String namespace,
             ResourceService resourceService,
-            StatementListener listener,
             ContentPathFactory contentPathFactory,
             String dataDir,
-            String provDir
+            String provDir,
+            ActivityListener dereferenceListener
     ) {
         super(namespace,
                 resourceService,
@@ -49,9 +42,9 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         );
         this.namespace = namespace;
         this.dataDir = dataDir;
-        this.provDir = provDir;
         this.remote = resourceService;
-        this.listener = listener;
+        this.dereferenceListener = dereferenceListener;
+
     }
 
     @Override
@@ -69,46 +62,22 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
 
         );
 
-        Dereferencer<InputStream> deref
-                = iri -> remote.retrieve(URI.create(iri.getIRIString()));
-
-        DereferencerContentAddressed derefCas = new DereferencerContentAddressed(deref, blobStore);
+        Dereferencer<IRI> derefCas = new DereferencerContentAddressed(
+                iri -> remote.retrieve(URI.create(iri.getIRIString())),
+                blobStore
+        );
 
         try {
-            IRI dereferenced = derefCas.get(RefNodeFactory.toIRI(resourceURI));
+            IRI request = RefNodeFactory.toIRI(resourceURI);
+            UUID activityId = UUID.randomUUID();
+            dereferenceListener.onStarted(activityId, request);
+            IRI response = derefCas.get(request);
+            dereferenceListener.onCompleted(activityId, request, response);
 
-            streamProvenance(resourceURI, dereferenced, listener);
-            recordProvenance(resourceURI, keyToPath, dereferenced);
-            return blobStore.get(dereferenced);
+            return blobStore.get(response);
         } catch (IOException ex) {
             throw new IOException("failed to retrieve [" + resourceURI + "]", ex);
         }
-    }
-
-    private void streamProvenance(URI resourceURI, IRI dereferenced, StatementListener statementListener) {
-        if (statementListener != null) {
-            Quad quad = RefNodeFactory.toStatement(
-                    RefNodeFactory.toIRI(resourceURI),
-                    RefNodeConstants.HAS_VERSION,
-                    dereferenced
-            );
-            statementListener.on(quad);
-        }
-    }
-
-    private void recordProvenance(URI resourceURI, KeyTo1LevelPath keyToPath, IRI dereferenced) throws IOException {
-        URI localPathURI = keyToPath.toPath(dereferenced);
-        ContentProvenance contentProvenanceWithNamespace
-                = new ContentProvenance(namespace,
-                resourceURI,
-                localPathURI,
-                StringUtils.replace(dereferenced.getIRIString(), "hash://sha256/", ""),
-                DateUtil.nowDateString());
-
-        ProvenanceLog.appendProvenanceLog(
-                new File(provDir),
-                contentProvenanceWithNamespace
-        );
     }
 
 

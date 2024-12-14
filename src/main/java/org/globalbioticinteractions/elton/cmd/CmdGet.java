@@ -4,7 +4,6 @@ import bio.guoda.preston.RefNodeFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
-
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
@@ -44,15 +43,9 @@ public class CmdGet extends CmdDefaultParams {
     }
 
     void run(PrintStream out) {
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheOrLocalDir(
-                getDataDir(),
-                getProvDir(),
-                getWorkDir(),
-                createInputStreamFactory(),
-                getContentPathFactory(),
-                getProvenancePathFactory(),
-                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
-        );
+
+
+        DatasetRegistry registry = getDatasetRegistry();
 
         final List<String> actualNamespaces = new ArrayList<>();
         try {

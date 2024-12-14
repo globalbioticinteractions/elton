@@ -34,15 +34,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
 
     void run(PrintStream out) {
 
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheOrLocalDir(
-                getDataDir(),
-                getProvDir(),
-                getWorkDir(),
-                createInputStreamFactory(),
-                getContentPathFactory(),
-                getProvenancePathFactory(),
-                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
-        );
+        DatasetRegistry registry = getDatasetRegistry();
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForInteractionWriting(!shouldSkipHeader(), out);
 
@@ -80,6 +72,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 new File(getWorkDir())
         );
     }
+
 }
 
 

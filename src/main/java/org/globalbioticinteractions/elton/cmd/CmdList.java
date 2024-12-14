@@ -13,6 +13,7 @@ import picocli.CommandLine;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @CommandLine.Command(
@@ -36,24 +37,18 @@ public class CmdList extends CmdOnlineParams {
 
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
-        DatasetRegistry registryLocal = DatasetRegistryUtil.forCacheOrLocalDir(
-                getDataDir(),
-                getProvDir(),
-                getWorkDir(),
-                inputStreamFactory,
-                getContentPathFactory(),
-                getProvenancePathFactory(),
-                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
-        );
+
+        DatasetRegistry registryLocal = getDatasetRegistry(inputStreamFactory);
 
         File cacheDir = new File(getDataDir());
-        List<DatasetRegistry> registries =
-                isOnline()
-                        ? Arrays.asList(
-                        new DatasetRegistryZenodo(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
-                        new DatasetRegistryGitHubArchive(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
-                        registryLocal)
-                        : Arrays.asList(registryLocal);
+
+        List<DatasetRegistry> onlineAndOffline = Arrays.asList(
+                new DatasetRegistryZenodo(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
+                new DatasetRegistryGitHubArchive(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
+                registryLocal
+        );
+
+        List<DatasetRegistry> registries = isOnline() ? onlineAndOffline : Collections.singletonList(registryLocal);
 
         DatasetRegistry registry = new DatasetRegistryProxy(registries);
         try {

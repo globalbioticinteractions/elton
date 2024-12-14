@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import picocli.CommandLine;
 
 public abstract class CmdTabularWriterParams extends CmdDefaultParams {

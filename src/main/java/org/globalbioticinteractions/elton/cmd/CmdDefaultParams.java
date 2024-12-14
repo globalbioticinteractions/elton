@@ -6,14 +6,17 @@ import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
 import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.rdf.api.Quad;
+import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.cache.ProvenancePathFactoryImpl;
+import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityProxy;
 import org.globalbioticinteractions.elton.store.ProvLogger;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursorRotating;
@@ -220,6 +223,26 @@ abstract class CmdDefaultParams implements Runnable {
                         new ProvLogger(getStatementListener()),
                         new AccessLogger(namespaceLocal, getProvDir())
                 )
+        );
+    }
+
+    protected ActivityProxy getActivityListener() {
+        return getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL);
+    }
+
+    protected DatasetRegistry getDatasetRegistry() {
+        return getDatasetRegistry(createInputStreamFactory());
+    }
+
+    protected DatasetRegistry getDatasetRegistry(InputStreamFactory inputStreamFactory) {
+        return DatasetRegistryUtil.forCacheOrLocalDir(
+                getDataDir(),
+                getProvDir(),
+                getWorkDir(),
+                inputStreamFactory,
+                getContentPathFactory(),
+                getProvenancePathFactory(),
+                getActivityListener()
         );
     }
 }

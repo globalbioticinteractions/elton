@@ -47,15 +47,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
     }
 
     void run(PrintStream out) {
-        DatasetRegistry registry = DatasetRegistryUtil.forCacheOrLocalDir(
-                getDataDir(),
-                getProvDir(),
-                getWorkDir(),
-                createInputStreamFactory(),
-                getContentPathFactory(),
-                getProvenancePathFactory(),
-                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
-        );
+        DatasetRegistry registry = getDatasetRegistry();
 
         InteractionWriter serializer = createSerializer(out);
 

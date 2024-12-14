@@ -33,8 +33,10 @@ import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.Elton;
+import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
-import org.globalbioticinteractions.elton.store.DeferenceListener;
+import org.globalbioticinteractions.elton.store.ActivityProxy;
+import org.globalbioticinteractions.elton.store.ProvLogger;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
@@ -112,11 +114,8 @@ public class CmdReview extends CmdTabularWriterParams {
 
             InputStreamFactory factory = createInputStreamFactory();
 
-            ActivityListener dereferenceListener = new DeferenceListener(
-                    DatasetRegistryUtil.NAMESPACE_LOCAL,
-                    getStatementListener(),
-                    getProvDir()
-            );
+            ActivityListener dereferenceListener =
+                            new AccessLogger(DatasetRegistryUtil.NAMESPACE_LOCAL, getProvDir());
 
             for (URI localNamespace : localNamespaces) {
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(

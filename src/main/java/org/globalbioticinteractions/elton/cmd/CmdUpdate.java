@@ -11,8 +11,10 @@ import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
+import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
-import org.globalbioticinteractions.elton.store.DeferenceListener;
+import org.globalbioticinteractions.elton.store.ActivityProxy;
+import org.globalbioticinteractions.elton.store.ProvLogger;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import picocli.CommandLine;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -91,10 +94,11 @@ public class CmdUpdate extends CmdDefaultParams {
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getProvDir(), namespace);
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
 
-            DeferenceListener dereferenceListener = new DeferenceListener(
-                    namespace,
-                    getStatementListener(),
-                    getProvDir()
+            ActivityProxy dereferenceListener = new ActivityProxy(
+                    Arrays.asList(
+                            new ProvLogger(getStatementListener()),
+                            new AccessLogger(namespace, getProvDir())
+                    )
             );
 
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(

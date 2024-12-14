@@ -26,7 +26,6 @@ import org.globalbioticinteractions.dataset.DatasetRegistryLogger;
 import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
-import org.globalbioticinteractions.elton.store.DeferenceListener;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.slf4j.Logger;

@@ -13,11 +13,14 @@ import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
+import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
-import org.globalbioticinteractions.elton.store.DeferenceListener;
+import org.globalbioticinteractions.elton.store.ActivityProxy;
+import org.globalbioticinteractions.elton.store.ProvLogger;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Arrays;
 
 public class DatasetRegistryUtil {
 
@@ -115,10 +118,11 @@ public class DatasetRegistryUtil {
                     contentPathFactory,
                     dataDir,
                     provDir,
-                    new DeferenceListener(
-                            NAMESPACE_LOCAL,
-                            listener,
-                            provDir
+                    new ActivityProxy(
+                            Arrays.asList(
+                                    new ProvLogger(listener),
+                                    new AccessLogger(NAMESPACE_LOCAL, provDir)
+                            )
                     )
             );
         }

@@ -88,7 +88,8 @@ public class LoggingResourceService implements ResourceService {
                             RefNodeFactory.toIRI(archiveURI),
                             archiveContentId,
                             activityEmitter,
-                            Optional.of(ctx.getActivity()));
+                            Optional.of(ctx.getActivity())
+                    );
                 }
 
                 String localDatasetRoot = DatasetFinderUtil.getLocalDatasetURIRoot(local.retrieve(archiveURI));

@@ -88,7 +88,9 @@ public class CmdLog extends CmdDefaultParams {
                 getNamespaces(),
                 "logging provenance",
                 NullAppendable.INSTANCE,
-                new NullImportLogger(), new File(getWorkDir())
+                new NullImportLogger(),
+                new File(getWorkDir()
+                )
         );
     }
 

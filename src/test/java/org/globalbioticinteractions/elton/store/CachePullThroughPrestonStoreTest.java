@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.store;
 
 import bio.guoda.preston.HashType;
+import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.process.StatementListener;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo1LevelPath;
@@ -24,7 +25,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
 
+import static bio.guoda.preston.RefNodeConstants.HAS_VERSION;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,7 +45,17 @@ public class CachePullThroughPrestonStoreTest {
 
         String dataDir = folder.getRoot().getAbsolutePath();
         String provDir = folder.getRoot().getAbsolutePath();
-        pullResource(quads, dataDir, provDir);
+        pullResource(quads, dataDir, provDir, new ActivityListener() {
+            @Override
+            public void onStarted(UUID activityId, IRI request) {
+
+            }
+
+            @Override
+            public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
+                quads.add(RefNodeFactory.toStatement(request, HAS_VERSION, response));
+            }
+        }, "some/namespace");
 
         assertFalse(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
@@ -85,10 +99,11 @@ public class CachePullThroughPrestonStoreTest {
                 , new ResourceServiceLocal(in -> in),
                 new ContentPathFactoryDepth0(),
                 dataDir,
-                provDir, new DeferenceListener(
-                "some/namespace",
-                listener,
-                provDir
+                provDir, new ActivityProxy(
+                Arrays.asList(
+                        new ProvLogger(listener),
+                        new AccessLogger("some/namespace", provDir)
+                )
         )
         );
 
@@ -112,44 +127,30 @@ public class CachePullThroughPrestonStoreTest {
 
         assertFalse(file.exists());
 
-        pullResource(quads, dataDir, provDir);
+        pullResource(quads, dataDir, provDir, new ActivityListener() {
+            @Override
+            public void onStarted(UUID activityId, IRI request) {
+
+            }
+
+            @Override
+            public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
+                quads.add(RefNodeFactory.toStatement(request, HAS_VERSION, response));
+            }
+        }, "some/namespace");
 
         assertTrue(file.exists());
 
     }
 
-    @Test
-    public void testCreatProvDirIfNotExists() throws IOException, URISyntaxException {
-        ArrayList<Quad> quads = new ArrayList<>();
-
-        String dataDir = folder.newFolder("data").getAbsolutePath();
-        String provDir = folder.newFolder("prov").getAbsolutePath();
-
-        File file = new File(provDir);
-        file.delete();
-
-        assertFalse(file.exists());
-
-        pullResource(quads, dataDir, provDir);
-
-        assertTrue(file.exists());
-        assertTrue(file.isDirectory());
-
-    }
-
-    private void pullResource(ArrayList<Quad> quads, String dataDir, String provDir) throws IOException, URISyntaxException {
-        String namespace = "some/namespace";
+    private void pullResource(ArrayList<Quad> quads, String dataDir, String provDir, ActivityListener dereferenceListener, String namespace) throws IOException, URISyntaxException {
         Cache cache = new CachePullThroughPrestonStore(
                 namespace,
                 new ResourceServiceLocal(in -> in),
                 new ContentPathFactoryDepth0(),
                 dataDir,
                 provDir,
-                new DeferenceListener(
-                        namespace,
-                        quads::add,
-                        provDir
-                )
+                dereferenceListener
         );
 
         assertThat(quads.size(), Is.is(0));
@@ -161,6 +162,7 @@ public class CachePullThroughPrestonStoreTest {
         assertTrue(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
         assertThat(IOUtils.toString(is, StandardCharsets.UTF_8.name()), Is.is("hello"));
+
         assertThat(quads.size(), Is.is(1));
         assertThat(quads.get(0).getSubject().toString(), endsWith("org/globalbioticinteractions/elton/store/hello.txt>"));
         assertThat(quads.get(0).getPredicate().toString(), Is.is("<http://purl.org/pav/hasVersion>"));

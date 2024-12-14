@@ -14,7 +14,10 @@ import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
-import org.globalbioticinteractions.elton.store.DeferenceListener;
+import org.globalbioticinteractions.elton.store.AccessLogger;
+import org.globalbioticinteractions.elton.store.ActivityListener;
+import org.globalbioticinteractions.elton.store.ActivityProxy;
+import org.globalbioticinteractions.elton.store.ProvLogger;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 class StreamingDatasetsHandler implements NamespaceHandler {
     private final static Logger LOG = LoggerFactory.getLogger(StreamingDatasetsHandler.class);
@@ -60,15 +64,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     @Override
     public void onNamespace(String namespace) throws Exception {
         stderr.print("tracking [" + namespace + "]...");
-        DeferenceListener dereferenceListener = new DeferenceListener(
-                namespace,
-                quad -> {
-                    if (quad != null) {
-                        System.out.println(quad.toString());
-                    }
-                },
-                provDir
-        );
+        ActivityListener dereferenceListener = new AccessLogger(namespace, provDir);
 
         CacheFactory cacheFactory = CmdUtil.createCacheFactory(
                 namespace,

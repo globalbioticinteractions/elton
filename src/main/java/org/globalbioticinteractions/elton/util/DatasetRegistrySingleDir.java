@@ -9,7 +9,6 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
-import org.globalbioticinteractions.elton.store.DeferenceListener;
 
 import java.net.URI;
 import java.util.Collections;

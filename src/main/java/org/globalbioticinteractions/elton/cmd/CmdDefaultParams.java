@@ -5,30 +5,26 @@ import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
 import bio.guoda.preston.process.StatementListener;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Quad;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.cache.ProvenancePathFactoryImpl;
 import org.globalbioticinteractions.elton.Elton;
+import org.globalbioticinteractions.elton.store.AccessLogger;
+import org.globalbioticinteractions.elton.store.ActivityProxy;
+import org.globalbioticinteractions.elton.store.ProvLogger;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursorRotating;
 import picocli.CommandLine;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -218,4 +214,12 @@ abstract class CmdDefaultParams implements Runnable {
     }
 
 
+    protected ActivityProxy getActivityListener(String namespaceLocal) {
+        return new ActivityProxy(
+                Arrays.asList(
+                        new ProvLogger(getStatementListener()),
+                        new AccessLogger(namespaceLocal, getProvDir())
+                )
+        );
+    }
 }

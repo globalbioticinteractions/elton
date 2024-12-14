@@ -1,8 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
 
-import bio.guoda.preston.process.StatementListener;
-import org.apache.commons.rdf.api.Quad;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -65,7 +63,7 @@ public class CmdDatasets extends CmdTabularWriterParams {
                 createInputStreamFactory(),
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getStatementListener()
+                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
         );
 
         try {

@@ -143,7 +143,11 @@ public class CachePullThroughPrestonStoreTest {
 
     }
 
-    private void pullResource(ArrayList<Quad> quads, String dataDir, String provDir, ActivityListener dereferenceListener, String namespace) throws IOException, URISyntaxException {
+    private void pullResource(ArrayList<Quad> quads,
+                              String dataDir,
+                              String provDir,
+                              ActivityListener dereferenceListener,
+                              String namespace) throws IOException, URISyntaxException {
         Cache cache = new CachePullThroughPrestonStore(
                 namespace,
                 new ResourceServiceLocal(in -> in),

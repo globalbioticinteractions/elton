@@ -1,7 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.process.StatementListener;
-import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.util.ResourceServiceRemote;
 
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -45,7 +43,7 @@ public class CmdList extends CmdOnlineParams {
                 inputStreamFactory,
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getStatementListener()
+                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
         );
 
         File cacheDir = new File(getDataDir());

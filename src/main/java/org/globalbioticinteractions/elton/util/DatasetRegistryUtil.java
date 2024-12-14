@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.util;
 
-import bio.guoda.preston.process.StatementListener;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocal;
@@ -13,14 +12,11 @@ import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
-import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.ActivityProxy;
-import org.globalbioticinteractions.elton.store.ProvLogger;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
 
 public class DatasetRegistryUtil {
 
@@ -84,7 +80,7 @@ public class DatasetRegistryUtil {
                                                      InputStreamFactory streamFactory,
                                                      ContentPathFactory contentPathFactory,
                                                      ProvenancePathFactory provenancePathFactory,
-                                                     StatementListener listener) {
+                                                     ActivityListener activityListener) {
         return forCacheOrLocalDir(
                 dataDir,
                 provDir,
@@ -93,7 +89,7 @@ public class DatasetRegistryUtil {
                 new ResourceServiceLocalAndRemote(streamFactory, new File(dataDir)),
                 contentPathFactory,
                 provenancePathFactory,
-                listener);
+                activityListener);
     }
 
     public static DatasetRegistry forCacheOrLocalDir(String dataDir,
@@ -103,7 +99,7 @@ public class DatasetRegistryUtil {
                                                      ResourceService resourceServiceRemote,
                                                      ContentPathFactory contentPathFactory,
                                                      ProvenancePathFactory provenancePathFactory,
-                                                     StatementListener listener) {
+                                                     ActivityListener dereferenceListener) {
         DatasetRegistry registry = forCache(
                 dataDir,
                 provDir,
@@ -118,12 +114,7 @@ public class DatasetRegistryUtil {
                     contentPathFactory,
                     dataDir,
                     provDir,
-                    new ActivityProxy(
-                            Arrays.asList(
-                                    new ProvLogger(listener),
-                                    new AccessLogger(NAMESPACE_LOCAL, provDir)
-                            )
-                    )
+                    dereferenceListener
             );
         }
         return registry;

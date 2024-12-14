@@ -1,7 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.process.StatementListener;
-import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.tool.NullImportLogger;
 
@@ -40,7 +38,7 @@ public class CmdNames extends CmdTabularWriterParams {
                 createInputStreamFactory(),
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getStatementListener()
+                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
         );
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForTaxonWriting(!shouldSkipHeader(), out);

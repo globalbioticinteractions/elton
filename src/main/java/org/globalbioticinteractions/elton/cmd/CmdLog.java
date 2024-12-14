@@ -4,10 +4,8 @@ import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
-import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.io.output.NullAppendable;
 import org.apache.commons.rdf.api.IRI;
-import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.tool.NullImportLogger;
@@ -55,7 +53,7 @@ public class CmdLog extends CmdDefaultParams {
                 createInputStreamFactory(),
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getStatementListener()
+                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
         );
 
         IRI softwareAgent = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");

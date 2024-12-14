@@ -1,7 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.process.StatementListener;
-import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
@@ -43,7 +41,7 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 createInputStreamFactory(),
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getStatementListener()
+                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
         );
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForInteractionWriting(!shouldSkipHeader(), out);

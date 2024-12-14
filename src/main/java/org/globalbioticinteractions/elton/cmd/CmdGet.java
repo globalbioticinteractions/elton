@@ -1,12 +1,10 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.RefNodeFactory;
-import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
 
-import org.apache.commons.rdf.api.Quad;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
@@ -53,7 +51,7 @@ public class CmdGet extends CmdDefaultParams {
                 createInputStreamFactory(),
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getStatementListener()
+                getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL)
         );
 
         final List<String> actualNamespaces = new ArrayList<>();

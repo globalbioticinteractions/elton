@@ -43,7 +43,7 @@ public class CmdUpdate extends CmdDefaultParams {
         this.registryNames = registryNames;
     }
 
-    @CommandLine.Option (names = {"--registries", "--registry"},
+    @CommandLine.Option(names = {"--registries", "--registry"},
             description = "[registry1],[registry2],..."
     )
     private List<String> registryNames = new ArrayList<String>() {{
@@ -61,23 +61,27 @@ public class CmdUpdate extends CmdDefaultParams {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
 
 
-
         List<DatasetRegistry> registries = new ArrayList<>();
         for (String registryName : registryNames) {
             DatasetRegistryFactoryImpl datasetRegistryFactory
                     = new DatasetRegistryFactoryImpl(
-                            getWorkDir(), inputStreamFactory, getDataDir(), getProvDir(), new ActivityListener() {
+                    getWorkDir(),
+                    inputStreamFactory,
+                    getDataDir(),
+                    getProvDir(),
+                    new ActivityListener() {
 
-                                @Override
-                                public void onStarted(UUID activityId, IRI request) {
+                        @Override
+                        public void onStarted(UUID activityId, IRI request) {
 
-                                }
+                        }
 
-                                @Override
-                                public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
+                        @Override
+                        public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
 
-                                }
-                            });
+                        }
+                    }
+            );
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);
@@ -94,12 +98,7 @@ public class CmdUpdate extends CmdDefaultParams {
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getProvDir(), namespace);
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
 
-            ActivityProxy dereferenceListener = new ActivityProxy(
-                    Arrays.asList(
-                            new ProvLogger(getStatementListener()),
-                            new AccessLogger(namespace, getProvDir())
-                    )
-            );
+            ActivityProxy dereferenceListener = getActivityListener(namespace);
 
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
                     registryProxy,

@@ -236,6 +236,7 @@ public class CachePullThroughPrestonStoreTest {
             builder.append("\n");
         });
 
+        String origin = sourceURI.toString();
         String expected = "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
                 "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
                 "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#startedAtTime> \"2024-12-18T20:54:27.951Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
@@ -243,8 +244,8 @@ public class CachePullThroughPrestonStoreTest {
                 "<hash://sha256/2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
                 "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#generatedAtTime> \"2024-12-18T20:54:28.029Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
                 "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
-                "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#used> <file:/home/jorrit/proj/globi/elton/target/test-classes/org/globalbioticinteractions/elton/store/hello.txt> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
-                "<" + sourceURI.toString() + "> <http://purl.org/pav/hasVersion> <hash://sha256/2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#used> <" + origin + "> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<" + origin + "> <http://purl.org/pav/hasVersion> <hash://sha256/2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
                 "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#endedAtTime> \"2024-12-18T20:54:28.029Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n";
 
         assertThat(builder.toString(), Is.is(expected));

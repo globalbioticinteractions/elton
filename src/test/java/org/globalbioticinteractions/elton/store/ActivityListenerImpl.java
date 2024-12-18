@@ -3,31 +3,20 @@ package org.globalbioticinteractions.elton.store;
 import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.process.StatementListener;
-import org.apache.commons.rdf.api.BlankNodeOrIRI;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Literal;
 
 import java.net.URI;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-
-import static bio.guoda.preston.RefNodeConstants.HAS_VERSION;
 
 public class ActivityListenerImpl implements ActivityListener {
     private final StatementListener listener;
     private final Supplier<Literal> clock;
 
-    public ActivityListenerImpl(Literal startTime, Literal endTime, StatementListener listener) {
+    public ActivityListenerImpl(StatementListener listener, Supplier<Literal> clock) {
         this.listener = listener;
-        this.clock = new Supplier<Literal>() {
-            private AtomicInteger count = new AtomicInteger(0);
-            @Override
-            public Literal get() {
-                int callNumber = count.getAndIncrement();
-                return callNumber == 0 ? startTime : endTime;
-            }
-        };
+        this.clock = clock;
     }
 
     @Override

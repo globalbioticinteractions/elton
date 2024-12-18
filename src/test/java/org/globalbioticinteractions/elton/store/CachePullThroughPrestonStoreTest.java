@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import static junit.framework.TestCase.assertTrue;
@@ -43,6 +44,17 @@ public class CachePullThroughPrestonStoreTest {
     private Literal startTime = RefNodeFactory.toDateTime("2024-12-18T20:54:27.951Z");
     private Literal endTime = RefNodeFactory.toDateTime("2024-12-18T20:54:28.029Z");
 
+    private Supplier<Literal> clock = new Supplier<Literal>() {
+        private AtomicInteger count = new AtomicInteger(0);
+
+        @Override
+        public Literal get() {
+            int callNumber = count.getAndIncrement();
+            return callNumber == 0 ? startTime : endTime;
+        }
+    };
+
+
     @Test
     public void testPrestonStore() throws IOException, URISyntaxException {
         ArrayList<Quad> quads = new ArrayList<>();
@@ -54,13 +66,13 @@ public class CachePullThroughPrestonStoreTest {
                 quads,
                 dataDir,
                 provDir,
-                new ActivityListenerImpl(startTime, endTime, new StatementListener() {
+                new ActivityListenerImpl(new StatementListener() {
 
                     @Override
                     public void on(Quad quad) {
                         quads.add(quad);
                     }
-                }),
+                }, this.clock),
                 "some/namespace"
         );
 
@@ -156,13 +168,13 @@ public class CachePullThroughPrestonStoreTest {
                 quads,
                 dataDir,
                 provDir,
-                new ActivityListenerImpl(startTime, endTime, new StatementListener() {
+                new ActivityListenerImpl(new StatementListener() {
 
                     @Override
                     public void on(Quad quad) {
                         quads.add(quad);
                     }
-                }),
+                }, this.clock),
                 "some/namespace"
         );
 

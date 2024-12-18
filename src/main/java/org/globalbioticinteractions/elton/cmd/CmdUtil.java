@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.rdf.api.IRI;
@@ -114,10 +115,10 @@ public class CmdUtil {
                             return null;
                         }
                     },
-                    new Supplier<UUID>() {
+                    new Supplier<IRI>() {
                         @Override
-                        public UUID get() {
-                            return UUID.randomUUID();
+                        public IRI get() {
+                            return RefNodeFactory.toIRI(UUID.randomUUID());
                         }
                     });
 

@@ -124,10 +124,10 @@ public class CachePullThroughPrestonStoreTest {
             public String getDescription() {
                 return null;
             }
-        }, new Supplier<UUID>() {
+        }, new Supplier<IRI>() {
             @Override
-            public UUID get() {
-                return UUID.randomUUID();
+            public IRI get() {
+                return RefNodeFactory.toIRI(UUID.randomUUID());
             }
         }
         );
@@ -188,11 +188,11 @@ public class CachePullThroughPrestonStoreTest {
             }
         };
 
-        Supplier<UUID> uuidFactory = new Supplier<UUID>() {
+        Supplier<IRI> uuidFactory = new Supplier<IRI>() {
 
             @Override
-            public UUID get() {
-                return UUID.fromString("e4fe8c5c-1455-46c6-bcfe-f11a065978aa");
+            public IRI get() {
+                return RefNodeFactory.toIRI(UUID.fromString("e4fe8c5c-1455-46c6-bcfe-f11a065978aa"));
             }
         };
 

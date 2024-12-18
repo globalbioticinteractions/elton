@@ -31,22 +31,20 @@ public class ActivityListenerImpl implements ActivityListener {
     }
 
     @Override
-    public void onStarted(IRI parentActivitiyId, UUID activityId, IRI request) {
-        IRI downloadActivity = RefNodeFactory.toIRI(activityId);
-        listener.on(RefNodeFactory.toStatement(downloadActivity, downloadActivity, RefNodeConstants.IS_A, RefNodeConstants.GENERATION));
-        listener.on(RefNodeFactory.toStatement(downloadActivity, downloadActivity, RefNodeConstants.WAS_INFORMED_BY, parentActivitiyId));
-        listener.on(RefNodeFactory.toStatement(downloadActivity, downloadActivity, RefNodeConstants.STARTED_AT_TIME, clock.get()));
+    public void onStarted(IRI parentActivitiyId, IRI activityId, IRI request) {
+        listener.on(RefNodeFactory.toStatement(activityId, activityId, RefNodeConstants.IS_A, RefNodeConstants.GENERATION));
+        listener.on(RefNodeFactory.toStatement(activityId, activityId, RefNodeConstants.WAS_INFORMED_BY, parentActivitiyId));
+        listener.on(RefNodeFactory.toStatement(activityId, activityId, RefNodeConstants.STARTED_AT_TIME, clock.get()));
     }
 
     @Override
-    public void onCompleted(IRI parentActivityId, UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
-        BlankNodeOrIRI downloadActivity = RefNodeFactory.toIRI(activityId);
-        listener.on(RefNodeFactory.toStatement(downloadActivity, response, RefNodeConstants.WAS_GENERATED_BY, downloadActivity));
-        listener.on(RefNodeFactory.toStatement(downloadActivity, response, RefNodeConstants.QUALIFIED_GENERATION, downloadActivity));
-        listener.on(RefNodeFactory.toStatement(downloadActivity, downloadActivity, RefNodeConstants.GENERATED_AT_TIME, clock.get()));
-        listener.on(RefNodeFactory.toStatement(downloadActivity, downloadActivity, RefNodeConstants.IS_A, RefNodeConstants.GENERATION));
-        listener.on(RefNodeFactory.toStatement(downloadActivity, downloadActivity, RefNodeConstants.USED, request));
-        listener.on(RefNodeFactory.toStatement(downloadActivity, request, RefNodeConstants.HAS_VERSION, response));
-        listener.on(RefNodeFactory.toStatement(downloadActivity, downloadActivity, RefNodeConstants.ENDED_AT_TIME, clock.get()));
+    public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
+        listener.on(RefNodeFactory.toStatement(activityId, response, RefNodeConstants.WAS_GENERATED_BY, activityId));
+        listener.on(RefNodeFactory.toStatement(activityId, response, RefNodeConstants.QUALIFIED_GENERATION, activityId));
+        listener.on(RefNodeFactory.toStatement(activityId, activityId, RefNodeConstants.GENERATED_AT_TIME, clock.get()));
+        listener.on(RefNodeFactory.toStatement(activityId, activityId, RefNodeConstants.IS_A, RefNodeConstants.GENERATION));
+        listener.on(RefNodeFactory.toStatement(activityId, activityId, RefNodeConstants.USED, request));
+        listener.on(RefNodeFactory.toStatement(activityId, request, RefNodeConstants.HAS_VERSION, response));
+        listener.on(RefNodeFactory.toStatement(activityId, activityId, RefNodeConstants.ENDED_AT_TIME, clock.get()));
     }
 }

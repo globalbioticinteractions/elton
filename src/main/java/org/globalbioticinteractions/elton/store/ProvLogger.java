@@ -20,12 +20,12 @@ public class ProvLogger implements ActivityListener {
     }
 
     @Override
-    public void onStarted(IRI parentActivityId, UUID activityId, IRI request) {
+    public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
 
     }
 
     @Override
-    public void onCompleted(IRI parentActivityId, UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
+    public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
         if (listener != null) {
             ActivityUtil.emitDownloadActivity(
                     request,
@@ -36,7 +36,7 @@ public class ProvLogger implements ActivityListener {
                             listener.on(quad);
                         }
                     },
-                    Optional.of(RefNodeFactory.toIRI(activityId))
+                    Optional.of(activityId)
             );
         }
     }

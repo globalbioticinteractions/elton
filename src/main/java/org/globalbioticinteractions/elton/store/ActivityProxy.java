@@ -14,12 +14,12 @@ public class ActivityProxy implements ActivityListener {
     }
 
     @Override
-    public void onStarted(IRI parentActivityId, UUID activityId, IRI request) {
+    public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
 
     }
 
     @Override
-    public void onCompleted(IRI parentActivityId, UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
+    public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
         listeners.forEach(l -> l.onCompleted(parentActivityId, activityId, request, response, localPathOfResponseData));
     }
 

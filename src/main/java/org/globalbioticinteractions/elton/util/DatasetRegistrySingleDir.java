@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
+import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
@@ -78,10 +79,10 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
                                 return null;
                             }
                         },
-                        new Supplier<UUID>() {
+                        new Supplier<IRI>() {
                             @Override
-                            public UUID get() {
-                                return UUID.randomUUID();
+                            public IRI get() {
+                                return RefNodeFactory.toIRI(UUID.randomUUID());
                             }
                         }
                 )

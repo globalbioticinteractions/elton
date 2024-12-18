@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class CachePullThroughPrestonStore extends CachePullThrough {
@@ -27,7 +26,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
     private final ResourceService resourceService;
     private final String dataDir;
     private final ActivityContext ctx;
-    private final Supplier<UUID> uuidFactory;
+    private final Supplier<IRI> iriFactory;
 
     private ActivityListener dereferenceListener;
 
@@ -38,7 +37,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                                         String provDir,
                                         ActivityListener dereferenceListener,
                                         ActivityContext ctx,
-                                        Supplier<UUID> uuidFactory) {
+                                        Supplier<IRI> iriFactory) {
         super(namespace,
                 resourceServiceLocal,
                 contentPathFactory,
@@ -50,7 +49,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         this.resourceService = resourceServiceLocal;
         this.dereferenceListener = dereferenceListener;
         this.ctx = ctx;
-        this.uuidFactory = uuidFactory;
+        this.iriFactory = iriFactory;
     }
 
     @Override
@@ -76,7 +75,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         try {
             IRI request = RefNodeFactory.toIRI(resourceURI);
             IRI parentActivityId = ctx.getActivity();
-            UUID activityId = uuidFactory.get();
+            IRI activityId = iriFactory.get();
 
             dereferenceListener.onStarted(
                     parentActivityId,

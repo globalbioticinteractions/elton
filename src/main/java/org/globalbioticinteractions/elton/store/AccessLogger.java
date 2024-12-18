@@ -22,12 +22,12 @@ public class AccessLogger implements ActivityListener {
     }
 
     @Override
-    public void onStarted(UUID activityId, IRI request) {
+    public void onStarted(IRI parentActivityId, UUID activityId, IRI request) {
 
     }
 
     @Override
-    public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
+    public void onCompleted(IRI parentActivityId, UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
         try {
             ContentProvenance contentProvenanceWithNamespace
                     = new ContentProvenance(this.namespace,

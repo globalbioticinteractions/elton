@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
@@ -37,7 +39,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class CmdUtil {
@@ -98,7 +102,24 @@ public class CmdUtil {
                     contentPathFactory,
                     dataDir,
                     provDir,
-                    dereferenceListener);
+                    dereferenceListener,
+                    new ActivityContext() {
+                        @Override
+                        public IRI getActivity() {
+                            return null;
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return null;
+                        }
+                    },
+                    new Supplier<UUID>() {
+                        @Override
+                        public UUID get() {
+                            return UUID.randomUUID();
+                        }
+                    });
 
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(
                     namespace,

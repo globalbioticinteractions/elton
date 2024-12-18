@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.util;
 
+import bio.guoda.preston.cmd.ActivityContext;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.dataset.Dataset;
@@ -12,7 +14,9 @@ import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class DatasetRegistrySingleDir implements DatasetRegistry {
     private final URI localArchiveDir;
@@ -62,7 +66,24 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
                         contentPathFactory,
                         dataDir,
                         provDir,
-                        dereferenceListener
+                        dereferenceListener,
+                        new ActivityContext() {
+                            @Override
+                            public IRI getActivity() {
+                                return null;
+                            }
+
+                            @Override
+                            public String getDescription() {
+                                return null;
+                            }
+                        },
+                        new Supplier<UUID>() {
+                            @Override
+                            public UUID get() {
+                                return UUID.randomUUID();
+                            }
+                        }
                 )
         );
     }

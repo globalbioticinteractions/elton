@@ -29,6 +29,7 @@ public class AccessLoggerTest {
 
         String namespace = "some/namespace";
         new AccessLogger(namespace, provDir).onCompleted(
+                RefNodeFactory.toIRI(UUID.randomUUID()),
                 UUID.randomUUID(),
                 RefNodeFactory.toIRI("some:request"),
                 RefNodeFactory.toIRI("some:response"),

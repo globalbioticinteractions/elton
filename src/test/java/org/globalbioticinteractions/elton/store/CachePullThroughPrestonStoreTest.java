@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.store;
 
 import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeFactory;
+import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.StatementListener;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo1LevelPath;
@@ -9,6 +10,7 @@ import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Literal;
 import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.globalbioticinteractions.cache.Cache;
@@ -27,10 +29,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.function.Supplier;
 
-import static bio.guoda.preston.RefNodeConstants.HAS_VERSION;
 import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 
@@ -39,23 +40,29 @@ public class CachePullThroughPrestonStoreTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
+    private Literal startTime = RefNodeFactory.toDateTime("2024-12-18T20:54:27.951Z");
+    private Literal endTime = RefNodeFactory.toDateTime("2024-12-18T20:54:28.029Z");
+
     @Test
     public void testPrestonStore() throws IOException, URISyntaxException {
         ArrayList<Quad> quads = new ArrayList<>();
 
         String dataDir = folder.getRoot().getAbsolutePath();
         String provDir = folder.getRoot().getAbsolutePath();
-        pullResource(quads, dataDir, provDir, new ActivityListener() {
-            @Override
-            public void onStarted(UUID activityId, IRI request) {
 
-            }
+        pullResource(
+                quads,
+                dataDir,
+                provDir,
+                new ActivityListenerImpl(startTime, endTime, new StatementListener() {
 
-            @Override
-            public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
-                quads.add(RefNodeFactory.toStatement(request, HAS_VERSION, response));
-            }
-        }, "some/namespace");
+                    @Override
+                    public void on(Quad quad) {
+                        quads.add(quad);
+                    }
+                }),
+                "some/namespace"
+        );
 
         assertFalse(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
@@ -66,7 +73,8 @@ public class CachePullThroughPrestonStoreTest {
                         new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
                 true,
-                HashType.sha256);
+                HashType.sha256
+        );
 
         assertFalse(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
@@ -79,7 +87,8 @@ public class CachePullThroughPrestonStoreTest {
         assertThat(IOUtils.toString(inputStream, StandardCharsets.UTF_8.name()), Is.is("hello"));
 
         assertTrue(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
-        assertThat(quads.size(), Is.is(1));
+
+        assertThat(quads.size(), Is.is(10));
     }
 
 
@@ -99,12 +108,28 @@ public class CachePullThroughPrestonStoreTest {
                 , new ResourceServiceLocal(in -> in),
                 new ContentPathFactoryDepth0(),
                 dataDir,
-                provDir, new ActivityProxy(
-                Arrays.asList(
-                        new ProvLogger(listener),
-                        new AccessLogger("some/namespace", provDir)
-                )
-        )
+                provDir,
+                new ActivityProxy(
+                        Arrays.asList(
+                                new ProvLogger(listener),
+                                new AccessLogger("some/namespace", provDir)
+                        )
+                ), new ActivityContext() {
+            @Override
+            public IRI getActivity() {
+                return null;
+            }
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+        }, new Supplier<UUID>() {
+            @Override
+            public UUID get() {
+                return UUID.randomUUID();
+            }
+        }
         );
 
         File namespaceDir = new File(folder.getRoot(), "some/namespace");
@@ -127,17 +152,19 @@ public class CachePullThroughPrestonStoreTest {
 
         assertFalse(file.exists());
 
-        pullResource(quads, dataDir, provDir, new ActivityListener() {
-            @Override
-            public void onStarted(UUID activityId, IRI request) {
+        pullResource(
+                quads,
+                dataDir,
+                provDir,
+                new ActivityListenerImpl(startTime, endTime, new StatementListener() {
 
-            }
-
-            @Override
-            public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
-                quads.add(RefNodeFactory.toStatement(request, HAS_VERSION, response));
-            }
-        }, "some/namespace");
+                    @Override
+                    public void on(Quad quad) {
+                        quads.add(quad);
+                    }
+                }),
+                "some/namespace"
+        );
 
         assertTrue(file.exists());
 
@@ -148,13 +175,36 @@ public class CachePullThroughPrestonStoreTest {
                               String provDir,
                               ActivityListener dereferenceListener,
                               String namespace) throws IOException, URISyntaxException {
+
+        ActivityContext ctx = new ActivityContext() {
+            @Override
+            public IRI getActivity() {
+                return RefNodeFactory.toIRI(UUID.fromString("e4fe8c5c-1455-46c6-bcfe-f11a065978aa"));
+            }
+
+            @Override
+            public String getDescription() {
+                return "this is a description";
+            }
+        };
+
+        Supplier<UUID> uuidFactory = new Supplier<UUID>() {
+
+            @Override
+            public UUID get() {
+                return UUID.fromString("e4fe8c5c-1455-46c6-bcfe-f11a065978aa");
+            }
+        };
+
         Cache cache = new CachePullThroughPrestonStore(
                 namespace,
                 new ResourceServiceLocal(in -> in),
                 new ContentPathFactoryDepth0(),
                 dataDir,
                 provDir,
-                dereferenceListener
+                dereferenceListener,
+                ctx,
+                uuidFactory
         );
 
         assertThat(quads.size(), Is.is(0));
@@ -162,15 +212,30 @@ public class CachePullThroughPrestonStoreTest {
         File namespaceDir = new File(dataDir, namespace);
         assertFalse(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
-        InputStream is = cache.retrieve(getClass().getResource("hello.txt").toURI());
+        URI sourceURI = getClass().getResource("hello.txt").toURI();
+        InputStream is = cache.retrieve(sourceURI);
         assertTrue(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
         assertThat(IOUtils.toString(is, StandardCharsets.UTF_8.name()), Is.is("hello"));
 
-        assertThat(quads.size(), Is.is(1));
-        assertThat(quads.get(0).getSubject().toString(), endsWith("org/globalbioticinteractions/elton/store/hello.txt>"));
-        assertThat(quads.get(0).getPredicate().toString(), Is.is("<http://purl.org/pav/hasVersion>"));
-        assertThat(quads.get(0).getObject().toString(), Is.is("<hash://sha256/2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824>"));
+        StringBuilder builder = new StringBuilder();
+        quads.forEach(q -> {
+            builder.append(q.toString());
+            builder.append("\n");
+        });
+
+        String expected = "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#startedAtTime> \"2024-12-18T20:54:27.951Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<hash://sha256/2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<hash://sha256/2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#generatedAtTime> \"2024-12-18T20:54:28.029Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#used> <file:/home/jorrit/proj/globi/elton/target/test-classes/org/globalbioticinteractions/elton/store/hello.txt> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<" + sourceURI.toString() + "> <http://purl.org/pav/hasVersion> <hash://sha256/2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n" +
+                "<urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> <http://www.w3.org/ns/prov#endedAtTime> \"2024-12-18T20:54:28.029Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:e4fe8c5c-1455-46c6-bcfe-f11a065978aa> .\n";
+
+        assertThat(builder.toString(), Is.is(expected));
     }
 
 

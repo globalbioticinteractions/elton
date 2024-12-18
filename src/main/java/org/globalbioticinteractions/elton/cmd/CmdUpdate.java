@@ -4,17 +4,14 @@ import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
-
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
-import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.ActivityProxy;
-import org.globalbioticinteractions.elton.store.ProvLogger;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.slf4j.Logger;
@@ -24,7 +21,6 @@ import picocli.CommandLine;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,12 +68,12 @@ public class CmdUpdate extends CmdDefaultParams {
                     new ActivityListener() {
 
                         @Override
-                        public void onStarted(UUID activityId, IRI request) {
+                        public void onStarted(IRI parentActivityId, UUID activityId, IRI request) {
 
                         }
 
                         @Override
-                        public void onCompleted(UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
+                        public void onCompleted(IRI parentActivityId, UUID activityId, IRI request, IRI response, URI localPathOfResponseData) {
 
                         }
                     }

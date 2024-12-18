@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.store;
 
 import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeFactory;
+import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.Dereferencer;
 import bio.guoda.preston.store.DereferencerContentAddressed;
@@ -18,43 +19,47 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public class CachePullThroughPrestonStore extends CachePullThrough {
 
     private final String namespace;
-    private final ResourceService remote;
+    private final ResourceService resourceService;
     private final String dataDir;
+    private final ActivityContext ctx;
+    private final Supplier<UUID> uuidFactory;
+
     private ActivityListener dereferenceListener;
 
-    public CachePullThroughPrestonStore(
-            String namespace,
-            ResourceService resourceService,
-            ContentPathFactory contentPathFactory,
-            String dataDir,
-            String provDir,
-            ActivityListener dereferenceListener
-    ) {
+    public CachePullThroughPrestonStore(String namespace,
+                                        ResourceService resourceServiceLocal,
+                                        ContentPathFactory contentPathFactory,
+                                        String dataDir,
+                                        String provDir,
+                                        ActivityListener dereferenceListener,
+                                        ActivityContext ctx,
+                                        Supplier<UUID> uuidFactory) {
         super(namespace,
-                resourceService,
+                resourceServiceLocal,
                 contentPathFactory,
                 dataDir,
                 provDir
         );
         this.namespace = namespace;
         this.dataDir = dataDir;
-        this.remote = resourceService;
+        this.resourceService = resourceServiceLocal;
         this.dereferenceListener = dereferenceListener;
-
+        this.ctx = ctx;
+        this.uuidFactory = uuidFactory;
     }
 
     @Override
     public InputStream retrieve(URI resourceURI) throws IOException {
         File dataFolder = new File(dataDir, namespace);
         KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(dataFolder.toURI());
-        File tmpDir = dataFolder;
         BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
                 new KeyValueStoreLocalFileSystem(
-                        tmpDir,
+                        dataFolder,
                         keyToPath,
                         new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
@@ -64,16 +69,30 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         );
 
         Dereferencer<IRI> derefCas = new DereferencerContentAddressed(
-                iri -> remote.retrieve(URI.create(iri.getIRIString())),
+                iri -> resourceService.retrieve(URI.create(iri.getIRIString())),
                 blobStore
         );
 
         try {
             IRI request = RefNodeFactory.toIRI(resourceURI);
-            UUID activityId = UUID.randomUUID();
-            dereferenceListener.onStarted(activityId, request);
+            IRI parentActivityId = ctx.getActivity();
+            UUID activityId = uuidFactory.get();
+
+            dereferenceListener.onStarted(
+                    parentActivityId,
+                    activityId,
+                    request
+            );
+
             IRI response = derefCas.get(request);
-            dereferenceListener.onCompleted(activityId, request, response, keyToPath.toPath(response));
+
+            dereferenceListener.onCompleted(
+                    parentActivityId,
+                    activityId,
+                    request,
+                    response,
+                    keyToPath.toPath(response)
+            );
 
             return blobStore.get(response);
         } catch (IOException ex) {

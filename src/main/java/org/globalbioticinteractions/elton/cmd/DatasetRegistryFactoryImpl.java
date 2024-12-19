@@ -1,7 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.process.StatementListener;
+import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Supplier;
 
 public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
     private static final Map<String, Class<? extends DatasetRegistry>> REGISTRY_LOOKUP = MapUtils.unmodifiableMap(new TreeMap<String, Class<? extends DatasetRegistry>>() {{
@@ -37,19 +39,26 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
 
     private final String provDir;
     private final ActivityListener activityListener;
+    private ActivityContext activityContext;
+    private Supplier<IRI> iriSupplier;
 
     public DatasetRegistryFactoryImpl(
             URI workDir,
             InputStreamFactory inputStreamFactory,
             String dataDir,
             String provDir,
-            ActivityListener activityListener
+            ActivityListener activityListener,
+            ActivityContext activityContext,
+            Supplier<IRI> iriSupplier
     ) {
         this.workDir = workDir;
         this.inputStreamFactory = inputStreamFactory;
         this.dataDir = dataDir;
         this.provDir = provDir;
         this.activityListener = activityListener;
+        this.activityContext = activityContext;
+        this.iriSupplier = iriSupplier;
+
     }
 
     @Override
@@ -59,7 +68,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
             throw new DatasetRegistryException("failed to create registry for [" + name + "]: not supported");
         }
         try {
-            Class<?>[] paramTypes = {URI.class, ResourceService.class, ContentPathFactory.class, String.class, String.class, ActivityListener.class};
+            Class<?>[] paramTypes = {URI.class, ResourceService.class, ContentPathFactory.class, String.class, String.class, ActivityListener.class, ActivityContext.class, Supplier.class};
             Optional<Constructor<? extends DatasetRegistry>> constructor = constructorFor(registryClass, paramTypes);
             ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory, new File(getDataDir()));
             if (!constructor.isPresent()) {
@@ -69,7 +78,15 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
                         .orElseThrow(() -> new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]")
                         ).newInstance(resourceService);
             } else {
-                return constructor.get().newInstance(getWorkDir(), resourceService, new ContentPathFactoryDepth0(), getDataDir(), getProvDir(), getActivityListener());
+                return constructor.get().newInstance(
+                        getWorkDir(),
+                        resourceService,
+                        new ContentPathFactoryDepth0(),
+                        getDataDir(),
+                        getProvDir(),
+                        getActivityListener(),
+                        activityContext,
+                        iriSupplier);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]", e);

@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.cmd.ActivityContext;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
@@ -18,6 +20,7 @@ import picocli.CommandLine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @CommandLine.Command(
         name = "sync",
@@ -58,7 +61,22 @@ public class CmdUpdate extends CmdDefaultParams {
                     inputStreamFactory,
                     getDataDir(),
                     getProvDir(),
-                    getActivityListener()
+                    getActivityListener(), new ActivityContext() {
+                        @Override
+                        public IRI getActivity() {
+                            return null;
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return null;
+                        }
+                    }, new Supplier<IRI>() {
+                        @Override
+                        public IRI get() {
+                            return null;
+                        }
+                    }
             );
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);

@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.rdf.api.IRI;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -11,6 +12,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -36,6 +38,21 @@ public class DatasetRegistryFactoryImplTest {
                         @Override
                         public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
 
+                        }
+                    }, new ActivityContext() {
+                        @Override
+                        public IRI getActivity() {
+                            return null;
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return null;
+                        }
+                    }, new Supplier<IRI>() {
+                        @Override
+                        public IRI get() {
+                            return null;
                         }
                     }).createRegistryByName(supportedRegistry);
             registries.add(registry);

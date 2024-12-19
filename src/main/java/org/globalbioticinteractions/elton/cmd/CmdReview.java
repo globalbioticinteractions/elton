@@ -120,7 +120,7 @@ public class CmdReview extends CmdTabularWriterParams {
                         getDataDir(),
                         getProvDir(),
                         dereferenceListener,
-                        getCtx(),
+                        getActivityContext(),
                         getActivityIdFactory()
                 );
 

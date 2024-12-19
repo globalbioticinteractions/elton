@@ -253,12 +253,12 @@ abstract class CmdDefaultParams implements Runnable {
                 getContentPathFactory(),
                 getProvenancePathFactory(),
                 getActivityListener(),
-                getCtx(),
+                getActivityContext(),
                 getActivityIdFactory()
         );
     }
 
-    protected ActivityContext getCtx() {
+    protected ActivityContext getActivityContext() {
         return new ActivityContext() {
             @Override
             public IRI getActivity() {

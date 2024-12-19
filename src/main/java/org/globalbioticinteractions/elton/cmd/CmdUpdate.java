@@ -1,7 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.cmd.ActivityContext;
-import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.io.FileUtils;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
@@ -20,7 +19,6 @@ import picocli.CommandLine;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 @CommandLine.Command(
         name = "sync",
@@ -62,7 +60,7 @@ public class CmdUpdate extends CmdDefaultParams {
                     getDataDir(),
                     getProvDir(),
                     getActivityListener(),
-                    getCtx(),
+                    getActivityContext(),
                     getActivityIdFactory()
             );
             try {
@@ -77,7 +75,7 @@ public class CmdUpdate extends CmdDefaultParams {
         NamespaceHandler namespaceHandler = namespace -> {
             getStderr().print("tracking [" + namespace + "]... ");
 
-            CacheUtil.findOrMakeProvOrDataDirForNamespace(new File(getWorkDir()), namespace);
+            FileUtils.forceMkdir(new File(getWorkDir()));
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getProvDir(), namespace);
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
 
@@ -90,7 +88,7 @@ public class CmdUpdate extends CmdDefaultParams {
                     getContentPathFactory(),
                     getProvenancePathFactory(),
                     getActivityListener(namespace),
-                    getCtx(),
+                    getActivityContext(),
                     getActivityIdFactory()
             );
 

@@ -2,7 +2,6 @@ package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -44,20 +43,24 @@ public class CmdUpdateIT {
         CmdUpdate cmd = new CmdUpdate();
         File dataProvFolder = tmpDir.newFolder();
         dataProvFolder.delete();
-        doUpdate("globalbioticinteractions/template-dataset", cmd, dataProvFolder);
+        doUpdate("globalbioticinteractions/template-dataset", cmd, dataProvFolder, tmpDir.newFolder("workdir"));
     }
 
     private void assertAccessLogForNamespace(String namespace) throws IOException {
         CmdUpdate cmd = new CmdUpdate();
         File dataAndProvFolder = tmpDir.newFolder();
-        doUpdate(namespace, cmd, dataAndProvFolder);
+        doUpdate(namespace, cmd, dataAndProvFolder, tmpDir.newFolder("workdir"));
     }
 
-    private void doUpdate(String namespace, CmdUpdate cmd, File dataAndProvFolder) throws IOException {
+    private void doUpdate(String namespace, CmdUpdate cmd, File dataAndProvFolder, File workdir) throws IOException {
         String absolutePath = dataAndProvFolder.getAbsolutePath();
         cmd.setDataDir(absolutePath);
         cmd.setProvDir(absolutePath);
+        cmd.setWorkDir(workdir.getAbsolutePath());
         cmd.setNamespaces(Collections.singletonList(namespace));
+
+        File workDir = new File(cmd.getWorkDir());
+        CmdTestUtil.assertEmpty(workDir);
 
         cmd.run();
 
@@ -67,6 +70,9 @@ public class CmdUpdateIT {
         assertThat(getNumberOfLogEntries(datasetDir) > 3, is(true));
         int numberOfCacheFiles = getNumberOfCacheFiles(datasetDir);
         assertTmpFilesRemoved(dataAndProvFolder);
+
+        CmdTestUtil.assertEmpty(workDir);
+
 
         // rerun
         cmd.run();

@@ -1,8 +1,11 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -13,6 +16,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.endsWith;
@@ -27,15 +31,20 @@ public class CmdUpdateTest {
 
     @Test
     public void updateLocalDataset() throws IOException, URISyntaxException {
-
         URL localDataset = getClass().getResource("/dataset-local-test/globi.json");
-
         File localWorkDir = new File(localDataset.toURI()).getParentFile();
-
+        File tmpWorkDir = createTmpWorkDir(localWorkDir);
 
         CmdUpdate cmd = new CmdUpdate();
         File file = tmpDir.newFolder();
-        assertUpdate(localWorkDir, cmd, file);
+        assertUpdate(tmpWorkDir, cmd, file);
+    }
+
+    private File createTmpWorkDir(File localWorkDir) throws IOException {
+        File tmpWorkDir = tmpDir.newFolder("workdir");
+        FileUtils.copyFileToDirectory(new File(localWorkDir, "globi.json"), tmpWorkDir);
+        FileUtils.copyFileToDirectory(new File(localWorkDir, "interactions.tsv"), tmpWorkDir);
+        return tmpWorkDir;
     }
 
     @Test
@@ -44,12 +53,13 @@ public class CmdUpdateTest {
         URL localDataset = getClass().getResource("/dataset-local-test/globi.json");
 
         File localWorkDir = new File(localDataset.toURI()).getParentFile();
+        File tmpWorkDir = createTmpWorkDir(localWorkDir);
 
         File file = tmpDir.newFolder();
         file.delete();
 
         CmdUpdate cmd = new CmdUpdate();
-        assertUpdate(localWorkDir, cmd, file);
+        assertUpdate(tmpWorkDir, cmd, file);
     }
 
     private void assertUpdate(File localWorkDir, CmdUpdate cmd, File file) throws IOException {
@@ -59,7 +69,23 @@ public class CmdUpdateTest {
         cmd.setRegistryNames(Arrays.asList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         cmd.setNamespaces(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
 
+        Collection<File> files = FileUtils.listFilesAndDirs(
+                localWorkDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        assertThat(files.size(), CoreMatchers.is(3));
+
         cmd.run();
+
+        files = FileUtils.listFilesAndDirs(
+                localWorkDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        assertThat(files.size(), CoreMatchers.is(3));
 
         File local = new File(file, DatasetRegistryUtil.NAMESPACE_LOCAL);
         assertThat(local.exists(), is(true));

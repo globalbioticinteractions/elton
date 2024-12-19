@@ -5,6 +5,7 @@ import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
 import bio.guoda.preston.process.StatementListener;
+import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.ContentPathFactory;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 abstract class CmdDefaultParams implements Runnable {
 
@@ -75,6 +77,9 @@ abstract class CmdDefaultParams implements Runnable {
     private InputStream stdin = System.in;
 
     private final UUID activityId = UUID.randomUUID();
+
+    public static final Supplier<IRI> ACTIVITY_ID_FACTORY = () -> RefNodeFactory.toIRI(UUID.randomUUID());
+
 
     final private ProgressCursorFactory cursorFactory = new ProgressCursorFactory() {
         private final ProgressCursor cursor = new ProgressCursorRotating(stderr);
@@ -175,6 +180,10 @@ abstract class CmdDefaultParams implements Runnable {
         return activityId;
     }
 
+    public Supplier<IRI> getActivityIdFactory() {
+        return ACTIVITY_ID_FACTORY;
+    }
+
     @Override
     public void run() {
         start();
@@ -243,7 +252,36 @@ abstract class CmdDefaultParams implements Runnable {
                 inputStreamFactory,
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getActivityListener()
+                getActivityListener(), new ActivityContext() {
+                    @Override
+                    public IRI getActivity() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return null;
+                    }
+                }, new Supplier<IRI>() {
+                    @Override
+                    public IRI get() {
+                        return RefNodeFactory.toIRI(UUID.randomUUID());
+                    }
+                }
         );
+    }
+
+    protected ActivityContext getCtx() {
+        return new ActivityContext() {
+            @Override
+            public IRI getActivity() {
+                return RefNodeFactory.toIRI(CmdDefaultParams.this.getActivityId());
+            }
+
+            @Override
+            public String getDescription() {
+                return CmdDefaultParams.this.getDescription();
+            }
+        };
     }
 }

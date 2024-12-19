@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
@@ -10,8 +9,6 @@ import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
-import org.globalbioticinteractions.elton.store.ActivityListener;
-import org.globalbioticinteractions.elton.store.ActivityProxy;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.slf4j.Logger;
@@ -19,10 +16,8 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @CommandLine.Command(
         name = "sync",
@@ -56,27 +51,14 @@ public class CmdUpdate extends CmdDefaultParams {
     protected void doRun() {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
 
-
         List<DatasetRegistry> registries = new ArrayList<>();
         for (String registryName : registryNames) {
-            DatasetRegistryFactoryImpl datasetRegistryFactory
-                    = new DatasetRegistryFactoryImpl(
+            DatasetRegistryFactoryImpl datasetRegistryFactory = new DatasetRegistryFactoryImpl(
                     getWorkDir(),
                     inputStreamFactory,
                     getDataDir(),
                     getProvDir(),
-                    new ActivityListener() {
-
-                        @Override
-                        public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
-
-                        }
-
-                        @Override
-                        public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
-
-                        }
-                    }
+                    getActivityListener()
             );
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
@@ -94,8 +76,6 @@ public class CmdUpdate extends CmdDefaultParams {
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getProvDir(), namespace);
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
 
-            ActivityProxy dereferenceListener = getActivityListener(namespace);
-
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
                     registryProxy,
                     namespace,
@@ -104,7 +84,9 @@ public class CmdUpdate extends CmdDefaultParams {
                     inputStreamFactory,
                     getContentPathFactory(),
                     getProvenancePathFactory(),
-                    dereferenceListener
+                    getActivityListener(namespace),
+                    getCtx(),
+                    getActivityIdFactory()
             );
 
             Dataset dataset =
@@ -119,7 +101,8 @@ public class CmdUpdate extends CmdDefaultParams {
                         dataset,
                         factory,
                         null,
-                        new File(getWorkDir()));
+                        new File(getWorkDir())
+                );
                 getStderr().println("done.");
             } catch (StudyImporterException ex) {
                 LOG.error("tracking of [" + namespace + "] failed.", ex);

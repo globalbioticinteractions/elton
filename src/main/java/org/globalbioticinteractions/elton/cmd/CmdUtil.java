@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.rdf.api.IRI;
@@ -20,7 +19,6 @@ import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ProvenancePathFactory;
-
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -40,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -73,7 +70,9 @@ public class CmdUtil {
             InputStreamFactory factory,
             ContentPathFactory contentPathFactory,
             ProvenancePathFactory provenancePathFactory,
-            ActivityListener dereferenceListener) {
+            ActivityListener dereferenceListener,
+            ActivityContext ctx,
+            Supplier<IRI> iriFactory) {
 
         CacheFactory cacheFactory = createCacheFactory(
                 namespace,
@@ -82,7 +81,8 @@ public class CmdUtil {
                 factory,
                 contentPathFactory,
                 provenancePathFactory,
-                dereferenceListener
+                dereferenceListener,
+                ctx, iriFactory
         );
         return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, dataDir), cacheFactory);
     }
@@ -93,7 +93,9 @@ public class CmdUtil {
                                                   InputStreamFactory factory,
                                                   ContentPathFactory contentPathFactory,
                                                   ProvenancePathFactory provenancePathFactory,
-                                                  ActivityListener dereferenceListener) {
+                                                  ActivityListener dereferenceListener,
+                                                  ActivityContext ctx,
+                                                  Supplier<IRI> iriFactory) {
         return dataset -> {
             ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(dataDir));
             ResourceService local = new ResourceServiceLocal(factory);
@@ -104,23 +106,8 @@ public class CmdUtil {
                     dataDir,
                     provDir,
                     dereferenceListener,
-                    new ActivityContext() {
-                        @Override
-                        public IRI getActivity() {
-                            return null;
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return null;
-                        }
-                    },
-                    new Supplier<IRI>() {
-                        @Override
-                        public IRI get() {
-                            return RefNodeFactory.toIRI(UUID.randomUUID());
-                        }
-                    });
+                    ctx,
+                    iriFactory);
 
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(
                     namespace,

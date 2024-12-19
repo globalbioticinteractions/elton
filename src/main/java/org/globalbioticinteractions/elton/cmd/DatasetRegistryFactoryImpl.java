@@ -38,7 +38,13 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
     private final String provDir;
     private final ActivityListener activityListener;
 
-    public DatasetRegistryFactoryImpl(URI workDir, InputStreamFactory inputStreamFactory, String dataDir, String provDir, ActivityListener activityListener) {
+    public DatasetRegistryFactoryImpl(
+            URI workDir,
+            InputStreamFactory inputStreamFactory,
+            String dataDir,
+            String provDir,
+            ActivityListener activityListener
+    ) {
         this.workDir = workDir;
         this.inputStreamFactory = inputStreamFactory;
         this.dataDir = dataDir;

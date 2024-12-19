@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.util;
 
+import bio.guoda.preston.cmd.ActivityContext;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocal;
@@ -8,15 +10,14 @@ import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ProvenancePathFactory;
-
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
 import org.globalbioticinteractions.elton.store.ActivityListener;
-import org.globalbioticinteractions.elton.store.ActivityProxy;
 
 import java.io.File;
 import java.net.URI;
+import java.util.function.Supplier;
 
 public class DatasetRegistryUtil {
 
@@ -29,14 +30,18 @@ public class DatasetRegistryUtil {
                                               ContentPathFactory contentPathFactory,
                                               String dataDir,
                                               String provDir,
-                                              ActivityListener dereferenceListener) {
+                                              ActivityListener dereferenceListener,
+                                              ActivityContext ctx,
+                                              Supplier<IRI> activityIdFactory) {
         return new DatasetRegistrySingleDir(
                 localArchiveDir,
                 resourceServiceRemote,
                 contentPathFactory,
                 dataDir,
                 provDir,
-                dereferenceListener
+                dereferenceListener,
+                ctx,
+                activityIdFactory
         );
     }
 
@@ -80,7 +85,9 @@ public class DatasetRegistryUtil {
                                                      InputStreamFactory streamFactory,
                                                      ContentPathFactory contentPathFactory,
                                                      ProvenancePathFactory provenancePathFactory,
-                                                     ActivityListener activityListener) {
+                                                     ActivityListener activityListener,
+                                                     ActivityContext ctx,
+                                                     Supplier<IRI> activityIdFactory) {
         return forCacheOrLocalDir(
                 dataDir,
                 provDir,
@@ -89,7 +96,10 @@ public class DatasetRegistryUtil {
                 new ResourceServiceLocalAndRemote(streamFactory, new File(dataDir)),
                 contentPathFactory,
                 provenancePathFactory,
-                activityListener);
+                activityListener,
+                ctx,
+                activityIdFactory
+        );
     }
 
     public static DatasetRegistry forCacheOrLocalDir(String dataDir,
@@ -99,7 +109,9 @@ public class DatasetRegistryUtil {
                                                      ResourceService resourceServiceRemote,
                                                      ContentPathFactory contentPathFactory,
                                                      ProvenancePathFactory provenancePathFactory,
-                                                     ActivityListener dereferenceListener) {
+                                                     ActivityListener dereferenceListener,
+                                                     ActivityContext ctx,
+                                                     Supplier<IRI> activityIdFactory) {
         DatasetRegistry registry = forCache(
                 dataDir,
                 provDir,
@@ -114,7 +126,9 @@ public class DatasetRegistryUtil {
                     contentPathFactory,
                     dataDir,
                     provDir,
-                    dereferenceListener
+                    dereferenceListener,
+                    ctx,
+                    activityIdFactory
             );
         }
         return registry;

@@ -1,7 +1,10 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.RefNodeFactory;
+import bio.guoda.preston.cmd.ActivityContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
@@ -16,8 +19,6 @@ import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
 import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
-import org.globalbioticinteractions.elton.store.ActivityProxy;
-import org.globalbioticinteractions.elton.store.ProvLogger;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,8 @@ import java.io.File;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 class StreamingDatasetsHandler implements NamespaceHandler {
     private final static Logger LOG = LoggerFactory.getLogger(StreamingDatasetsHandler.class);
@@ -73,7 +75,22 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                 factory,
                 contentPathFactory,
                 provenancePathFactory,
-                dereferenceListener
+                dereferenceListener, new ActivityContext() {
+                    @Override
+                    public IRI getActivity() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return null;
+                    }
+                }, new Supplier<IRI>() {
+                    @Override
+                    public IRI get() {
+                        return RefNodeFactory.toIRI(UUID.randomUUID());
+                    }
+                }
         );
 
         Dataset dataset = new DatasetWithResourceMapping(

@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.util;
 
-import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
@@ -15,7 +14,6 @@ import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -26,19 +24,25 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
     private ResourceService resourceService;
     private ContentPathFactory contentPathFactory;
     private ActivityListener dereferenceListener;
+    private ActivityContext ctx;
+    private Supplier<IRI> activityIdFactory;
 
     public DatasetRegistrySingleDir(URI localArchiveDir,
                                     ResourceService resourceService,
                                     ContentPathFactory contentPathFactory,
                                     String dataDir,
                                     String provDir,
-                                    ActivityListener dereferenceListener) {
+                                    ActivityListener dereferenceListener,
+                                    ActivityContext ctx,
+                                    Supplier<IRI> activityIdFactory) {
         this.localArchiveDir = localArchiveDir;
         this.resourceService = resourceService;
         this.contentPathFactory = contentPathFactory;
         this.dataDir = dataDir;
         this.provDir = provDir;
         this.dereferenceListener = dereferenceListener;
+        this.ctx = ctx;
+        this.activityIdFactory = activityIdFactory;
 
     }
 
@@ -68,23 +72,8 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
                         dataDir,
                         provDir,
                         dereferenceListener,
-                        new ActivityContext() {
-                            @Override
-                            public IRI getActivity() {
-                                return null;
-                            }
-
-                            @Override
-                            public String getDescription() {
-                                return null;
-                            }
-                        },
-                        new Supplier<IRI>() {
-                            @Override
-                            public IRI get() {
-                                return RefNodeFactory.toIRI(UUID.randomUUID());
-                            }
-                        }
+                        ctx,
+                        activityIdFactory
                 )
         );
     }

@@ -10,11 +10,11 @@ import java.net.URI;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-public class ActivityListenerImpl implements ActivityListener {
+public class ProvLoggerWithClock implements ActivityListener {
     private final StatementListener listener;
     private final Supplier<Literal> clock;
 
-    public ActivityListenerImpl(StatementListener listener, Supplier<Literal> clock) {
+    public ProvLoggerWithClock(StatementListener listener, Supplier<Literal> clock) {
         this.listener = listener;
         this.clock = clock;
     }

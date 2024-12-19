@@ -28,36 +28,51 @@ public class DatasetRegistryFactoryImplTest {
                     in -> in,
                     "someDataDir",
                     "someProvDir",
-                    new ActivityListener() {
-
-                        @Override
-                        public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
-
-                        }
-
-                        @Override
-                        public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
-
-                        }
-                    }, new ActivityContext() {
-                        @Override
-                        public IRI getActivity() {
-                            return null;
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return null;
-                        }
-                    }, new Supplier<IRI>() {
-                        @Override
-                        public IRI get() {
-                            return null;
-                        }
-                    }).createRegistryByName(supportedRegistry);
+                    getListener(),
+                    getCtx(),
+                    getActivityIdFactory()
+            ).createRegistryByName(supportedRegistry);
             registries.add(registry);
         }
         assertThat(registries.size(), Is.is(supportedRegistries.size()));
+    }
+
+    private Supplier<IRI> getActivityIdFactory() {
+        return new Supplier<IRI>() {
+            @Override
+            public IRI get() {
+                return null;
+            }
+        };
+    }
+
+    private ActivityContext getCtx() {
+        return new ActivityContext() {
+            @Override
+            public IRI getActivity() {
+                return null;
+            }
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+        };
+    }
+
+    private ActivityListener getListener() {
+        return new ActivityListener() {
+
+            @Override
+            public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
+
+            }
+
+            @Override
+            public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
+
+            }
+        };
     }
 
 }

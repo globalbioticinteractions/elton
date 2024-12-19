@@ -5,39 +5,21 @@ import bio.guoda.preston.process.ActivityUtil;
 import bio.guoda.preston.process.StatementListener;
 import bio.guoda.preston.process.StatementsEmitterAdapter;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Literal;
 import org.apache.commons.rdf.api.Quad;
+import org.globalbioticinteractions.cache.ProvenanceLog;
 
 import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
-public class ProvLogger implements ActivityListener {
+public class ProvLogger extends ProvLoggerWithClock {
 
     private StatementListener listener;
 
     public ProvLogger(StatementListener listener) {
-        this.listener = listener;
+        super(listener, RefNodeFactory::nowDateTimeLiteral);
     }
 
-    @Override
-    public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
-
-    }
-
-    @Override
-    public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
-        if (listener != null) {
-            ActivityUtil.emitDownloadActivity(
-                    request,
-                    response,
-                    new StatementsEmitterAdapter() {
-                        @Override
-                        public void emit(Quad quad) {
-                            listener.on(quad);
-                        }
-                    },
-                    Optional.of(activityId)
-            );
-        }
-    }
 }

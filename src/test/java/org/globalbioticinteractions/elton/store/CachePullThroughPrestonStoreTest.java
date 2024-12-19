@@ -66,13 +66,7 @@ public class CachePullThroughPrestonStoreTest {
                 quads,
                 dataDir,
                 provDir,
-                new ActivityListenerImpl(new StatementListener() {
-
-                    @Override
-                    public void on(Quad quad) {
-                        quads.add(quad);
-                    }
-                }, this.clock),
+                new ProvLoggerWithClock(quads::add, this.clock),
                 "some/namespace"
         );
 
@@ -168,7 +162,7 @@ public class CachePullThroughPrestonStoreTest {
                 quads,
                 dataDir,
                 provDir,
-                new ActivityListenerImpl(new StatementListener() {
+                new ProvLoggerWithClock(new StatementListener() {
 
                     @Override
                     public void on(Quad quad) {

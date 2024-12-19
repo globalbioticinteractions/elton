@@ -61,22 +61,9 @@ public class CmdUpdate extends CmdDefaultParams {
                     inputStreamFactory,
                     getDataDir(),
                     getProvDir(),
-                    getActivityListener(), new ActivityContext() {
-                        @Override
-                        public IRI getActivity() {
-                            return null;
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return null;
-                        }
-                    }, new Supplier<IRI>() {
-                        @Override
-                        public IRI get() {
-                            return null;
-                        }
-                    }
+                    getActivityListener(),
+                    getCtx(),
+                    getActivityIdFactory()
             );
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);

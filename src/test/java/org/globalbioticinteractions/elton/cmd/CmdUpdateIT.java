@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Collections;
 
 import static junit.framework.TestCase.assertTrue;
@@ -47,28 +49,34 @@ public class CmdUpdateIT {
 
     private void assertAccessLogForNamespace(String namespace) throws IOException {
         CmdUpdate cmd = new CmdUpdate();
-        File file1 = tmpDir.newFolder();
-        doUpdate(namespace, cmd, file1);
+        File dataAndProvFolder = tmpDir.newFolder();
+        doUpdate(namespace, cmd, dataAndProvFolder);
     }
 
-    private void doUpdate(String namespace, CmdUpdate cmd, File dataProvFolder) throws IOException {
-        String absolutePath = dataProvFolder.getAbsolutePath();
+    private void doUpdate(String namespace, CmdUpdate cmd, File dataAndProvFolder) throws IOException {
+        String absolutePath = dataAndProvFolder.getAbsolutePath();
         cmd.setDataDir(absolutePath);
         cmd.setProvDir(absolutePath);
         cmd.setNamespaces(Collections.singletonList(namespace));
 
         cmd.run();
 
-        File datasetDir = assertAccessLog(namespace, dataProvFolder);
+        File datasetDir = assertAccessLog(namespace, dataAndProvFolder);
 
         int numberOfLogEntries = getNumberOfLogEntries(datasetDir);
         assertThat(getNumberOfLogEntries(datasetDir) > 3, is(true));
         int numberOfCacheFiles = getNumberOfCacheFiles(datasetDir);
+        assertTmpFilesRemoved(dataAndProvFolder);
 
         // rerun
         cmd.run();
         assertThat("should update regardless or preexisting entries in cache", getNumberOfLogEntries(datasetDir) + 3 > numberOfLogEntries, is(true));
         assertThat("number of cached files should not have changed after update", numberOfCacheFiles, is(getNumberOfCacheFiles(datasetDir)));
+    }
+
+    private void assertTmpFilesRemoved(File dataAndProvFolder) {
+        Collection<File> files = FileUtils.listFiles(dataAndProvFolder, null, false);
+        assertThat(files.size(), is(0));
     }
 
     private File assertAccessLog(String namespace, File file1) throws IOException {

@@ -252,22 +252,9 @@ abstract class CmdDefaultParams implements Runnable {
                 inputStreamFactory,
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getActivityListener(), new ActivityContext() {
-                    @Override
-                    public IRI getActivity() {
-                        return null;
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return null;
-                    }
-                }, new Supplier<IRI>() {
-                    @Override
-                    public IRI get() {
-                        return RefNodeFactory.toIRI(UUID.randomUUID());
-                    }
-                }
+                getActivityListener(),
+                getCtx(),
+                getActivityIdFactory()
         );
     }
 

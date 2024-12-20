@@ -84,7 +84,10 @@ public class CmdUtil {
                 dereferenceListener,
                 ctx, iriFactory
         );
-        return new DatasetRegistryWithCache(new DatasetRegistryLogger(registry, dataDir), cacheFactory);
+        return new DatasetRegistryWithCache(
+                new DatasetRegistryLogger(registry, provDir),
+                cacheFactory
+        );
     }
 
     public static CacheFactory createCacheFactory(String namespace,

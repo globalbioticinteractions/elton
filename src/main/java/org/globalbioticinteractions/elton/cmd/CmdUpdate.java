@@ -109,7 +109,8 @@ public class CmdUpdate extends CmdDefaultParams {
                 getStderr().println("done.");
             } catch (StudyImporterException ex) {
                 LOG.error("tracking of [" + namespace + "] failed.", ex);
-                getStderr().println("failed with [ " + ex.getMessage() + "].");
+                getStderr().println("failed with [" + ex.getMessage() + "].");
+                ex.printStackTrace(getStderr());
             }
         };
 

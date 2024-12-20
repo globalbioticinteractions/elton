@@ -44,6 +44,11 @@ public class CmdUpdateIT {
     }
 
     @Test
+    public void runUpdateUCSB() throws IOException {
+        assertAccessLogForNamespace("globalbioticinteractions/ucsb-izc");
+    }
+
+    @Test
     public void runUpdateNonExistingDataProvFolders() throws IOException {
         CmdUpdate cmd = new CmdUpdate();
         File dataProvFolder = tmpDir.newFolder();

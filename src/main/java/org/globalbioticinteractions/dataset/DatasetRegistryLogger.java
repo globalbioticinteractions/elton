@@ -13,11 +13,11 @@ import java.util.function.Consumer;
 public class DatasetRegistryLogger implements DatasetRegistry {
     private final DatasetRegistry registry;
 
-    private final String cacheDir;
+    private final String provDir;
 
-    public DatasetRegistryLogger(DatasetRegistry registry, String cacheDir) {
+    public DatasetRegistryLogger(DatasetRegistry registry, String provDir) {
         this.registry = registry;
-        this.cacheDir = cacheDir;
+        this.provDir = provDir;
     }
 
     public Iterable<String> findNamespaces() throws DatasetRegistryException {
@@ -36,7 +36,7 @@ public class DatasetRegistryLogger implements DatasetRegistry {
             String accessedAt = ISODateTimeFormat.dateTime().withZoneUTC().print(new Date().getTime());
             ContentProvenance prov = new ContentProvenance(namespace, dataset.getArchiveURI(), null, null, accessedAt);
             prov.setType(CacheUtil.MIME_TYPE_GLOBI);
-            ProvenanceLog.appendProvenanceLog(new File(getCacheDir()), prov);
+            ProvenanceLog.appendProvenanceLog(new File(getProvDir()), prov);
         } catch (IOException var4) {
             throw new DatasetRegistryException("failed to record access", var4);
         }
@@ -48,8 +48,8 @@ public class DatasetRegistryLogger implements DatasetRegistry {
         return this.registry;
     }
 
-    private String getCacheDir() {
-        return cacheDir;
+    private String getProvDir() {
+        return provDir;
     }
 
 

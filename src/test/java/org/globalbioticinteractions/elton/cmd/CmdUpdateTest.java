@@ -37,7 +37,19 @@ public class CmdUpdateTest {
 
         CmdUpdate cmd = new CmdUpdate();
         File file = tmpDir.newFolder();
-        assertUpdate(tmpWorkDir, cmd, file);
+        assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath());
+    }
+
+    @Test
+    public void updateLocalDatasetSeparateDataProvDirs() throws IOException, URISyntaxException {
+        URL localDataset = getClass().getResource("/dataset-local-test/globi.json");
+        File localWorkDir = new File(localDataset.toURI()).getParentFile();
+        File tmpWorkDir = createTmpWorkDir(localWorkDir);
+
+        CmdUpdate cmd = new CmdUpdate();
+        String dataDir = tmpDir.newFolder("data").getAbsolutePath();
+        String provDir = tmpDir.newFolder("prov").getAbsolutePath();
+        assertUpdate(tmpWorkDir, cmd, dataDir, provDir);
     }
 
     private File createTmpWorkDir(File localWorkDir) throws IOException {
@@ -59,12 +71,12 @@ public class CmdUpdateTest {
         file.delete();
 
         CmdUpdate cmd = new CmdUpdate();
-        assertUpdate(tmpWorkDir, cmd, file);
+        assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath());
     }
 
-    private void assertUpdate(File localWorkDir, CmdUpdate cmd, File file) throws IOException {
-        cmd.setDataDir(file.getAbsolutePath());
-        cmd.setProvDir(file.getAbsolutePath());
+    private void assertUpdate(File localWorkDir, CmdUpdate cmd, String dataDir, String provDir) throws IOException {
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(provDir);
         cmd.setWorkDir(localWorkDir.getAbsolutePath());
         cmd.setRegistryNames(Arrays.asList(DatasetRegistryUtil.NAMESPACE_LOCAL));
         cmd.setNamespaces(Collections.singletonList(DatasetRegistryUtil.NAMESPACE_LOCAL));
@@ -87,11 +99,19 @@ public class CmdUpdateTest {
 
         assertThat(files.size(), CoreMatchers.is(3));
 
-        File local = new File(file, DatasetRegistryUtil.NAMESPACE_LOCAL);
-        assertThat(local.exists(), is(true));
+        File localDataDir = new File(dataDir, DatasetRegistryUtil.NAMESPACE_LOCAL);
+        assertThat(localDataDir.exists(), is(true));
 
-        File provenanceLog = new File(local, "access.tsv");
+        File localProvDir = new File(provDir, DatasetRegistryUtil.NAMESPACE_LOCAL);
+        assertThat(localProvDir.exists(), is(true));
+
+        if (!localDataDir.equals(localProvDir)) {
+            assertThat(new File(localDataDir, "access.tsv").exists(), is(false));
+        }
+
+        File provenanceLog = new File(localProvDir, "access.tsv");
         assertThat(provenanceLog.exists(), is(true));
+
 
         String provenanceLogString = IOUtils.toString(provenanceLog.toURI(), StandardCharsets.UTF_8);
 

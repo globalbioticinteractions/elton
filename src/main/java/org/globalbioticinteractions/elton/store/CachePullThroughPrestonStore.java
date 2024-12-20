@@ -18,20 +18,29 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class CachePullThroughPrestonStore extends CachePullThrough {
 
-    private final String namespace;
     private final ResourceService resourceService;
-    private final String dataDir;
     private final ActivityContext ctx;
     private final Supplier<IRI> iriFactory;
+    private final BlobStoreAppendOnly blobStore;
 
-    private ActivityListener dereferenceListener;
+    private final ActivityListener dereferenceListener;
+    private final KeyTo1LevelPath keyToPath;
+
+    private final AtomicReference<IRI> currentContext = new AtomicReference<>(null);
+    private final Map<IRI, IRI> successfullyRequested = Collections.synchronizedMap(new HashMap<>());
+    private final LocalPathToHashIRI translateToHashSpace;
+
 
     public CachePullThroughPrestonStore(String namespace,
-                                        ResourceService resourceServiceLocal,
+                                        ResourceService resourceService,
                                         ContentPathFactory contentPathFactory,
                                         String dataDir,
                                         String provDir,
@@ -39,24 +48,20 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                                         ActivityContext ctx,
                                         Supplier<IRI> iriFactory) {
         super(namespace,
-                resourceServiceLocal,
+                resourceService,
                 contentPathFactory,
                 dataDir,
                 provDir
         );
-        this.namespace = namespace;
-        this.dataDir = dataDir;
-        this.resourceService = resourceServiceLocal;
+        this.resourceService = resourceService;
         this.dereferenceListener = dereferenceListener;
         this.ctx = ctx;
         this.iriFactory = iriFactory;
-    }
-
-    @Override
-    public InputStream retrieve(URI resourceURI) throws IOException {
         File dataFolder = new File(dataDir, namespace);
-        KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(dataFolder.toURI());
-        BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
+
+        this.translateToHashSpace = new LocalPathToHashIRI(dataFolder);
+        this.keyToPath = new KeyTo1LevelPath(dataFolder.toURI());
+        this.blobStore = new BlobStoreAppendOnly(
                 new KeyValueStoreLocalFileSystem(
                         dataFolder,
                         keyToPath,
@@ -64,35 +69,62 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                 ),
                 true,
                 HashType.sha256
-
         );
 
-        Dereferencer<IRI> derefCas = new DereferencerContentAddressed(
+    }
+
+    @Override
+    public InputStream retrieve(URI resourceURI) throws IOException {
+        DereferencerContentAddressed dca = new DereferencerContentAddressed(
                 iri -> resourceService.retrieve(URI.create(iri.getIRIString())),
                 blobStore
         );
+        Dereferencer<IRI> derefCas = new Dereferencer<IRI>() {
+            @Override
+            public IRI get(IRI requested) throws IOException {
+                updateContext();
+
+                return successfullyRequested.containsKey(requested)
+                        ? successfullyRequested.get(requested)
+                        : retrieve(requested);
+            }
+
+            private IRI retrieve(IRI request) throws IOException {
+                IRI parentActivityId = ctx.getActivity();
+                IRI activityId = iriFactory.get();
+
+                dereferenceListener.onStarted(
+                        parentActivityId,
+                        activityId,
+                        translateToHashSpace.get(request)
+                );
+
+                IRI response = dca.get(request);
+
+                dereferenceListener.onCompleted(
+                        parentActivityId,
+                        activityId,
+                        translateToHashSpace.get(request),
+                        response,
+                        keyToPath.toPath(response)
+                );
+
+                successfullyRequested.put(request, response);
+                return response;
+            }
+
+            private void updateContext() {
+                if (currentContext.get() == null
+                        || !currentContext.get().equals(ctx.getActivity())) {
+                    successfullyRequested.clear();
+                    currentContext.set(ctx.getActivity());
+                }
+            }
+        };
 
         try {
             IRI request = RefNodeFactory.toIRI(resourceURI);
-            IRI parentActivityId = ctx.getActivity();
-            IRI activityId = iriFactory.get();
-
-            dereferenceListener.onStarted(
-                    parentActivityId,
-                    activityId,
-                    request
-            );
-
             IRI response = derefCas.get(request);
-
-            dereferenceListener.onCompleted(
-                    parentActivityId,
-                    activityId,
-                    request,
-                    response,
-                    keyToPath.toPath(response)
-            );
-
             return blobStore.get(response);
         } catch (IOException ex) {
             throw new IOException("failed to retrieve [" + resourceURI + "]", ex);

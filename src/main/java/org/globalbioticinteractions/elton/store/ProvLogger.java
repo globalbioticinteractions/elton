@@ -16,8 +16,6 @@ import java.util.function.Supplier;
 
 public class ProvLogger extends ProvLoggerWithClock {
 
-    private StatementListener listener;
-
     public ProvLogger(StatementListener listener) {
         super(listener, RefNodeFactory::nowDateTimeLiteral);
     }

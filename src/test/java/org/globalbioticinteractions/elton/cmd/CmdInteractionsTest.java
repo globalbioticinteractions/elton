@@ -1,8 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.core.Is;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -13,10 +13,18 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertNotNull;
@@ -99,6 +107,57 @@ public class CmdInteractionsTest {
         assertThat(lines[0], is("argumentTypeId\tsourceOccurrenceId\tsourceCatalogNumber\tsourceCollectionCode\tsourceCollectionId\tsourceInstitutionCode\tsourceTaxonId\tsourceTaxonName\tsourceTaxonRank\tsourceTaxonPathIds\tsourceTaxonPath\tsourceTaxonPathNames\tsourceBodyPartId\tsourceBodyPartName\tsourceLifeStageId\tsourceLifeStageName\tsourceSexId\tsourceSexName\tinteractionTypeId\tinteractionTypeName\ttargetOccurrenceId\ttargetCatalogNumber\ttargetCollectionCode\ttargetCollectionId\ttargetInstitutionCode\ttargetTaxonId\ttargetTaxonName\ttargetTaxonRank\ttargetTaxonPathIds\ttargetTaxonPath\ttargetTaxonPathNames\ttargetBodyPartId\ttargetBodyPartName\ttargetLifeStageId\ttargetLifeStageName\ttargetSexId\ttargetSexName\tbasisOfRecordId\tbasisOfRecordName\thttp://rs.tdwg.org/dwc/terms/eventDate\tdecimalLatitude\tdecimalLongitude\tlocalityId\tlocalityName\treferenceDoi\treferenceUrl\treferenceCitation\tnamespace\tcitation\tarchiveURI\tlastSeenAt\tcontentHash\teltonVersion"));
         assertThat(lines[1], is("https://en.wiktionary.org/wiki/support\t\t\t\t\t\t\tLeptoconchus incycloseris\t\t\t\t\t\t\t\t\t\t\thttp://purl.obolibrary.org/obo/RO_0002444\tparasiteOf\t\t\t\t\t\t\tFungia (Cycloseris) costulata\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t10.1007/s13127-011-0039-1\thttps://doi.org/10.1007/s13127-011-0039-1\tGittenberger, A., Gittenberger, E. (2011). Cryptic, adaptive radiation of endoparasitic snails: sibling species of Leptoconchus (Gastropoda: Coralliophilidae) in corals. Org Divers Evol, 11(1), 21–41. doi:10.1007/s13127-011-0039-1\tglobalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f\tdev"));
         assertThat(lines[0].split("\t").length, is(lines[1].split("\t").length));
+    }
+
+    @Test
+    public void interactionsWithHeaderInProvMode() throws URISyntaxException, IOException {
+        CmdInteractions cmd = new CmdInteractions();
+
+        String dataDirStatic = CmdTestUtil.cacheDirTest();
+        File dataDir = tmpFolder.newFolder("data");
+        FileUtils.copyDirectory(new File(dataDirStatic), dataDir);
+        cmd.setDataDir(dataDir.getAbsolutePath());
+
+        String provDirStatic = CmdTestUtil.cacheDirTest();
+        File provDir = tmpFolder.newFolder("prov");
+        FileUtils.copyDirectory(new File(provDirStatic), provDir);
+
+        cmd.setProvDir(provDir.getAbsolutePath());
+
+        cmd.setEnableProvMode(true);
+
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
+
+        ByteArrayOutputStream out1 = new ByteArrayOutputStream();
+        PrintStream out = new PrintStream(out1);
+        cmd.setStdout(out);
+
+        assertThat(numberOfDataFiles(dataDir), is(4));
+
+        cmd.run();
+        String actual1 = out1.toString();
+        String[] lines = StringUtils.splitByWholeSeparator(actual1, "\n");
+        for (String line : lines) {
+            assertThat(line, not(containsString("\t")));
+        }
+
+        assertThat(numberOfDataFiles(dataDir), is(5));
+
+        assertThat(new File(dataDir, "50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599").exists(), is(true));
+
+        assertThat(lines[0], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
+        assertThat(lines[1], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent>"));
+
+        Stream<String> stringStream = Arrays.stream(lines).filter(l -> StringUtils.contains(l, "50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599"));
+
+        List<String> dataStatements = stringStream.collect(Collectors.toList());
+
+        assertThat(dataStatements.size(), is(3));
+
+    }
+
+    private int numberOfDataFiles(File dataDir) {
+        return FileUtils.listFiles(dataDir, null, true).size();
     }
 
 

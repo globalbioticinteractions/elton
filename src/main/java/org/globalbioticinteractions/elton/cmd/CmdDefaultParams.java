@@ -54,10 +54,10 @@ abstract class CmdDefaultParams implements Runnable {
     )
     private boolean noProgress = false;
 
-    @CommandLine.Option(names = {"--enable-prov-logging"},
+    @CommandLine.Option(names = {"--prov-mode"},
             description = "Log provenance activity (default: ${DEFAULT-VALUE})"
     )
-    private boolean enableProvenanceLogging = false;
+    private boolean enableProvMode = false;
 
 
     public void setNamespaces(List<String> namespaces) {
@@ -169,7 +169,7 @@ abstract class CmdDefaultParams implements Runnable {
 
     public StatementListener getStatementListener() {
         return quad -> {
-            if (enableProvenanceLogging && quad != null) {
+            if (enableProvMode && quad != null) {
                 Quad quadInActivity = RefNodeFactory.toStatement(RefNodeFactory.toIRI(getActivityId()), quad);
                 getStdout().println(quadInActivity);
             }
@@ -193,7 +193,6 @@ abstract class CmdDefaultParams implements Runnable {
             stop();
         }
     }
-
 
     private void start() {
         ActivityContext activity = getActivity();
@@ -271,4 +270,12 @@ abstract class CmdDefaultParams implements Runnable {
             }
         };
     }
+
+    public void setEnableProvMode(boolean enableProvMode) {
+        this.enableProvMode = enableProvMode;
+    }
+    public boolean getEnableProvMode() {
+        return this.enableProvMode;
+    }
+
 }

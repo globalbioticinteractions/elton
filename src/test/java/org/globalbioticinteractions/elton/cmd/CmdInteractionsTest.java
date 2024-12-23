@@ -13,9 +13,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -111,6 +109,62 @@ public class CmdInteractionsTest {
 
     @Test
     public void interactionsWithHeaderInProvMode() throws URISyntaxException, IOException {
+        assertResultInProvMode();
+
+    }
+
+    @Test
+    public void interactionsWithHeaderInProvModeTwice() throws URISyntaxException, IOException {
+        CmdInteractions cmd1 = new CmdInteractions();
+
+        String dataDirStatic1 = CmdTestUtil.cacheDirTest();
+        File dataDir1 = tmpFolder.newFolder("data");
+        FileUtils.copyDirectory(new File(dataDirStatic1), dataDir1);
+        cmd1.setDataDir(dataDir1.getAbsolutePath());
+
+        String provDirStatic1 = CmdTestUtil.cacheDirTest();
+        File provDir1 = tmpFolder.newFolder("prov");
+        FileUtils.copyDirectory(new File(provDirStatic1), provDir1);
+
+        cmd1.setProvDir(provDir1.getAbsolutePath());
+
+        cmd1.setEnableProvMode(true);
+
+        cmd1.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
+
+        ByteArrayOutputStream out11 = new ByteArrayOutputStream();
+        PrintStream out2 = new PrintStream(out11);
+        cmd1.setStdout(out2);
+
+        assertThat(numberOfDataFiles(dataDir1), is(4));
+
+        cmd1.run();
+        assertResults(dataDir1, out11);
+        cmd1.run();
+    }
+
+    private void assertResults(File dataDir1, ByteArrayOutputStream out11) {
+        String actual11 = out11.toString();
+        String[] lines1 = StringUtils.splitByWholeSeparator(actual11, "\n");
+        for (String line1 : lines1) {
+            assertThat(line1, not(containsString("\t")));
+        }
+
+        assertThat(numberOfDataFiles(dataDir1), is(5));
+
+        assertThat(new File(dataDir1, "50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599").exists(), is(true));
+
+        assertThat(lines1[0], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
+        assertThat(lines1[1], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent>"));
+
+        Stream<String> stringStream1 = Arrays.stream(lines1).filter(l -> StringUtils.contains(l, "50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599"));
+
+        List<String> dataStatements1 = stringStream1.collect(Collectors.toList());
+
+        assertThat(dataStatements1.size(), is(3));
+    }
+
+    private void assertResultInProvMode() throws URISyntaxException, IOException {
         CmdInteractions cmd = new CmdInteractions();
 
         String dataDirStatic = CmdTestUtil.cacheDirTest();
@@ -135,25 +189,7 @@ public class CmdInteractionsTest {
         assertThat(numberOfDataFiles(dataDir), is(4));
 
         cmd.run();
-        String actual1 = out1.toString();
-        String[] lines = StringUtils.splitByWholeSeparator(actual1, "\n");
-        for (String line : lines) {
-            assertThat(line, not(containsString("\t")));
-        }
-
-        assertThat(numberOfDataFiles(dataDir), is(5));
-
-        assertThat(new File(dataDir, "50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599").exists(), is(true));
-
-        assertThat(lines[0], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
-        assertThat(lines[1], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent>"));
-
-        Stream<String> stringStream = Arrays.stream(lines).filter(l -> StringUtils.contains(l, "50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599"));
-
-        List<String> dataStatements = stringStream.collect(Collectors.toList());
-
-        assertThat(dataStatements.size(), is(3));
-
+        assertResults(dataDir, out1);
     }
 
     private int numberOfDataFiles(File dataDir) {

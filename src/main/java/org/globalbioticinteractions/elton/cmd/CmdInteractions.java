@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -52,13 +53,13 @@ public class CmdInteractions extends CmdTabularWriterParams {
 
         DatasetRegistry registry = getDatasetRegistry();
 
-        File tmpDataFile = null;
+        File tmpSourceFile = null;
 
         PrintStream dataOut = out;
         if (getEnableProvMode()) {
             try {
-                tmpDataFile = File.createTempFile(new File(getWorkDir()).getAbsolutePath(), "interactions");
-                dataOut = new PrintStream(tmpDataFile);
+                tmpSourceFile = File.createTempFile(new File(getWorkDir()).getAbsolutePath(), "interactions");
+                dataOut = new PrintStream(tmpSourceFile);
             } catch (IOException e) {
                 throw new RuntimeException("failed to create tmp file", e);
             }
@@ -76,8 +77,8 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 new File(getWorkDir())
         );
 
-        if (getEnableProvMode() && tmpDataFile != null) {
-            try (FileInputStream fis = new FileInputStream(tmpDataFile)) {
+        if (getEnableProvMode() && tmpSourceFile != null) {
+            try (FileInputStream fis = new FileInputStream(tmpSourceFile)) {
                 IRI iri = Hasher.calcHashIRI(fis, NullOutputStream.INSTANCE, true, HashType.sha256);
                 ActivityUtil.emitDownloadActivity(RefNodeFactory.toIRI(UUID.randomUUID()), iri, new StatementsEmitterAdapter() {
                     @Override
@@ -85,7 +86,15 @@ public class CmdInteractions extends CmdTabularWriterParams {
                         getStatementListener().on(quad);
                     }
                 }, Optional.of(getActivityContext().getActivity()));
-                FileUtils.moveFile(tmpDataFile, new File(getDataDir(), StringUtils.replace(iri.getIRIString(), HashType.sha256.getPrefix(), "")));
+                File destFile = new File(getDataDir(), StringUtils.replace(iri.getIRIString(), HashType.sha256.getPrefix(), ""));
+                if (destFile.exists()) {
+                    FileUtils.delete(tmpSourceFile);
+                } else {
+                    FileUtils.moveFile(
+                            tmpSourceFile,
+                            destFile
+                    );
+                }
             } catch (IOException e) {
                 throw new RuntimeException("failed to persist data stream to", e);
             }

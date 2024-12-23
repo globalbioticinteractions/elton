@@ -3,7 +3,6 @@ package org.globalbioticinteractions.elton.cmd;
 import org.eol.globi.tool.NullImportLogger;
 
 import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.IdGenerator;
 import org.globalbioticinteractions.elton.util.InteractionWriter;
 import org.globalbioticinteractions.elton.util.NanoPubWriter;
@@ -53,13 +52,13 @@ public class CmdNanoPubs extends CmdDefaultParams {
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, dataset -> dataset);
 
-        CmdUtil.handleNamespaces(registry
-                , nodeFactory
-                , getNamespaces()
-                , "listing nanopubs",
+        final NullImportLogger nullImportLogger = new NullImportLogger();
+        final File file = new File(getWorkDir());
+        CmdUtil.handleNamespaces(registry,
+                getNamespaces(),
+                "listing nanopubs",
                 getStderr(),
-                new NullImportLogger(),
-                new File(getWorkDir())
+                getNamespaceHandler(registry, nodeFactory, file, nullImportLogger)
         );
     }
 

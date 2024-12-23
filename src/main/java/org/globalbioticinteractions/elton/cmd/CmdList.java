@@ -7,7 +7,6 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -38,7 +37,7 @@ public class CmdList extends CmdOnlineParams {
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
 
-        DatasetRegistry registryLocal = getDatasetRegistry(inputStreamFactory);
+        DatasetRegistry registryLocal = getDatasetRegistry(inputStreamFactory, getActivityListener());
 
         File cacheDir = new File(getDataDir());
 

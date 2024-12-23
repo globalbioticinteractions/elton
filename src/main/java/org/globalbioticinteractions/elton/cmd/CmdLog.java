@@ -16,7 +16,6 @@ import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.elton.Elton;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import picocli.CommandLine;
 
@@ -72,15 +71,15 @@ public class CmdLog extends CmdDefaultParams {
 
         NodeFactory nodeFactory = new NodeFactoryNull();
 
+        final NullImportLogger nullImportLogger = new NullImportLogger();
+        final File file = new File(getWorkDir()
+        );
         CmdUtil.handleNamespaces(
                 proxy,
-                nodeFactory,
                 getNamespaces(),
                 "logging provenance",
                 NullAppendable.INSTANCE,
-                new NullImportLogger(),
-                new File(getWorkDir()
-                )
+                getNamespaceHandler(proxy, nodeFactory, file, nullImportLogger)
         );
     }
 

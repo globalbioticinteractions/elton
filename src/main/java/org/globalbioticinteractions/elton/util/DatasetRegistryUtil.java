@@ -65,9 +65,18 @@ public class DatasetRegistryUtil {
                                            ResourceService resourceServiceLocal,
                                            ContentPathFactory contentPathFactory,
                                            ProvenancePathFactory provenancePathFactory) {
+
+        CacheFactory cacheFactory = getCacheFactoryLocal(
+                dataDir,
+                provDir,
+                resourceServiceLocal,
+                contentPathFactory,
+                provenancePathFactory
+        );
+
         return new DatasetRegistryLocal(
                 provDir,
-                getCacheFactoryLocal(dataDir, provDir, resourceServiceLocal, contentPathFactory, provenancePathFactory),
+                cacheFactory,
                 resourceServiceLocal);
     }
 

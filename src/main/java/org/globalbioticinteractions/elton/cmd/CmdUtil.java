@@ -3,13 +3,10 @@ package org.globalbioticinteractions.elton.cmd;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.rdf.api.IRI;
-import org.eol.globi.data.ImportLogger;
-import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.GeoNamesService;
 import org.eol.globi.service.ResourceService;
-import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
@@ -20,7 +17,6 @@ import org.globalbioticinteractions.cache.CacheProxy;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLogger;
@@ -129,12 +125,10 @@ public class CmdUtil {
     }
 
     public static void handleNamespaces(DatasetRegistry registry,
-                                        NodeFactory nodeFactory,
                                         List<String> namespaces,
                                         String msgPrefix,
                                         Appendable out,
-                                        ImportLogger logger,
-                                        File workDir) {
+                                        NamespaceHandler namespaceHandler) {
         try {
             List<String> failedNamespaces = Collections.synchronizedList(new ArrayList<>());
             final AtomicReference<Throwable> firstException = new AtomicReference<>();
@@ -144,7 +138,7 @@ public class CmdUtil {
                         .append(namespace)
                         .append("]... ");
                 try {
-                    handleSingleNamespace(registry, nodeFactory, namespace, logger, workDir);
+                    namespaceHandler.onNamespace(namespace);
                     out.append("done.\n");
                 } catch (StudyImporterException | DatasetRegistryException ex) {
                     failedNamespaces.add(namespace);
@@ -164,24 +158,7 @@ public class CmdUtil {
         }
     }
 
-    private static void handleSingleNamespace(DatasetRegistry registry,
-                                              NodeFactory nodeFactory,
-                                              String namespace,
-                                              ImportLogger logger,
-                                              File workDir) throws DatasetRegistryException, StudyImporterException {
-        Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
-
-        DatasetImportUtil.importDataset(
-                null,
-                dataset,
-                nodeFactory,
-                logger,
-                createDummyGeoNamesService(),
-                workDir
-        );
-    }
-
-    private static GeoNamesService createDummyGeoNamesService() {
+    public static GeoNamesService createDummyGeoNamesService() {
         return new GeoNamesService() {
             @Override
             public boolean hasTermForLocale(String locality) {
@@ -194,4 +171,5 @@ public class CmdUtil {
             }
         };
     }
+
 }

@@ -7,6 +7,8 @@ import bio.guoda.preston.process.ActivityUtil;
 import bio.guoda.preston.process.StatementListener;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Quad;
+import org.eol.globi.data.ImportLogger;
+import org.eol.globi.data.NodeFactory;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
@@ -15,14 +17,17 @@ import org.globalbioticinteractions.cache.ProvenancePathFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.store.AccessLogger;
+import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.ActivityProxy;
 import org.globalbioticinteractions.elton.store.ProvLogger;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
+import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressCursorRotating;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
@@ -143,7 +148,7 @@ abstract class CmdDefaultParams implements Runnable {
 
 
     public ContentPathFactory getContentPathFactory() {
-        return (this.contentPathFactory);
+        return this.contentPathFactory;
     }
 
 
@@ -226,7 +231,7 @@ abstract class CmdDefaultParams implements Runnable {
     }
 
 
-    protected ActivityProxy getActivityListener(String namespaceLocal) {
+    protected ActivityListener getActivityListener(String namespaceLocal) {
         return new ActivityProxy(
                 Arrays.asList(
                         new ProvLogger(getStatementListener()),
@@ -235,15 +240,19 @@ abstract class CmdDefaultParams implements Runnable {
         );
     }
 
-    protected ActivityProxy getActivityListener() {
+    protected ActivityListener getActivityListener() {
         return getActivityListener(DatasetRegistryUtil.NAMESPACE_LOCAL);
     }
 
     protected DatasetRegistry getDatasetRegistry() {
-        return getDatasetRegistry(createInputStreamFactory());
+        return getDatasetRegistry(createInputStreamFactory(), getActivityListener());
     }
 
-    protected DatasetRegistry getDatasetRegistry(InputStreamFactory inputStreamFactory) {
+    protected DatasetRegistry getDatasetRegistry(ActivityListener activityListener) {
+        return getDatasetRegistry(createInputStreamFactory(), activityListener);
+    }
+
+    protected DatasetRegistry getDatasetRegistry(InputStreamFactory inputStreamFactory, ActivityListener activityListener) {
         return DatasetRegistryUtil.forCacheOrLocalDir(
                 getDataDir(),
                 getProvDir(),
@@ -251,7 +260,7 @@ abstract class CmdDefaultParams implements Runnable {
                 inputStreamFactory,
                 getContentPathFactory(),
                 getProvenancePathFactory(),
-                getActivityListener(),
+                activityListener,
                 getActivityContext(),
                 getActivityIdFactory()
         );
@@ -278,4 +287,7 @@ abstract class CmdDefaultParams implements Runnable {
         return this.enableProvMode;
     }
 
+    protected NamespaceHandler getNamespaceHandler(DatasetRegistry registry, NodeFactory nodeFactory, File workDir, ImportLogger logger) {
+        return new NamespaceHandlerImpl(registry, nodeFactory, logger, workDir);
+    }
 }

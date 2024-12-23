@@ -4,7 +4,6 @@ import org.eol.globi.data.NodeFactory;
 import org.eol.globi.tool.NullImportLogger;
 
 import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -35,13 +34,13 @@ public class CmdNames extends CmdTabularWriterParams {
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForTaxonWriting(!shouldSkipHeader(), out);
 
+        final NullImportLogger nullImportLogger = new NullImportLogger();
+        final File file = new File(getWorkDir());
         CmdUtil.handleNamespaces(registry,
-                nodeFactory,
                 getNamespaces(),
                 "listing taxa",
                 getStderr(),
-                new NullImportLogger(),
-                new File(getWorkDir())
+                getNamespaceHandler(registry, nodeFactory, file, nullImportLogger)
         );
     }
 

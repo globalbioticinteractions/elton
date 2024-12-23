@@ -13,19 +13,16 @@ import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
-
 import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
+import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
 import picocli.CommandLine;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.StandardCopyOption;
+import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -51,7 +48,17 @@ public class CmdInteractions extends CmdTabularWriterParams {
 
     void run(PrintStream out) {
 
-        DatasetRegistry registry = getDatasetRegistry();
+        DatasetRegistry registry = getDatasetRegistry(new ActivityListener() {
+            @Override
+            public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
+                System.out.println("retrieving some data registry resource: [" + request.getIRIString() + "]");
+            }
+
+            @Override
+            public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
+                System.out.println("retrieved some data registry resource: [" + request.getIRIString() + "]");
+            }
+        });
 
         File tmpSourceFile = null;
 
@@ -67,14 +74,13 @@ public class CmdInteractions extends CmdTabularWriterParams {
 
         NodeFactory nodeFactory = WriterUtil.nodeFactoryForInteractionWriting(!shouldSkipHeader(), dataOut);
 
+        final File file = new File(getWorkDir());
         CmdUtil.handleNamespaces(
                 registry,
-                nodeFactory,
                 getNamespaces(),
                 "listing interactions",
                 getStderr(),
-                getLogger(),
-                new File(getWorkDir())
+                getNamespaceHandler(registry, nodeFactory, file, getLogger())
         );
 
         if (getEnableProvMode() && tmpSourceFile != null) {
@@ -90,19 +96,6 @@ public class CmdInteractions extends CmdTabularWriterParams {
             } catch (IOException e) {
                 throw new RuntimeException("failed to persist data stream to", e);
             }
-        }
-    }
-
-    private void saveGeneratedContentIfNeeded(File tmpSourceFile, IRI iri) throws IOException {
-        File destFile = new File(getDataDir(), StringUtils.replace(iri.getIRIString(), HashType.sha256.getPrefix(), ""));
-
-        if (destFile.exists()) {
-            FileUtils.delete(tmpSourceFile);
-        } else {
-            FileUtils.moveFile(
-                    tmpSourceFile,
-                    destFile
-            );
         }
     }
 
@@ -132,6 +125,20 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 }
             }
         };
+    }
+
+
+    private void saveGeneratedContentIfNeeded(File tmpSourceFile, IRI iri) throws IOException {
+        File destFile = new File(getDataDir(), StringUtils.replace(iri.getIRIString(), HashType.sha256.getPrefix(), ""));
+
+        if (destFile.exists()) {
+            FileUtils.delete(tmpSourceFile);
+        } else {
+            FileUtils.moveFile(
+                    tmpSourceFile,
+                    destFile
+            );
+        }
     }
 
 }

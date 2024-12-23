@@ -86,18 +86,23 @@ public class CmdInteractions extends CmdTabularWriterParams {
                         getStatementListener().on(quad);
                     }
                 }, Optional.of(getActivityContext().getActivity()));
-                File destFile = new File(getDataDir(), StringUtils.replace(iri.getIRIString(), HashType.sha256.getPrefix(), ""));
-                if (destFile.exists()) {
-                    FileUtils.delete(tmpSourceFile);
-                } else {
-                    FileUtils.moveFile(
-                            tmpSourceFile,
-                            destFile
-                    );
-                }
+                saveGeneratedContentIfNeeded(tmpSourceFile, iri);
             } catch (IOException e) {
                 throw new RuntimeException("failed to persist data stream to", e);
             }
+        }
+    }
+
+    private void saveGeneratedContentIfNeeded(File tmpSourceFile, IRI iri) throws IOException {
+        File destFile = new File(getDataDir(), StringUtils.replace(iri.getIRIString(), HashType.sha256.getPrefix(), ""));
+
+        if (destFile.exists()) {
+            FileUtils.delete(tmpSourceFile);
+        } else {
+            FileUtils.moveFile(
+                    tmpSourceFile,
+                    destFile
+            );
         }
     }
 

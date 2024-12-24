@@ -44,7 +44,8 @@ public class CmdListTest {
 
         long numberOfWasDerivedFromCount = Arrays.stream(lines).filter(line -> StringUtils.contains(line, "wasDerivedFrom")).count();
 
-        assertThat(numberOfWasDerivedFromCount, not(is(0L)));
+        // for now, lists derived from offline resources do not log dependencies
+        assertThat(numberOfWasDerivedFromCount, is(0L));
     }
 
     @Test

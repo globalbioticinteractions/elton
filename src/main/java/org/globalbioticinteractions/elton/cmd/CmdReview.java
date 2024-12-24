@@ -34,6 +34,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
+import org.globalbioticinteractions.elton.store.LocalPathToHashIRI;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
@@ -111,20 +112,34 @@ public class CmdReview extends CmdTabularWriterParams {
 
             InputStreamFactory factory = createInputStreamFactory();
 
-            ActivityListener dereferenceListener =
+            ActivityListener activityListener =
                     getEnableProvMode()
                             ? getActivityListenerWithProv()
                             : new AccessLogger(DatasetRegistryUtil.NAMESPACE_LOCAL, getProvDir());
 
             PrintStream dataOut = getDataSink(getStdout());
+
+
+
             for (URI localNamespace : localNamespaces) {
+
+                DatasetRegistryUtil.ResourceServiceListening resourceServiceLocalAndRemote
+                        = new DatasetRegistryUtil.ResourceServiceListening(
+                        getActivityIdFactory(),
+                        activityListener,
+                        getActivityContext(),
+                        new ResourceServiceLocalAndRemote(factory, new File(getDataDir())),
+                        new LocalPathToHashIRI(new File(getDataDir()))
+                );
+
+
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
                         localNamespace,
-                        new ResourceServiceLocalAndRemote(factory, new File(getDataDir())),
+                        resourceServiceLocalAndRemote,
                         getContentPathFactory(),
                         getDataDir(),
                         getProvDir(),
-                        dereferenceListener,
+                        activityListener,
                         getActivityContext(),
                         getActivityIdFactory()
                 );
@@ -137,7 +152,12 @@ public class CmdReview extends CmdTabularWriterParams {
                 );
             }
 
-            reviewCachedOrRemote(remoteNamespaces, factory, dataOut);
+            reviewCachedOrRemote(
+                    remoteNamespaces,
+                    factory,
+                    dataOut,
+                    activityListener
+            );
 
         } catch (StudyImporterException e) {
             throw new RuntimeException(e);
@@ -151,16 +171,27 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private void reviewCachedOrRemote(List<String> namespaces,
                                       InputStreamFactory inputStreamFactory,
-                                      PrintStream dataOut) throws StudyImporterException {
+                                      PrintStream dataOut, ActivityListener activityListener) throws StudyImporterException {
         for (String namespace : namespaces) {
+
+            DatasetRegistryUtil.ResourceServiceListening resourceServiceLocal
+                    = new DatasetRegistryUtil.ResourceServiceListening(
+                    getActivityIdFactory(),
+                    activityListener,
+                    getActivityContext(),
+                    new ResourceServiceLocal(inputStreamFactory),
+                    new LocalPathToHashIRI(new File(getDataDir()))
+            );
+
+            DatasetRegistry registry = DatasetRegistryUtil.forCache(
+                    getDataDir(),
+                    getProvDir(),
+                    resourceServiceLocal,
+                    getContentPathFactory(),
+                    getProvenancePathFactory()
+            );
             review(namespace,
-                    DatasetRegistryUtil.forCache(
-                            getDataDir(),
-                            getProvDir(),
-                            new ResourceServiceLocal(inputStreamFactory),
-                            getContentPathFactory(),
-                            getProvenancePathFactory()
-                    ),
+                    registry,
                     inputStreamFactory,
                     shouldSkipHeader(),
                     dataOut

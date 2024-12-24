@@ -155,7 +155,7 @@ public class DatasetRegistryUtil {
         return registry;
     }
 
-    private static class ResourceServiceListening implements ResourceService {
+    public static class ResourceServiceListening implements ResourceService {
         private final Supplier<IRI> activityIdFactory;
         private final ActivityListener activityListener;
         private final ActivityContext ctx;

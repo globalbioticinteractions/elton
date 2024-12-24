@@ -17,6 +17,7 @@ import java.io.PrintStream;
 public class CmdNames extends CmdTabularWriterParams {
 
     public static final String DESCRIPTION = "List taxa";
+    public static final String RECORD_TYPE_NAME = "name";
 
     @Override
     public void doRun() {
@@ -44,6 +45,10 @@ public class CmdNames extends CmdTabularWriterParams {
         );
     }
 
+    @Override
+    public String getRecordType() {
+        return RECORD_TYPE_NAME;
+    }
 }
 
 

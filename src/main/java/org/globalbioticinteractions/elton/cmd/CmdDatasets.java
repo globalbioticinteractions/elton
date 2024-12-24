@@ -4,7 +4,6 @@ package org.globalbioticinteractions.elton.cmd;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 import picocli.CommandLine;
@@ -19,6 +18,12 @@ import java.util.stream.Stream;
 public class CmdDatasets extends CmdTabularWriterParams {
 
     public static final String DESCRIPTION = "List Datasets Details";
+    public static final String RECORD_TYPE_DATASET = "dataset";
+
+    @Override
+    public String getRecordType() {
+        return RECORD_TYPE_DATASET;
+    }
 
     public class TsvDatasetWriter implements TabularWriter {
         private final PrintStream out;

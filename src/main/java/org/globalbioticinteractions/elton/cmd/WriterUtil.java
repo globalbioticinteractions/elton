@@ -1,5 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.NodeFactoryException;
@@ -17,7 +19,8 @@ import java.io.PrintStream;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class WriterUtil {
-    static NodeFactory nodeFactoryForInteractionWriting(boolean shouldWriteHeader, PrintStream stdout) {
+
+    private static NodeFactory nodeFactoryForInteractionWriting(boolean shouldWriteHeader, PrintStream stdout) {
         WriterInteractionsTSV writer = new WriterInteractionsTSV(stdout);
         if (shouldWriteHeader) {
             writer.writeHeader();
@@ -67,4 +70,17 @@ public class WriterUtil {
         return new CmdReview.NodeFactoryReview(new AtomicLong(0), importLogger);
     }
 
+    public static NodeFactory getNodeFactoryForType(String recordType, boolean shouldWriteHeader, PrintStream out, ImportLogger logger) {
+        NodeFactory factory;
+        if (StringUtils.equals("interaction", recordType)) {
+            factory = nodeFactoryForInteractionWriting(shouldWriteHeader, out);
+        } else if (StringUtils.equals("name", recordType)) {
+            factory = nodeFactoryForTaxonWriting(shouldWriteHeader, out);
+        } else if (StringUtils.equals("review", recordType)) {
+            factory = nodeFactoryForReviewWriting(shouldWriteHeader, out, logger);
+        } else {
+            throw new NotImplementedException("no node factory for [" + recordType + "] available yet.");
+        }
+        return factory;
+    }
 }

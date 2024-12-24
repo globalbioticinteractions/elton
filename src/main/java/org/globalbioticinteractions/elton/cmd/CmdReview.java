@@ -76,6 +76,8 @@ public class CmdReview extends CmdTabularWriterParams {
     public static final String REVIEWER_DEFAULT = "GloBI automated reviewer (elton-" + Elton.getVersionString() + ")";
     public static final String DESCRIPTION = "Review Datasets. If no namespace is provided the local workdir is used.";
 
+    public static final String RECORD_TYPE_REVIEW = "review";
+
     @CommandLine.Option(names = {"-n", "--lines"}, description = "print first n number of lines")
     private Long maxLines = null;
 
@@ -328,6 +330,11 @@ public class CmdReview extends CmdTabularWriterParams {
 
     public void setDesiredReviewCommentTypes(List<ReviewCommentType> commentTypes) {
         desiredReviewCommentTypes = commentTypes;
+    }
+
+    @Override
+    public String getRecordType() {
+        return RECORD_TYPE_REVIEW;
     }
 
     public static class NodeFactoryReview extends NodeFactoryNull {

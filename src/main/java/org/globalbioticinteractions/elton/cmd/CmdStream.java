@@ -165,21 +165,10 @@ public class CmdStream extends CmdDefaultParams {
 
         @Override
         public NodeFactory createNodeFactory() {
-            NodeFactory factory;
-            if (StringUtils.equals("interaction", recordType)) {
-                factory = WriterUtil.nodeFactoryForInteractionWriting(shouldWriteHeader, getStdout());
-            } else if (StringUtils.equals("name", recordType)) {
-                factory = WriterUtil.nodeFactoryForTaxonWriting(shouldWriteHeader, getStdout());
-            } else if (StringUtils.equals("review", recordType)) {
-                factory = WriterUtil.nodeFactoryForReviewWriting(shouldWriteHeader, getStdout(), logger);
-            } else {
-                throw new NotImplementedException("no node factory for [" + recordType + "] available yet.");
-            }
-            return factory;
+            String recordType = this.recordType;
+            return WriterUtil.getNodeFactoryForType(recordType, shouldWriteHeader, getStdout(), logger);
         }
-    }
-
-    public static class WriterFactory {
 
     }
+
 }

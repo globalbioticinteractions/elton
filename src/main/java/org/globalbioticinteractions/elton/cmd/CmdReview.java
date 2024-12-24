@@ -341,7 +341,6 @@ public class CmdReview extends CmdTabularWriterParams {
 
 
     private static void logReviewCommentWithReviewerInfo(PrintStream out, String reviewId, DateFactory dateFactory, String reviewerName, String... fields) {
-        out.print('\n');
         Stream<String> enrichedFields = Stream.concat(
                 Stream.of(
                         reviewId,
@@ -361,6 +360,7 @@ public class CmdReview extends CmdTabularWriterParams {
             throw new IllegalArgumentException("not enough log fields: need [" + LOG_NUMBER_OF_FIELDS + "], but found [" + fields.length + "] in [" + StringUtils.join(fields, CharsetConstant.SEPARATOR));
         }
         out.print(String.format(LOG_FORMAT_STRING, Stream.of(fields).map(x -> x == null ? "" : CSVTSVUtil.escapeTSV(x.toString())).toArray()));
+        out.print("\n");
     }
 
     public Long getMaxLines() {

@@ -196,7 +196,7 @@ public class CmdReviewTest {
             assertThat(outOs.toString(), endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t0 note(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 info(s)\t\t\t\t\t\t\t\t\t"));
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 info(s)\t\t\t\t\t\t\t\t\t\n"));
         }
     }
 
@@ -244,7 +244,7 @@ public class CmdReviewTest {
             assertThat(outOs.toString(), endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t0 note(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 info(s)\t\t\t\t\t\t\t\t\t"));
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 info(s)\t\t\t\t\t\t\t\t\t\n"));
         }
     }
 
@@ -259,13 +259,15 @@ public class CmdReviewTest {
             String[] lines = StringUtils.splitPreserveAllTokens(reviewReport, '\n');
             int expectedNumberOfColumns = 15;
             for (String line : lines) {
-                int numberOfColumns = StringUtils.splitPreserveAllTokens(line, '\t').length;
-                assertThat("mismatching number of columns in line [" + line + "]", numberOfColumns, is(expectedNumberOfColumns));
+                if (StringUtils.isNotBlank(line)) {
+                    int numberOfColumns = StringUtils.splitPreserveAllTokens(line, '\t').length;
+                    assertThat("mismatching number of columns in line [" + line + "]", numberOfColumns, is(expectedNumberOfColumns));
+                }
             }
             assertThat(reviewReport, endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t7 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t3 note(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t9 info(s)\t\t\t\t\t\t\t\t\t"));
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t9 info(s)\t\t\t\t\t\t\t\t\t\n"));
         }
     }
 
@@ -283,7 +285,7 @@ public class CmdReviewTest {
             assertThat(outOs.toString(), endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
                             "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t1 note(s)\t\t\t\t\t\t\t\t\t\n" +
-                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t11 info(s)\t\t\t\t\t\t\t\t\t"));
+                            "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t11 info(s)\t\t\t\t\t\t\t\t\t\n"));
         }
     }
 

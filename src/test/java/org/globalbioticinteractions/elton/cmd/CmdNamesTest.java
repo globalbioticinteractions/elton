@@ -1,9 +1,12 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -14,11 +17,12 @@ import static org.hamcrest.core.Is.is;
 
 public class CmdNamesTest {
 
+    @Rule
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
+
     @Test
-    public void namesNoHeader() throws URISyntaxException {
-        CmdNames cmd = new CmdNames();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest());
-        cmd.setProvDir(CmdTestUtil.cacheDirTest());
+    public void namesNoHeader() throws URISyntaxException, IOException {
+        CmdNames cmd = getCmdNames();
         cmd.setSkipHeader(true);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
@@ -28,11 +32,16 @@ public class CmdNamesTest {
         assertThat(out1.toString().split("\n").length, is(22));
     }
 
+    private CmdNames getCmdNames() throws URISyntaxException, IOException {
+        CmdNames cmd = new CmdNames();
+        cmd.setDataDir(CmdTestUtil.cacheDirTest(tmpFolder));
+        cmd.setProvDir(CmdTestUtil.cacheDirTest(tmpFolder));
+        return cmd;
+    }
+
     @Test
-    public void namesWithHeader() throws URISyntaxException {
-        CmdNames cmdNames = new CmdNames();
-        cmdNames.setDataDir(CmdTestUtil.cacheDirTest());
-        cmdNames.setProvDir(CmdTestUtil.cacheDirTest());
+    public void namesWithHeader() throws URISyntaxException, IOException {
+        CmdNames cmdNames = getCmdNames();
         cmdNames.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();

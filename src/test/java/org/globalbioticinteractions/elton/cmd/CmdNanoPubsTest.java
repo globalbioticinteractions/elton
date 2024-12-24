@@ -1,9 +1,12 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -13,11 +16,15 @@ import static org.hamcrest.core.Is.is;
 
 public class CmdNanoPubsTest {
 
+    @Rule
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
+
     @Test
-    public void interactions() throws URISyntaxException {
+    public void interactions() throws URISyntaxException, IOException {
         CmdNanoPubs cmd = new CmdNanoPubs();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest());
-        cmd.setProvDir(CmdTestUtil.cacheDirTest());
+        String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.setIdGenerator(() -> "1");
 

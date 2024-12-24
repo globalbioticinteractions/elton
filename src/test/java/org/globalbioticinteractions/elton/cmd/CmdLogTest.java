@@ -29,10 +29,10 @@ public class CmdLogTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void logTemplate() throws URISyntaxException {
+    public void logTemplate() throws URISyntaxException, IOException {
         CmdLog cmd = new CmdLog();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest());
-        cmd.setProvDir(CmdTestUtil.cacheDirTest());
+        cmd.setDataDir(CmdTestUtil.cacheDirTest(folder));
+        cmd.setProvDir(CmdTestUtil.cacheDirTest(folder));
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
@@ -76,11 +76,11 @@ public class CmdLogTest {
     }
 
     @Test
-    public void logTemplateSha1() throws URISyntaxException {
+    public void logTemplateSha1() throws URISyntaxException, IOException {
         CmdLog cmd = new CmdLog();
         cmd.setHashType(HashType.sha1);
-        cmd.setDataDir(CmdTestUtil.cacheDirTest());
-        cmd.setProvDir(CmdTestUtil.cacheDirTest());
+        cmd.setDataDir(CmdTestUtil.cacheDirTest(folder));
+        cmd.setProvDir(CmdTestUtil.cacheDirTest(folder));
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
@@ -96,14 +96,14 @@ public class CmdLogTest {
     }
 
     @Test
-    public void logTemplateMD5() throws URISyntaxException {
+    public void logTemplateMD5() throws URISyntaxException, IOException {
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         CmdLog cmd = new CmdLog();
         cmd.setHashType(HashType.md5);
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);
-        cmd.setDataDir(CmdTestUtil.cacheDirTest());
-        cmd.setProvDir(CmdTestUtil.cacheDirTest());
+        cmd.setDataDir(CmdTestUtil.cacheDirTest(folder));
+        cmd.setProvDir(CmdTestUtil.cacheDirTest(folder));
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.run();
         List<String> versionStatements = toVersionStatements(out1);

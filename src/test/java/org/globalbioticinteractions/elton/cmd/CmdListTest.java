@@ -1,9 +1,12 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 
@@ -13,9 +16,12 @@ import static org.hamcrest.core.Is.is;
 
 public class CmdListTest {
 
+    @Rule
+    public TemporaryFolder tmpFolder = new TemporaryFolder();
+
     @Test
-    public void listOffline() throws URISyntaxException {
-        String cacheDir = CmdTestUtil.cacheDirTest();
+    public void listOffline() throws URISyntaxException, IOException {
+        String cacheDir = CmdTestUtil.cacheDirTest(tmpFolder);
         ByteArrayOutputStream out = runCmd(cacheDir);
         assertThat(out.toString(), startsWith("globalbioticinteractions/template-dataset"));
     }

@@ -33,13 +33,14 @@ public class CmdInteractionsTest {
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
     @Test
-    public void interactionsNoHeader() throws URISyntaxException {
+    public void interactionsNoHeader() throws URISyntaxException, IOException {
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
 
         CmdInteractions cmd = new CmdInteractions();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest());
-        cmd.setProvDir(CmdTestUtil.cacheDirTest());
+        String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
         cmd.setSkipHeader(true);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         cmd.run(out);
@@ -91,10 +92,11 @@ public class CmdInteractionsTest {
     }
 
     @Test
-    public void interactionsWithHeader() throws URISyntaxException {
+    public void interactionsWithHeader() throws URISyntaxException, IOException {
         CmdInteractions cmd = new CmdInteractions();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest());
-        cmd.setProvDir(CmdTestUtil.cacheDirTest());
+        String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
@@ -117,16 +119,12 @@ public class CmdInteractionsTest {
     public void interactionsWithHeaderInProvModeTwice() throws URISyntaxException, IOException {
         CmdInteractions cmd1 = new CmdInteractions();
 
-        String dataDirStatic1 = CmdTestUtil.cacheDirTest();
-        File dataDir1 = tmpFolder.newFolder();
-        FileUtils.copyDirectory(new File(dataDirStatic1), dataDir1);
-        cmd1.setDataDir(dataDir1.getAbsolutePath());
+        String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd1.setDataDir(dataDir);
 
-        String provDirStatic1 = CmdTestUtil.cacheDirTest();
-        File provDir1 = tmpFolder.newFolder();
-        FileUtils.copyDirectory(new File(provDirStatic1), provDir1);
+        String provDir = CmdTestUtil.cacheDirTest(tmpFolder);
 
-        cmd1.setProvDir(provDir1.getAbsolutePath());
+        cmd1.setProvDir(provDir);
 
         cmd1.setEnableProvMode(true);
 
@@ -136,10 +134,10 @@ public class CmdInteractionsTest {
         PrintStream out2 = new PrintStream(out11);
         cmd1.setStdout(out2);
 
-        assertThat(numberOfDataFiles(dataDir1), is(4));
+        assertThat(numberOfDataFiles(new File(dataDir)), is(4));
 
         cmd1.run();
-        assertResults(dataDir1, out11);
+        assertResults(new File(dataDir), out11);
         cmd1.run();
     }
 
@@ -169,12 +167,12 @@ public class CmdInteractionsTest {
     private void assertResultInProvMode() throws URISyntaxException, IOException {
         CmdInteractions cmd = new CmdInteractions();
 
-        String dataDirStatic = CmdTestUtil.cacheDirTest();
+        String dataDirStatic = CmdTestUtil.cacheDirTest(tmpFolder);
         File dataDir = tmpFolder.newFolder();
         FileUtils.copyDirectory(new File(dataDirStatic), dataDir);
         cmd.setDataDir(dataDir.getAbsolutePath());
 
-        String provDirStatic = CmdTestUtil.cacheDirTest();
+        String provDirStatic = CmdTestUtil.cacheDirTest(tmpFolder);
         File provDir = tmpFolder.newFolder();
         FileUtils.copyDirectory(new File(provDirStatic), provDir);
 

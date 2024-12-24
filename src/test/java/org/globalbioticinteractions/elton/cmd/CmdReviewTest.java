@@ -54,8 +54,8 @@ public class CmdReviewTest {
     }
 
     @Test
-    public void runCheck() throws URISyntaxException {
-        String cacheDir = CmdTestUtil.cacheDirTest();
+    public void runCheck() throws URISyntaxException, IOException {
+        String cacheDir = CmdTestUtil.cacheDirTest(tmpDir);
         runOfflineWith(cacheDir);
     }
 

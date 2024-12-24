@@ -114,6 +114,7 @@ public class CmdReview extends CmdTabularWriterParams {
             ActivityListener dereferenceListener =
                     new AccessLogger(DatasetRegistryUtil.NAMESPACE_LOCAL, getProvDir());
 
+            PrintStream dataOut = getDataSink(getStdout());
             for (URI localNamespace : localNamespaces) {
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
                         localNamespace,
@@ -129,11 +130,12 @@ public class CmdReview extends CmdTabularWriterParams {
                 review(DatasetRegistryUtil.NAMESPACE_LOCAL,
                         registryLocal,
                         factory,
-                        shouldSkipHeader()
+                        shouldSkipHeader(),
+                        dataOut
                 );
             }
 
-            reviewCachedOrRemote(remoteNamespaces, factory);
+            reviewCachedOrRemote(remoteNamespaces, factory, dataOut);
 
         } catch (StudyImporterException e) {
             throw new RuntimeException(e);
@@ -145,7 +147,9 @@ public class CmdReview extends CmdTabularWriterParams {
         return DESCRIPTION;
     }
 
-    private void reviewCachedOrRemote(List<String> namespaces, InputStreamFactory inputStreamFactory) throws StudyImporterException {
+    private void reviewCachedOrRemote(List<String> namespaces,
+                                      InputStreamFactory inputStreamFactory,
+                                      PrintStream dataOut) throws StudyImporterException {
         for (String namespace : namespaces) {
             review(namespace,
                     DatasetRegistryUtil.forCache(
@@ -156,14 +160,19 @@ public class CmdReview extends CmdTabularWriterParams {
                             getProvenancePathFactory()
                     ),
                     inputStreamFactory,
-                    shouldSkipHeader()
+                    shouldSkipHeader(),
+                    dataOut
             );
         }
     }
 
-    private void review(String namespace, DatasetRegistry registry, InputStreamFactory inputStreamFactory, boolean shouldSkipHeader) throws StudyImporterException {
+    private void review(String namespace,
+                        DatasetRegistry registry,
+                        InputStreamFactory inputStreamFactory,
+                        boolean shouldSkipHeader,
+                        PrintStream dataOut) throws StudyImporterException {
         ReviewReport report = createReport(namespace, CmdReview.this.reviewId, CmdReview.this.getReviewerName(), CmdReview.this.dateFactory);
-        ReviewReportLogger logger = new ReviewReportLogger(report, getStdout(), getMaxLines(), getProgressCursorFactory());
+        ReviewReportLogger logger = new ReviewReportLogger(report, dataOut, getMaxLines(), getProgressCursorFactory());
 
         try {
             getStderr().print("creating review [" + namespace + "]... ");
@@ -174,7 +183,7 @@ public class CmdReview extends CmdTabularWriterParams {
                     .datasetFor(namespace);
 
             if (!shouldSkipHeader) {
-                logReviewHeader(getStdout());
+                logReviewHeader(dataOut);
             }
 
             NodeFactoryReview nodeFactory = new NodeFactoryReview(
@@ -205,7 +214,12 @@ public class CmdReview extends CmdTabularWriterParams {
                 logger.warn(null, "no interactions found");
             }
             getStderr().println("done.");
-            log(null, dataset.getArchiveURI().toString(), ReviewCommentType.summary, report, getStdout());
+            log(null,
+                    dataset.getArchiveURI().toString(),
+                    ReviewCommentType.summary,
+                    report,
+                    dataOut
+            );
         } catch (DatasetRegistryException e) {
             logger.warn(null, "no local repository at [" + getWorkDir().toString() + "]");
             getStderr().println("failed.");
@@ -217,9 +231,9 @@ public class CmdReview extends CmdTabularWriterParams {
             logger.severe(null, new String(out.toByteArray()));
             throw new StudyImporterException(e);
         } finally {
-            log(null, report.getInteractionCounter().get() + " interaction(s)", ReviewCommentType.summary, report, getStdout());
-            log(null, report.getNoteCounter().get() + " note(s)", ReviewCommentType.summary, report, getStdout());
-            log(null, report.getInfoCounter().get() + " info(s)", ReviewCommentType.summary, report, getStdout());
+            log(null, report.getInteractionCounter().get() + " interaction(s)", ReviewCommentType.summary, report, dataOut);
+            log(null, report.getNoteCounter().get() + " note(s)", ReviewCommentType.summary, report, dataOut);
+            log(null, report.getInfoCounter().get() + " info(s)", ReviewCommentType.summary, report, dataOut);
         }
         if (report.getInteractionCounter().get() == 0) {
             throw new StudyImporterException("No interactions found, nothing to review. Please check logs.");

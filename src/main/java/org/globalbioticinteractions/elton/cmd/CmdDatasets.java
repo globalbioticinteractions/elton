@@ -8,6 +8,7 @@ import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
@@ -47,7 +48,7 @@ public class CmdDatasets extends CmdTabularWriterParams {
 
     @Override
     public void doRun() {
-        run(System.out);
+        run(getStdout());
     }
 
     @Override
@@ -56,12 +57,13 @@ public class CmdDatasets extends CmdTabularWriterParams {
     }
 
     void run(PrintStream out) {
-        TsvDatasetWriter serializer = new TsvDatasetWriter(out);
+        PrintStream dataSink = getDataSink(out);
+        TsvDatasetWriter serializer = new TsvDatasetWriter(dataSink);
         if (!shouldSkipHeader()) {
             serializer.writeHeader();
         }
 
-        DatasetRegistry registry = getDatasetRegistry();
+        DatasetRegistry registry = getDatasetRegistryWithProv();
 
         try {
             CmdUtil.handleNamespaces(registry,

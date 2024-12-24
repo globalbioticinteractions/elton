@@ -72,7 +72,7 @@ public class CmdReviewTest {
         String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
-        runCheck(localTestPath, errOs, outOs, 100L);
+        runCheck(localTestPath, errOs, outOs, 100L, false, 3);
 
         assertThat(errOs.toString(), containsString("creating review [local]..."));
         assertThat(errOs.toString(), endsWith("done.\n"));
@@ -87,12 +87,34 @@ public class CmdReviewTest {
         assertThat(lines[lines.length - 3], is(thirdToLast));
     }
 
+    @Test
+    public void runCheckLocalWithProv() throws IOException {
+        String localTestPath = "src/test/resources/dataset-local-test";
+        ByteArrayOutputStream errOs = new ByteArrayOutputStream();
+        ByteArrayOutputStream outOs = new ByteArrayOutputStream();
+        runCheck(
+                localTestPath,
+                errOs,
+                outOs,
+                100L,
+                true,
+                4
+        );
+
+        assertThat(errOs.toString(), containsString("creating review [local]..."));
+        assertThat(errOs.toString(), endsWith("done.\n"));
+
+        assertThat(outOs.toString(), not(startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewCommentType\treviewComment\t")));
+        String[] lines = outOs.toString().split("\n");
+        assertThat(lines[lines.length - 1], containsString("endedAtTime"));
+    }
+
     @Test(expected = RuntimeException.class)
     public void throwOnEmpty() throws IOException {
         String localTestPath = "src/test/resources/dataset-local-test-no-records";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
-        runCheck(localTestPath, errOs, outOs, 100);
+        runCheck(localTestPath, errOs, outOs, 100, false, 3);
     }
 
     @Test
@@ -102,7 +124,9 @@ public class CmdReviewTest {
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         runCheck(localTestPath, errOs, outOs,
                 100,
-                Collections.singletonList(ReviewCommentType.summary));
+                Collections.singletonList(ReviewCommentType.summary),
+                false,
+                3);
 
         assertThat(errOs.toString(), containsString("creating review [local]..."));
         assertThat(errOs.toString(), endsWith("done.\n"));
@@ -118,24 +142,31 @@ public class CmdReviewTest {
         assertThat(lines[lines.length - 3], is(thirdToLast));
     }
 
-    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, long maxLines) throws IOException {
-        runCheck(localTestPath, errOs, outOs, maxLines, Arrays.asList(ReviewCommentType.values()));
+    private void runCheck(String localTestPath, ByteArrayOutputStream errOs, ByteArrayOutputStream outOs, long maxLines, boolean enableProvMode, int expectedNumberOfDataFiles) throws IOException {
+        runCheck(localTestPath, errOs, outOs, maxLines, Arrays.asList(ReviewCommentType.values()), enableProvMode, expectedNumberOfDataFiles);
     }
 
     private void runCheck(String localTestPath,
                           ByteArrayOutputStream errOs,
                           ByteArrayOutputStream outOs,
                           long maxLines,
-                          List<ReviewCommentType> commentTypes) throws IOException {
+                          List<ReviewCommentType> commentTypes,
+                          boolean enableProvMode,
+                          int expectedNumberOfDataFiles) throws IOException {
         PrintStream err = new PrintStream(errOs);
         cmdReview.setStderr(err);
         PrintStream out = new PrintStream(outOs);
         cmdReview.setStdout(out);
         cmdReview.setWorkDir(Paths.get(localTestPath).toAbsolutePath().toString());
-        cmdReview.setDataDir(tmpDir.newFolder().getAbsolutePath());
+        String dataDir = tmpDir.newFolder().getAbsolutePath();
+        cmdReview.setDataDir(dataDir);
+        cmdReview.setProvDir(dataDir);
         cmdReview.setMaxLines(maxLines);
         cmdReview.setDesiredReviewCommentTypes(commentTypes);
+        cmdReview.setEnableProvMode(enableProvMode);
+
         cmdReview.run();
+        assertThat(CmdTestUtil.numberOfDataFiles(dataDir), is(expectedNumberOfDataFiles));
     }
 
     @Test
@@ -148,7 +179,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 100);
+            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 100, false, 4);
         } finally {
             assertThat(outOs.toString(), endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
@@ -163,7 +194,14 @@ public class CmdReviewTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck("src/test/resources/ucsb-izc-default-interaction", errOs, outOs, 100);
+            runCheck(
+                    "src/test/resources/ucsb-izc-default-interaction",
+                    errOs,
+                    outOs,
+                    100,
+                    false,
+                    2
+            );
         } finally {
 
             String reviewReport = outOs.toString();
@@ -183,7 +221,13 @@ public class CmdReviewTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 1);
+            runCheck("src/test/resources/dataset-local-with-remote-dependency-test",
+                    errOs,
+                    outOs,
+                    1,
+                    false,
+                    4
+            );
         } finally {
             assertThat(outOs.toString(), endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
@@ -197,7 +241,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs, 10);
+            runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs, 10, false, 2);
         } finally {
             String reviewReport = outOs.toString();
             String[] lines = StringUtils.splitPreserveAllTokens(reviewReport, '\n');
@@ -222,7 +266,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck(localTestPath, errOs, outOs, 100);
+            runCheck(localTestPath, errOs, outOs, 100, false, 3);
         } finally {
             assertThat(outOs.toString(), endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +

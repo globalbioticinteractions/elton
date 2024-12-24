@@ -54,6 +54,12 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
 
     protected NodeFactory getNodeFactoryForProv(final PrintStream out) {
         PrintStream dataOut = out;
+        dataOut = getDataSink(dataOut);
+
+        return WriterUtil.getNodeFactoryForType(getRecordType(), !shouldSkipHeader(), dataOut, getLogger());
+    }
+
+    protected PrintStream getDataSink(PrintStream dataOut) {
         if (getEnableProvMode()) {
             try {
                 File datafile = File.createTempFile(new File(getWorkDir()).getAbsolutePath(), "interactions");
@@ -63,8 +69,7 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
                 throw new RuntimeException("failed to create tmp file", e);
             }
         }
-
-        return WriterUtil.getNodeFactoryForType(getRecordType(), !shouldSkipHeader(), dataOut, getLogger());
+        return dataOut;
     }
 
     protected DatasetRegistry getDatasetRegistryWithProv() {

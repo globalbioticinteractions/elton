@@ -28,21 +28,23 @@ public class AccessLogger implements ActivityListener {
 
     @Override
     public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
-        try {
-            ContentProvenance contentProvenanceWithNamespace
-                    = new ContentProvenance(this.namespace,
-                    URI.create(request.getIRIString()),
-                    localPathOfResponseData,
-                    StringUtils.replace(response.getIRIString(), "hash://sha256/", ""),
-                    DateUtil.nowDateString()
-            );
+        if (request != null && response != null && !request.equals(response)) {
+            try {
+                ContentProvenance contentProvenanceWithNamespace
+                        = new ContentProvenance(this.namespace,
+                        URI.create(request.getIRIString()),
+                        localPathOfResponseData,
+                        StringUtils.replace(response.getIRIString(), "hash://sha256/", ""),
+                        DateUtil.nowDateString()
+                );
 
-            ProvenanceLog.appendProvenanceLog(
-                    new File(provDir),
-                    contentProvenanceWithNamespace
-            );
-        } catch (IOException e) {
-            throw new RuntimeException("failed to record provenance", e);
+                ProvenanceLog.appendProvenanceLog(
+                        new File(provDir),
+                        contentProvenanceWithNamespace
+                );
+            } catch (IOException e) {
+                throw new RuntimeException("failed to record provenance", e);
+            }
         }
     }
 }

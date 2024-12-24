@@ -38,4 +38,12 @@ final class CmdTestUtil {
         assertThat(files.size(), CoreMatchers.is(1));
         assertThat(files.iterator().next().getAbsolutePath(), CoreMatchers.is(dir.getAbsolutePath()));
     }
+
+    public static int numberOfDataFiles(String dataDir) {
+        return numberOfDataFiles(new File(dataDir));
+    }
+
+    public static int numberOfDataFiles(File dataDir) {
+        return FileUtils.listFiles(dataDir, null, true).size();
+    }
 }

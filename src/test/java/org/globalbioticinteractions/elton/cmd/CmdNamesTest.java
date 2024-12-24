@@ -27,15 +27,18 @@ public class CmdNamesTest {
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), is(4));
         cmd.run(out);
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), is(4));
         assertThat(out1.toString(), startsWith("\tLeptoconchus incycloseris"));
         assertThat(out1.toString().split("\n").length, is(22));
     }
 
     private CmdNames getCmdNames() throws URISyntaxException, IOException {
         CmdNames cmd = new CmdNames();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest(tmpFolder));
-        cmd.setProvDir(CmdTestUtil.cacheDirTest(tmpFolder));
+        String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
         return cmd;
     }
 

@@ -4,6 +4,7 @@ import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -31,13 +32,20 @@ public class CmdLogTest {
     @Test
     public void logTemplate() throws URISyntaxException, IOException {
         CmdLog cmd = new CmdLog();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest(folder));
-        cmd.setProvDir(CmdTestUtil.cacheDirTest(folder));
+        String dataDir = CmdTestUtil.cacheDirTest(folder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);
+
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
+
         cmd.run();
+
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
+
         List<String> split = toVersionStatements(out1);
         assertThat(split.size(), is(3));
         assertThat(split.get(0), startsWith("<https://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip> <http://purl.org/pav/hasVersion> <hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f> "));
@@ -63,7 +71,10 @@ public class CmdLogTest {
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);
+        int before = CmdTestUtil.numberOfDataFiles(cmd.getDataDir());
         cmd.run();
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(before));
+
 
         List<String> split = toVersionStatements(out1);
 
@@ -79,13 +90,19 @@ public class CmdLogTest {
     public void logTemplateSha1() throws URISyntaxException, IOException {
         CmdLog cmd = new CmdLog();
         cmd.setHashType(HashType.sha1);
-        cmd.setDataDir(CmdTestUtil.cacheDirTest(folder));
-        cmd.setProvDir(CmdTestUtil.cacheDirTest(folder));
+        String dataDir = CmdTestUtil.cacheDirTest(folder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);
+
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
+
         cmd.run();
+
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
 
         List<String> split = toVersionStatements(out1);
 
@@ -102,10 +119,17 @@ public class CmdLogTest {
         cmd.setHashType(HashType.md5);
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);
-        cmd.setDataDir(CmdTestUtil.cacheDirTest(folder));
-        cmd.setProvDir(CmdTestUtil.cacheDirTest(folder));
+        String dataDir = CmdTestUtil.cacheDirTest(folder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
         cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
+
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
+
         cmd.run();
+
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
+
         List<String> versionStatements = toVersionStatements(out1);
 
         assertThat(versionStatements.size(), is(3));

@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.lang.StringUtils;
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -20,26 +21,35 @@ public class CmdDatasetsTest {
 
     @Test
     public void interactionsNoHeader() throws URISyntaxException, IOException {
-        CmdDatasets cmd = new CmdDatasets();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest(tmpFolder));
-        cmd.setProvDir(CmdTestUtil.cacheDirTest(tmpFolder));
+        CmdDatasets cmd = getCmdDatasets();
         cmd.setSkipHeader(true);
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
         cmd.run(out);
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
         assertThat(out1.toString().split("\n")[0],
                 is("globalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f\tdev"));
     }
 
+    private CmdDatasets getCmdDatasets() throws URISyntaxException, IOException {
+        CmdDatasets cmd = new CmdDatasets();
+        String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(CmdTestUtil.cacheDirTest(tmpFolder));
+        return cmd;
+    }
+
     @Test
     public void interactionsWithHeader() throws URISyntaxException, IOException {
-        CmdDatasets cmd = new CmdDatasets();
-        cmd.setDataDir(CmdTestUtil.cacheDirTest(tmpFolder));
-        cmd.setProvDir(CmdTestUtil.cacheDirTest(tmpFolder));
+        CmdDatasets cmd = getCmdDatasets();
 
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
         cmd.run(out);
+        assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
+
         String actual1 = out1.toString();
         String[] lines = StringUtils.splitByWholeSeparator(actual1, "\n");
         assertThat(lines[0], is("namespace\tcitation\tarchiveURI\tlastSeenAt\tcontentHash\teltonVersion"));

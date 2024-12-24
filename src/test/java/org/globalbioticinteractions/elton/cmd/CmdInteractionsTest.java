@@ -134,7 +134,7 @@ public class CmdInteractionsTest {
         PrintStream out2 = new PrintStream(out11);
         cmd1.setStdout(out2);
 
-        assertThat(numberOfDataFiles(new File(dataDir)), is(4));
+        assertThat(CmdTestUtil.numberOfDataFiles(new File(dataDir)), is(4));
 
         cmd1.run();
         assertResults(new File(dataDir), out11);
@@ -148,7 +148,7 @@ public class CmdInteractionsTest {
             assertThat(line1, not(containsString("\t")));
         }
 
-        assertThat(numberOfDataFiles(dataDir1), is(5));
+        assertThat(CmdTestUtil.numberOfDataFiles(dataDir1), is(5));
 
         assertThat(new File(dataDir1, "50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599").exists(), is(true));
 
@@ -186,14 +186,10 @@ public class CmdInteractionsTest {
         PrintStream out = new PrintStream(out1);
         cmd.setStdout(out);
 
-        assertThat(numberOfDataFiles(dataDir), is(4));
+        assertThat(CmdTestUtil.numberOfDataFiles(dataDir), is(4));
 
         cmd.run();
         assertResults(dataDir, out1);
-    }
-
-    private int numberOfDataFiles(File dataDir) {
-        return FileUtils.listFiles(dataDir, null, true).size();
     }
 
 

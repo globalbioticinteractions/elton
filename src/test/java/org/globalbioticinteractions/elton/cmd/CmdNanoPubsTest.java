@@ -9,10 +9,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collections;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 
 public class CmdNanoPubsTest {
 
@@ -31,7 +35,37 @@ public class CmdNanoPubsTest {
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);
         cmd.run(out);
-        String firstLine = "@prefix this: <http://purl.org/np/RAM--3NEBQBShWIe6LfGgwADTY4xDLL7-hIcxs7b5uI7o> ." +
+        assertThat(StringUtils.trim(out1.toString().split("\\n")[0]), is(expectedFirstLine()));
+    }
+
+    @Test
+    public void interactionsWithProv() throws URISyntaxException, IOException {
+        CmdNanoPubs cmd = new CmdNanoPubs();
+        String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
+        cmd.setIdGenerator(() -> "1");
+        cmd.setEnableProvMode(true);
+
+        ByteArrayOutputStream out1 = new ByteArrayOutputStream();
+        PrintStream out = new PrintStream(out1);
+        cmd.setStdout(out);
+        cmd.run();
+        String[] lines = out1.toString().split("\\n");
+        assertThat(lines.length, is(25));
+
+        long numberOfWasDerivedFromStatements = Arrays.stream(lines).filter(line -> StringUtils.contains(line, "wasDerivedFrom")).count();
+
+        assertThat(numberOfWasDerivedFromStatements, is(3L));
+
+        assertThat(StringUtils.trim(lines[0]), is(not(expectedFirstLine())));
+        assertThat(StringUtils.trim(lines[0]), startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
+        assertThat(StringUtils.trim(lines[lines.length - 1]), containsString("<http://www.w3.org/ns/prov#endedAtTime>"));
+    }
+
+    private String expectedFirstLine() {
+        return "@prefix this: <http://purl.org/np/RAM--3NEBQBShWIe6LfGgwADTY4xDLL7-hIcxs7b5uI7o> ." +
                 " @prefix sub: <http://purl.org/np/RAM--3NEBQBShWIe6LfGgwADTY4xDLL7-hIcxs7b5uI7o#> ." +
                 " @prefix np: <http://www.nanopub.org/nschema#> ." +
                 " @prefix dcterms: <http://purl.org/dc/terms/> ." +
@@ -62,7 +96,6 @@ public class CmdNanoPubsTest {
                 "     prov:wasDerivedFrom <https://doi.org/10.5281/zenodo.207958> ." +
                 "      <https://doi.org/10.5281/zenodo.207958> dcterms:bibliographicCitation \"Jorrit H. Poelen. 2014. Species associations manually extracted from literature. doi:10.5281/zenodo.207958\" ." +
                 " }";
-        assertThat(StringUtils.trim(out1.toString().split("\\n")[0]), is(firstLine));
     }
 
 }

@@ -33,7 +33,7 @@ public class CmdNanoPubs extends CmdDefaultParams {
 
     @Override
     public void doRun() {
-        run(System.out);
+        run(getStdout());
     }
 
     @Override
@@ -46,15 +46,18 @@ public class CmdNanoPubs extends CmdDefaultParams {
     }
 
     void run(PrintStream out) {
-        DatasetRegistry registry = getDatasetRegistry();
+        DatasetRegistry registry = getDatasetRegistryWithProv();
 
-        InteractionWriter serializer = createSerializer(out);
+        PrintStream dataSink = getDataSink(out);
+
+        InteractionWriter serializer = createSerializer(dataSink);
 
         NodeFactoryNull nodeFactory = new NodeFactoryForDataset(serializer, dataset -> dataset);
 
         final NullImportLogger nullImportLogger = new NullImportLogger();
         final File file = new File(getWorkDir());
-        CmdUtil.handleNamespaces(registry,
+        CmdUtil.handleNamespaces(
+                registry,
                 getNamespaces(),
                 "listing nanopubs",
                 getStderr(),

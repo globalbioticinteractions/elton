@@ -119,8 +119,6 @@ public class CmdReview extends CmdTabularWriterParams {
 
             PrintStream dataOut = getDataSink(getStdout());
 
-
-
             for (URI localNamespace : localNamespaces) {
 
                 DatasetRegistryUtil.ResourceServiceListening resourceServiceLocalAndRemote

@@ -30,12 +30,13 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
     public abstract String getRecordType();
 
     protected NodeFactory getNodeFactoryForProv(final PrintStream out) {
-        PrintStream dataOut = out;
-        dataOut = getDataSink(dataOut);
-
-        return WriterUtil.getNodeFactoryForType(getRecordType(), !shouldSkipHeader(), dataOut, getLogger());
+        return WriterUtil.getNodeFactoryForType(
+                getRecordType(),
+                !shouldSkipHeader(),
+                getDataSink(out),
+                getLogger()
+        );
     }
-
 
     protected ImportLogger getLogger() {
         return new ImportLogger() {

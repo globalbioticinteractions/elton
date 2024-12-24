@@ -73,7 +73,11 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
     }
 
     protected DatasetRegistry getDatasetRegistryWithProv() {
-        return getDatasetRegistry(new ActivityListener() {
+        return getDatasetRegistry(getActivityListenerWithProv());
+    }
+
+    protected ActivityListener getActivityListenerWithProv() {
+        return new ActivityListener() {
                 @Override
                 public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
                     // may be attempting to retrieve resources that do not exist
@@ -85,7 +89,7 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
                         getDependencies().add(response.getIRIString());
                     }
                 }
-            });
+            };
     }
 
     @Override

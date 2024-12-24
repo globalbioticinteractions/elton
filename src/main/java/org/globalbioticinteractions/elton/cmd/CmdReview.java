@@ -112,7 +112,9 @@ public class CmdReview extends CmdTabularWriterParams {
             InputStreamFactory factory = createInputStreamFactory();
 
             ActivityListener dereferenceListener =
-                    new AccessLogger(DatasetRegistryUtil.NAMESPACE_LOCAL, getProvDir());
+                    getEnableProvMode()
+                            ? getActivityListenerWithProv()
+                            : new AccessLogger(DatasetRegistryUtil.NAMESPACE_LOCAL, getProvDir());
 
             PrintStream dataOut = getDataSink(getStdout());
             for (URI localNamespace : localNamespaces) {

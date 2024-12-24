@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eol.globi.data.LogUtil;
@@ -23,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -98,7 +100,7 @@ public class CmdReviewTest {
                 outOs,
                 100L,
                 true,
-                4
+                3
         );
 
         assertThat(errOs.toString(), containsString("creating review [local]..."));
@@ -106,6 +108,13 @@ public class CmdReviewTest {
 
         assertThat(outOs.toString(), not(startsWith("reviewId\treviewDate\treviewer\tnamespace\treviewCommentType\treviewComment\t")));
         String[] lines = outOs.toString().split("\n");
+
+        long numberOfDerivedFromStatements = Arrays
+                .stream(lines)
+                .filter(line -> StringUtils.contains(line, "wasDerivedFrom"))
+                .count();
+
+        assertThat(numberOfDerivedFromStatements, is(not(0L)));
         assertThat(lines[lines.length - 1], containsString("endedAtTime"));
     }
 
@@ -167,6 +176,9 @@ public class CmdReviewTest {
 
         cmdReview.run();
         assertThat(CmdTestUtil.numberOfDataFiles(dataDir), is(expectedNumberOfDataFiles));
+        Collection<File> files = FileUtils.listFiles(new File(dataDir), null, true);
+        long numberOfAccessTsvFiles = files.stream().filter(file -> StringUtils.endsWith(file.getName(), "access.tsv")).count();
+        assertThat(numberOfAccessTsvFiles, is(enableProvMode ? 0L : 1L));
     }
 
     @Test

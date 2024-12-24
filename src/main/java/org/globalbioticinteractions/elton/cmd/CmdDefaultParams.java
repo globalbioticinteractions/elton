@@ -248,7 +248,7 @@ abstract class CmdDefaultParams implements Runnable {
         return getDatasetRegistry(createInputStreamFactory(), getActivityListener());
     }
 
-    protected DatasetRegistry getDatasetRegistry(ActivityListener activityListener) {
+    protected DatasetRegistry  getDatasetRegistry(ActivityListener activityListener) {
         return getDatasetRegistry(createInputStreamFactory(), activityListener);
     }
 

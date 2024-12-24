@@ -161,7 +161,9 @@ public class CmdInteractionsTest {
 
         List<String> dataStatements1 = stringStream1.collect(Collectors.toList());
 
-        assertThat(dataStatements1.size(), is(3));
+        assertThat(dataStatements1.size(), is(6));
+        assertThat(dataStatements1.get(4), startsWith("<hash://sha256/50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599> <http://www.w3.org/ns/prov#wasDerivedFrom> <jar:hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f!/globalbioticinteractions-template-dataset-e68f448/globi.json> "));
+        assertThat(dataStatements1.get(5), startsWith("<hash://sha256/50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599> <http://www.w3.org/ns/prov#wasDerivedFrom> <jar:hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f!/globalbioticinteractions-template-dataset-e68f448/interactions.tsv> "));
     }
 
     private void assertResultInProvMode() throws URISyntaxException, IOException {

@@ -1,6 +1,9 @@
 package org.globalbioticinteractions.elton.util;
 
+import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactory;
@@ -14,8 +17,11 @@ import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLocal;
 import org.globalbioticinteractions.elton.store.ActivityListener;
+import org.globalbioticinteractions.elton.store.LocalPathToHashIRI;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.function.Supplier;
 
@@ -77,7 +83,8 @@ public class DatasetRegistryUtil {
         return new DatasetRegistryLocal(
                 provDir,
                 cacheFactory,
-                resourceServiceLocal);
+                resourceServiceLocal
+        );
     }
 
     private static boolean isEmpty(DatasetRegistry registry) {
@@ -97,12 +104,17 @@ public class DatasetRegistryUtil {
                                                      ActivityListener activityListener,
                                                      ActivityContext ctx,
                                                      Supplier<IRI> activityIdFactory) {
+        File dataFolder = new File(dataDir);
+        ResourceServiceListening resourceServiceLocal
+                = new ResourceServiceListening(activityIdFactory, activityListener, ctx, new ResourceServiceLocal(streamFactory), new LocalPathToHashIRI(dataFolder));
+        ResourceServiceListening resourceServiceRemote
+                = new ResourceServiceListening(activityIdFactory, activityListener, ctx, new ResourceServiceLocalAndRemote(streamFactory, dataFolder), new LocalPathToHashIRI(dataFolder));
         return forCacheOrLocalDir(
                 dataDir,
                 provDir,
                 workDir,
-                new ResourceServiceLocal(streamFactory),
-                new ResourceServiceLocalAndRemote(streamFactory, new File(dataDir)),
+                resourceServiceLocal,
+                resourceServiceRemote,
                 contentPathFactory,
                 provenancePathFactory,
                 activityListener,
@@ -111,16 +123,16 @@ public class DatasetRegistryUtil {
         );
     }
 
-    public static DatasetRegistry forCacheOrLocalDir(String dataDir,
-                                                     String provDir,
-                                                     URI workDir,
-                                                     ResourceService resourceServiceLocal,
-                                                     ResourceService resourceServiceRemote,
-                                                     ContentPathFactory contentPathFactory,
-                                                     ProvenancePathFactory provenancePathFactory,
-                                                     ActivityListener dereferenceListener,
-                                                     ActivityContext ctx,
-                                                     Supplier<IRI> activityIdFactory) {
+    private static DatasetRegistry forCacheOrLocalDir(String dataDir,
+                                                      String provDir,
+                                                      URI workDir,
+                                                      ResourceService resourceServiceLocal,
+                                                      ResourceService resourceServiceRemote,
+                                                      ContentPathFactory contentPathFactory,
+                                                      ProvenancePathFactory provenancePathFactory,
+                                                      ActivityListener dereferenceListener,
+                                                      ActivityContext ctx,
+                                                      Supplier<IRI> activityIdFactory) {
         DatasetRegistry registry = forCache(
                 dataDir,
                 provDir,
@@ -143,4 +155,48 @@ public class DatasetRegistryUtil {
         return registry;
     }
 
+    private static class ResourceServiceListening implements ResourceService {
+        private final Supplier<IRI> activityIdFactory;
+        private final ActivityListener activityListener;
+        private final ActivityContext ctx;
+        private final ResourceService service;
+        private final LocalPathToHashIRI localPathToHashIRI;
+
+        public ResourceServiceListening(
+                Supplier<IRI> activityIdFactory,
+                ActivityListener activityListener,
+                ActivityContext ctx,
+                ResourceService service,
+                LocalPathToHashIRI localPathToHashIRI
+        ) {
+            this.activityIdFactory = activityIdFactory;
+            this.activityListener = activityListener;
+            this.ctx = ctx;
+            this.service = service;
+            this.localPathToHashIRI = localPathToHashIRI;
+        }
+
+        @Override
+        public InputStream retrieve(URI uri) throws IOException {
+            IRI accessId = activityIdFactory.get();
+            activityListener.onStarted(ctx.getActivity(), accessId, RefNodeFactory.toIRI(uri));
+            InputStream is = service.retrieve(uri);
+
+            return new ProxyInputStream(is) {
+                @Override
+                public void close() throws IOException {
+                    IRI request = RefNodeFactory.toIRI(uri);
+                    IRI response = RefNodeFactory.toIRI(uri);
+                    activityListener.onCompleted(
+                            ctx.getActivity(),
+                            accessId,
+                            localPathToHashIRI.get(request),
+                            localPathToHashIRI.get(response),
+                            null
+                    );
+                    IOUtils.close(in, this::handleIOException);
+                }
+            };
+        }
+    }
 }

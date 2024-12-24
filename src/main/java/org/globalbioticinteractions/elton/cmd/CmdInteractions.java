@@ -2,13 +2,16 @@ package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.HashType;
 import bio.guoda.preston.Hasher;
+import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
-import bio.guoda.preston.process.ActivityUtil;
+import bio.guoda.preston.process.StatementsEmitter;
 import bio.guoda.preston.process.StatementsEmitterAdapter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.rdf.api.BlankNodeOrIRI;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Literal;
 import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
@@ -23,9 +26,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+
+import static bio.guoda.preston.RefNodeConstants.GENERATED_AT_TIME;
+import static bio.guoda.preston.RefNodeConstants.HAS_VERSION;
+import static bio.guoda.preston.RefNodeConstants.IS_A;
+import static bio.guoda.preston.RefNodeConstants.WAS_GENERATED_BY;
+import static bio.guoda.preston.RefNodeFactory.toIRI;
+import static bio.guoda.preston.RefNodeFactory.toStatement;
 
 @CommandLine.Command(
         name = "interactions",
@@ -48,15 +63,19 @@ public class CmdInteractions extends CmdTabularWriterParams {
 
     void run(PrintStream out) {
 
+        Set<String> dependencies = Collections.synchronizedSet(new TreeSet<>());
+
         DatasetRegistry registry = getDatasetRegistry(new ActivityListener() {
             @Override
             public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
-                System.out.println("retrieving some data registry resource: [" + request.getIRIString() + "]");
+                // may be attempting to retrieve resources that do not exist
             }
 
             @Override
             public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
-                System.out.println("retrieved some data registry resource: [" + request.getIRIString() + "]");
+                if (response != null && getEnableProvMode()) {
+                    dependencies.add(response.getIRIString());
+                }
             }
         });
 
@@ -86,13 +105,19 @@ public class CmdInteractions extends CmdTabularWriterParams {
         if (getEnableProvMode() && tmpSourceFile != null) {
             try (FileInputStream fis = new FileInputStream(tmpSourceFile)) {
                 IRI iri = Hasher.calcHashIRI(fis, NullOutputStream.INSTANCE, true, HashType.sha256);
-                ActivityUtil.emitDownloadActivity(RefNodeFactory.toIRI(UUID.randomUUID()), iri, new StatementsEmitterAdapter() {
-                    @Override
-                    public void emit(Quad quad) {
-                        getStatementListener().on(quad);
-                    }
-                }, Optional.of(getActivityContext().getActivity()));
                 saveGeneratedContentIfNeeded(tmpSourceFile, iri);
+                emitDataGenerationActivity(
+                        dependencies.stream().map(RefNodeFactory::toIRI).collect(Collectors.toList()),
+                        RefNodeFactory.toIRI(UUID.randomUUID()),
+                        iri,
+                        new StatementsEmitterAdapter() {
+                            @Override
+                            public void emit(Quad quad) {
+                                getStatementListener().on(quad);
+                            }
+                        },
+                        Optional.of(getActivityContext().getActivity())
+                );
             } catch (IOException e) {
                 throw new RuntimeException("failed to persist data stream to", e);
             }
@@ -140,6 +165,60 @@ public class CmdInteractions extends CmdTabularWriterParams {
             );
         }
     }
+
+    public static void emitDataGenerationActivity(
+            List<IRI> dependencies,
+            IRI versionSource,
+            BlankNodeOrIRI newVersion,
+            StatementsEmitter emitter,
+            Optional<BlankNodeOrIRI> sourceActivity
+    ) {
+        Literal nowLiteral = RefNodeFactory.nowDateTimeLiteral();
+
+        IRI downloadActivity = toIRI(UUID.randomUUID());
+        emitter.emit(toStatement(
+                downloadActivity,
+                newVersion,
+                WAS_GENERATED_BY,
+                downloadActivity));
+        emitter.emit(toStatement(
+                downloadActivity,
+                newVersion,
+                RefNodeConstants.QUALIFIED_GENERATION,
+                downloadActivity));
+        emitter.emit(toStatement(
+                downloadActivity,
+                downloadActivity,
+                GENERATED_AT_TIME,
+                nowLiteral));
+        emitter.emit(toStatement(
+                downloadActivity,
+                downloadActivity,
+                IS_A,
+                RefNodeConstants.GENERATION));
+        sourceActivity.ifPresent(blankNodeOrIRI -> emitter.emit(toStatement(
+                downloadActivity,
+                downloadActivity,
+                RefNodeConstants.WAS_INFORMED_BY,
+                blankNodeOrIRI)));
+        for (IRI dependency : dependencies) {
+            emitter.emit(toStatement(
+                    downloadActivity,
+                    downloadActivity,
+                    RefNodeConstants.USED,
+                    dependency)
+            );
+        }
+        emitter.emit(toStatement(downloadActivity, versionSource, HAS_VERSION, newVersion));
+        for (IRI dependency : dependencies) {
+            emitter.emit(toStatement(
+                    downloadActivity,
+                    newVersion,
+                    RefNodeConstants.WAS_DERIVED_FROM,
+                    dependency));
+        }
+    }
+
 
 }
 

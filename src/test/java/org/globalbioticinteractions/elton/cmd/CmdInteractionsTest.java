@@ -118,12 +118,12 @@ public class CmdInteractionsTest {
         CmdInteractions cmd1 = new CmdInteractions();
 
         String dataDirStatic1 = CmdTestUtil.cacheDirTest();
-        File dataDir1 = tmpFolder.newFolder("data");
+        File dataDir1 = tmpFolder.newFolder();
         FileUtils.copyDirectory(new File(dataDirStatic1), dataDir1);
         cmd1.setDataDir(dataDir1.getAbsolutePath());
 
         String provDirStatic1 = CmdTestUtil.cacheDirTest();
-        File provDir1 = tmpFolder.newFolder("prov");
+        File provDir1 = tmpFolder.newFolder();
         FileUtils.copyDirectory(new File(provDirStatic1), provDir1);
 
         cmd1.setProvDir(provDir1.getAbsolutePath());
@@ -170,12 +170,12 @@ public class CmdInteractionsTest {
         CmdInteractions cmd = new CmdInteractions();
 
         String dataDirStatic = CmdTestUtil.cacheDirTest();
-        File dataDir = tmpFolder.newFolder("data");
+        File dataDir = tmpFolder.newFolder();
         FileUtils.copyDirectory(new File(dataDirStatic), dataDir);
         cmd.setDataDir(dataDir.getAbsolutePath());
 
         String provDirStatic = CmdTestUtil.cacheDirTest();
-        File provDir = tmpFolder.newFolder("prov");
+        File provDir = tmpFolder.newFolder();
         FileUtils.copyDirectory(new File(provDirStatic), provDir);
 
         cmd.setProvDir(provDir.getAbsolutePath());

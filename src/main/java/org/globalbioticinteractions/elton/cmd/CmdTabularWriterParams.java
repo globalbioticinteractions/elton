@@ -39,7 +39,8 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
 
     private boolean skipHeader = false;
     private Set<String> dependencies = Collections.synchronizedSet(new TreeSet<>());
-    private File stdOutRedirect;
+
+    private File dataSink;
 
     boolean shouldSkipHeader() {
         return skipHeader;
@@ -51,18 +52,19 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
 
     public abstract String getRecordType();
 
-    protected NodeFactory getNodeFactoryForProv(PrintStream out) {
+    protected NodeFactory getNodeFactoryForProv(final PrintStream out) {
+        PrintStream dataOut = out;
         if (getEnableProvMode()) {
             try {
-                File redirect = File.createTempFile(new File(getWorkDir()).getAbsolutePath(), "interactions");
-                out = new PrintStream(redirect);
-                setStdOutRedirect(redirect);
+                File datafile = File.createTempFile(new File(getWorkDir()).getAbsolutePath(), "interactions");
+                dataOut = new PrintStream(datafile);
+                setDataSink(datafile);
             } catch (IOException e) {
                 throw new RuntimeException("failed to create tmp file", e);
             }
         }
 
-        return WriterUtil.getNodeFactoryForType(getRecordType(), !shouldSkipHeader(), out, getLogger());
+        return WriterUtil.getNodeFactoryForType(getRecordType(), !shouldSkipHeader(), dataOut, getLogger());
     }
 
     protected DatasetRegistry getDatasetRegistryWithProv() {
@@ -81,12 +83,18 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
             });
     }
 
+    @Override
+    protected void stop() {
+        emitProcessDescription();
+        super.stop();
+    }
+
     protected void emitProcessDescription() {
-        File stdOutRedirect = getStdOutRedirect();
-        if (getEnableProvMode() && stdOutRedirect != null) {
-            try (FileInputStream fis = new FileInputStream(stdOutRedirect)) {
+        File dataSink = getDataSink();
+        if (getEnableProvMode() && dataSink != null) {
+            try (FileInputStream fis = new FileInputStream(dataSink)) {
                 IRI iri = Hasher.calcHashIRI(fis, NullOutputStream.INSTANCE, true, HashType.sha256);
-                ProvUtil.saveGeneratedContentIfNeeded(stdOutRedirect, iri, getDataDir());
+                ProvUtil.saveGeneratedContentIfNeeded(dataSink, iri, getDataDir());
                 ProvUtil.emitDataGenerationActivity(
                         getDependencies().stream().map(RefNodeFactory::toIRI).collect(Collectors.toList()),
                         RefNodeFactory.toIRI(UUID.randomUUID()),
@@ -137,11 +145,11 @@ public abstract class CmdTabularWriterParams extends CmdDefaultParams {
         return dependencies;
     }
 
-    public File getStdOutRedirect() {
-        return stdOutRedirect;
+    public File getDataSink() {
+        return dataSink;
     }
 
-    public void setStdOutRedirect(File stdOutRedirect) {
-        this.stdOutRedirect = stdOutRedirect;
+    public void setDataSink(File datafile) {
+        this.dataSink = datafile;
     }
 }

@@ -21,7 +21,7 @@ public class CmdNames extends CmdTabularWriterParams {
 
     @Override
     public void doRun() {
-        run(System.out);
+        run(getStdout());
     }
 
     @Override
@@ -31,17 +31,16 @@ public class CmdNames extends CmdTabularWriterParams {
 
     void run(PrintStream out) {
 
-        DatasetRegistry registry = getDatasetRegistry();
+        DatasetRegistry registry = getDatasetRegistryWithProv();
 
-        NodeFactory nodeFactory = WriterUtil.nodeFactoryForTaxonWriting(!shouldSkipHeader(), out);
+        NodeFactory nodeFactory = getNodeFactoryForProv(out);
 
-        final NullImportLogger nullImportLogger = new NullImportLogger();
         final File file = new File(getWorkDir());
         CmdUtil.handleNamespaces(registry,
                 getNamespaces(),
                 "listing taxa",
                 getStderr(),
-                getNamespaceHandler(registry, nodeFactory, file, nullImportLogger)
+                getNamespaceHandler(registry, nodeFactory, file, getLogger())
         );
     }
 

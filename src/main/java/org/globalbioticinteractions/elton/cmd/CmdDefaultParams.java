@@ -218,7 +218,7 @@ abstract class CmdDefaultParams implements Runnable {
         return ActivityUtil.createNewActivityContext(CmdDefaultParams.this.getDescription());
     }
 
-    private void stop() {
+    protected void stop() {
         getStatementListener().on(
                 RefNodeFactory.toStatement(
                         getActivity().getActivity(),

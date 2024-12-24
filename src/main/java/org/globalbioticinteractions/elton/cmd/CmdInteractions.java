@@ -67,7 +67,6 @@ public class CmdInteractions extends CmdTabularWriterParams {
                 getNamespaceHandler(registry, nodeFactory, file, getLogger())
         );
 
-        emitProcessDescription();
     }
 
     @Override

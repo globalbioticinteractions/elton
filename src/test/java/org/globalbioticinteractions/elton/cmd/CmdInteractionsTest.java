@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
@@ -112,33 +111,32 @@ public class CmdInteractionsTest {
     @Test
     public void interactionsWithHeaderInProvMode() throws URISyntaxException, IOException {
         assertResultInProvMode();
-
     }
 
     @Test
     public void interactionsWithHeaderInProvModeTwice() throws URISyntaxException, IOException {
-        CmdInteractions cmd1 = new CmdInteractions();
+        CmdInteractions cmd = new CmdInteractions();
 
         String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
-        cmd1.setDataDir(dataDir);
+        cmd.setDataDir(dataDir);
 
         String provDir = CmdTestUtil.cacheDirTest(tmpFolder);
 
-        cmd1.setProvDir(provDir);
+        cmd.setProvDir(provDir);
 
-        cmd1.setEnableProvMode(true);
+        cmd.setEnableProvMode(true);
 
-        cmd1.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
 
         ByteArrayOutputStream out11 = new ByteArrayOutputStream();
         PrintStream out2 = new PrintStream(out11);
-        cmd1.setStdout(out2);
+        cmd.setStdout(out2);
 
         assertThat(CmdTestUtil.numberOfDataFiles(new File(dataDir)), is(4));
 
-        cmd1.run();
+        cmd.run();
         assertResults(new File(dataDir), out11);
-        cmd1.run();
+        cmd.run();
     }
 
     private void assertResults(File dataDir1, ByteArrayOutputStream out11) {
@@ -162,21 +160,19 @@ public class CmdInteractionsTest {
         assertThat(dataStatements1.size(), is(6));
         assertThat(dataStatements1.get(4), startsWith("<hash://sha256/50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599> <http://www.w3.org/ns/prov#wasDerivedFrom> <jar:hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f!/globalbioticinteractions-template-dataset-e68f448/globi.json> "));
         assertThat(dataStatements1.get(5), startsWith("<hash://sha256/50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599> <http://www.w3.org/ns/prov#wasDerivedFrom> <jar:hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f!/globalbioticinteractions-template-dataset-e68f448/interactions.tsv> "));
+
+        assertThat(lines1[lines1.length - 2], containsString("<http://www.w3.org/ns/prov#endedAtTime>"));
+
     }
 
     private void assertResultInProvMode() throws URISyntaxException, IOException {
         CmdInteractions cmd = new CmdInteractions();
 
-        String dataDirStatic = CmdTestUtil.cacheDirTest(tmpFolder);
-        File dataDir = tmpFolder.newFolder();
-        FileUtils.copyDirectory(new File(dataDirStatic), dataDir);
-        cmd.setDataDir(dataDir.getAbsolutePath());
+        String dataDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd.setDataDir(dataDir);
 
-        String provDirStatic = CmdTestUtil.cacheDirTest(tmpFolder);
-        File provDir = tmpFolder.newFolder();
-        FileUtils.copyDirectory(new File(provDirStatic), provDir);
-
-        cmd.setProvDir(provDir.getAbsolutePath());
+        String provDir = CmdTestUtil.cacheDirTest(tmpFolder);
+        cmd.setProvDir(provDir);
 
         cmd.setEnableProvMode(true);
 
@@ -189,7 +185,7 @@ public class CmdInteractionsTest {
         assertThat(CmdTestUtil.numberOfDataFiles(dataDir), is(4));
 
         cmd.run();
-        assertResults(dataDir, out1);
+        assertResults(new File(dataDir), out1);
     }
 
 

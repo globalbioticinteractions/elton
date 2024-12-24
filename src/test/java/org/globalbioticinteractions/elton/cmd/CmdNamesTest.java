@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.core.StringStartsWith;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -11,9 +12,11 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.Collections;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 
 public class CmdNamesTest {
 
@@ -55,6 +58,25 @@ public class CmdNamesTest {
         assertThat(actualLines[0], is("taxonId\ttaxonName\ttaxonRank\ttaxonPathIds\ttaxonPath\ttaxonPathNames\tnamespace\tcitation\tarchiveURI\tlastSeenAt\tcontentHash\teltonVersion"));
         assertThat(actualLines[1], is("\tLeptoconchus incycloseris\t\t\t\t\tglobalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f\tdev"));
         assertThat(actualLines[1].split("\t").length, is(actualLines[0].split("\t").length));
+    }
+
+    @Test
+    public void namesWithHeaderProvMode() throws URISyntaxException, IOException {
+        CmdNames cmdNames = getCmdNames();
+        cmdNames.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
+        cmdNames.setEnableProvMode(true);
+        ByteArrayOutputStream out1 = new ByteArrayOutputStream();
+        PrintStream out = new PrintStream(out1);
+        cmdNames.setStdout(out);
+        cmdNames.run();
+        String actualOutput = out1.toString();
+
+        String[] actualLines = StringUtils.splitByWholeSeparator(actualOutput, "\n");
+        assertThat(actualLines.length, not(is(0)));
+        assertThat(actualLines[0], is(not("taxonId\ttaxonName\ttaxonRank\ttaxonPathIds\ttaxonPath\ttaxonPathNames\tnamespace\tcitation\tarchiveURI\tlastSeenAt\tcontentHash\teltonVersion")));
+        assertThat(actualLines[0], StringStartsWith.startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
+        assertThat(actualLines[1], StringStartsWith.startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent>"));
+        assertThat(actualLines[actualLines.length - 2], containsString("<http://www.w3.org/ns/prov#endedAtTime>"));
     }
 
     @Test

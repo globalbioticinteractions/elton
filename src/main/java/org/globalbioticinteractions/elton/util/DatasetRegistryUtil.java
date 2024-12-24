@@ -130,7 +130,7 @@ public class DatasetRegistryUtil {
                                                       ResourceService resourceServiceRemote,
                                                       ContentPathFactory contentPathFactory,
                                                       ProvenancePathFactory provenancePathFactory,
-                                                      ActivityListener dereferenceListener,
+                                                      ActivityListener activityListener,
                                                       ActivityContext ctx,
                                                       Supplier<IRI> activityIdFactory) {
         DatasetRegistry registry = forCache(
@@ -147,7 +147,7 @@ public class DatasetRegistryUtil {
                     contentPathFactory,
                     dataDir,
                     provDir,
-                    dereferenceListener,
+                    activityListener,
                     ctx,
                     activityIdFactory
             );

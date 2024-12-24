@@ -1,12 +1,15 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import org.eol.globi.util.ResourceServiceRemote;
-
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
+import org.globalbioticinteractions.elton.store.AccessLogger;
+import org.globalbioticinteractions.elton.store.ActivityListener;
+import org.globalbioticinteractions.elton.store.LocalPathToHashIRI;
+import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -37,21 +40,39 @@ public class CmdList extends CmdOnlineParams {
     public void run(PrintStream out) {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
 
-        DatasetRegistry registryLocal = getDatasetRegistry(inputStreamFactory, getActivityListener());
+        DatasetRegistry registryLocal = getDatasetRegistryWithProv();
+
+        ActivityListener activityListener =
+                getEnableProvMode()
+                        ? getActivityListenerWithProv()
+                        : new AccessLogger(DatasetRegistryUtil.NAMESPACE_LOCAL, getProvDir());
+
 
         File cacheDir = new File(getDataDir());
 
+        DatasetRegistryUtil.ResourceServiceListening resourceServiceRemote
+                = new DatasetRegistryUtil.ResourceServiceListening(
+                getActivityIdFactory(),
+                activityListener,
+                getActivityContext(),
+                new ResourceServiceRemote(inputStreamFactory, cacheDir),
+                new LocalPathToHashIRI(new File(getDataDir()))
+        );
+
+
         List<DatasetRegistry> onlineAndOffline = Arrays.asList(
-                new DatasetRegistryZenodo(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
-                new DatasetRegistryGitHubArchive(new ResourceServiceRemote(inputStreamFactory, cacheDir)),
+                new DatasetRegistryZenodo(resourceServiceRemote),
+                new DatasetRegistryGitHubArchive(resourceServiceRemote),
                 registryLocal
         );
 
         List<DatasetRegistry> registries = isOnline() ? onlineAndOffline : Collections.singletonList(registryLocal);
 
+        PrintStream dataSink = getDataSink(out);
+
         DatasetRegistry registry = new DatasetRegistryProxy(registries);
         try {
-            registry.findNamespaces(out::println);
+            registry.findNamespaces(dataSink::println);
         } catch (
                 DatasetRegistryException e) {
             throw new RuntimeException(e);

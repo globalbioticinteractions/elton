@@ -6,6 +6,7 @@ import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
 import org.apache.commons.io.output.NullAppendable;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.tool.NullImportLogger;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 
 @CommandLine.Command(
         name = "log",
@@ -33,6 +35,9 @@ import java.util.Collections;
 public class CmdLog extends CmdDefaultParams {
 
     public static final String DESCRIPTION = "lists provenance of original resources";
+    public static final String ELTON_CITATION_PREFIX = "Jorrit Poelen, Tobias Kuhn & Katrin Leinweber. (2023). globalbioticinteractions/elton: ";
+    public static final String ELTON_DESCRIPTION = "Elton helps to access, review and index existing species interaction datasets.";
+    public static final IRI ELTON_CONCEPT_DOI = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");
     @CommandLine.Option(
             names = {"--hash-algorithm", "--algo", "-a"},
             description = "Hash algorithm used to generate primary content identifiers. Supported values: ${COMPLETION-CANDIDATES}."
@@ -47,13 +52,7 @@ public class CmdLog extends CmdDefaultParams {
     public void doRun() {
         DatasetRegistry registry = getDatasetRegistry();
 
-        IRI softwareAgent = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");
-        emitter.emit(ActivityUtil.generateSoftwareAgentProcessDescription(
-                ctx,
-                softwareAgent,
-                softwareAgent,
-                "Jorrit Poelen, Tobias Kuhn & Katrin Leinweber. (2023). globalbioticinteractions/elton: " + Elton.getVersionString() + ". Zenodo. " + softwareAgent.getIRIString(),
-                "Elton helps to access, review and index existing species interaction datasets."));
+        emitter.emit(getEltonDescription(ctx));
 
 
         DatasetRegistry proxy = new DatasetRegistryProxy(Collections.singletonList(registry)) {
@@ -81,6 +80,19 @@ public class CmdLog extends CmdDefaultParams {
                 NullAppendable.INSTANCE,
                 getNamespaceHandler(proxy, nodeFactory, file, nullImportLogger)
         );
+    }
+
+    public static List<Quad> getEltonDescription(ActivityContext ctx) {
+        String citationString = "Jorrit Poelen, Tobias Kuhn & Katrin Leinweber. (2017/2024). globalbioticinteractions/elton: "
+                + Elton.getVersionString()
+                + ". Zenodo. "
+                + ELTON_CONCEPT_DOI.getIRIString();
+        return ActivityUtil.generateSoftwareAgentProcessDescription(
+                ctx,
+                ELTON_CONCEPT_DOI,
+                ELTON_CONCEPT_DOI,
+                citationString,
+                ELTON_DESCRIPTION);
     }
 
     @Override

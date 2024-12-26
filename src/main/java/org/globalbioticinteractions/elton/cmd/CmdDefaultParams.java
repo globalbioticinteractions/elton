@@ -19,7 +19,6 @@ import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.cache.ProvenancePathFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.elton.Elton;
 import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.ActivityProxy;
@@ -49,6 +48,8 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static org.globalbioticinteractions.elton.cmd.CmdLog.getEltonDescription;
 
 abstract class CmdDefaultParams implements Runnable {
 
@@ -214,14 +215,7 @@ abstract class CmdDefaultParams implements Runnable {
     }
 
     private void start() {
-        ActivityContext activity = getActivity();
-        List<Quad> quads = ActivityUtil.generateSoftwareAgentProcessDescription(
-                activity,
-                RefNodeFactory.toIRI("https://globalbioticinteractions.org/elton"),
-                RefNodeFactory.toIRI("https://doi.org/10.5281/zenodo.998263"),
-                "Tobias Kuhn, Jorrit Poelen, & Katrin Leinweber. (2024). globalbioticinteractions/elton: " + Elton.getVersionString() + ". Zenodo. https://doi.org/10.5281/zenodo.13863810",
-                "Elton helps to access, review and index existing species interaction datasets.");
-        quads.forEach(q -> getStatementListener().on(q));
+        getEltonDescription(getActivityContext()).forEach(q -> getStatementListener().on(q));
     }
 
     protected abstract void doRun();
@@ -251,18 +245,18 @@ abstract class CmdDefaultParams implements Runnable {
 
     protected ActivityListener getActivityListenerWithProv() {
         return new ActivityListener() {
-                @Override
-                public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
-                    // may be attempting to retrieve resources that do not exist
-                }
+            @Override
+            public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
+                // may be attempting to retrieve resources that do not exist
+            }
 
-                @Override
-                public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
-                    if (response != null && getEnableProvMode()) {
-                        getDependencies().add(response.getIRIString());
-                    }
+            @Override
+            public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
+                if (response != null && getEnableProvMode()) {
+                    getDependencies().add(response.getIRIString());
                 }
-            };
+            }
+        };
     }
 
     protected void stop() {
@@ -296,7 +290,7 @@ abstract class CmdDefaultParams implements Runnable {
         return getDatasetRegistry(createInputStreamFactory(), getActivityListener());
     }
 
-    protected DatasetRegistry  getDatasetRegistry(ActivityListener activityListener) {
+    protected DatasetRegistry getDatasetRegistry(ActivityListener activityListener) {
         return getDatasetRegistry(createInputStreamFactory(), activityListener);
     }
 
@@ -331,6 +325,7 @@ abstract class CmdDefaultParams implements Runnable {
     public void setEnableProvMode(boolean enableProvMode) {
         this.enableProvMode = enableProvMode;
     }
+
     public boolean getEnableProvMode() {
         return this.enableProvMode;
     }

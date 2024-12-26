@@ -39,6 +39,7 @@ import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.globalbioticinteractions.elton.util.ProgressUtil;
+import org.globalbioticinteractions.elton.util.ResourceServiceListening;
 import org.globalbioticinteractions.elton.util.SpecimenNull;
 import picocli.CommandLine;
 
@@ -121,8 +122,8 @@ public class CmdReview extends CmdTabularWriterParams {
 
             for (URI localNamespace : localNamespaces) {
 
-                DatasetRegistryUtil.ResourceServiceListening resourceServiceLocalAndRemote
-                        = new DatasetRegistryUtil.ResourceServiceListening(
+                ResourceServiceListening resourceServiceLocalAndRemote
+                        = new ResourceServiceListening(
                         getActivityIdFactory(),
                         activityListener,
                         getActivityContext(),
@@ -150,7 +151,7 @@ public class CmdReview extends CmdTabularWriterParams {
                 );
             }
 
-            reviewCachedOrRemote(
+            reviewLocal(
                     remoteNamespaces,
                     factory,
                     dataOut,
@@ -167,13 +168,13 @@ public class CmdReview extends CmdTabularWriterParams {
         return DESCRIPTION;
     }
 
-    private void reviewCachedOrRemote(List<String> namespaces,
-                                      InputStreamFactory inputStreamFactory,
-                                      PrintStream dataOut, ActivityListener activityListener) throws StudyImporterException {
+    private void reviewLocal(List<String> namespaces,
+                             InputStreamFactory inputStreamFactory,
+                             PrintStream dataOut, ActivityListener activityListener) throws StudyImporterException {
         for (String namespace : namespaces) {
 
-            DatasetRegistryUtil.ResourceServiceListening resourceServiceLocal
-                    = new DatasetRegistryUtil.ResourceServiceListening(
+            ResourceServiceListening resourceServiceLocal
+                    = new ResourceServiceListening(
                     getActivityIdFactory(),
                     activityListener,
                     getActivityContext(),
@@ -188,6 +189,7 @@ public class CmdReview extends CmdTabularWriterParams {
                     getContentPathFactory(),
                     getProvenancePathFactory()
             );
+
             review(namespace,
                     registry,
                     inputStreamFactory,

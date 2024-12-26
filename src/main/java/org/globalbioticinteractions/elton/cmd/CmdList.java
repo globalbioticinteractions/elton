@@ -10,6 +10,7 @@ import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.LocalPathToHashIRI;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
+import org.globalbioticinteractions.elton.util.ResourceServiceListening;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -50,8 +51,8 @@ public class CmdList extends CmdOnlineParams {
 
         File cacheDir = new File(getDataDir());
 
-        DatasetRegistryUtil.ResourceServiceListening resourceServiceRemote
-                = new DatasetRegistryUtil.ResourceServiceListening(
+        ResourceServiceListening resourceServiceRemote
+                = new ResourceServiceListening(
                 getActivityIdFactory(),
                 activityListener,
                 getActivityContext(),
@@ -60,13 +61,17 @@ public class CmdList extends CmdOnlineParams {
         );
 
 
+
         List<DatasetRegistry> onlineAndOffline = Arrays.asList(
                 new DatasetRegistryZenodo(resourceServiceRemote),
                 new DatasetRegistryGitHubArchive(resourceServiceRemote),
                 registryLocal
         );
 
-        List<DatasetRegistry> registries = isOnline() ? onlineAndOffline : Collections.singletonList(registryLocal);
+        List<DatasetRegistry> registries =
+                isOnline()
+                        ? onlineAndOffline
+                        : Collections.singletonList(registryLocal);
 
         PrintStream dataSink = getDataSink(out);
 

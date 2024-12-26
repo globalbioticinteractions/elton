@@ -2,7 +2,7 @@ package org.eol.globi.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.globalbioticinteractions.dataset.Dataset;
@@ -42,7 +42,7 @@ public class GitHubUtil {
 
     private static boolean hasInteractionData(URI gloBIConfigURI, ResourceService resourceService) throws IOException {
         try (InputStream is = resourceService.retrieve(gloBIConfigURI)) {
-            IOUtils.copy(is, NullOutputStream.NULL_OUTPUT_STREAM);
+            IOUtils.copy(is, NullOutputStream.INSTANCE);
             return true;
         } catch (Throwable th) {
             return false;

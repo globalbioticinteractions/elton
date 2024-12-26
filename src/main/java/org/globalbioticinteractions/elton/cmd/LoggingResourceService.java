@@ -18,12 +18,10 @@ import org.globalbioticinteractions.dataset.DatasetFinderUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class LoggingResourceService implements ResourceService {
@@ -64,7 +62,14 @@ public class LoggingResourceService implements ResourceService {
             final URI resource = local instanceof Dataset
                     ? getLocationInDataset(uri, (Dataset) local) : uri;
 
-            return new DigestLoggingInputStream(retrieve, md, resource);
+            return new DigestEmittingInputStream(
+                    retrieve,
+                    md,
+                    resource,
+                    ctx,
+                    activityEmitter,
+                    hashType
+            );
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("algorithm [" + hashType.getAlgorithm() + "] not supported", e);
         }
@@ -99,53 +104,6 @@ public class LoggingResourceService implements ResourceService {
             }
         }
         return resourceLocation;
-    }
-
-    public class DigestLoggingInputStream extends DigestInputStream {
-        final AtomicBoolean isEOF;
-        final AtomicBoolean hasLogged;
-        final URI resourceLocation;
-        private final MessageDigest md;
-        private final URI resource;
-
-        public DigestLoggingInputStream(InputStream retrieve, MessageDigest md, URI resource) {
-            super(retrieve, md);
-            this.md = md;
-            this.resource = resource;
-            isEOF = new AtomicBoolean(false);
-            hasLogged = new AtomicBoolean(false);
-            resourceLocation = resource;
-        }
-
-        public int read() throws IOException {
-            return setEOFIfEncountered(super.read());
-        }
-
-        public int read(byte[] var1, int var2, int var3) throws IOException {
-            return setEOFIfEncountered(super.read(var1, var2, var3));
-        }
-
-        private int setEOFIfEncountered(int read) {
-            if (read == -1) {
-                isEOF.set(true);
-            }
-            return read;
-        }
-
-        public void close() throws IOException {
-            this.in.close();
-
-            if (isEOF.get() && !hasLogged.get()) {
-                IRI object = Hasher.toHashIRI(md, hashType);
-                ActivityUtil.emitDownloadActivity(
-                        RefNodeFactory.toIRI(resourceLocation),
-                        object,
-                        activityEmitter,
-                        Optional.of(ctx.getActivity()));
-                hasLogged.set(true);
-            }
-        }
-
     }
 
 }

@@ -38,7 +38,6 @@ public class ResourceServiceListening implements ResourceService {
     @Override
     public InputStream retrieve(URI uri) throws IOException {
 
-
         IRI accessId = activityIdFactory.get();
         activityListener.onStarted(ctx.getActivity(), accessId, RefNodeFactory.toIRI(uri));
         InputStream is = service.retrieve(uri);

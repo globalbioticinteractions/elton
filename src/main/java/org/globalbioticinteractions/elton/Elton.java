@@ -4,7 +4,12 @@ package org.globalbioticinteractions.elton;
     Elton - a GloBI commandline tool to help access species interaction data.
  */
 
+import bio.guoda.preston.RefNodeFactory;
+import bio.guoda.preston.cmd.ActivityContext;
+import bio.guoda.preston.process.ActivityUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Quad;
 import org.globalbioticinteractions.elton.cmd.CmdStream;
 import org.globalbioticinteractions.elton.cmd.CmdDatasets;
 import org.globalbioticinteractions.elton.cmd.CmdGet;
@@ -21,6 +26,8 @@ import org.globalbioticinteractions.elton.cmd.CmdUpdate;
 import org.globalbioticinteractions.elton.cmd.CmdVersion;
 import picocli.CommandLine;
 import picocli.codegen.docgen.manpage.ManPageGenerator;
+
+import java.util.List;
 
 import static java.lang.System.exit;
 
@@ -49,8 +56,25 @@ import static java.lang.System.exit;
 
 public class Elton implements CommandLine.IVersionProvider {
 
+    private static final String ELTON_DESCRIPTION = "Elton helps to access, review and index existing species interaction datasets.";
+    private static final IRI ELTON_CONCEPT_DOI = RefNodeFactory.toIRI("https://zenodo.org/doi/10.5281/zenodo.998263");
+
+    public static List<Quad> getEltonDescription(ActivityContext ctx) {
+        String citationString = "Jorrit Poelen, Tobias Kuhn & Katrin Leinweber. (2017/2024). globalbioticinteractions/elton: "
+                + getVersionString()
+                + ". Zenodo. "
+                + ELTON_CONCEPT_DOI.getIRIString();
+
+        return ActivityUtil.generateSoftwareAgentProcessDescription(
+                ctx,
+                ELTON_CONCEPT_DOI,
+                ELTON_CONCEPT_DOI,
+                citationString,
+                ELTON_DESCRIPTION);
+    }
+
     public String[] getVersion() {
-        return new String[] {getVersionString()};
+        return new String[]{getVersionString()};
     }
 
     public static String getVersionString() {

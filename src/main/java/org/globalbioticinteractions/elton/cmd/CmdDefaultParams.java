@@ -49,7 +49,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.globalbioticinteractions.elton.cmd.CmdLog.getEltonDescription;
+import static org.globalbioticinteractions.elton.Elton.getEltonDescription;
 
 abstract class CmdDefaultParams implements Runnable {
 

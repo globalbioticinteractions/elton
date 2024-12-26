@@ -67,7 +67,7 @@ public class Elton implements CommandLine.IVersionProvider {
 
         return ActivityUtil.generateSoftwareAgentProcessDescription(
                 ctx,
-                ELTON_CONCEPT_DOI,
+                RefNodeFactory.toIRI("https://globalbioticinteractions.org/elton"),
                 ELTON_CONCEPT_DOI,
                 citationString,
                 ELTON_DESCRIPTION);

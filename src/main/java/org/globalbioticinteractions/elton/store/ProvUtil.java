@@ -69,11 +69,13 @@ public class ProvUtil {
         }
         emitter.emit(toStatement(downloadActivity, versionSource, HAS_VERSION, newVersion));
         for (IRI dependency : dependencies) {
-            emitter.emit(toStatement(
-                    downloadActivity,
-                    newVersion,
-                    RefNodeConstants.WAS_DERIVED_FROM,
-                    dependency));
+            if (!dependency.equals(newVersion)) {
+                emitter.emit(toStatement(
+                        downloadActivity,
+                        newVersion,
+                        RefNodeConstants.WAS_DERIVED_FROM,
+                        dependency));
+            }
         }
     }
 

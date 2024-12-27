@@ -1,11 +1,17 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.RefNodeConstants;
+import bio.guoda.preston.RefNodeFactory;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.util.ResourceServiceRemote;
+import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
+import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.LocalPathToHashIRI;
@@ -18,6 +24,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 @CommandLine.Command(
         name = "list",
@@ -61,7 +68,6 @@ public class CmdList extends CmdOnlineParams {
         );
 
 
-
         List<DatasetRegistry> onlineAndOffline = Arrays.asList(
                 new DatasetRegistryZenodo(resourceServiceRemote),
                 new DatasetRegistryGitHubArchive(resourceServiceRemote),
@@ -77,7 +83,35 @@ public class CmdList extends CmdOnlineParams {
 
         DatasetRegistry registry = new DatasetRegistryProxy(registries);
         try {
-            registry.findNamespaces(dataSink::println);
+            registry.findNamespaces(namespace -> {
+                Dataset dataset;
+                try {
+                    dataset = registry.datasetFor(namespace);
+                    getStatementListener().on(RefNodeFactory.toStatement(
+                            getActivityContext().getActivity(),
+                            RefNodeFactory.toIRI("urn:lsid:globalbioticinteractions.org:" + namespace),
+                            RefNodeConstants.WAS_ASSOCIATED_WITH,
+                            RefNodeFactory.toIRI(dataset.getArchiveURI()))
+                    );
+                    String contentHash = dataset.getOrDefault("contentHash", null);
+                    if (StringUtils.isNotBlank(contentHash)) {
+                        IRI archiveContentId = RefNodeFactory.toIRI("hash://sha256/" + contentHash);
+                        getStatementListener().on(RefNodeFactory.toStatement(
+                                getActivityContext().getActivity(),
+                                RefNodeFactory.toIRI(dataset.getArchiveURI()),
+                                RefNodeConstants.HAS_VERSION,
+                                archiveContentId)
+                        );
+                        getDependencies().add(archiveContentId.getIRIString());
+                    }
+                } catch (DatasetRegistryException e) {
+                    // opportunistic association
+                }
+
+                dataSink.println(namespace);
+
+            }
+            );
         } catch (
                 DatasetRegistryException e) {
             throw new RuntimeException(e);

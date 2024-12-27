@@ -7,9 +7,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
 
@@ -41,6 +43,42 @@ public class CmdUpdateIT {
     @Test
     public void runUpdate() throws IOException {
         assertAccessLogForNamespace("globalbioticinteractions/template-dataset");
+    }
+
+    @Test
+    public void runUpdateWithProv() throws IOException {
+        CmdUpdate cmd = new CmdUpdate();
+        cmd.setEnableProvMode(true);
+        File dataAndProvFolder = tmpDir.newFolder("dataAndProv");
+        String absolutePath = dataAndProvFolder.getAbsolutePath();
+        cmd.setDataDir(absolutePath);
+        cmd.setProvDir(absolutePath);
+        cmd.setWorkDir(tmpDir.newFolder("workdir").getAbsolutePath());
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        cmd.setStdout(new PrintStream(os));
+
+        File workDir = new File(cmd.getWorkDir());
+        CmdTestUtil.assertEmpty(workDir);
+
+        File datasetDir1 = new File(dataAndProvFolder, "globalbioticinteractions/template-dataset");
+        File file = new File(datasetDir1,"access.tsv");
+
+        assertThat(file.exists(), is(false));
+
+        cmd.run();
+
+        assertThat(file.exists(), is(false));
+
+        CmdTestUtil.assertEmpty(workDir);
+
+        assertThat(new String(os.toByteArray(), StandardCharsets.UTF_8), startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
+
+
+        // rerun
+        cmd.run();
+        assertThat(file.exists(), is(false));
     }
 
     @Test

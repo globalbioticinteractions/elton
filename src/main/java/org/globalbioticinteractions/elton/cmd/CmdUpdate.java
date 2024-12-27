@@ -8,7 +8,9 @@ import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryAccessLogger;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
+import org.globalbioticinteractions.dataset.DatasetRegistryProvLogger;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
@@ -72,6 +74,11 @@ public class CmdUpdate extends CmdDefaultParams {
         }
 
         DatasetRegistry registryProxy = new DatasetRegistryProxy(registries);
+        DatasetRegistry registryProvenanceLogger = getEnableProvMode()
+                ? new DatasetRegistryProvLogger(registryProxy, getStatementListener(), getActivityContext())
+                : new DatasetRegistryAccessLogger(registryProxy, getProvDir());
+
+
         NamespaceHandler namespaceHandler = namespace -> {
             getStderr().print("tracking [" + namespace + "]... ");
 
@@ -80,7 +87,6 @@ public class CmdUpdate extends CmdDefaultParams {
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getDataDir(), namespace);
 
             DatasetRegistry registry = CmdUtil.createDataFinderLoggingCaching(
-                    registryProxy,
                     namespace,
                     getDataDir(),
                     getProvDir(),
@@ -89,7 +95,8 @@ public class CmdUpdate extends CmdDefaultParams {
                     getProvenancePathFactory(),
                     getActivityListener(namespace),
                     getActivityContext(),
-                    getActivityIdFactory()
+                    getActivityIdFactory(),
+                    registryProvenanceLogger
             );
 
             Dataset dataset =

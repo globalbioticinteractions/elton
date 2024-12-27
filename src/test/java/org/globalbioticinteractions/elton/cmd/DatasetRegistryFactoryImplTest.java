@@ -19,7 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class DatasetRegistryFactoryImplTest {
 
     @Test
-    public void list() throws DatasetRegistryException {
+    public void listAndCreateSupportedRegistries() throws DatasetRegistryException {
         List<DatasetRegistry> registries = new ArrayList<>();
         Set<String> supportedRegistries = DatasetRegistryFactoryImpl.getSupportedRegistries();
         for (String supportedRegistry : supportedRegistries) {

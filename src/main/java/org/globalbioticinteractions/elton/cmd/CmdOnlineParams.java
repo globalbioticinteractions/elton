@@ -13,4 +13,8 @@ abstract class CmdOnlineParams extends CmdDefaultParams {
     boolean isOnline() {
         return online;
     }
+
+    void setOnline(boolean online) {
+        this.online = online;
+    }
 }

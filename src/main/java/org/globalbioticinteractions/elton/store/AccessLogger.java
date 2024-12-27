@@ -9,7 +9,6 @@ import org.globalbioticinteractions.cache.ProvenanceLog;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.UUID;
 
 public class AccessLogger implements ActivityListener {
 

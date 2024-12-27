@@ -19,7 +19,6 @@ import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
-import org.globalbioticinteractions.dataset.DatasetRegistryLogger;
 import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
@@ -59,16 +58,16 @@ public class CmdUtil {
     }
 
     static DatasetRegistry createDataFinderLoggingCaching(
-            DatasetRegistry registry,
             String namespace,
             String dataDir,
             String provDir,
             InputStreamFactory factory,
             ContentPathFactory contentPathFactory,
             ProvenancePathFactory provenancePathFactory,
-            ActivityListener dereferenceListener,
+            ActivityListener activityListener,
             ActivityContext ctx,
-            Supplier<IRI> iriFactory) {
+            Supplier<IRI> iriFactory,
+            DatasetRegistry registryProvenanceLogger) {
 
         CacheFactory cacheFactory = createCacheFactory(
                 namespace,
@@ -77,11 +76,12 @@ public class CmdUtil {
                 factory,
                 contentPathFactory,
                 provenancePathFactory,
-                dereferenceListener,
-                ctx, iriFactory
+                activityListener,
+                ctx,
+                iriFactory
         );
         return new DatasetRegistryWithCache(
-                new DatasetRegistryLogger(registry, provDir),
+                registryProvenanceLogger,
                 cacheFactory
         );
     }

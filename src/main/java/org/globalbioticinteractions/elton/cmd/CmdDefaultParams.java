@@ -274,12 +274,9 @@ abstract class CmdDefaultParams implements Runnable {
 
 
     protected ActivityListener getActivityListener(String namespaceLocal) {
-        return new ActivityProxy(
-                Arrays.asList(
-                        new ProvLogger(getStatementListener()),
-                        new AccessLogger(namespaceLocal, getProvDir())
-                )
-        );
+        return getEnableProvMode()
+                ? new ProvLogger(getStatementListener())
+                : new AccessLogger(namespaceLocal, getProvDir());
     }
 
     protected ActivityListener getActivityListener() {

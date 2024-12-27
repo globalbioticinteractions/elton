@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.function.Consumer;
 
-public class DatasetRegistryLogger implements DatasetRegistry {
+public class DatasetRegistryAccessLogger implements DatasetRegistry {
     private final DatasetRegistry registry;
 
     private final String provDir;
 
-    public DatasetRegistryLogger(DatasetRegistry registry, String provDir) {
+    public DatasetRegistryAccessLogger(DatasetRegistry registry, String provDir) {
         this.registry = registry;
         this.provDir = provDir;
     }

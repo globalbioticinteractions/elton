@@ -1,8 +1,11 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.RefNodeConstants;
+import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.rdf.api.IRI;
+import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.geo.LatLng;
 import org.eol.globi.service.GeoNamesService;
@@ -14,6 +17,7 @@ import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.cache.CacheLocalReadonly;
 import org.globalbioticinteractions.cache.CacheProxy;
+import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ProvenancePathFactory;
 import org.globalbioticinteractions.dataset.Dataset;
@@ -172,4 +176,17 @@ public class CmdUtil {
         };
     }
 
+    public static List<Quad> stateDatasetArchiveAssociations(Dataset dataset, ActivityContext ctx) {
+        Quad associate = RefNodeFactory.toStatement(ctx.getActivity(),
+                RefNodeFactory.toIRI("urn:lsid:globalbioticinteractions.org:" + dataset.getNamespace()),
+                RefNodeConstants.WAS_ASSOCIATED_WITH,
+                RefNodeFactory.toIRI(dataset.getArchiveURI()));
+
+        Quad hasFormat = RefNodeFactory.toStatement(ctx.getActivity(),
+                RefNodeFactory.toIRI(dataset.getArchiveURI()),
+                RefNodeConstants.HAS_FORMAT,
+                RefNodeFactory.toLiteral(CacheUtil.MIME_TYPE_GLOBI));
+
+        return Arrays.asList(associate, hasFormat);
+    }
 }

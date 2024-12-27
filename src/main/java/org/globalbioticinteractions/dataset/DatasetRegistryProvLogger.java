@@ -1,14 +1,12 @@
 package org.globalbioticinteractions.dataset;
 
-import bio.guoda.preston.RefNodeConstants;
-import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.StatementListener;
-import org.apache.commons.rdf.api.IRI;
-import org.globalbioticinteractions.elton.store.ActivityListener;
+import org.apache.commons.rdf.api.Quad;
+import org.globalbioticinteractions.elton.cmd.CmdUtil;
 
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class DatasetRegistryProvLogger implements DatasetRegistry {
     private final DatasetRegistry registry;
@@ -37,12 +35,11 @@ public class DatasetRegistryProvLogger implements DatasetRegistry {
     public Dataset datasetFor(String namespace) throws DatasetRegistryException {
         Dataset dataset = this.getRegistry().datasetFor(namespace);
 
-        getStatementListener().on(
-                RefNodeFactory.toStatement(ctx.getActivity(),
-                        RefNodeFactory.toIRI("urn:lsid:globalbioticinteractions.org:" + namespace),
-                        RefNodeConstants.WAS_ASSOCIATED_WITH,
-                        RefNodeFactory.toIRI(dataset.getArchiveURI()))
-        );
+
+        List<Quad> associateDatasetArchive = CmdUtil.stateDatasetArchiveAssociations(dataset, ctx);
+
+
+        associateDatasetArchive.forEach(getStatementListener()::on);
 
         return dataset;
     }

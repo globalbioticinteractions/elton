@@ -87,12 +87,10 @@ public class CmdList extends CmdOnlineParams {
                 Dataset dataset;
                 try {
                     dataset = registry.datasetFor(namespace);
-                    getStatementListener().on(RefNodeFactory.toStatement(
-                            getActivityContext().getActivity(),
-                            RefNodeFactory.toIRI("urn:lsid:globalbioticinteractions.org:" + namespace),
-                            RefNodeConstants.WAS_ASSOCIATED_WITH,
-                            RefNodeFactory.toIRI(dataset.getArchiveURI()))
-                    );
+
+                    CmdUtil.stateDatasetArchiveAssociations(dataset, getActivityContext())
+                            .forEach(getStatementListener()::on);
+
                     String contentHash = dataset.getOrDefault("contentHash", null);
                     if (StringUtils.isNotBlank(contentHash)) {
                         IRI archiveContentId = RefNodeFactory.toIRI("hash://sha256/" + contentHash);

@@ -45,7 +45,7 @@ public class CmdListTest {
         assertThat(actual, not(startsWith("globalbioticinteractions/template-dataset")));
 
         String[] lines = StringUtils.split(actual, '\n');
-        assertThat(lines.length, is(25));
+        assertThat(lines.length, is(26));
         assertThat(lines[0], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
         assertThat(lines[lines.length - 1], containsString("<http://www.w3.org/ns/prov#endedAtTime>"));
 
@@ -63,6 +63,12 @@ public class CmdListTest {
         assertThat(collect.size(), is(2));
         assertThat(collect.get(0), startsWith("<hash://sha256/2bcc437219f978f35db9cab36922628b3b87b7fea688efcf4f325c13681663c6> <http://www.w3.org/ns/prov#wasDerivedFrom> <hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f>"));
         assertThat(collect.get(1), startsWith("<hash://sha256/2bcc437219f978f35db9cab36922628b3b87b7fea688efcf4f325c13681663c6> <http://www.w3.org/ns/prov#wasDerivedFrom> <jar:hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f!/globalbioticinteractions-template-dataset-e68f448/globi.json>"));
+
+        Stream<String> format = getLinesWith(lines, RefNodeConstants.HAS_FORMAT);
+        List<String> formatList = format.collect(Collectors.toList());
+
+        assertThat(formatList.size(), is(1));
+        assertThat(formatList.get(0), startsWith("<https://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip> <http://purl.org/dc/elements/1.1/format> \"application/globi\""));
 
         File namespaceList = new File(cacheDir, "2bcc437219f978f35db9cab36922628b3b87b7fea688efcf4f325c13681663c6");
 

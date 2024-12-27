@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.RefNodeConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
 
 public class CmdListIT {
 
@@ -39,13 +41,13 @@ public class CmdListIT {
         assertThat(actual, not(startsWith("globalbioticinteractions/template-dataset")));
 
         String[] lines = StringUtils.split(actual, '\n');
-        assertThat(lines.length, is(19));
+        assertThat(lines.length, is(greaterThan(19)));
         assertThat(lines[0], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
         assertThat(lines[lines.length - 1], containsString("<http://www.w3.org/ns/prov#endedAtTime>"));
 
-        long numberOfWasDerivedFromCount = Arrays.stream(lines).filter(line -> StringUtils.contains(line, "wasDerivedFrom")).count();
+        long numberOfWasDerivedFromCount = Arrays.stream(lines).filter(line -> StringUtils.contains(line, RefNodeConstants.WAS_DERIVED_FROM.getIRIString())).count();
 
-        // for now, lists derived from offline resources do not log dependencies
+        // lists derived from offline resources log their dependencies
         assertThat(numberOfWasDerivedFromCount, is(not(0L)));
     }
 

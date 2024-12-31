@@ -21,6 +21,7 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -67,16 +68,9 @@ public class CmdList extends CmdOnlineParams {
                 new LocalPathToHashIRI(new File(getDataDir()))
         );
 
-
-        List<DatasetRegistry> onlineAndOffline = Arrays.asList(
-                new DatasetRegistryZenodo(resourceServiceRemote),
-                new DatasetRegistryGitHubArchive(resourceServiceRemote),
-                registryLocal
-        );
-
         List<DatasetRegistry> registries =
                 isOnline()
-                        ? onlineAndOffline
+                        ? getOnlineAndOfflineRegistries(registryLocal, resourceServiceRemote)
                         : Collections.singletonList(registryLocal);
 
         PrintStream dataSink = getDataSink(out);
@@ -84,36 +78,50 @@ public class CmdList extends CmdOnlineParams {
         DatasetRegistry registry = new DatasetRegistryProxy(registries);
         try {
             registry.findNamespaces(namespace -> {
-                Dataset dataset;
-                try {
-                    dataset = registry.datasetFor(namespace);
+                        Dataset dataset;
+                        try {
+                            dataset = registry.datasetFor(namespace);
 
-                    CmdUtil.stateDatasetArchiveAssociations(dataset, getActivityContext())
-                            .forEach(getStatementListener()::on);
+                            CmdUtil.stateDatasetArchiveAssociations(dataset, getActivityContext())
+                                    .forEach(getStatementListener()::on);
 
-                    String contentHash = dataset.getOrDefault("contentHash", null);
-                    if (StringUtils.isNotBlank(contentHash)) {
-                        IRI archiveContentId = RefNodeFactory.toIRI("hash://sha256/" + contentHash);
-                        getStatementListener().on(RefNodeFactory.toStatement(
-                                getActivityContext().getActivity(),
-                                RefNodeFactory.toIRI(dataset.getArchiveURI()),
-                                RefNodeConstants.HAS_VERSION,
-                                archiveContentId)
-                        );
-                        getDependencies().add(archiveContentId.getIRIString());
+                            String contentHash = dataset.getOrDefault("contentHash", null);
+                            if (StringUtils.isNotBlank(contentHash)) {
+                                IRI archiveContentId = RefNodeFactory.toIRI("hash://sha256/" + contentHash);
+                                getStatementListener().on(RefNodeFactory.toStatement(
+                                        getActivityContext().getActivity(),
+                                        RefNodeFactory.toIRI(dataset.getArchiveURI()),
+                                        RefNodeConstants.HAS_VERSION,
+                                        archiveContentId)
+                                );
+                                getDependencies().add(archiveContentId.getIRIString());
+                            }
+                        } catch (DatasetRegistryException e) {
+                            // opportunistic association
+                        }
+
+                        dataSink.println(namespace);
+
                     }
-                } catch (DatasetRegistryException e) {
-                    // opportunistic association
-                }
-
-                dataSink.println(namespace);
-
-            }
             );
         } catch (
                 DatasetRegistryException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<DatasetRegistry> getOnlineAndOfflineRegistries(DatasetRegistry registryLocal, ResourceServiceListening resourceServiceRemote) {
+        List<DatasetRegistry> onlineAndOffline = new ArrayList<>();
+
+        List<String> registryNames = getRegistryNames();
+        if (registryNames.contains("zenodo")) {
+            onlineAndOffline.add(new DatasetRegistryZenodo(resourceServiceRemote));
+        }
+        if (registryNames.contains("github")) {
+            onlineAndOffline.add(new DatasetRegistryGitHubArchive(resourceServiceRemote));
+        }
+        onlineAndOffline.add(registryLocal);
+        return onlineAndOffline;
     }
 
 

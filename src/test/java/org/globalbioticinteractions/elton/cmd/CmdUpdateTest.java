@@ -35,7 +35,7 @@ public class CmdUpdateTest {
         File localWorkDir = new File(localDataset.toURI()).getParentFile();
         File tmpWorkDir = createTmpWorkDir(localWorkDir);
 
-        CmdUpdate cmd = new CmdUpdate();
+        CmdRegistry cmd = new CmdUpdate();
         File file = tmpDir.newFolder();
         assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath());
     }
@@ -46,7 +46,7 @@ public class CmdUpdateTest {
         File localWorkDir = new File(localDataset.toURI()).getParentFile();
         File tmpWorkDir = createTmpWorkDir(localWorkDir);
 
-        CmdUpdate cmd = new CmdUpdate();
+        CmdRegistry cmd = new CmdUpdate();
         String dataDir = tmpDir.newFolder("data").getAbsolutePath();
         String provDir = tmpDir.newFolder("prov").getAbsolutePath();
         assertUpdate(tmpWorkDir, cmd, dataDir, provDir);
@@ -70,11 +70,11 @@ public class CmdUpdateTest {
         File file = tmpDir.newFolder();
         file.delete();
 
-        CmdUpdate cmd = new CmdUpdate();
+        CmdRegistry cmd = new CmdUpdate();
         assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath());
     }
 
-    private void assertUpdate(File localWorkDir, CmdUpdate cmd, String dataDir, String provDir) throws IOException {
+    private void assertUpdate(File localWorkDir, CmdRegistry cmd, String dataDir, String provDir) throws IOException {
         cmd.setDataDir(dataDir);
         cmd.setProvDir(provDir);
         cmd.setWorkDir(localWorkDir.getAbsolutePath());

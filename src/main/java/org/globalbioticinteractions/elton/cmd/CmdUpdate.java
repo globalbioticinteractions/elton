@@ -28,22 +28,10 @@ import java.util.List;
         description = CmdUpdate.DESCRIPTION
 )
 
-public class CmdUpdate extends CmdDefaultParams {
+public class CmdUpdate extends CmdRegistry {
 
     private final static Logger LOG = LoggerFactory.getLogger(CmdUpdate.class);
     public static final String DESCRIPTION = "Update Local Datasets With Remote Sources";
-
-    public void setRegistryNames(List<String> registryNames) {
-        this.registryNames = registryNames;
-    }
-
-    @CommandLine.Option(names = {"--registries", "--registry"},
-            description = "[registry1],[registry2],..."
-    )
-    private List<String> registryNames = new ArrayList<String>() {{
-        add("zenodo");
-        add("github");
-    }};
 
     @Override
     public String getDescription() {
@@ -55,7 +43,7 @@ public class CmdUpdate extends CmdDefaultParams {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
 
         List<DatasetRegistry> registries = new ArrayList<>();
-        for (String registryName : registryNames) {
+        for (String registryName : getRegistryNames()) {
             DatasetRegistryFactoryImpl datasetRegistryFactory = new DatasetRegistryFactoryImpl(
                     getWorkDir(),
                     inputStreamFactory,
@@ -126,10 +114,6 @@ public class CmdUpdate extends CmdDefaultParams {
         } catch (DatasetRegistryException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public List<String> getRegistryNames() {
-        return registryNames;
     }
 
 }

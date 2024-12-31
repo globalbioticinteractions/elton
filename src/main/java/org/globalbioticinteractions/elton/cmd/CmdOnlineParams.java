@@ -2,7 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import picocli.CommandLine;
 
-abstract class CmdOnlineParams extends CmdDefaultParams {
+abstract class CmdOnlineParams extends CmdRegistry {
 
     @CommandLine.Option(
             names = {"--online", "-o"},

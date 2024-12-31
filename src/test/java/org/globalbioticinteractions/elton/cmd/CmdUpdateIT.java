@@ -47,7 +47,7 @@ public class CmdUpdateIT {
 
     @Test
     public void runUpdateWithProv() throws IOException {
-        CmdUpdate cmd = new CmdUpdate();
+        CmdRegistry cmd = new CmdUpdate();
         cmd.setEnableProvMode(true);
         File dataAndProvFolder = tmpDir.newFolder("dataAndProv");
         String absolutePath = dataAndProvFolder.getAbsolutePath();
@@ -88,19 +88,19 @@ public class CmdUpdateIT {
 
     @Test
     public void runUpdateNonExistingDataProvFolders() throws IOException {
-        CmdUpdate cmd = new CmdUpdate();
+        CmdRegistry cmd = new CmdUpdate();
         File dataProvFolder = tmpDir.newFolder();
         dataProvFolder.delete();
         doUpdate("globalbioticinteractions/template-dataset", cmd, dataProvFolder, tmpDir.newFolder("workdir"));
     }
 
     private void assertAccessLogForNamespace(String namespace) throws IOException {
-        CmdUpdate cmd = new CmdUpdate();
+        CmdRegistry cmd = new CmdUpdate();
         File dataAndProvFolder = tmpDir.newFolder();
         doUpdate(namespace, cmd, dataAndProvFolder, tmpDir.newFolder("workdir"));
     }
 
-    private void doUpdate(String namespace, CmdUpdate cmd, File dataAndProvFolder, File workdir) throws IOException {
+    private void doUpdate(String namespace, CmdRegistry cmd, File dataAndProvFolder, File workdir) throws IOException {
         String absolutePath = dataAndProvFolder.getAbsolutePath();
         cmd.setDataDir(absolutePath);
         cmd.setProvDir(absolutePath);

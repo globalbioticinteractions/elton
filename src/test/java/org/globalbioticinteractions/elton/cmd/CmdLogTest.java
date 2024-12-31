@@ -57,7 +57,7 @@ public class CmdLogTest {
     @Test
     public void logRSSTemplate() throws URISyntaxException, IOException {
         String cacheDir = folder.newFolder().getAbsolutePath();
-        CmdUpdate pull = new CmdUpdate();
+        CmdRegistry pull = new CmdUpdate();
         pull.setDataDir(cacheDir);
         pull.setProvDir(cacheDir);
         pull.setWorkDir(new File(getClass().getResource("/dataset-rss-cache/globi.json").toURI()).getParent());

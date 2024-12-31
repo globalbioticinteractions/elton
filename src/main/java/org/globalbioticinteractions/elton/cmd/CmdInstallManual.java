@@ -15,7 +15,7 @@ import java.io.InputStream;
 @CommandLine.Command(
         name = "config-man",
         aliases = {"config-manpage", "install-manpage"},
-        description = "Installs/configures Elton man page, so you can type [man elton] on unix-like system to learn more about Preston. "
+        description = "Installs/configures Elton man page, so you can type [man elton] on *nix/posix-like system to learn more about Elton."
 )
 public class CmdInstallManual implements Runnable {
 

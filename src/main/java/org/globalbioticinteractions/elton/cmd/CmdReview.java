@@ -203,6 +203,7 @@ public class CmdReview extends CmdTabularWriterParams {
                     dataOut
             );
 
+            // always skip header after first review
             shouldSkipHeader = true;
         }
     }

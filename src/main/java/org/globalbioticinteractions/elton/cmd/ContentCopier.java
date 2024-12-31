@@ -2,7 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.HashType;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
-import com.google.common.hash.BloomFilter;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -19,20 +19,30 @@ import java.util.function.Consumer;
 public class ContentCopier implements Consumer<String> {
 
     private final BlobStoreAppendOnly blobStore;
-    private String dataDir;
+    private final Collection<String> writeCache;
+    private File dataDir;
     private PrintStream stderr;
+    private HashType contentType;
 
-    public ContentCopier(BlobStoreAppendOnly blobStore, String dataDir, PrintStream stderr) {
+    public ContentCopier(BlobStoreAppendOnly blobStore, String dataDir, PrintStream stderr, HashType contentType) {
         this.blobStore = blobStore;
-        this.dataDir = dataDir;
+        this.dataDir = new File(dataDir);
         this.stderr = stderr;
+        this.contentType = contentType;
+        this.writeCache = new CircularFifoQueue<>(1024);
     }
 
     @Override
     public void accept(String contentIdCandidate) {
-        File dataDir = new File(this.dataDir);
+        if (!writeCache.contains(contentIdCandidate)) {
+            copy(contentIdCandidate);
+            writeCache.add(contentIdCandidate);
+        }
+    }
+
+    private void copy(String contentIdCandidate) {
         Collection<File> files = FileUtils.listFiles(dataDir,
-                new NameFileFilter(StringUtils.removeStart(contentIdCandidate, HashType.sha256.getPrefix())),
+                new NameFileFilter(StringUtils.removeStart(contentIdCandidate, contentType.getPrefix())),
                 TrueFileFilter.TRUE
         );
 

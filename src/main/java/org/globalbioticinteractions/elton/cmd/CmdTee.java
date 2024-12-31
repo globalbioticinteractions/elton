@@ -47,6 +47,7 @@ public class CmdTee extends CmdDefaultParams {
 
     void run(PrintStream out) {
 
+        HashType hashType = HashType.sha256;
 
         BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
                 new KeyValueStoreLocalFileSystem(
@@ -55,10 +56,10 @@ public class CmdTee extends CmdDefaultParams {
                         new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
                 true,
-                HashType.sha256
+                hashType
         );
 
-        Consumer<String> contentCopier = new ContentCopier(blobStore, getDataDir(), this.getStderr());
+        Consumer<String> contentCopier = new ContentCopier(blobStore, getDataDir(), this.getStderr(), hashType);
 
         InputStream stdin = getStdin();
         contentDetector(out, contentCopier, stdin);

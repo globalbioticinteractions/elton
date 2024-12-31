@@ -120,8 +120,9 @@ public class CmdReview extends CmdTabularWriterParams {
 
             PrintStream dataOut = getDataSink(getStdout());
 
-            for (URI localNamespace : localNamespaces) {
+            boolean shouldSkipHeader = shouldSkipHeader();
 
+            for (URI localNamespace : localNamespaces) {
                 ResourceServiceListening resourceServiceLocalAndRemote
                         = new ResourceServiceListening(
                         getActivityIdFactory(),
@@ -130,7 +131,6 @@ public class CmdReview extends CmdTabularWriterParams {
                         new ResourceServiceLocalAndRemote(factory, new File(getDataDir())),
                         new LocalPathToHashIRI(new File(getDataDir()))
                 );
-
 
                 DatasetRegistry registryLocal = DatasetRegistryUtil.forLocalDir(
                         localNamespace,
@@ -146,16 +146,20 @@ public class CmdReview extends CmdTabularWriterParams {
                 review(DatasetRegistryUtil.NAMESPACE_LOCAL,
                         registryLocal,
                         factory,
-                        shouldSkipHeader(),
+                        shouldSkipHeader,
                         dataOut
                 );
+
+                // skip header after first review
+                shouldSkipHeader = true;
             }
 
             reviewLocal(
                     remoteNamespaces,
                     factory,
                     dataOut,
-                    activityListener
+                    activityListener,
+                    shouldSkipHeader()
             );
 
         } catch (StudyImporterException e) {
@@ -170,7 +174,9 @@ public class CmdReview extends CmdTabularWriterParams {
 
     private void reviewLocal(List<String> namespaces,
                              InputStreamFactory inputStreamFactory,
-                             PrintStream dataOut, ActivityListener activityListener) throws StudyImporterException {
+                             PrintStream dataOut,
+                             ActivityListener activityListener,
+                             boolean shouldSkipHeader) throws StudyImporterException {
         for (String namespace : namespaces) {
 
             ResourceServiceListening resourceServiceLocal
@@ -193,9 +199,11 @@ public class CmdReview extends CmdTabularWriterParams {
             review(namespace,
                     registry,
                     inputStreamFactory,
-                    shouldSkipHeader(),
+                    shouldSkipHeader,
                     dataOut
             );
+
+            shouldSkipHeader = true;
         }
     }
 

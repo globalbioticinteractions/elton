@@ -144,7 +144,7 @@ public class DatasetRegistryZenodo implements DatasetRegistry {
             try {
                 resumptionToken = parseResumptionToken(IOUtils.toInputStream(nextPage, StandardCharsets.UTF_8));
             } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
-                throw new DatasetRegistryException("failed to parse Zenodo registry results");
+                throw new DatasetRegistryException("failed to parse Zenodo registry results", e);
             }
             cachedPages.add(nextPage);
         } while (StringUtils.isNoneBlank(resumptionToken));

@@ -22,6 +22,7 @@ import org.globalbioticinteractions.elton.cmd.CmdNames;
 import org.globalbioticinteractions.elton.cmd.CmdNanoPubs;
 import org.globalbioticinteractions.elton.cmd.CmdReview;
 import org.globalbioticinteractions.elton.cmd.CmdSupportedRegistries;
+import org.globalbioticinteractions.elton.cmd.CmdTee;
 import org.globalbioticinteractions.elton.cmd.CmdUpdate;
 import org.globalbioticinteractions.elton.cmd.CmdVersion;
 import picocli.CommandLine;
@@ -41,6 +42,7 @@ import static java.lang.System.exit;
                 CmdNames.class,
                 CmdReview.class,
                 CmdDatasets.class,
+                CmdTee.class,
                 CmdSupportedRegistries.class,
                 CmdVersion.class,
                 CmdNanoPubs.class,

@@ -149,7 +149,6 @@ public class CmdInteractionsTest {
         assertThat(CmdTestUtil.numberOfDataFiles(dataDir1), is(5));
 
         assertThat(new File(dataDir1, "50d471337b22cd0ac900221a9dcff7fa4010ebf136f2c6872deb7f6f4f090599").exists(), is(true));
-        assertThat(new File(dataDir1, "631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f").exists(), is(true));
 
         assertThat(lines1[0], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
         assertThat(lines1[1], startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent>"));

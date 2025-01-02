@@ -18,14 +18,11 @@ import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
-import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
-import org.globalbioticinteractions.elton.store.CachePullThroughPrestonStore;
-import org.globalbioticinteractions.elton.store.LocalPathToHashIRI;
+import org.globalbioticinteractions.elton.store.ActivityProxy;
 import org.globalbioticinteractions.elton.store.ProvLoggerWithClock;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
-import org.globalbioticinteractions.elton.util.ResourceServiceListening;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -37,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @CommandLine.Command(
@@ -147,19 +143,7 @@ public class CmdList extends CmdOnlineParams {
             public InputStream retrieve(URI uri) throws IOException {
                 IRI activityId = getActivityIdFactory().get();
                 IRI request = RefNodeFactory.toIRI(uri);
-                final ActivityListener proxy = new ActivityListener() {
-                    List<ActivityListener> listeners = Arrays.asList(logger, activityListener);
-
-                    @Override
-                    public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
-                        listeners.forEach(listener -> listener.onStarted(parentActivityId, activityId, request));
-                    }
-
-                    @Override
-                    public void onCompleted(IRI parentActivityId, IRI activityId, IRI request, IRI response, URI localPathOfResponseData) {
-                        listeners.forEach(listener -> listener.onCompleted(parentActivityId, activityId, request, response, localPathOfResponseData));
-                    }
-                };
+                final ActivityListener proxy = new ActivityProxy(Arrays.asList(logger, activityListener));
                 proxy.onStarted(getActivityContext().getActivity(), activityId, request);
                 InputStream retrieve = resourceServiceRemote.retrieve(uri);
                 IRI put = blobStore.put(retrieve);

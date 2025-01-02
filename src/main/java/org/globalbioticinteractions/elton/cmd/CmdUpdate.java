@@ -20,7 +20,9 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 @CommandLine.Command(
         name = "sync",
@@ -62,9 +64,18 @@ public class CmdUpdate extends CmdRegistry {
         }
 
         DatasetRegistry registryProxy = new DatasetRegistryProxy(registries);
+
+        DatasetRegistryAccessLogger accessLogger = new DatasetRegistryAccessLogger(registryProxy, getProvDir());
+
+        DatasetRegistryProxy provAndAccessLogger = new DatasetRegistryProxy(
+                Arrays.asList(
+                        new DatasetRegistryProvLogger(registryProxy, getStatementListener(), getActivityContext()),
+                        accessLogger)
+        );
+
         DatasetRegistry registryProvenanceLogger = getEnableProvMode()
-                ? new DatasetRegistryProvLogger(registryProxy, getStatementListener(), getActivityContext())
-                : new DatasetRegistryAccessLogger(registryProxy, getProvDir());
+                ? provAndAccessLogger
+                : accessLogger;
 
 
         NamespaceHandler namespaceHandler = namespace -> {

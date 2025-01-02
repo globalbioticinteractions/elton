@@ -15,6 +15,7 @@ public class ActivityProxy implements ActivityListener {
 
     @Override
     public void onStarted(IRI parentActivityId, IRI activityId, IRI request) {
+        listeners.forEach(l -> l.onStarted(parentActivityId, activityId, request));
 
     }
 

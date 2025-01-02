@@ -29,7 +29,9 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,7 +119,9 @@ public class CmdStream extends CmdDefaultParams {
                     new NodeFactoryFactoryImpl(shouldWriteHeader, recordType, loggerFactory.createImportLogger()),
                     loggerFactory,
                     getContentPathFactory(),
-                    getProvenancePathFactory()
+                    getProvenancePathFactory(),
+                    getActivityContext(),
+                    getActivityIdFactory()
             );
             namespaceHandler.onNamespace(namespace);
             handled = true;

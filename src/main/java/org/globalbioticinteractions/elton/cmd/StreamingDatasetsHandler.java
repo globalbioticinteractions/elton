@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.io.IOUtils;
@@ -27,7 +26,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 class StreamingDatasetsHandler implements NamespaceHandler {
@@ -42,6 +40,8 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     private ContentPathFactory contentPathFactory;
     private ProvenancePathFactory provenancePathFactory;
     private final String provDir;
+    private ActivityContext ctx;
+    private Supplier<IRI> activityIdFactory;
 
     public StreamingDatasetsHandler(JsonNode config,
                                     String cacheDir,
@@ -51,7 +51,9 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                                     NodeFactorFactory nodeFactorFactory,
                                     ImportLoggerFactory loggerFactory,
                                     ContentPathFactory contentPathFactory,
-                                    ProvenancePathFactory provenancePathFactory) {
+                                    ProvenancePathFactory provenancePathFactory,
+                                    ActivityContext ctx,
+                                    Supplier<IRI> activityIdFactory) {
         this.factory = inputStreamFactory;
         this.cacheDir = cacheDir;
         this.provDir = provDir;
@@ -61,6 +63,8 @@ class StreamingDatasetsHandler implements NamespaceHandler {
         this.loggerFactory = loggerFactory;
         this.contentPathFactory = contentPathFactory;
         this.provenancePathFactory = provenancePathFactory;
+        this.ctx = ctx;
+        this.activityIdFactory = activityIdFactory;
     }
 
     @Override
@@ -75,22 +79,9 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                 factory,
                 contentPathFactory,
                 provenancePathFactory,
-                dereferenceListener, new ActivityContext() {
-                    @Override
-                    public IRI getActivity() {
-                        return null;
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return null;
-                    }
-                }, new Supplier<IRI>() {
-                    @Override
-                    public IRI get() {
-                        return RefNodeFactory.toIRI(UUID.randomUUID());
-                    }
-                }
+                dereferenceListener,
+                ctx,
+                activityIdFactory
         );
 
         Dataset dataset = new DatasetWithResourceMapping(

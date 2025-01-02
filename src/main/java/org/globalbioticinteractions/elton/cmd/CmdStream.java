@@ -233,14 +233,14 @@ public class CmdStream extends CmdDefaultParams {
                 Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)>.*");
                 Matcher matcher = namespacePattern.matcher(line);
                 if (matcher.matches()) {
+                    resetOnLocationSwitch(matcher);
                     resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
-                    resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
                 }
             } else if (StringUtils.contains(line, FORMAT)) {
                 Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
                 Matcher matcher = namespacePattern.matcher(line);
                 if (matcher.matches()) {
-                    resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
+                    resetOnLocationSwitch(matcher);
                     resourceFormat = matcher.group("format");
                 }
                 // possible format statement
@@ -249,7 +249,7 @@ public class CmdStream extends CmdDefaultParams {
                 Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)>.*");
                 Matcher matcher = namespacePattern.matcher(line);
                 if (matcher.matches()) {
-                    resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
+                    resetOnLocationSwitch(matcher);
                     resourceVersion = RefNodeFactory.toIRI(matcher.group("version"));
                 }
             }
@@ -269,14 +269,26 @@ public class CmdStream extends CmdDefaultParams {
                 ObjectNode objectNode = new ObjectMapper().createObjectNode();
                 objectNode.put(resourceLocation.getIRIString(), "https://linker.bio/" + resourceVersion.getIRIString());
                 resourceMapping.add(objectNode);
-                globiConfig.set("resources", resourceMapping);
+                //globiConfig.set("resources", resourceMapping);
                 handled = handleGloBIJson(namespace, isFirstLine, globiConfig);
-                resourceLocation = null;
-                resourceFormat = null;
-                resourceVersion = null;
-                resourceNamespace = null;
+                resetContext();
             }
             return handled;
+        }
+
+        private void resetOnLocationSwitch(Matcher matcher) {
+            String location = matcher.group("location");
+            if (resourceLocation == null || !StringUtils.equals(location, resourceLocation.getIRIString())) {
+                resetContext();
+            }
+            resourceLocation = RefNodeFactory.toIRI(location);
+        }
+
+        private void resetContext() {
+            resourceLocation = null;
+            resourceFormat = null;
+            resourceVersion = null;
+            resourceNamespace = null;
         }
     }
 }

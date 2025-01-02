@@ -1,8 +1,10 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.globalbioticinteractions.dataset.Dataset;
+
 import java.io.IOException;
 
 public interface LineHandler {
 
-    boolean processLine(String line, boolean isFirstLine) throws IOException;
+    Dataset extractDataset(String line, boolean isFirstLine) throws IOException;
 }

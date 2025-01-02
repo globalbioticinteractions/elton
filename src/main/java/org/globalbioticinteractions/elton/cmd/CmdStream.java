@@ -14,7 +14,8 @@ import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.tool.NullImportLogger;
-
+import org.globalbioticinteractions.dataset.Dataset;
+import org.globalbioticinteractions.dataset.DatasetImpl;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
@@ -29,9 +30,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,10 +45,6 @@ public class CmdStream extends CmdDefaultParams {
     public static final String DESCRIPTION = "stream interactions associated with dataset configuration provided by globi.json line-json as input.\n" +
             "example input:" +
             "{ \"namespace\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\", \"citation\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\", \"format\": \"dwca\", \"url\": \"https://linker.bio/hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\" }\n";
-    public static final String ASSOCIATED_WITH = " <http://www.w3.org/ns/prov#wasAssociatedWith> ";
-    public static final String FORMAT = " <http://purl.org/dc/elements/1.1/format> ";
-    public static final String HAS_VERSION = " <http://purl.org/pav/hasVersion> ";
-    public static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG = "urn:lsid:globalbioticinteractions.org:";
 
     public void setRecordType(String recordType) {
         this.recordType = recordType;
@@ -73,12 +68,14 @@ public class CmdStream extends CmdDefaultParams {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                boolean handled = jsonLineHandler.processLine(line, shouldWriteHeader.get());
-                if (!handled) {
-                    provLineHandler.processLine(line, shouldWriteHeader.get());
+                Dataset dataset = jsonLineHandler.extractDataset(line, shouldWriteHeader.get());
+                if (dataset == null) {
+                    dataset = provLineHandler.extractDataset(line, shouldWriteHeader.get());
                 }
-                if (handled) {
-                    shouldWriteHeader.set(false);
+                if (dataset != null) {
+                    if (handleDatasetConfig(dataset.getNamespace(), shouldWriteHeader.get(), dataset.getConfig())) {
+                        shouldWriteHeader.set(false);
+                    }
                 }
             }
         } catch (IOException ex) {
@@ -87,21 +84,7 @@ public class CmdStream extends CmdDefaultParams {
 
     }
 
-    private boolean handleAsGloBIJson(String line, boolean isFirst) throws IOException {
-        boolean handled = false;
-        try {
-            JsonNode jsonNode = new ObjectMapper().readTree(line);
-            String namespace = jsonNode.at("/namespace").asText(DatasetRegistryUtil.NAMESPACE_LOCAL);
-            if (StringUtils.isNotBlank(namespace)) {
-                handled = handleGloBIJson(namespace, isFirst, jsonNode);
-            }
-        } catch (JsonProcessingException e) {
-            // ignore non-json lines
-        }
-        return handled;
-    }
-
-    private boolean handleGloBIJson(final String namespace, boolean shouldWriteHeader, JsonNode jsonNode) throws IOException {
+    private boolean handleDatasetConfig(final String namespace, boolean shouldWriteHeader, JsonNode jsonNode) throws IOException {
         boolean handled = false;
         ImportLoggerFactory loggerFactory = new ImportLoggerFactoryImpl(
                 recordType,
@@ -214,20 +197,36 @@ public class CmdStream extends CmdDefaultParams {
     public class LineHandlerJson implements LineHandler {
 
         @Override
-        public boolean processLine(String line, boolean isFirstLine) throws IOException {
-            return handleAsGloBIJson(line, isFirstLine);
+        public Dataset extractDataset(String line, boolean isFirstLine) throws IOException {
+            Dataset dataset = null;
+            try {
+                JsonNode jsonNode = new ObjectMapper().readTree(line);
+                String namespace = jsonNode.at("/namespace").asText(DatasetRegistryUtil.NAMESPACE_LOCAL);
+                if (StringUtils.isNotBlank(namespace)) {
+                    dataset = new DatasetImpl(namespace, null, null);
+                    dataset.setConfig(jsonNode);
+                }
+            } catch (JsonProcessingException e) {
+                // ignore non-json lines
+            }
+            return dataset;
         }
     }
 
     public class LineHandlerProv implements LineHandler {
+        static final String ASSOCIATED_WITH = " <http://www.w3.org/ns/prov#wasAssociatedWith> ";
+        static final String FORMAT = " <http://purl.org/dc/elements/1.1/format> ";
+        static final String HAS_VERSION = " <http://purl.org/pav/hasVersion> ";
+        static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG = "urn:lsid:globalbioticinteractions.org:";
+
         IRI resourceLocation = null;
         IRI resourceNamespace = null;
         String resourceFormat = null;
         IRI resourceVersion = null;
 
         @Override
-        public boolean processLine(String line, boolean isFirstLine) throws IOException {
-            boolean handled = false;
+        public Dataset extractDataset(String line, boolean isFirstLine) throws IOException {
+            Dataset dataset = null;
             if (StringUtils.contains(line, ASSOCIATED_WITH)) {
                 // possible namespace statement
                 Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)>.*");
@@ -270,10 +269,11 @@ public class CmdStream extends CmdDefaultParams {
                 objectNode.put(resourceLocation.getIRIString(), "https://linker.bio/" + resourceVersion.getIRIString());
                 resourceMapping.add(objectNode);
                 //globiConfig.set("resources", resourceMapping);
-                handled = handleGloBIJson(namespace, isFirstLine, globiConfig);
+                dataset = new DatasetImpl(namespace, null, null);
+                dataset.setConfig(globiConfig);
                 resetContext();
             }
-            return handled;
+            return dataset;
         }
 
         private void resetOnLocationSwitch(Matcher matcher) {

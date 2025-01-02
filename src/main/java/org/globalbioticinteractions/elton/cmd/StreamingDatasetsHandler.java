@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 
 class StreamingDatasetsHandler implements NamespaceHandler {
     private final static Logger LOG = LoggerFactory.getLogger(StreamingDatasetsHandler.class);
-    private final String cacheDir;
+    private final String dataDir;
     private final PrintStream stderr;
 
     private InputStreamFactory factory;
@@ -44,7 +44,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     private Supplier<IRI> activityIdFactory;
 
     public StreamingDatasetsHandler(JsonNode config,
-                                    String cacheDir,
+                                    String dataDir,
                                     String provDir,
                                     PrintStream stderr,
                                     InputStreamFactory inputStreamFactory,
@@ -55,7 +55,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                                     ActivityContext ctx,
                                     Supplier<IRI> activityIdFactory) {
         this.factory = inputStreamFactory;
-        this.cacheDir = cacheDir;
+        this.dataDir = dataDir;
         this.provDir = provDir;
         this.stderr = stderr;
         this.config = config;
@@ -74,7 +74,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
 
         CacheFactory cacheFactory = CmdUtil.createCacheFactory(
                 namespace,
-                cacheDir,
+                dataDir,
                 provDir,
                 factory,
                 contentPathFactory,
@@ -101,7 +101,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                     datasetWithCache,
                     nodeFactory,
                     loggerFactory.createImportLogger(),
-                    new File(cacheDir)
+                    new File(dataDir)
             );
             stderr.println("done.");
         } catch (StudyImporterException ex) {

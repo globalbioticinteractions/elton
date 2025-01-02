@@ -71,7 +71,7 @@ public class CmdUtil {
             ActivityListener activityListener,
             ActivityContext ctx,
             Supplier<IRI> iriFactory,
-            DatasetRegistry registryProvenanceLogger) {
+            DatasetRegistry datasetRegistry) {
 
         CacheFactory cacheFactory = createCacheFactory(
                 namespace,
@@ -85,7 +85,7 @@ public class CmdUtil {
                 iriFactory
         );
         return new DatasetRegistryWithCache(
-                registryProvenanceLogger,
+                datasetRegistry,
                 cacheFactory
         );
     }

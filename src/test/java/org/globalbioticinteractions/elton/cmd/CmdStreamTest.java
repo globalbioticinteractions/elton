@@ -1,6 +1,8 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,9 +13,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -78,11 +84,38 @@ public class CmdStreamTest {
         cmdStream.setStdout(new PrintStream(outputStream));
         cmdStream.setStderr(new PrintStream(errorStream));
         cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByElton, StandardCharsets.UTF_8));
+
+        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
+        assertThat(numberOfFilesBefore, Is.is(0L));
+
+
         cmdStream.run();
+
+        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
+
+        assertThat(numberOfFilesAfter, Is.is(2L));
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        assertThat(filenames, hasItems("d84999936296e4b85086f2851f4459605502f4eb80b9484049b81d34f43b2ff1"));
+        assertThat(filenames, hasItems("76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44"));
 
         assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), startsWith(headerInteractions()));
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("tracking [globalbioticinteractions/template-dataset]...done.\nwrote [globalbioticinteractions/template-dataset]\n"));
     }
+
 
     @Test
     public void streamSomeInteractionsCustomNamespace() {

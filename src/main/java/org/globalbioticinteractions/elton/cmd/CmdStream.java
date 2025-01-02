@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
@@ -24,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -64,64 +62,21 @@ public class CmdStream extends CmdDefaultParams {
     public void doRun() {
 
         BufferedReader reader = IOUtils.buffer(new InputStreamReader(getStdin(), StandardCharsets.UTF_8));
-        AtomicBoolean isFirst = new AtomicBoolean(true);
+        AtomicBoolean shouldWriteHeader = new AtomicBoolean(true);
         try {
-            IRI resourceLocation = null;
-            IRI resourceNamespace = null;
-            String resourceFormat = null;
-            IRI resourceVersion = null;
+
+            LineHandler jsonLineHandler = new LineHandlerJson();
+
+            LineHandler provLineHandler = new LineHandlerProv();
+
             String line;
             while ((line = reader.readLine()) != null) {
-                boolean handled = handleAsGloBIJson(isFirst, line);
+                boolean handled = jsonLineHandler.processLine(line, shouldWriteHeader.get());
                 if (!handled) {
-                    if (StringUtils.contains(line, ASSOCIATED_WITH)) {
-                        // possible namespace statement
-                        Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)>.*");
-                        Matcher matcher = namespacePattern.matcher(line);
-                        if (matcher.matches()) {
-                            resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
-                            resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
-                        }
-                    } else if (StringUtils.contains(line, FORMAT)) {
-                        Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
-                        Matcher matcher = namespacePattern.matcher(line);
-                        if (matcher.matches()) {
-                            resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
-                            resourceFormat = matcher.group("format");
-                        }
-                        // possible format statement
-                    } else if (StringUtils.contains(line, HAS_VERSION)) {
-                        // possible version statement
-                        Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)>.*");
-                        Matcher matcher = namespacePattern.matcher(line);
-                        if (matcher.matches()) {
-                            resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
-                            resourceVersion = RefNodeFactory.toIRI(matcher.group("version"));
-                        }
-                    }
-
-                    if (resourceLocation != null
-                            && resourceFormat != null
-                            && resourceVersion != null) {
-                        String resourceNamespaceString = (resourceNamespace == null
-                                ? RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local")
-                                : resourceNamespace).getIRIString();
-                        String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
-                        ObjectNode globiConfig = new ObjectMapper().createObjectNode();
-                        globiConfig.put("url", resourceLocation.getIRIString());
-                        globiConfig.put("format", StringUtils.replace(resourceFormat, "application/globi", "globi"));
-                        globiConfig.put("citation", resourceVersion.getIRIString());
-                        ArrayNode resourceMapping = new ObjectMapper().createArrayNode();
-                        ObjectNode objectNode = new ObjectMapper().createObjectNode();
-                        objectNode.put(resourceLocation.getIRIString(), "https://linker.bio/" + resourceVersion.getIRIString());
-                        resourceMapping.add(objectNode);
-                        globiConfig.set("resources", resourceMapping);
-                        handleGloBIJson(namespace, isFirst, globiConfig);
-                        resourceLocation = null;
-                        resourceFormat = null;
-                        resourceVersion = null;
-                        resourceNamespace = null;
-                    }
+                    provLineHandler.processLine(line, shouldWriteHeader.get());
+                }
+                if (handled) {
+                    shouldWriteHeader.set(false);
                 }
             }
         } catch (IOException ex) {
@@ -130,7 +85,7 @@ public class CmdStream extends CmdDefaultParams {
 
     }
 
-    private boolean handleAsGloBIJson(AtomicBoolean isFirst, String line) throws IOException {
+    private boolean handleAsGloBIJson(String line, boolean isFirst) throws IOException {
         boolean handled = false;
         try {
             JsonNode jsonNode = new ObjectMapper().readTree(line);
@@ -144,7 +99,7 @@ public class CmdStream extends CmdDefaultParams {
         return handled;
     }
 
-    private boolean handleGloBIJson(final String namespace, AtomicBoolean isFirst, JsonNode jsonNode) throws IOException {
+    private boolean handleGloBIJson(final String namespace, boolean shouldWriteHeader, JsonNode jsonNode) throws IOException {
         boolean handled = false;
         ImportLoggerFactory loggerFactory = new ImportLoggerFactoryImpl(
                 recordType,
@@ -153,7 +108,6 @@ public class CmdStream extends CmdDefaultParams {
                 getStdout()
         );
         try {
-            boolean shouldWriteHeader = isFirst.get();
             StreamingDatasetsHandler namespaceHandler = new StreamingDatasetsHandler(
                     jsonNode,
                     getDataDir(),
@@ -166,7 +120,6 @@ public class CmdStream extends CmdDefaultParams {
                     getProvenancePathFactory()
             );
             namespaceHandler.onNamespace(namespace);
-            isFirst.set(false);
             handled = true;
         } catch (Exception e) {
             String msg = "failed to add dataset associated with namespace [" + namespace + "]";
@@ -254,4 +207,72 @@ public class CmdStream extends CmdDefaultParams {
 
     }
 
+    public class LineHandlerJson implements LineHandler {
+
+        @Override
+        public boolean processLine(String line, boolean isFirstLine) throws IOException {
+            return handleAsGloBIJson(line, isFirstLine);
+        }
+    }
+
+    public class LineHandlerProv implements LineHandler {
+        IRI resourceLocation = null;
+        IRI resourceNamespace = null;
+        String resourceFormat = null;
+        IRI resourceVersion = null;
+
+        @Override
+        public boolean processLine(String line, boolean isFirstLine) throws IOException {
+            boolean handled = false;
+            if (StringUtils.contains(line, ASSOCIATED_WITH)) {
+                // possible namespace statement
+                Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)>.*");
+                Matcher matcher = namespacePattern.matcher(line);
+                if (matcher.matches()) {
+                    resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
+                    resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
+                }
+            } else if (StringUtils.contains(line, FORMAT)) {
+                Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
+                Matcher matcher = namespacePattern.matcher(line);
+                if (matcher.matches()) {
+                    resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
+                    resourceFormat = matcher.group("format");
+                }
+                // possible format statement
+            } else if (StringUtils.contains(line, HAS_VERSION)) {
+                // possible version statement
+                Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)>.*");
+                Matcher matcher = namespacePattern.matcher(line);
+                if (matcher.matches()) {
+                    resourceLocation = RefNodeFactory.toIRI(matcher.group("location"));
+                    resourceVersion = RefNodeFactory.toIRI(matcher.group("version"));
+                }
+            }
+
+            if (resourceLocation != null
+                    && resourceFormat != null
+                    && resourceVersion != null) {
+                String resourceNamespaceString = (resourceNamespace == null
+                        ? RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local")
+                        : resourceNamespace).getIRIString();
+                String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
+                ObjectNode globiConfig = new ObjectMapper().createObjectNode();
+                globiConfig.put("url", resourceLocation.getIRIString());
+                globiConfig.put("format", StringUtils.replace(resourceFormat, "application/globi", "globi"));
+                globiConfig.put("citation", resourceVersion.getIRIString());
+                ArrayNode resourceMapping = new ObjectMapper().createArrayNode();
+                ObjectNode objectNode = new ObjectMapper().createObjectNode();
+                objectNode.put(resourceLocation.getIRIString(), "https://linker.bio/" + resourceVersion.getIRIString());
+                resourceMapping.add(objectNode);
+                globiConfig.set("resources", resourceMapping);
+                handled = handleGloBIJson(namespace, isFirstLine, globiConfig);
+                resourceLocation = null;
+                resourceFormat = null;
+                resourceVersion = null;
+                resourceNamespace = null;
+            }
+            return handled;
+        }
+    }
 }

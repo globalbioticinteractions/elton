@@ -39,6 +39,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
 
     private final String provDir;
     private final ActivityListener activityListener;
+    private final ResourceService resourceService;
     private ActivityContext activityContext;
     private Supplier<IRI> iriSupplier;
 
@@ -49,8 +50,8 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
             String provDir,
             ActivityListener activityListener,
             ActivityContext activityContext,
-            Supplier<IRI> iriSupplier
-    ) {
+            Supplier<IRI> iriSupplier,
+            ResourceService resourceService) {
         this.workDir = workDir;
         this.inputStreamFactory = inputStreamFactory;
         this.dataDir = dataDir;
@@ -58,6 +59,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
         this.activityListener = activityListener;
         this.activityContext = activityContext;
         this.iriSupplier = iriSupplier;
+        this.resourceService = resourceService;
 
     }
 
@@ -70,7 +72,9 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
         try {
             Class<?>[] paramTypes = {URI.class, ResourceService.class, ContentPathFactory.class, String.class, String.class, ActivityListener.class, ActivityContext.class, Supplier.class};
             Optional<Constructor<? extends DatasetRegistry>> constructor = constructorFor(registryClass, paramTypes);
-            ResourceService resourceService = new ResourceServiceLocalAndRemote(inputStreamFactory, new File(getDataDir()));
+            ResourceService resourceService = this.resourceService == null
+                    ? new ResourceServiceLocalAndRemote(inputStreamFactory, new File(getWorkDir()))
+                    : this.resourceService;
             if (!constructor.isPresent()) {
                 Class<?>[] paramTypesShort = {ResourceService.class};
                 Optional<Constructor<? extends DatasetRegistry>> constructor2 = constructorFor(registryClass, paramTypesShort);

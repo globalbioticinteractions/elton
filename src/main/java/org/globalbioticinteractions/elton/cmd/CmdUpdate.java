@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import org.apache.commons.io.FileUtils;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
+import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.DatasetImportUtil;
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
@@ -22,7 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 @CommandLine.Command(
         name = "sync",
@@ -44,6 +44,11 @@ public class CmdUpdate extends CmdRegistry {
     protected void doRun() {
         InputStreamFactoryLogging inputStreamFactory = createInputStreamFactory();
 
+        ResourceService resourceService = getEnableProvMode()
+                ? getResourceServiceRemoteWithProv(inputStreamFactory, getActivityListener(), new File(getWorkDir()))
+                : null;
+
+
         List<DatasetRegistry> registries = new ArrayList<>();
         for (String registryName : getRegistryNames()) {
             DatasetRegistryFactoryImpl datasetRegistryFactory = new DatasetRegistryFactoryImpl(
@@ -53,8 +58,8 @@ public class CmdUpdate extends CmdRegistry {
                     getProvDir(),
                     getActivityListener(),
                     getActivityContext(),
-                    getActivityIdFactory()
-            );
+                    getActivityIdFactory(),
+                    resourceService);
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);

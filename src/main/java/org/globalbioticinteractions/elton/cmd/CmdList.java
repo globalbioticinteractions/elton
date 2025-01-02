@@ -1,17 +1,11 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
-import bio.guoda.preston.store.BlobStoreAppendOnly;
-import bio.guoda.preston.store.KeyTo1LevelPath;
-import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
-import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
-import org.apache.commons.rdf.api.Literal;
 import org.eol.globi.service.ResourceService;
-import org.eol.globi.util.ResourceServiceRemote;
+import org.globalbioticinteractions.elton.util.ResourceServiceRemote;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -20,21 +14,14 @@ import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
-import org.globalbioticinteractions.elton.store.ActivityProxy;
-import org.globalbioticinteractions.elton.store.ProvLoggerWithClock;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
 @CommandLine.Command(
         name = "list",
@@ -69,7 +56,7 @@ public class CmdList extends CmdOnlineParams {
         File tmpDir = new File(getWorkDir());
 
         ResourceService serviceRemote = getEnableProvMode()
-                ? getResourceServiceWithProv(inputStreamFactory, activityListener, tmpDir)
+                ? getResourceServiceRemoteWithProv(inputStreamFactory, activityListener, tmpDir)
                 : new ResourceServiceRemote(inputStreamFactory, tmpDir);
 
         List<DatasetRegistry> registries =
@@ -112,45 +99,6 @@ public class CmdList extends CmdOnlineParams {
                 DatasetRegistryException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private ResourceService getResourceServiceWithProv(InputStreamFactoryLogging inputStreamFactory, ActivityListener activityListener, File tmpDir) {
-        File dataFolder = new File(getDataDir());
-
-        KeyTo1LevelPath keyToPath = new KeyTo1LevelPath(dataFolder.toURI());
-        BlobStoreAppendOnly blobStore = new BlobStoreAppendOnly(
-                new KeyValueStoreLocalFileSystem(
-                        dataFolder,
-                        keyToPath,
-                        new ValidatingKeyValueStreamContentAddressedFactory()
-                ),
-                true,
-                HashType.sha256
-        );
-
-        return new ResourceService() {
-
-            private final ResourceServiceRemote resourceServiceRemote = new ResourceServiceRemote(inputStreamFactory, tmpDir);
-
-            private final ProvLoggerWithClock logger = new ProvLoggerWithClock(getStatementListener(), new Supplier<Literal>() {
-                @Override
-                public Literal get() {
-                    return RefNodeFactory.nowDateTimeLiteral();
-                }
-            });
-
-            @Override
-            public InputStream retrieve(URI uri) throws IOException {
-                IRI activityId = getActivityIdFactory().get();
-                IRI request = RefNodeFactory.toIRI(uri);
-                final ActivityListener proxy = new ActivityProxy(Arrays.asList(logger, activityListener));
-                proxy.onStarted(getActivityContext().getActivity(), activityId, request);
-                InputStream retrieve = resourceServiceRemote.retrieve(uri);
-                IRI put = blobStore.put(retrieve);
-                proxy.onCompleted(getActivityContext().getActivity(), activityId, request, put, null);
-                return blobStore.get(put);
-            }
-        };
     }
 
     private List<DatasetRegistry> getOnlineAndOfflineRegistries(DatasetRegistry registryLocal, ResourceService resourceServiceRemote) {

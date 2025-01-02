@@ -100,6 +100,7 @@ public class CachePullThroughPrestonStoreTest {
 
     @Test(expected = IOException.class)
     public void testMissingFromPrestonStore() throws IOException, URISyntaxException {
+        IRI parentActivity = RefNodeFactory.toIRI(UUID.randomUUID());
 
         String dataDir = folder.getRoot().getAbsolutePath();
         String provDir = folder.getRoot().getAbsolutePath();
@@ -123,7 +124,7 @@ public class CachePullThroughPrestonStoreTest {
                 ), new ActivityContext() {
             @Override
             public IRI getActivity() {
-                return null;
+                return parentActivity;
             }
 
             @Override

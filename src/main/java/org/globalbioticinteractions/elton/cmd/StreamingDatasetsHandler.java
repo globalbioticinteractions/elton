@@ -1,23 +1,20 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.cmd.ActivityContext;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
 import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.Cache;
-import org.globalbioticinteractions.cache.CacheFactory;
-import org.globalbioticinteractions.cache.ContentPathFactory;
-import org.globalbioticinteractions.cache.ProvenancePathFactory;
 
 import org.globalbioticinteractions.dataset.Dataset;
+import org.globalbioticinteractions.dataset.DatasetFactory;
+import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
+import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
 import org.globalbioticinteractions.dataset.DatasetWithCache;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
-import org.globalbioticinteractions.elton.store.AccessLogger;
-import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,79 +23,74 @@ import java.io.File;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 class StreamingDatasetsHandler implements NamespaceHandler {
     private final static Logger LOG = LoggerFactory.getLogger(StreamingDatasetsHandler.class);
     private final String dataDir;
     private final PrintStream stderr;
+    private final Dataset dataset;
 
-    private InputStreamFactory factory;
-    private final JsonNode config;
     private NodeFactorFactory nodeFactorFactory;
     private ImportLoggerFactory loggerFactory;
-    private ContentPathFactory contentPathFactory;
-    private ProvenancePathFactory provenancePathFactory;
-    private final String provDir;
-    private ActivityContext ctx;
-    private Supplier<IRI> activityIdFactory;
+    private Cache cache;
 
-    public StreamingDatasetsHandler(JsonNode config,
+    public StreamingDatasetsHandler(Dataset dataset,
                                     String dataDir,
-                                    String provDir,
                                     PrintStream stderr,
                                     InputStreamFactory inputStreamFactory,
                                     NodeFactorFactory nodeFactorFactory,
                                     ImportLoggerFactory loggerFactory,
-                                    ContentPathFactory contentPathFactory,
-                                    ProvenancePathFactory provenancePathFactory,
                                     ActivityContext ctx,
-                                    Supplier<IRI> activityIdFactory) {
-        this.factory = inputStreamFactory;
+                                    Cache cache) {
         this.dataDir = dataDir;
-        this.provDir = provDir;
         this.stderr = stderr;
-        this.config = config;
+        this.dataset = dataset;
         this.nodeFactorFactory = nodeFactorFactory;
         this.loggerFactory = loggerFactory;
-        this.contentPathFactory = contentPathFactory;
-        this.provenancePathFactory = provenancePathFactory;
-        this.ctx = ctx;
-        this.activityIdFactory = activityIdFactory;
+        this.cache = cache;
     }
 
     @Override
     public void onNamespace(String namespace) throws Exception {
         stderr.print("tracking [" + namespace + "]...");
-        ActivityListener dereferenceListener = new AccessLogger(namespace, provDir);
 
-        CacheFactory cacheFactory = CmdUtil.createCacheFactory(
-                namespace,
-                dataDir,
-                provDir,
-                factory,
-                contentPathFactory,
-                provenancePathFactory,
-                dereferenceListener,
-                ctx,
-                activityIdFactory
-        );
+        URI archiveURI = this.dataset.getArchiveURI();
+        if (archiveURI == null && this.dataset.getConfig() != null) {
+            archiveURI = URI.create(this.dataset.getOrDefault("url", null));
+        }
 
         Dataset dataset = new DatasetWithResourceMapping(
                 namespace,
-                URI.create(config.get("url").asText()),
-                cacheFactory.cacheFor(null)
+                archiveURI,
+                cache
         );
-        dataset.setConfig(config);
-        Cache cache = cacheFactory.cacheFor(dataset);
+
         DatasetWithCache datasetWithCache = new DatasetWithCache(dataset, cache);
 
+        Dataset datasetWithCacheAndConfig = new DatasetFactory(new DatasetRegistry() {
+            @Override
+            public Iterable<String> findNamespaces() throws DatasetRegistryException {
+                return null;
+            }
+
+            @Override
+            public void findNamespaces(Consumer<String> namespaceConsumer) throws DatasetRegistryException {
+
+            }
+
+            @Override
+            public Dataset datasetFor(String namespace) throws DatasetRegistryException {
+                return datasetWithCache;
+            }
+        }, in -> in).datasetFor(namespace);
+
         NodeFactory nodeFactory = this.nodeFactorFactory.createNodeFactory();
-        nodeFactory.getOrCreateDataset(dataset);
+        nodeFactory.getOrCreateDataset(datasetWithCacheAndConfig);
         try {
             DatasetImportUtil.importDataset(
                     null,
-                    datasetWithCache,
+                    datasetWithCacheAndConfig,
                     nodeFactory,
                     loggerFactory.createImportLogger(),
                     new File(dataDir)

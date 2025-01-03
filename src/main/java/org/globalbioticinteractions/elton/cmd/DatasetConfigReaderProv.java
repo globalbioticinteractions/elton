@@ -1,17 +1,21 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
+import org.globalbioticinteractions.cache.Cache;
+import org.globalbioticinteractions.cache.CacheFactory;
 import org.globalbioticinteractions.dataset.Dataset;
+import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetImpl;
+import org.globalbioticinteractions.dataset.DatasetRegistry;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
+import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,14 +38,25 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
             Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)>.*");
             Matcher matcher = namespacePattern.matcher(line);
             if (matcher.matches()) {
-                resetOnLocationSwitch(matcher);
+                resetContext();
+                String location = matcher.group("location");
+                resourceLocation = RefNodeFactory.toIRI(location);
                 resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
+                resourceFormat = "application/globi";
             }
         } else if (StringUtils.contains(line, FORMAT)) {
             Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
             Matcher matcher = namespacePattern.matcher(line);
             if (matcher.matches()) {
-                resetOnLocationSwitch(matcher);
+                String location = matcher.group("location");
+                if (resourceLocation == null
+                        || !StringUtils.equals(location, resourceLocation.getIRIString())) {
+                    if (resourceNamespace == null) {
+                        resetContext();
+                        resourceLocation = RefNodeFactory.toIRI(location);
+                        resourceNamespace = RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local");
+                    }
+                }
                 resourceFormat = matcher.group("format");
             }
             // possible format statement
@@ -50,54 +65,23 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
             Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)>.*");
             Matcher matcher = namespacePattern.matcher(line);
             if (matcher.matches()) {
-                resetOnLocationSwitch(matcher);
-                resourceVersion = RefNodeFactory.toIRI(matcher.group("version"));
+                String location = matcher.group("location");
+                if (resourceLocation != null && StringUtils.equals(location, resourceLocation.getIRIString())) {
+                    resourceVersion = RefNodeFactory.toIRI(matcher.group("version"));
+                }
             }
         }
 
         if (resourceLocation != null
+                && resourceNamespace != null
                 && resourceFormat != null
                 && resourceVersion != null) {
-            String resourceNamespaceString = (resourceNamespace == null
-                    ? RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local")
-                    : resourceNamespace).getIRIString();
-
-            String format = resourceFormat == null ? "application/dwca" : resourceFormat;
-
+            String resourceNamespaceString = resourceNamespace.getIRIString();
             String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
-            if (StringUtils.equals(resourceFormat, "application/globi")) {
-                dataset = new DatasetImpl(namespace, null, null);
-                ObjectNode globiConfig = new ObjectMapper().createObjectNode();
-                globiConfig.put("namespace", resourceVersion.getIRIString());
-                globiConfig.put("url", resourceLocation.getIRIString());
-                globiConfig.put("format", "globi");
-                globiConfig.put("citation", RefNodeFactory.toStatement(resourceLocation, RefNodeConstants.HAS_VERSION, resourceVersion).toString());
-                dataset.setConfig(globiConfig);
-            } else {
-                ObjectNode globiConfig = new ObjectMapper().createObjectNode();
-                globiConfig.put("namespace", resourceVersion.getIRIString());
-                globiConfig.put("url", "https://linker.bio/" + resourceVersion.getIRIString());
-                globiConfig.put("format", StringUtils.replace(format, "application/globi", "globi"));
-                globiConfig.put("citation", RefNodeFactory.toStatement(resourceLocation, RefNodeConstants.HAS_VERSION, resourceVersion).toString());
-                ArrayNode resourceMapping = new ObjectMapper().createArrayNode();
-                ObjectNode objectNode = new ObjectMapper().createObjectNode();
-                objectNode.put(resourceLocation.getIRIString(), "https://linker.bio/" + resourceVersion.getIRIString());
-                resourceMapping.add(objectNode);
-                //globiConfig.set("resources", resourceMapping);
-                dataset = new DatasetImpl(namespace, null, null);
-                dataset.setConfig(globiConfig);
-            }
+            dataset = new DatasetImpl(namespace, null, URI.create(resourceVersion.getIRIString()));
             resetContext();
         }
         return dataset;
-    }
-
-    private void resetOnLocationSwitch(Matcher matcher) {
-        String location = matcher.group("location");
-        if (resourceLocation == null || !StringUtils.equals(location, resourceLocation.getIRIString())) {
-            resetContext();
-        }
-        resourceLocation = RefNodeFactory.toIRI(location);
     }
 
     private void resetContext() {

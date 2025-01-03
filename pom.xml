@@ -80,6 +80,10 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -142,7 +146,7 @@
         </dependency>
         <dependency>
             <groupId>bio.guoda</groupId>
-            <artifactId>preston-cas</artifactId>
+            <artifactId>preston-stream</artifactId>
             <version>${preston.version}</version>
             <exclusions>
                 <exclusion>

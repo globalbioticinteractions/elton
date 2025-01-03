@@ -1,8 +1,15 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.HashType;
+import bio.guoda.preston.RefNodeFactory;
+import bio.guoda.preston.store.BlobStoreAppendOnly;
+import bio.guoda.preston.store.KeyTo3LevelPath;
+import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
+import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.rdf.api.IRI;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,16 +19,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
 
 public class CmdStreamTest {
 
@@ -45,17 +57,29 @@ public class CmdStreamTest {
     }
 
     @Test
-    public void streamSomeInteractions() {
+    public void streamSomeInteractions() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
         CmdStream cmdStream = new CmdStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+
+
+        populateCacheWithResource(tmpDir, "/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip");
+
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+
         cmdStream.setStdout(new PrintStream(outputStream));
         cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream("{ \"url\": \"bla.tsv\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
+        cmdStream.setStdin(IOUtils.toInputStream("{ \"url\": \"hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
         cmdStream.run();
 
-        assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), startsWith(headerInteractions()));
+        assertHeaderAndMore(outputStream, headerInteractions());
+
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("tracking [local]..."));
     }
 
@@ -76,8 +100,13 @@ public class CmdStreamTest {
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
         CmdStream cmdStream = new CmdStream();
+
         File tmpDir = folder.newFolder("tmpDir");
         tmpDir.mkdirs();
+
+
+        populateCacheWithResource(tmpDir, "/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip");
+
         cmdStream.setWorkDir(tmpDir.getAbsolutePath());
         cmdStream.setDataDir(tmpDir.getAbsolutePath());
         cmdStream.setWorkDir(tmpDir.getAbsolutePath());
@@ -92,7 +121,7 @@ public class CmdStreamTest {
         );
 
         long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
-        assertThat(numberOfFilesBefore, Is.is(0L));
+        assertThat(numberOfFilesBefore, Is.is(1L));
 
 
         cmdStream.run();
@@ -105,64 +134,169 @@ public class CmdStreamTest {
 
         long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
 
-        assertThat(numberOfFilesAfter, Is.is(2L));
+        assertThat(numberOfFilesAfter, Is.is(1L));
 
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 
-        assertThat(filenames, hasItems("d84999936296e4b85086f2851f4459605502f4eb80b9484049b81d34f43b2ff1"));
         assertThat(filenames, hasItems("76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44"));
 
-        assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), startsWith(headerInteractions()));
+        assertHeaderAndMore(outputStream, headerInteractions());
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("tracking [globalbioticinteractions/template-dataset]...done.\nwrote [globalbioticinteractions/template-dataset]\n"));
+    }
+
+    private void assertHeaderAndMore(ByteArrayOutputStream outputStream, String prefix) {
+        String stdout = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+        assertThat(stdout, startsWith(prefix));
+        assertThat(stdout.split("\n").length, Is.is(greaterThan(1)));
+    }
+
+    private void populateCacheWithResource(File tmpDir, String resource) throws IOException {
+        BlobStoreAppendOnly blobStore = getBlobStore(tmpDir);
+        blobStore.put(getClass().getResourceAsStream(resource));
+    }
+
+    private BlobStoreAppendOnly getBlobStore(File tmpDir) {
+        KeyTo3LevelPath keyToPath = new KeyTo3LevelPath(tmpDir.toURI());
+        return new BlobStoreAppendOnly(
+                new KeyValueStoreLocalFileSystem(
+                        tmpDir,
+                        keyToPath,
+                        new ValidatingKeyValueStreamContentAddressedFactory()
+                ),
+                true,
+                HashType.sha256
+        );
+    }
+
+    @Test
+    public void streamSomeProvStatementsDwCA() throws IOException, URISyntaxException {
+
+        URL resource = getClass().getResource("/ucsb-izc-slim-dwca.zip");
+        assertNotNull(resource);
+
+        IRI iri = RefNodeFactory.toIRI(resource.toURI());
+
+        String provLogGeneratedByElton = "<urn:lsid:globalbioticinteractions.org:globalbioticinteractions/ucsb-izc> <http://www.w3.org/ns/prov#wasAssociatedWith> " + iri + " <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                iri + " <http://purl.org/dc/elements/1.1/format> \"application/dwca\" <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                iri + " <http://purl.org/pav/hasVersion> <hash://sha256/aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n";
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+        CmdStream cmdStream = new CmdStream();
+
+        populateCache(tmpDir);
+
+
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByElton, StandardCharsets.UTF_8));
+
+        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
+        assertThat(numberOfFilesBefore, Is.is(1L));
+
+
+        cmdStream.run();
+
+        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
+
+        assertThat(numberOfFilesAfter, Is.is(1L));
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        assertThat(filenames, hasItems("aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d"));
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("tracking [globalbioticinteractions/ucsb-izc]...done.\nwrote [globalbioticinteractions/ucsb-izc]\n"));
+    }
+
+    private void populateCache(File tmpDir) throws IOException {
+        populateCacheWithResource(tmpDir, "/ucsb-izc-slim-dwca.zip");
     }
 
 
     @Test
-    public void streamSomeInteractionsCustomNamespace() {
+    public void streamSomeInteractionsCustomNamespace() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
         CmdStream cmdStream = new CmdStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+
+
+        populateCache(tmpDir);
+
+        cmdStream.setRecordType("interaction");
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
         cmdStream.setStdout(new PrintStream(outputStream));
         cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream("{ \"namespace\": \"name/space\", \"url\": \"bla.tsv\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
+        cmdStream.setStdin(IOUtils.toInputStream("{ \"namespace\": \"name/space\", \"format\": \"dwca\", \"url\": \"hash://sha256/aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
         cmdStream.run();
 
-        assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), startsWith(headerInteractions()));
+        assertHeaderAndMore(outputStream, headerInteractions());
+
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("tracking [name/space]..."));
     }
 
     @Test
-    public void streamSomeNames() {
+    public void streamSomeNames() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
-        CmdStream cmdStream = new CmdStream();
-        cmdStream.setRecordType("name");
-        cmdStream.setStdout(new PrintStream(outputStream));
-        cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream("{ \"format\": \"dwca\", \"url\": \"bla.tsv\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
-        cmdStream.run();
+        runForRecordType(outputStream, errorStream, "name");
+
+        assertHeaderAndMore(outputStream, headerNames());
 
         assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), startsWith(headerNames()));
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("tracking [local]..."));
     }
 
+    private void runForRecordType(ByteArrayOutputStream outputStream, ByteArrayOutputStream errorStream, String recordType) throws IOException {
+        CmdStream cmdStream = new CmdStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+
+
+        populateCache(tmpDir);
+
+        cmdStream.setRecordType(recordType);
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setStdin(IOUtils.toInputStream("{ \"format\": \"dwca\", \"url\": \"hash://sha256/aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
+        cmdStream.run();
+    }
+
     @Test
-    public void streamSomeReviewNotesNoData() {
+    public void streamSomeReviewNotesNoData() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
-        CmdStream cmdStream = new CmdStream();
-        cmdStream.setRecordType("review");
-        cmdStream.setStdout(new PrintStream(outputStream));
-        cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream("{ \"format\": \"dwca\", \"url\": \"bla.tsv\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
-        cmdStream.run();
+        runForRecordType(outputStream, errorStream, "review");
 
-        assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), startsWith(headerReviewNotes()));
-        assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), containsString("failed to add dataset associated with namespace [local]"));
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("tracking [local]..."));
+        assertHeaderAndMore(outputStream, headerReviewNotes());
+
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), is("tracking [local]...done.\nwrote [local]\n"));
     }
 
     private String headerNames() {

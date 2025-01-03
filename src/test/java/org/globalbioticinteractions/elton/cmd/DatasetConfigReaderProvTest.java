@@ -9,6 +9,7 @@ import java.net.URI;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertNull;
 
 public class DatasetConfigReaderProvTest {
@@ -43,11 +44,8 @@ public class DatasetConfigReaderProvTest {
 
         assertNotNull(dataset);
         assertThat(dataset.getNamespace(), Is.is("globalbioticinteractions/template-dataset"));
-//        assertThat(dataset.getArchiveURI(), Is.is(URI.create(value)));
-        assertThat(dataset.getConfig().get("namespace").asText(), Is.is("hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44"));
-        assertThat(dataset.getConfig().get("url").asText(), Is.is(value));
-        assertThat(dataset.getConfig().get("format").asText(), Is.is("globi"));
-        assertThat(dataset.getConfig().get("citation").asText(), Is.is("<https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <http://purl.org/pav/hasVersion> <hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44> ."));
+        assertThat(dataset.getArchiveURI(), Is.is(URI.create(value)));
+        assertThat(dataset.getConfig(), Is.is(nullValue()));
     }
 
     @Test
@@ -102,10 +100,8 @@ public class DatasetConfigReaderProvTest {
 
         assertNotNull(dataset);
         assertThat(dataset.getNamespace(), Is.is("local"));
-        assertThat(dataset.getConfig().get("namespace").asText(), Is.is("hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423"));
-        assertThat(dataset.getConfig().get("url").asText(), Is.is("https://linker.bio/hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423"));
-        assertThat(dataset.getConfig().get("format").asText(), Is.is("application/dwca"));
-        assertThat(dataset.getConfig().get("citation").asText(), Is.is("<https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip> <http://purl.org/pav/hasVersion> <hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423> ."));
+        assertThat(dataset.getArchiveURI(), Is.is(URI.create("https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip")));
+        assertThat(dataset.getConfig(), Is.is(nullValue()));
     }
     @Test
     public void readDatasetPrestonPlainProv() {

@@ -1,38 +1,27 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.RefNodeFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.tool.NullImportLogger;
 import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetImpl;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @CommandLine.Command(
         name = "stream",
@@ -58,19 +47,20 @@ public class CmdStream extends CmdDefaultParams {
     @Override
     public void doRun() {
 
-        BufferedReader reader = IOUtils.buffer(new InputStreamReader(getStdin(), StandardCharsets.UTF_8));
         AtomicBoolean shouldWriteHeader = new AtomicBoolean(true);
         try {
 
-            LineHandler jsonLineHandler = new LineHandlerJson();
+            LineIterator lineIterator = IOUtils.lineIterator(getStdin(), StandardCharsets.UTF_8);
 
-            LineHandler provLineHandler = new LineHandlerProv();
+            DatasetConfigReader jsonDatasetConfigReader = new DatasetConfigReaderJson();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Dataset dataset = jsonLineHandler.extractDataset(line, shouldWriteHeader.get());
+            DatasetConfigReader provDatasetConfigReader = new DatasetConfigReaderProv();
+
+            while (lineIterator.hasNext()) {
+                String line = lineIterator.next();
+                Dataset dataset = jsonDatasetConfigReader.readConfig(line);
                 if (dataset == null) {
-                    dataset = provLineHandler.extractDataset(line, shouldWriteHeader.get());
+                    dataset = provDatasetConfigReader.readConfig(line);
                 }
                 if (dataset != null) {
                     if (handleDatasetConfig(dataset.getNamespace(), shouldWriteHeader.get(), dataset.getConfig())) {
@@ -194,101 +184,4 @@ public class CmdStream extends CmdDefaultParams {
 
     }
 
-    public class LineHandlerJson implements LineHandler {
-
-        @Override
-        public Dataset extractDataset(String line, boolean isFirstLine) throws IOException {
-            Dataset dataset = null;
-            try {
-                JsonNode jsonNode = new ObjectMapper().readTree(line);
-                String namespace = jsonNode.at("/namespace").asText(DatasetRegistryUtil.NAMESPACE_LOCAL);
-                if (StringUtils.isNotBlank(namespace)) {
-                    dataset = new DatasetImpl(namespace, null, null);
-                    dataset.setConfig(jsonNode);
-                }
-            } catch (JsonProcessingException e) {
-                // ignore non-json lines
-            }
-            return dataset;
-        }
-    }
-
-    public class LineHandlerProv implements LineHandler {
-        static final String ASSOCIATED_WITH = " <http://www.w3.org/ns/prov#wasAssociatedWith> ";
-        static final String FORMAT = " <http://purl.org/dc/elements/1.1/format> ";
-        static final String HAS_VERSION = " <http://purl.org/pav/hasVersion> ";
-        static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG = "urn:lsid:globalbioticinteractions.org:";
-
-        IRI resourceLocation = null;
-        IRI resourceNamespace = null;
-        String resourceFormat = null;
-        IRI resourceVersion = null;
-
-        @Override
-        public Dataset extractDataset(String line, boolean isFirstLine) throws IOException {
-            Dataset dataset = null;
-            if (StringUtils.contains(line, ASSOCIATED_WITH)) {
-                // possible namespace statement
-                Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)>.*");
-                Matcher matcher = namespacePattern.matcher(line);
-                if (matcher.matches()) {
-                    resetOnLocationSwitch(matcher);
-                    resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
-                }
-            } else if (StringUtils.contains(line, FORMAT)) {
-                Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
-                Matcher matcher = namespacePattern.matcher(line);
-                if (matcher.matches()) {
-                    resetOnLocationSwitch(matcher);
-                    resourceFormat = matcher.group("format");
-                }
-                // possible format statement
-            } else if (StringUtils.contains(line, HAS_VERSION)) {
-                // possible version statement
-                Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)>.*");
-                Matcher matcher = namespacePattern.matcher(line);
-                if (matcher.matches()) {
-                    resetOnLocationSwitch(matcher);
-                    resourceVersion = RefNodeFactory.toIRI(matcher.group("version"));
-                }
-            }
-
-            if (resourceLocation != null
-                    && resourceFormat != null
-                    && resourceVersion != null) {
-                String resourceNamespaceString = (resourceNamespace == null
-                        ? RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local")
-                        : resourceNamespace).getIRIString();
-                String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
-                ObjectNode globiConfig = new ObjectMapper().createObjectNode();
-                globiConfig.put("url", resourceLocation.getIRIString());
-                globiConfig.put("format", StringUtils.replace(resourceFormat, "application/globi", "globi"));
-                globiConfig.put("citation", resourceVersion.getIRIString());
-                ArrayNode resourceMapping = new ObjectMapper().createArrayNode();
-                ObjectNode objectNode = new ObjectMapper().createObjectNode();
-                objectNode.put(resourceLocation.getIRIString(), "https://linker.bio/" + resourceVersion.getIRIString());
-                resourceMapping.add(objectNode);
-                //globiConfig.set("resources", resourceMapping);
-                dataset = new DatasetImpl(namespace, null, null);
-                dataset.setConfig(globiConfig);
-                resetContext();
-            }
-            return dataset;
-        }
-
-        private void resetOnLocationSwitch(Matcher matcher) {
-            String location = matcher.group("location");
-            if (resourceLocation == null || !StringUtils.equals(location, resourceLocation.getIRIString())) {
-                resetContext();
-            }
-            resourceLocation = RefNodeFactory.toIRI(location);
-        }
-
-        private void resetContext() {
-            resourceLocation = null;
-            resourceFormat = null;
-            resourceVersion = null;
-            resourceNamespace = null;
-        }
-    }
 }

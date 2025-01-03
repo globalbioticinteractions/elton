@@ -4,7 +4,7 @@ import org.globalbioticinteractions.dataset.Dataset;
 
 import java.io.IOException;
 
-public interface LineHandler {
+public interface DatasetConfigReader {
 
-    Dataset extractDataset(String line, boolean isFirstLine) throws IOException;
+    Dataset readConfig(String line) throws IOException;
 }

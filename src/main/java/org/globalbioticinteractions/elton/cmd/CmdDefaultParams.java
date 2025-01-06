@@ -263,8 +263,8 @@ abstract class CmdDefaultParams implements Runnable {
         emitProcessDescription();
         getStatementListener().on(
                 RefNodeFactory.toStatement(
-                        getActivity().getActivity(),
-                        getActivity().getActivity(),
+                        getActivityContext().getActivity(),
+                        getActivityContext().getActivity(),
                         RefNodeConstants.ENDED_AT_TIME,
                         RefNodeFactory.nowDateTimeLiteral()
                 )

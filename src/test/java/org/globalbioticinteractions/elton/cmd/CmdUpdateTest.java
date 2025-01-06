@@ -10,8 +10,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +54,27 @@ public class CmdUpdateTest {
         assertUpdate(tmpWorkDir, cmd, dataDir, provDir);
     }
 
+
+    @Test
+    public void updateLocalDatasetSeparateDataProvDirsInProvMode() throws IOException, URISyntaxException {
+        URL localDataset = getClass().getResource("/dataset-local-test/globi.json");
+        File localWorkDir = new File(localDataset.toURI()).getParentFile();
+        File tmpWorkDir = createTmpWorkDir(localWorkDir);
+
+        CmdRegistry cmd = new CmdUpdate();
+        cmd.setEnableProvMode(true);
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+        cmd.setStdout(new PrintStream(stdout));
+        String dataDir = tmpDir.newFolder("data").getAbsolutePath();
+        String provDir = tmpDir.newFolder("prov").getAbsolutePath();
+        assertUpdate(tmpWorkDir, cmd, dataDir, provDir);
+
+        String[] lines = new String(stdout.toByteArray(), StandardCharsets.UTF_8).split("\n");
+        assertThat(lines[lines.length-1], endsWith(cmd.getActivityContext().getActivity() + " ."));
+        assertThat(lines[lines.length-1], startsWith(cmd.getActivityContext().getActivity().toString()));
+
+    }
+
     private File createTmpWorkDir(File localWorkDir) throws IOException {
         File tmpWorkDir = tmpDir.newFolder("workdir");
         FileUtils.copyFileToDirectory(new File(localWorkDir, "globi.json"), tmpWorkDir);
@@ -86,6 +109,7 @@ public class CmdUpdateTest {
                 TrueFileFilter.INSTANCE,
                 TrueFileFilter.INSTANCE
         );
+
 
         assertThat(files.size(), CoreMatchers.is(3));
 

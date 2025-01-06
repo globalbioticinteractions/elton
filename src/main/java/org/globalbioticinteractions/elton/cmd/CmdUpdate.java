@@ -75,7 +75,8 @@ public class CmdUpdate extends CmdRegistry {
         DatasetRegistryProxy provAndAccessLogger = new DatasetRegistryProxy(
                 Arrays.asList(
                         new DatasetRegistryProvLogger(registryProxy, getStatementListener(), getActivityContext()),
-                        accessLogger)
+                        accessLogger
+                )
         );
 
         DatasetRegistry registryProvenanceLogger = getEnableProvMode()

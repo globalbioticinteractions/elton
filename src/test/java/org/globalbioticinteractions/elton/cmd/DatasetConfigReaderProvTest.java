@@ -143,7 +143,7 @@ public class DatasetConfigReaderProvTest {
 
 
     @Test
-    public void externalReference() {
+    public void globiDatasetWithExternalReference() {
         String prov = "<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:db3d2ce3-6edc-4a8a-b572-1f829fa46073> .\n" +
                 "<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent> <urn:uuid:db3d2ce3-6edc-4a8a-b572-1f829fa46073> .\n" +
                 "<https://globalbioticinteractions.org/elton> <http://purl.org/dc/terms/description> \"Elton helps to access, review and index existing species interaction datasets.\"@en <urn:uuid:db3d2ce3-6edc-4a8a-b572-1f829fa46073> .\n" +

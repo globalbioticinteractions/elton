@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.dataset;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,21 +78,28 @@ public class DatasetRegistryProxy implements DatasetRegistry {
     private Dataset queryForDataset(String namespace) throws DatasetRegistryException {
         Dataset dataset = null;
         DatasetRegistryException lastException = null;
+        List<DatasetRegistry> availableRegistriesForNamespace = new ArrayList<>();
         for (DatasetRegistry datasetRegistry : registries) {
             try {
                 dataset = datasetRegistry.datasetFor(namespace);
                 if (dataset != null) {
-                    associateNamespaceWithRegistry(datasetRegistry, namespace);
-                    break;
+                    availableRegistriesForNamespace.add(datasetRegistry);
                 }
             } catch (DatasetRegistryException ex) {
                 lastException = ex;
             }
 
         }
-        if (dataset == null && lastException != null) {
+        if (availableRegistriesForNamespace.size() < 1 && lastException != null) {
             throw new DatasetRegistryException("failed to find dataset for [" + namespace + "] possibly due to unexpected error", lastException);
         }
+
+        if (availableRegistriesForNamespace.size() > 0) {
+            associateNamespaceWithRegistry(availableRegistriesForNamespace.get(0), namespace);
+        }
+
+
+
         return dataset;
     }
 

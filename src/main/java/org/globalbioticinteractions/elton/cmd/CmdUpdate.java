@@ -85,7 +85,7 @@ public class CmdUpdate extends CmdRegistry {
 
 
         NamespaceHandler namespaceHandler = namespace -> {
-            getStderr().print("tracking [" + namespace + "]... ");
+            getStderr().print("processing data stream from [" + namespace + "]... ");
 
             FileUtils.forceMkdir(new File(getWorkDir()));
             CacheUtil.findOrMakeProvOrDataDirForNamespace(getProvDir(), namespace);
@@ -120,7 +120,7 @@ public class CmdUpdate extends CmdRegistry {
                 );
                 getStderr().println("done.");
             } catch (StudyImporterException ex) {
-                LOG.error("tracking of [" + namespace + "] failed.", ex);
+                LOG.error("processing data stream from of [" + namespace + "] failed.", ex);
                 getStderr().println("failed with [" + ex.getMessage() + "].");
                 ex.printStackTrace(getStderr());
             }

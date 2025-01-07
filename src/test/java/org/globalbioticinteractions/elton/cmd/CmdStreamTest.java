@@ -55,8 +55,8 @@ public class CmdStreamTest {
         cmdStream.run();
 
         assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), Is.is(""));
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("tracking [local]..."));
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), endsWith("tracking [local]..."));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("processing data stream from [local]..."));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), endsWith("processing data stream from [local]..."));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class CmdStreamTest {
 
         assertHeaderAndMore(outputStream, headerInteractions());
 
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("tracking [local]..."));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("processing data stream from [local]..."));
     }
 
 
@@ -144,7 +144,7 @@ public class CmdStreamTest {
         assertThat(filenames, hasItems("76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44"));
 
         assertHeaderAndMore(outputStream, headerInteractions());
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("tracking [globalbioticinteractions/template-dataset]...done.\nwrote [globalbioticinteractions/template-dataset]\n"));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream from [globalbioticinteractions/template-dataset]...done.\ndone processing [globalbioticinteractions/template-dataset].\n"));
     }
 
     private void assertHeaderAndMore(ByteArrayOutputStream outputStream, String prefix) {
@@ -227,7 +227,7 @@ public class CmdStreamTest {
         assertThat(filenames, hasItems("aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d"));
 
         assertHeaderAndMore(outputStream, headerInteractions());
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("tracking [globalbioticinteractions/ucsb-izc]...done.\nwrote [globalbioticinteractions/ucsb-izc]\n"));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream from [globalbioticinteractions/ucsb-izc]...done.\ndone processing [globalbioticinteractions/ucsb-izc].\n"));
     }
 
     @Test
@@ -361,7 +361,7 @@ public class CmdStreamTest {
         assertThat(filenames, hasItems("1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43"));
 
         assertHeaderAndMore(outputStream, headerInteractions());
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("tracking [globalbioticinteractions/ucsb-izc]...done.\nwrote [globalbioticinteractions/ucsb-izc]\n"));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream from [globalbioticinteractions/ucsb-izc]...done.\ndone processing [globalbioticinteractions/ucsb-izc].\n"));
     }
 
     private void populateCache(File tmpDir) throws IOException {
@@ -391,7 +391,7 @@ public class CmdStreamTest {
 
         assertHeaderAndMore(outputStream, headerInteractions());
 
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("tracking [name/space]..."));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("processing data stream from [name/space]..."));
     }
 
     @Test
@@ -404,7 +404,7 @@ public class CmdStreamTest {
         assertHeaderAndMore(outputStream, headerNames());
 
         assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), startsWith(headerNames()));
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("tracking [local]..."));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("processing data stream from [local]..."));
     }
 
     private void runForRecordType(ByteArrayOutputStream outputStream, ByteArrayOutputStream errorStream, String recordType) throws IOException {
@@ -433,7 +433,7 @@ public class CmdStreamTest {
 
         assertHeaderAndMore(outputStream, headerReviewNotes());
 
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), is("tracking [local]...done.\nwrote [local]\n"));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), is("processing data stream from [local]...done.\ndone processing [local].\n"));
     }
 
     private String headerNames() {

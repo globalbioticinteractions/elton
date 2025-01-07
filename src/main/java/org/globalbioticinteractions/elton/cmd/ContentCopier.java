@@ -48,10 +48,7 @@ public class ContentCopier implements Consumer<String> {
 
         for (File file : files) {
             try {
-                IRI contentId = blobStore.put(new FileInputStream(file));
-                if (StringUtils.endsWith(contentId.getIRIString(), contentIdCandidate)) {
-                    stderr.println("copied [" + contentId + "]");
-                }
+                blobStore.put(new FileInputStream(file));
             } catch (IOException ex) {
                 stderr.println("failed to copy [" + file.getAbsolutePath() + "]");
                 ex.printStackTrace(stderr);

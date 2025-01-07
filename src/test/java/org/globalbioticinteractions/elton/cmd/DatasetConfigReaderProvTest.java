@@ -1,14 +1,19 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertNull;
 
@@ -24,7 +29,8 @@ public class DatasetConfigReaderProvTest {
                 "<urn:uuid:cce97773-a8e2-4af4-94f9-0ac2699cb28e> <http://www.w3.org/ns/prov#used> <jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/globi.json> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
                 "<jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/globi.json> <http://purl.org/pav/hasVersion> <hash://sha256/94bc19a3b0f172f63138fdc9384bb347f110e6fae6d42613a6eba019df6268d2> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
                 "<urn:uuid:c7b1a849-8230-4e34-a0d5-7b663bc87e01> <http://www.w3.org/ns/prov#used> <jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/interactions.tsv> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
-                "<jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/interactions.tsv> <http://purl.org/pav/hasVersion> <hash://sha256/d84999936296e4b85086f2851f4459605502f4eb80b9484049b81d34f43b2ff1> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n";
+                "<jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/interactions.tsv> <http://purl.org/pav/hasVersion> <hash://sha256/d84999936296e4b85086f2851f4459605502f4eb80b9484049b81d34f43b2ff1> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:34.689Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n";
 
         String[] lines = provLogGeneratedByElton.split("\n");
         DatasetConfigReaderProv datasetConfigReaderProv = new DatasetConfigReaderProv();
@@ -43,7 +49,39 @@ public class DatasetConfigReaderProvTest {
         assertNotNull(dataset);
         assertThat(dataset.getNamespace(), Is.is("globalbioticinteractions/template-dataset"));
         assertThat(dataset.getArchiveURI(), Is.is(URI.create("hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44")));
-        assertThat(dataset.getConfig(), Is.is(nullValue()));
+        assertThat(dataset.getConfig(), Is.is(not(nullValue())));
+    }
+    @Test
+    public void readDatasetEltonProvImplicitlyEnded() {
+
+        String provLogGeneratedByElton = "<urn:lsid:globalbioticinteractions.org:globalbioticinteractions/template-dataset> <http://www.w3.org/ns/prov#wasAssociatedWith> <https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <http://purl.org/dc/elements/1.1/format> \"application/globi\" <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:uuid:41389744-0f4d-47e2-8506-76999e1b5c34> <http://www.w3.org/ns/prov#used> <https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <http://purl.org/pav/hasVersion> <hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:uuid:cce97773-a8e2-4af4-94f9-0ac2699cb28e> <http://www.w3.org/ns/prov#used> <jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/globi.json> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/globi.json> <http://purl.org/pav/hasVersion> <hash://sha256/94bc19a3b0f172f63138fdc9384bb347f110e6fae6d42613a6eba019df6268d2> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:uuid:c7b1a849-8230-4e34-a0d5-7b663bc87e01> <http://www.w3.org/ns/prov#used> <jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/interactions.tsv> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/interactions.tsv> <http://purl.org/pav/hasVersion> <hash://sha256/d84999936296e4b85086f2851f4459605502f4eb80b9484049b81d34f43b2ff1> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:lsid:globalbioticinteractions.org:globalbioticinteractions/template-dataset> <http://www.w3.org/ns/prov#wasAssociatedWith> <https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <urn:uuid:efad3d9b-10bb-4d20-b790-02e570ea40e3> .\n";
+
+        String[] lines = provLogGeneratedByElton.split("\n");
+        DatasetConfigReaderProv datasetConfigReaderProv = new DatasetConfigReaderProv();
+        Dataset dataset = null;
+        for (String line : lines) {
+            try {
+                dataset = datasetConfigReaderProv.readConfig(line);
+                if (dataset != null) {
+                    break;
+                }
+            } catch (IOException e) {
+                //
+            }
+        }
+
+        assertNotNull(dataset);
+        assertThat(dataset.getNamespace(), Is.is("globalbioticinteractions/template-dataset"));
+        assertThat(dataset.getArchiveURI(), Is.is(URI.create("hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44")));
+        assertThat(dataset.getConfig(), Is.is(not(nullValue())));
     }
 
     @Test
@@ -99,7 +137,7 @@ public class DatasetConfigReaderProvTest {
         assertNotNull(dataset);
         assertThat(dataset.getNamespace(), Is.is("local"));
         assertThat(dataset.getArchiveURI(), Is.is(URI.create("hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423")));
-        assertThat(dataset.getConfig(), Is.is(nullValue()));
+        assertThat(dataset.getConfig(), Is.is(not(nullValue())));
     }
     @Test
     public void readDatasetPrestonPlainProv() {
@@ -143,7 +181,7 @@ public class DatasetConfigReaderProvTest {
 
 
     @Test
-    public void globiDatasetWithExternalReference() {
+    public void globiDatasetWithExternalReference() throws IOException {
         String prov = "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:8de5e11b-c8e3-4587-856d-60d15ffbf452> .\n" +
                 "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent> <urn:uuid:8de5e11b-c8e3-4587-856d-60d15ffbf452> .\n" +
                 "<https://preston.guoda.bio> <http://purl.org/dc/terms/description> \"Preston is a software program that finds, archives and provides access to biodiversity datasets.\"@en <urn:uuid:8de5e11b-c8e3-4587-856d-60d15ffbf452> .\n" +
@@ -382,7 +420,17 @@ public class DatasetConfigReaderProvTest {
                 "<urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:34.689Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n";
 
         String[] lines = prov.split("\n");
-        DatasetConfigReaderProv datasetConfigReaderProv = new DatasetConfigReaderProv();
+
+        List<URI> requested = new ArrayList<>();
+
+
+        DatasetConfigReaderProv datasetConfigReaderProv = new DatasetConfigReaderProv(new ResourceService() {
+            @Override
+            public InputStream retrieve(URI uri) throws IOException {
+                requested.add(uri);
+                return null;
+            }
+        });
         Dataset dataset = null;
         for (String line : lines) {
             try {
@@ -398,6 +446,20 @@ public class DatasetConfigReaderProvTest {
         assertThat(dataset.getNamespace(), Is.is("globalbioticinteractions/ucsb-izc"));
 
         assertThat(dataset.getArchiveURI().toString(), Is.is("hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43"));
+
+        dataset.retrieve(URI.create("https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip"));
+
+        assertThat(requested.size(), Is.is(1));
+
+        assertThat(requested.get(0).toString(), Is.is("hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423"));
+
+        requested.clear();
+
+        dataset.retrieve(URI.create("https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip"));
+
+        assertThat(requested.size(), Is.is(1));
+
+        assertThat(requested.get(0).toString(), Is.is("hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43"));
 
     }
 

@@ -1,21 +1,18 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.RefNodeFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
-import org.globalbioticinteractions.cache.Cache;
-import org.globalbioticinteractions.cache.CacheFactory;
+import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetFactory;
-import org.globalbioticinteractions.dataset.DatasetImpl;
-import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.dataset.DatasetRegistryException;
-import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
+import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.function.Consumer;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,25 +21,45 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
     private static final String FORMAT = " <http://purl.org/dc/elements/1.1/format> ";
     private static final String HAS_VERSION = " <http://purl.org/pav/hasVersion> ";
     private static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG = "urn:lsid:globalbioticinteractions.org:";
+    public static final String ENDED_AT_TIME = " <http://www.w3.org/ns/prov#endedAtTime> ";
+    private final ResourceService resourceService;
 
+    private IRI resourceActivityContext = null;
     private IRI resourceLocation = null;
     private IRI resourceNamespace = null;
     private String resourceFormat = null;
     private IRI resourceVersion = null;
+    private boolean contextComplete = false;
+    private TreeMap<URI, IRI> contextDeps = new TreeMap<>();
+
+    public DatasetConfigReaderProv() {
+        this(new ResourceService() {
+            @Override
+            public InputStream retrieve(URI uri) throws IOException {
+                throw new IOException("no resource service available to retrieve [" + uri + "]");
+            }
+        });
+    }
+
+    public DatasetConfigReaderProv(ResourceService resourceService) {
+        this.resourceService = resourceService;
+    }
 
     @Override
     public Dataset readConfig(String line) throws IOException {
         Dataset dataset = null;
         if (StringUtils.contains(line, ASSOCIATED_WITH)) {
             // possible namespace statement
-            Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)>.*");
+            Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
             Matcher matcher = namespacePattern.matcher(line);
             if (matcher.matches()) {
-                resetContext();
+                dataset = attemptToCreateDataset(dataset);
                 String location = matcher.group("location");
                 resourceLocation = RefNodeFactory.toIRI(location);
                 resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
                 resourceFormat = "application/globi";
+                resourceActivityContext = RefNodeFactory.toIRI(matcher.group("activity"));
+                contextComplete = false;
             }
         } else if (StringUtils.contains(line, FORMAT)) {
             Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
@@ -62,25 +79,97 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
             // possible format statement
         } else if (StringUtils.contains(line, HAS_VERSION)) {
             // possible version statement
-            Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)>.*");
+            Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)> <(?<activity>[^>]+)> [.]");
             Matcher matcher = namespacePattern.matcher(line);
             if (matcher.matches()) {
                 String location = matcher.group("location");
-                if (resourceLocation != null && StringUtils.equals(location, resourceLocation.getIRIString())) {
-                    resourceVersion = RefNodeFactory.toIRI(matcher.group("version"));
+                if (contextSupported()) {
+                    if (inSameActivity(matcher)) {
+                        IRI version = setVersionOnMatchingLocation(matcher, location);
+                        if (contextSupported()) {
+                            contextDeps.put(URI.create(location), version);
+                        }
+                    }
+                } else {
+                    setVersionOnMatchingLocation(matcher, location);
                 }
+
+            }
+        } else if (StringUtils.contains(line, ENDED_AT_TIME)) {
+            Pattern namespacePattern = Pattern.compile("<(?<activity>[^>]+)>" + ENDED_AT_TIME + ".*");
+            Matcher matcher = namespacePattern.matcher(line);
+            if (matcher.matches()) {
+                contextComplete = inSameActivity(matcher);
             }
         }
 
+        return createDatasetIfComplete(dataset);
+    }
+
+    private IRI setVersionOnMatchingLocation(Matcher matcher, String location) {
+        IRI version = RefNodeFactory.toIRI(matcher.group("version"));
+        if (resourceLocation != null && StringUtils.equals(location, resourceLocation.getIRIString())) {
+            resourceVersion = version;
+        }
+        return version;
+    }
+
+    private boolean inSameActivity(Matcher matcher) {
+        String activity = matcher.group("activity");
+        return inSameActivity(activity);
+    }
+
+    private boolean inSameActivity(String activity) {
+        boolean sameActivity = false;
+        if (resourceActivityContext != null && StringUtils.equals(activity, resourceActivityContext.getIRIString())) {
+            sameActivity = true;
+        }
+        return sameActivity;
+    }
+
+    private Dataset attemptToCreateDataset(Dataset dataset) {
+        if (contextSupported()) {
+            dataset = createDataset();
+        } else {
+            resetContext();
+        }
+        return dataset;
+    }
+
+    private Dataset createDatasetIfComplete(Dataset dataset) {
         if (resourceLocation != null
                 && resourceNamespace != null
                 && resourceFormat != null
                 && resourceVersion != null) {
-            String resourceNamespaceString = resourceNamespace.getIRIString();
-            String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
-            dataset = new DatasetImpl(namespace, null, URI.create(resourceVersion.getIRIString()));
-            resetContext();
+            if (contextSupported()) {
+                if (contextComplete) {
+                    dataset = createDataset();
+                }
+            } else {
+                dataset = createDataset();
+            }
         }
+        return dataset;
+    }
+
+    private boolean contextSupported() {
+        return "application/globi".equals(resourceFormat);
+    }
+
+    private Dataset createDataset() {
+        String resourceNamespaceString = resourceNamespace.getIRIString();
+        String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
+
+        Dataset dataset = new DatasetWithResourceMapping(namespace, URI.create(resourceVersion.getIRIString()), resourceService);
+        ObjectNode config = new ObjectMapper().createObjectNode();
+        ObjectNode resourceVersions = new ObjectMapper().createObjectNode();
+        contextDeps.forEach((location, version) -> {
+            resourceVersions.put(location.toString(), version.getIRIString());
+        });
+        config.set("resources", resourceVersions);
+        dataset.setConfig(config);
+
+        resetContext();
         return dataset;
     }
 
@@ -89,5 +178,8 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
         resourceFormat = null;
         resourceVersion = null;
         resourceNamespace = null;
+        resourceActivityContext = null;
+        contextComplete = false;
+        contextDeps.clear();
     }
 }

@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.HashType;
+import bio.guoda.preston.Hasher;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo3LevelPath;
@@ -9,6 +10,8 @@ import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.io.output.NullOutputStream;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
@@ -222,6 +225,140 @@ public class CmdStreamTest {
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 
         assertThat(filenames, hasItems("aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d"));
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("tracking [globalbioticinteractions/ucsb-izc]...done.\nwrote [globalbioticinteractions/ucsb-izc]\n"));
+    }
+
+    @Test
+    public void streamSomeProvStatementsEmbeddedDwCA() throws IOException, URISyntaxException {
+
+        URL resource = getClass().getResource("/ucsb-izc-in-globi-config.zip");
+        assertNotNull(resource);
+
+        String dwcArchive = "/ucsb-izc-slim-dwca.zip";
+        IRI dwcaReferenceReplacement = Hasher.calcHashIRI(getClass().getResourceAsStream(dwcArchive), NullOutputStream.INSTANCE, HashType.sha256);
+
+        String dwcaReference = "<hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423>";
+
+        String provLogGeneratedByElton = "<urn:lsid:globalbioticinteractions.org:globalbioticinteractions/ucsb-izc> <http://www.w3.org/ns/prov#wasAssociatedWith> <https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip> <http://purl.org/dc/elements/1.1/format> \"application/globi\" <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:29.176Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:29.177Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/cb7bf347dd51ccbfb0d82c2453e8a2ef0c7712c78461c7a8e0fe7545821084f3> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/cb7bf347dd51ccbfb0d82c2453e8a2ef0c7712c78461c7a8e0fe7545821084f3> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-01-06T18:00:29.228Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#used> <https://github.com/globalbioticinteractions/ucsb-izc/info/refs?service=git-upload-pack> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<https://github.com/globalbioticinteractions/ucsb-izc/info/refs?service=git-upload-pack> <http://purl.org/pav/hasVersion> <hash://sha256/cb7bf347dd51ccbfb0d82c2453e8a2ef0c7712c78461c7a8e0fe7545821084f3> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:29.229Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/cb7bf347dd51ccbfb0d82c2453e8a2ef0c7712c78461c7a8e0fe7545821084f3> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/cb7bf347dd51ccbfb0d82c2453e8a2ef0c7712c78461c7a8e0fe7545821084f3> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-01-06T18:00:29.229Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#used> <https://github.com/globalbioticinteractions/ucsb-izc/info/refs?service=git-upload-pack> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<https://github.com/globalbioticinteractions/ucsb-izc/info/refs?service=git-upload-pack> <http://purl.org/pav/hasVersion> <hash://sha256/cb7bf347dd51ccbfb0d82c2453e8a2ef0c7712c78461c7a8e0fe7545821084f3> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:2e5e62a5-cb98-4d5f-8e85-d5d0dabdc7ad> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:29.229Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:29.243Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-01-06T18:00:29.639Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <http://www.w3.org/ns/prov#used> <https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip> <http://purl.org/pav/hasVersion> <hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:22e26737-2ad4-4e56-9a88-c44616faab79> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:29.640Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:38603073-d24a-4d8e-82ba-cb4e6b2f3038> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:38603073-d24a-4d8e-82ba-cb4e6b2f3038> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:38603073-d24a-4d8e-82ba-cb4e6b2f3038> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:29.660Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:95eb64f4-ff7d-47bb-a6cc-691b6fc1e9d1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:95eb64f4-ff7d-47bb-a6cc-691b6fc1e9d1> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:95eb64f4-ff7d-47bb-a6cc-691b6fc1e9d1> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:29.664Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:29.667Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/1a9f4d35f2511e03acf12d4c841a73b9d37964a2ecdde940130338bb07954eaa> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/1a9f4d35f2511e03acf12d4c841a73b9d37964a2ecdde940130338bb07954eaa> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-01-06T18:00:29.669Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <http://www.w3.org/ns/prov#used> <jar:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/globi.json> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<jar:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/globi.json> <http://purl.org/pav/hasVersion> <hash://sha256/1a9f4d35f2511e03acf12d4c841a73b9d37964a2ecdde940130338bb07954eaa> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:746792af-a53e-45f8-a804-848bb7cf10a4> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:29.669Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:29.854Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-01-06T18:00:30.920Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <http://www.w3.org/ns/prov#used> <https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip> <http://purl.org/pav/hasVersion> <hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:f28b50fd-9e84-439b-a112-e6beb9706df0> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:30.920Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:da13a225-7d02-4b2d-8454-5c0937f268be> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:da13a225-7d02-4b2d-8454-5c0937f268be> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:da13a225-7d02-4b2d-8454-5c0937f268be> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:31.303Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <http://www.w3.org/ns/prov#startedAtTime> \"2025-01-06T18:00:31.306Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/7fafdc19aa1899121e85f68fe05e4ca917157045e683600f203e921c7b99a426> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<hash://sha256/7fafdc19aa1899121e85f68fe05e4ca917157045e683600f203e921c7b99a426> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-01-06T18:00:31.307Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <http://www.w3.org/ns/prov#used> <jar:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/interaction_types_mapping.csv> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<jar:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/interaction_types_mapping.csv> <http://purl.org/pav/hasVersion> <hash://sha256/7fafdc19aa1899121e85f68fe05e4ca917157045e683600f203e921c7b99a426> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:a78bed27-b096-4163-a20c-f61ac5622ec4> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:31.307Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n" +
+                "<urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:34.689Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:7be4be8f-c170-41d1-a46a-6f3415dd6cea> .\n";
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+        CmdStream cmdStream = new CmdStream();
+
+
+        populateCacheWithResource(tmpDir, "/ucsb-izc-in-globi-config.zip");
+        populateCacheWithResource(tmpDir, dwcArchive);
+
+
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setStdin(IOUtils.toInputStream(StringUtils.replace(provLogGeneratedByElton, dwcaReference, dwcaReferenceReplacement.toString()), StandardCharsets.UTF_8));
+
+        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
+        assertThat(numberOfFilesBefore, Is.is(2L));
+
+
+        cmdStream.run();
+
+        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
+
+        assertThat(numberOfFilesAfter, Is.is(2L));
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        assertThat(filenames, hasItems("1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43"));
+        assertThat(filenames, hasItems("1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43"));
 
         assertHeaderAndMore(outputStream, headerInteractions());
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("tracking [globalbioticinteractions/ucsb-izc]...done.\nwrote [globalbioticinteractions/ucsb-izc]\n"));

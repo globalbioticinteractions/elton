@@ -66,6 +66,8 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                 cache
         );
 
+        dataset.setConfig(this.dataset.getConfig());
+
         DatasetWithCache datasetWithCache = new DatasetWithCache(dataset, cache);
 
         Dataset datasetWithCacheAndConfig = new DatasetFactory(new DatasetRegistry() {

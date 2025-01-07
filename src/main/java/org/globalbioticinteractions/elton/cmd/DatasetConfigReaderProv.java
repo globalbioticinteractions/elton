@@ -49,61 +49,80 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
     public Dataset readConfig(String line) throws IOException {
         Dataset dataset = null;
         if (StringUtils.contains(line, ASSOCIATED_WITH)) {
-            // possible namespace statement
-            Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
-            Matcher matcher = namespacePattern.matcher(line);
-            if (matcher.matches()) {
-                dataset = attemptToCreateDataset(dataset);
-                String location = matcher.group("location");
-                resourceLocation = RefNodeFactory.toIRI(location);
-                resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
-                resourceFormat = "application/globi";
-                resourceActivityContext = RefNodeFactory.toIRI(matcher.group("activity"));
-                contextComplete = false;
-            }
+            dataset = handleAssociation(line, dataset);
         } else if (StringUtils.contains(line, FORMAT)) {
-            Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
-            Matcher matcher = namespacePattern.matcher(line);
-            if (matcher.matches()) {
-                String location = matcher.group("location");
-                if (resourceLocation == null
-                        || !StringUtils.equals(location, resourceLocation.getIRIString())) {
-                    if (resourceNamespace == null) {
-                        resetContext();
-                        resourceLocation = RefNodeFactory.toIRI(location);
-                        resourceNamespace = RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local");
-                    }
-                }
-                resourceFormat = matcher.group("format");
-            }
-            // possible format statement
+            handleFormat(line);
         } else if (StringUtils.contains(line, HAS_VERSION)) {
-            // possible version statement
-            Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)> <(?<activity>[^>]+)> [.]");
-            Matcher matcher = namespacePattern.matcher(line);
-            if (matcher.matches()) {
-                String location = matcher.group("location");
-                if (contextSupported()) {
-                    if (inSameActivity(matcher)) {
-                        IRI version = setVersionOnMatchingLocation(matcher, location);
-                        if (contextSupported()) {
-                            contextDeps.put(URI.create(location), version);
-                        }
-                    }
-                } else {
-                    setVersionOnMatchingLocation(matcher, location);
-                }
-
-            }
+            handleVersion(line);
         } else if (StringUtils.contains(line, ENDED_AT_TIME)) {
-            Pattern namespacePattern = Pattern.compile("<(?<activity>[^>]+)>" + ENDED_AT_TIME + ".*");
-            Matcher matcher = namespacePattern.matcher(line);
-            if (matcher.matches()) {
-                contextComplete = inSameActivity(matcher);
-            }
+            handleEnded(line);
         }
 
-        return createDatasetIfComplete(dataset);
+        return dataset == null
+                ? createDatasetIfComplete(dataset)
+                : dataset;
+    }
+
+    private void handleEnded(String line) {
+        Pattern namespacePattern = Pattern.compile("<(?<activity>[^>]+)>" + ENDED_AT_TIME + ".*");
+        Matcher matcher = namespacePattern.matcher(line);
+        if (matcher.matches()) {
+            contextComplete = inSameActivity(matcher);
+        }
+    }
+
+    private void handleVersion(String line) {
+        // possible version statement
+        Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)> <(?<activity>[^>]+)> [.]");
+        Matcher matcher = namespacePattern.matcher(line);
+        if (matcher.matches()) {
+            String location = matcher.group("location");
+            if (contextSupported()) {
+                if (inSameActivity(matcher)) {
+                    IRI version = setVersionOnMatchingLocation(matcher, location);
+                    if (contextSupported()) {
+                        contextDeps.put(URI.create(location), version);
+                    }
+                }
+            } else {
+                setVersionOnMatchingLocation(matcher, location);
+            }
+
+        }
+    }
+
+    private void handleFormat(String line) {
+        Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
+        Matcher matcher = namespacePattern.matcher(line);
+        if (matcher.matches()) {
+            String location = matcher.group("location");
+            if (resourceLocation == null
+                    || !StringUtils.equals(location, resourceLocation.getIRIString())) {
+                if (resourceNamespace == null) {
+                    resetContext();
+                    resourceLocation = RefNodeFactory.toIRI(location);
+                    resourceNamespace = RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local");
+                }
+            }
+            resourceFormat = matcher.group("format");
+        }
+        // possible format statement
+    }
+
+    private Dataset handleAssociation(String line, Dataset dataset) {
+        // possible namespace statement
+        Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
+        Matcher matcher = namespacePattern.matcher(line);
+        if (matcher.matches()) {
+            dataset = attemptToCreateDataset(dataset);
+            String location = matcher.group("location");
+            resourceLocation = RefNodeFactory.toIRI(location);
+            resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
+            resourceFormat = "application/globi";
+            resourceActivityContext = RefNodeFactory.toIRI(matcher.group("activity"));
+            contextComplete = false;
+        }
+        return dataset;
     }
 
     private IRI setVersionOnMatchingLocation(Matcher matcher, String location) {

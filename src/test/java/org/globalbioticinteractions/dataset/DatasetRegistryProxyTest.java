@@ -39,6 +39,17 @@ public class DatasetRegistryProxyTest {
         assertThat(registry.datasetFor("two").getNamespace(), is("one|two"));
     }
 
+    @Test
+    public void twoFindersTwoMatchesDynamicNamespaceAssignment() throws DatasetRegistryException {
+        DatasetRegistry registry = new DatasetRegistryProxy(Arrays.asList(
+                new DatasetRegistryMock(Arrays.asList("one")),
+                new DatasetRegistryMock(Arrays.asList("one", "two"))
+        ));
+
+        assertThat(registry.datasetFor("one").getNamespace(), is("one"));
+        assertThat(registry.datasetFor("two").getNamespace(), is("one|two"));
+    }
+
     @Test(expected = DatasetRegistryException.class)
     public void oneFinderNoMatch() throws DatasetRegistryException {
         DatasetRegistry registry = new DatasetRegistryProxy(Collections.singletonList(

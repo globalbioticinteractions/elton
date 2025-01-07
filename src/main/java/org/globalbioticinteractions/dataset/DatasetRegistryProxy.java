@@ -76,14 +76,17 @@ public class DatasetRegistryProxy implements DatasetRegistry {
     }
 
     private Dataset queryForDataset(String namespace) throws DatasetRegistryException {
-        Dataset dataset = null;
+        Dataset datasetFirst = null;
         DatasetRegistryException lastException = null;
         List<DatasetRegistry> availableRegistriesForNamespace = new ArrayList<>();
         for (DatasetRegistry datasetRegistry : registries) {
             try {
-                dataset = datasetRegistry.datasetFor(namespace);
+                Dataset dataset = datasetRegistry.datasetFor(namespace);
                 if (dataset != null) {
                     availableRegistriesForNamespace.add(datasetRegistry);
+                }
+                if (datasetFirst == null) {
+                    datasetFirst = dataset;
                 }
             } catch (DatasetRegistryException ex) {
                 lastException = ex;
@@ -98,9 +101,7 @@ public class DatasetRegistryProxy implements DatasetRegistry {
             associateNamespaceWithRegistry(availableRegistriesForNamespace.get(0), namespace);
         }
 
-
-
-        return dataset;
+        return datasetFirst;
     }
 
 }

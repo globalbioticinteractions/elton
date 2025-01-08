@@ -370,7 +370,7 @@ public class CmdStreamTest {
         tmpDir.mkdirs();
 
 
-        populateCacheWithResource(tmpDir, "/9ca04827ee8fa98828e9db1b50dedf95bd02afa4553f2de63c13fa468708e0b7.zip");
+        populateCacheWithResource(tmpDir, "/template-dataset-0.0.3.zip");
 
         cmdStream.setWorkDir(tmpDir.getAbsolutePath());
         cmdStream.setDataDir(tmpDir.getAbsolutePath());
@@ -403,7 +403,7 @@ public class CmdStreamTest {
 
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 
-        assertThat(filenames, hasItems("9ca04827ee8fa98828e9db1b50dedf95bd02afa4553f2de63c13fa468708e0b7"));
+        assertThat(filenames, hasItems("5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060"));
 
         assertHeaderAndMore(outputStream, headerInteractions());
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream from [globalbioticinteractions/template-dataset]...done.\ndone processing [globalbioticinteractions/template-dataset].\n"));

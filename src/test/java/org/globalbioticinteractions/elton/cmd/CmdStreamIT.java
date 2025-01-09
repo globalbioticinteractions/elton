@@ -89,7 +89,7 @@ public class CmdStreamIT {
 
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 
-        assertThat(filenames, hasItems("aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d"));
+        assertThat(filenames, hasItems("fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423"));
 
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream from [globalbioticinteractions/ucsb-izc]...done.\ndone processing [globalbioticinteractions/ucsb-izc].\n"));
 

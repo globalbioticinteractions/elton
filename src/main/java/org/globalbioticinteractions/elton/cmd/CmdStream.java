@@ -103,12 +103,7 @@ public class CmdStream extends CmdDefaultParams {
                 isCacheEnabled(),
                 getRemotes(),
                 getHashType(),
-                new DerefProgressListener() {
-                    @Override
-                    public void onProgress(IRI iri, DerefState derefState, long l, long l1) {
-
-                    }
-                },
+                getProgressListener(),
                 isSupportTarGzDiscovery()
         );
 
@@ -143,6 +138,19 @@ public class CmdStream extends CmdDefaultParams {
         } catch (IOException ex) {
             LOG.error("failed to read from stdin", ex);
         }
+    }
+
+    private DerefProgressListener getProgressListener() {
+        return hideProgressIndicator()
+        ? (iri, derefState, l, l1) -> {}
+        : new DerefProgressListener() {
+    private ProgressCursor progressCursor = getProgressCursorFactory().createProgressCursor();
+
+    @Override
+    public void onProgress(IRI dataURI, DerefState derefState, long read, long total) {
+        progressCursor.increment();
+    }
+};
     }
 
     private boolean isCacheEnabled() {

@@ -53,8 +53,6 @@ class StreamingDatasetsHandler implements NamespaceHandler {
 
     @Override
     public void onNamespace(String namespace) throws Exception {
-        stderr.print("processing data stream from [" + namespace + "]...");
-
         URI archiveURI = this.dataset.getArchiveURI();
         if (archiveURI == null && this.dataset.getConfig() != null) {
             archiveURI = URI.create(this.dataset.getOrDefault("url", null));
@@ -97,14 +95,11 @@ class StreamingDatasetsHandler implements NamespaceHandler {
                     loggerFactory.createImportLogger(),
                     new File(dataDir)
             );
-            stderr.println("done.");
         } catch (StudyImporterException ex) {
             LOG.error("procecssing of [" + namespace + "] failed.", ex);
             stderr.println("failed with [ " + ex.getMessage() + "].");
             ex.printStackTrace(stderr);
         }
-
-        IOUtils.write("done processing [" + namespace + "].\n", stderr, StandardCharsets.UTF_8);
     }
 
 }

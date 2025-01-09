@@ -67,7 +67,7 @@ abstract class CmdDefaultParams implements Runnable {
     )
     private String workDir = ".";
 
-    public boolean isNoProgress() {
+    public boolean hideProgressIndicator() {
         return noProgress;
     }
 

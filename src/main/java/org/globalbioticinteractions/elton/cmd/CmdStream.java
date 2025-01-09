@@ -7,8 +7,11 @@ import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.BlobStoreReadOnly;
 import bio.guoda.preston.store.KeyTo3LevelPath;
 import bio.guoda.preston.store.KeyValueStore;
+import bio.guoda.preston.store.KeyValueStoreConfig;
+import bio.guoda.preston.store.KeyValueStoreFactoryImpl;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
+import bio.guoda.preston.store.ValidatingKeyValueStreamFactory;
 import bio.guoda.preston.stream.ContentHashDereferencer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
@@ -93,17 +96,14 @@ public class CmdStream extends CmdDefaultParams {
         } catch (IOException ex) {
             LOG.error("failed to read from stdin", ex);
         }
-
     }
 
-    private KeyValueStore getKeyValueStore(ValidatingKeyValueStreamContentAddressedFactory validatingKeyValueStreamContentAddressedFactory) {
-        KeyValueStore primary = new KeyValueStoreLocalFileSystem(
-                new File(getWorkDir()),
-                new KeyTo3LevelPath(new File(getDataDir()).toURI()),
-                validatingKeyValueStreamContentAddressedFactory
-        );
+    private KeyValueStore getKeyValueStore(ValidatingKeyValueStreamFactory keyValueStreamFactory) {
+        KeyValueStoreConfig config
+                = new KeyValueStoreConfig(new File(getDataDir()), new File(getWorkDir()), 2);
 
-        return primary;
+        return new KeyValueStoreFactoryImpl(config)
+                .getKeyValueStore(keyValueStreamFactory);
     }
 
     private boolean handleDataset(final Dataset dataset, boolean shouldWriteHeader, Cache cache) throws IOException {

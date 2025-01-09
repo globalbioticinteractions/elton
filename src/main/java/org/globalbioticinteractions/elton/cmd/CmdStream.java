@@ -1,17 +1,15 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.DateUtil;
+import bio.guoda.preston.DerefProgressListener;
+import bio.guoda.preston.DerefState;
 import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.BlobStoreReadOnly;
-import bio.guoda.preston.store.KeyTo3LevelPath;
-import bio.guoda.preston.store.KeyValueStore;
 import bio.guoda.preston.store.KeyValueStoreConfig;
 import bio.guoda.preston.store.KeyValueStoreFactoryImpl;
-import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
 import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
-import bio.guoda.preston.store.ValidatingKeyValueStreamFactory;
 import bio.guoda.preston.stream.ContentHashDereferencer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
@@ -37,6 +35,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,6 +52,42 @@ public class CmdStream extends CmdDefaultParams {
             "example input:" +
             "{ \"namespace\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\", \"citation\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\", \"format\": \"dwca\", \"url\": \"hash://sha256/9cd053d40ef148e16389982ea16d724063b82567f7ba1799962670fc97876fbf\" }\n";
 
+    @CommandLine.Option(
+            names = {"--remote", "--remotes", "--include", "--repos", "--repositories"},
+            split = ",",
+            description = "Included repository dependencies (e.g., https://linker.bio/,https://softwareheritage.org,https://wikimedia.org,https://dataone.org,https://zenodo.org)"
+    )
+
+    private List<URI> remotes = new ArrayList<>();
+
+    @CommandLine.Option(
+            names = {"--no-cache", "--disable-cache"},
+            defaultValue = "false",
+            description = "Disable local content cache"
+    )
+    private Boolean disableCache = false;
+
+    @CommandLine.Option(
+            names = {"--no-progress", "--no-process"},
+            description = "Disable progress monitor"
+    )
+    private Boolean disableProgress = false;
+
+    @CommandLine.Option(
+            names = {"-d", "--depth"},
+            defaultValue = "2",
+            description = "folder depth of data dir"
+    )
+    private int depth = 2;
+
+    @CommandLine.Option(
+            names = {"--hash-algorithm", "--algo", "-a"},
+            description = "Hash algorithm used to generate primary content identifiers. Supported values: ${COMPLETION-CANDIDATES}."
+    )
+    private HashType hashType = HashType.sha256;
+
+    private boolean supportTarGzDiscovery = true;
+
 
     public void setRecordType(String recordType) {
         this.recordType = recordType;
@@ -66,8 +101,26 @@ public class CmdStream extends CmdDefaultParams {
     @Override
     public void doRun() {
 
+        KeyValueStoreConfig config
+                = new KeyValueStoreConfig(
+                new File(getDataDir()),
+                new File(getWorkDir()),
+                2,
+                isCacheEnabled(),
+                getRemotes(),
+                getHashType(),
+                new DerefProgressListener() {
+                    @Override
+                    public void onProgress(IRI iri, DerefState derefState, long l, long l1) {
+
+                    }
+                },
+                isSupportTarGzDiscovery()
+        );
+
         BlobStoreReadOnly blobStore = new BlobStoreAppendOnly(
-                getKeyValueStore(new ValidatingKeyValueStreamContentAddressedFactory()),
+                new KeyValueStoreFactoryImpl(config)
+                        .getKeyValueStore(new ValidatingKeyValueStreamContentAddressedFactory()),
                 true,
                 HashType.sha256
         );
@@ -98,12 +151,8 @@ public class CmdStream extends CmdDefaultParams {
         }
     }
 
-    private KeyValueStore getKeyValueStore(ValidatingKeyValueStreamFactory keyValueStreamFactory) {
-        KeyValueStoreConfig config
-                = new KeyValueStoreConfig(new File(getDataDir()), new File(getWorkDir()), 2);
-
-        return new KeyValueStoreFactoryImpl(config)
-                .getKeyValueStore(keyValueStreamFactory);
+    private boolean isCacheEnabled() {
+        return !getDisableCache();
     }
 
     private boolean handleDataset(final Dataset dataset, boolean shouldWriteHeader, Cache cache) throws IOException {
@@ -146,6 +195,34 @@ public class CmdStream extends CmdDefaultParams {
     @Override
     public String getDescription() {
         return DESCRIPTION;
+    }
+
+    public List<URI> getRemotes() {
+        return remotes;
+    }
+
+    public Boolean getDisableCache() {
+        return disableCache;
+    }
+
+    public Boolean getDisableProgress() {
+        return disableProgress;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public HashType getHashType() {
+        return hashType;
+    }
+
+    public boolean isSupportTarGzDiscovery() {
+        return supportTarGzDiscovery;
+    }
+
+    public void setRemotes(List<URI> remotes) {
+        this.remotes = remotes;
     }
 
     public static class ImportLoggerFactoryImpl implements ImportLoggerFactory {

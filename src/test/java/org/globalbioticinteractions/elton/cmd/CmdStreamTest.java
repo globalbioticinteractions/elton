@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,6 +80,42 @@ public class CmdStreamTest {
         cmdStream.setStdout(new PrintStream(outputStream));
         cmdStream.setStderr(new PrintStream(errorStream));
         cmdStream.setStdin(IOUtils.toInputStream("{ \"url\": \"hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
+        cmdStream.run();
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("processing data stream from [local]..."));
+    }
+
+    @Test
+    public void streamSomeInteractionsUsingLocalRepository() throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+
+        CmdStream cmdStream = new CmdStream();
+
+
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setStdin(IOUtils.toInputStream("{ \"url\": \"hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
+        cmdStream.run();
+
+        String stdout = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+        assertThat(stdout, Is.is(""));
+
+        File repoDir = folder.newFolder("repoDir");
+        repoDir.mkdirs();
+
+        populateCacheWithResource(repoDir, "/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip");
+
+        cmdStream.setStdin(IOUtils.toInputStream("{ \"url\": \"hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44\", \"citation\": \"some citation\" }", StandardCharsets.UTF_8));
+        cmdStream.setRemotes(Arrays.asList(repoDir.toURI()));
         cmdStream.run();
 
         assertHeaderAndMore(outputStream, headerInteractions());

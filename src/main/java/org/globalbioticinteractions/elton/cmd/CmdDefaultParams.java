@@ -67,6 +67,10 @@ abstract class CmdDefaultParams implements Runnable {
     )
     private String workDir = ".";
 
+    public boolean isNoProgress() {
+        return noProgress;
+    }
+
     @CommandLine.Option(names = {"--no-progress", "--silent"},
             description = "Do not show progress indicator (default: ${DEFAULT-VALUE})"
     )

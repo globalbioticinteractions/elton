@@ -446,7 +446,7 @@ public class CmdStreamTest {
         assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream from [globalbioticinteractions/template-dataset]...done.\ndone processing [globalbioticinteractions/template-dataset].\n"));
     }
 
-    private void assertHeaderAndMore(ByteArrayOutputStream outputStream, String prefix) {
+    static void assertHeaderAndMore(ByteArrayOutputStream outputStream, String prefix) {
         String stdout = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
         assertThat(stdout, startsWith(prefix));
         assertThat(stdout.split("\n").length, Is.is(greaterThan(1)));
@@ -739,7 +739,7 @@ public class CmdStreamTest {
         return "taxonId\ttaxonName\ttaxonRank\ttaxonPathIds\ttaxonPath\ttaxonPathNames\tnamespace\tcitation\tarchiveURI\tlastSeenAt\tcontentHash\teltonVersion";
     }
 
-    private String headerInteractions() {
+    static String headerInteractions() {
         return "argumentTypeId\tsourceOccurrenceId\tsourceCatalogNumber\tsourceCollectionCode\tsourceCollectionId\tsourceInstitutionCode\tsourceTaxonId\tsourceTaxonName\tsourceTaxonRank\tsourceTaxonPathIds\tsourceTaxonPath\tsourceTaxonPathNames\tsourceBodyPartId\tsourceBodyPartName\tsourceLifeStageId\tsourceLifeStageName\tsourceSexId\tsourceSexName\tinteractionTypeId\tinteractionTypeName\ttargetOccurrenceId\ttargetCatalogNumber\ttargetCollectionCode\ttargetCollectionId\ttargetInstitutionCode\ttargetTaxonId\ttargetTaxonName\ttargetTaxonRank\ttargetTaxonPathIds\ttargetTaxonPath\ttargetTaxonPathNames\ttargetBodyPartId\ttargetBodyPartName\ttargetLifeStageId\ttargetLifeStageName\ttargetSexId\ttargetSexName\tbasisOfRecordId\tbasisOfRecordName\thttp://rs.tdwg.org/dwc/terms/eventDate\tdecimalLatitude\tdecimalLongitude\tlocalityId\tlocalityName\treferenceDoi\treferenceUrl\treferenceCitation\tnamespace\tcitation\tarchiveURI\tlastSeenAt\tcontentHash\teltonVersion";
     }
 

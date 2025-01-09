@@ -68,12 +68,6 @@ public class CmdStream extends CmdDefaultParams {
     private Boolean disableCache = false;
 
     @CommandLine.Option(
-            names = {"--no-progress", "--no-process"},
-            description = "Disable progress monitor"
-    )
-    private Boolean disableProgress = false;
-
-    @CommandLine.Option(
             names = {"-d", "--depth"},
             defaultValue = "2",
             description = "folder depth of data dir"
@@ -203,10 +197,6 @@ public class CmdStream extends CmdDefaultParams {
 
     public Boolean getDisableCache() {
         return disableCache;
-    }
-
-    public Boolean getDisableProgress() {
-        return disableProgress;
     }
 
     public int getDepth() {

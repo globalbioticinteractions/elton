@@ -9,6 +9,12 @@ import java.io.PrintStream;
 @CommandLine.Command (name = "version", description = "Print versions")
 public class CmdVersion implements Runnable {
 
+    @CommandLine.Option(names = {"--verbose"},
+            description = "include versions of libraries used by Elton also"
+    )
+    private boolean verbose = false;
+
+
     @Override
     public void run() {
         PrintStream out = System.out;
@@ -16,7 +22,11 @@ public class CmdVersion implements Runnable {
     }
 
     void run(PrintStream out) {
-        out.println("elton@" + Elton.getVersionString() + " preston@" + VersionUtil.getVersionString());
+        String verboseVersion = "elton@" + Elton.getVersionString() + " preston@" + VersionUtil.getVersionString();
+        out.println(verbose ? Elton.getVersionString() : verboseVersion);
     }
 
+    public void setVerbose(boolean b) {
+        this.verbose = verbose;
+    }
 }

@@ -23,6 +23,7 @@ public class CmdVersionTest {
     @Test
     public void showVersions() {
         CmdVersion cmdVersion = new CmdVersion();
+        cmdVersion.setVerbose(false);
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         cmdVersion.run(new PrintStream(stdout));
         assertThat(new String(stdout.toByteArray(), StandardCharsets.UTF_8), Is.is("dev\n"));

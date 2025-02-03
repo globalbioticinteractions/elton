@@ -23,10 +23,10 @@ public class CmdVersion implements Runnable {
 
     void run(PrintStream out) {
         String verboseVersion = "elton@" + Elton.getVersionString() + " preston@" + VersionUtil.getVersionString();
-        out.println(verbose ? Elton.getVersionString() : verboseVersion);
+        out.println(verbose ? verboseVersion : Elton.getVersionString());
     }
 
-    public void setVerbose(boolean b) {
+    public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 }

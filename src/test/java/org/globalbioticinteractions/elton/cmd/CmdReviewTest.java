@@ -74,7 +74,7 @@ public class CmdReviewTest {
         String localTestPath = "src/test/resources/dataset-local-test";
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
-        runCheck(localTestPath, errOs, outOs, 100L, false, 3);
+        runCheck(localTestPath, errOs, outOs, 100L, false, 7);
 
         assertThat(errOs.toString(), containsString("creating review [local]..."));
         assertThat(errOs.toString(), endsWith("done.\n"));
@@ -100,7 +100,7 @@ public class CmdReviewTest {
                 outOs,
                 100L,
                 true,
-                3
+                7
         );
 
         assertThat(errOs.toString(), containsString("creating review [local]..."));
@@ -135,7 +135,7 @@ public class CmdReviewTest {
                 100,
                 Collections.singletonList(ReviewCommentType.summary),
                 false,
-                3);
+                7);
 
         assertThat(errOs.toString(), containsString("creating review [local]..."));
         assertThat(errOs.toString(), endsWith("done.\n"));
@@ -191,7 +191,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 100, false, 4);
+            runCheck("src/test/resources/dataset-local-with-remote-dependency-test", errOs, outOs, 100, false, 8);
         } finally {
             assertThat(outOs.toString(), endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t2 interaction(s)\t\t\t\t\t\t\t\t\t\n" +
@@ -212,7 +212,7 @@ public class CmdReviewTest {
                     outOs,
                     100,
                     false,
-                    2
+                    6
             );
         } finally {
 
@@ -238,7 +238,7 @@ public class CmdReviewTest {
                     outOs,
                     1,
                     false,
-                    4
+                    8
             );
         } finally {
             assertThat(outOs.toString(), endsWith(
@@ -253,7 +253,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs, 10, false, 2);
+            runCheck("src/test/resources/dataset-fmnh-rr-test", errOs, outOs, 10, false, 6);
         } finally {
             String reviewReport = outOs.toString();
             String[] lines = StringUtils.splitPreserveAllTokens(reviewReport, '\n');
@@ -280,7 +280,7 @@ public class CmdReviewTest {
         ByteArrayOutputStream errOs = new ByteArrayOutputStream();
         ByteArrayOutputStream outOs = new ByteArrayOutputStream();
         try {
-            runCheck(localTestPath, errOs, outOs, 100, false, 3);
+            runCheck(localTestPath, errOs, outOs, 100, false, 7);
         } finally {
             assertThat(outOs.toString(), endsWith(
                     "6a550a42-8951-416a-a187-34edbd3f87d0\t1970-01-01T00:00:00Z\telton-dev\tlocal\tsummary\t11 interaction(s)\t\t\t\t\t\t\t\t\t\n" +

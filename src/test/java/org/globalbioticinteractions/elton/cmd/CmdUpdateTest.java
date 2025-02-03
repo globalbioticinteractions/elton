@@ -73,8 +73,8 @@ public class CmdUpdateTest {
         String provLog = new String(stdout.toByteArray(), StandardCharsets.UTF_8);
         String[] lines = provLog.split("\n");
         assertThat(provLog, containsString("interactions.tsv"));
-        assertThat(provLog, containsString("interaction_types_mapping.tsv"));
-        assertThat(provLog, containsString("interaction_types_ignored.tsv"));
+        assertThat(provLog, containsString("interaction_types_mapping.csv"));
+        assertThat(provLog, containsString("interaction_types_ignored.csv"));
         assertThat(lines[lines.length-1], startsWith(cmd.getActivityContext().getActivity().toString()));
         assertThat(lines[lines.length-1], startsWith(cmd.getActivityContext().getActivity().toString()));
 
@@ -146,7 +146,7 @@ public class CmdUpdateTest {
 
         String[] lines = StringUtils.split(provenanceLogString, "\n");
 
-        assertThat(lines.length, is(3));
+        assertThat(lines.length, is(7));
 
         assertThat(lines[0], startsWith("local\tfile://" + localWorkDir.getAbsolutePath() + "/\t\t"));
         assertThat(lines[0], endsWith("application/globi"));

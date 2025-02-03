@@ -4,7 +4,7 @@ import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.util.DatasetImportUtil;
 import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetFactory;
+import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 
@@ -31,7 +31,7 @@ public class NamespaceHandlerImpl implements NamespaceHandler {
 
     @Override
     public void onNamespace(String namespace) throws Exception {
-        Dataset dataset = new DatasetFactory(registry).datasetFor(namespace);
+        Dataset dataset = new DatasetFactoryImpl(registry).datasetFor(namespace);
 
         DatasetImportUtil.importDataset(
                 null,

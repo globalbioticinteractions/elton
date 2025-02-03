@@ -7,7 +7,7 @@ import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.DatasetImportUtil;
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetFactory;
+import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryAccessLogger;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -105,7 +105,7 @@ public class CmdUpdate extends CmdRegistry {
             );
 
             Dataset dataset =
-                    new DatasetFactory(registry, createInputStreamFactory())
+                    new DatasetFactoryImpl(registry, createInputStreamFactory())
                             .datasetFor(namespace);
 
             NodeFactory factory = new NodeFactoryNull();

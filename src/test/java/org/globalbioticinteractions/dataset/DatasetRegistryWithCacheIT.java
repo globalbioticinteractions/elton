@@ -60,7 +60,7 @@ public class DatasetRegistryWithCacheIT {
             );
         });
 
-        Dataset dataset = new DatasetFactory(finder).datasetFor("globalbioticinteractions/template-dataset");
+        Dataset dataset = new DatasetFactoryImpl(finder).datasetFor("globalbioticinteractions/template-dataset");
 
         assertThat(dataset.getArchiveURI().toString(), containsString(expectedURIFragment));
         assertThat(dataset.retrieve(URI.create("globi.json")), Is.is(notNullValue()));
@@ -84,7 +84,7 @@ public class DatasetRegistryWithCacheIT {
                 )
         );
 
-        Dataset dataset = new DatasetFactory(finder).datasetFor("globalbioticinteractions/Catalogue-of-Afrotropical-Bees");
+        Dataset dataset = new DatasetFactoryImpl(finder).datasetFor("globalbioticinteractions/Catalogue-of-Afrotropical-Bees");
 
         assertThat(dataset.getArchiveURI().toString(), containsString("github.com"));
         assertThat(dataset.retrieve(URI.create("globi.json")), Is.is(notNullValue()));
@@ -108,7 +108,7 @@ public class DatasetRegistryWithCacheIT {
                 )
         );
 
-        Dataset dataset = new DatasetFactory(finder).datasetFor("globalbioticinteractions/hafner");
+        Dataset dataset = new DatasetFactoryImpl(finder).datasetFor("globalbioticinteractions/hafner");
 
         try (InputStream resource = dataset.retrieve(URI.create("hafner/gopher_lice_int.csv"))) {
             assertNotNull(resource);

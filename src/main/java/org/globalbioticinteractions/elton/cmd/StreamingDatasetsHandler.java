@@ -10,6 +10,7 @@ import org.globalbioticinteractions.cache.Cache;
 
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactory;
+import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
@@ -68,7 +69,7 @@ class StreamingDatasetsHandler implements NamespaceHandler {
 
         DatasetWithCache datasetWithCache = new DatasetWithCache(dataset, cache);
 
-        Dataset datasetWithCacheAndConfig = new DatasetFactory(new DatasetRegistry() {
+        Dataset datasetWithCacheAndConfig = new DatasetFactoryImpl(new DatasetRegistry() {
             @Override
             public Iterable<String> findNamespaces() throws DatasetRegistryException {
                 return null;

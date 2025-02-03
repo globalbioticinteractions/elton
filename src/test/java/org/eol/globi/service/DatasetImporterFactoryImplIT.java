@@ -25,6 +25,7 @@ import org.globalbioticinteractions.cache.ProvenancePathFactoryImpl;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetConstant;
 import org.globalbioticinteractions.dataset.DatasetFactory;
+import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
@@ -73,7 +74,7 @@ public class DatasetImporterFactoryImplIT {
     @Test
     public void createHafner() throws StudyImporterException, DatasetRegistryException, IOException {
         final DatasetRegistry datasetRegistryGitHubRemote = getDatasetFinderGitHubRemote();
-        Dataset dataset = new DatasetFactory(datasetRegistryGitHubRemote).datasetFor("globalbioticinteractions/hafner");
+        Dataset dataset = new DatasetFactoryImpl(datasetRegistryGitHubRemote).datasetFor("globalbioticinteractions/hafner");
         DatasetImporter importer = new StudyImporterFactoryImpl(null).createImporter(dataset);
         assertThat(importer, is(notNullValue()));
         DatasetImporterForHafner haftnerImporter = (DatasetImporterForHafner) importer;
@@ -131,7 +132,7 @@ public class DatasetImporterFactoryImplIT {
     }
 
     public DatasetImporter importerFor(DatasetRegistryGitHubRemote datasetFinderGitHubRemote, String repo) throws StudyImporterException, DatasetRegistryException {
-        Dataset dataset = new DatasetFactory(datasetFinderGitHubRemote).datasetFor(repo);
+        Dataset dataset = new DatasetFactoryImpl(datasetFinderGitHubRemote).datasetFor(repo);
         return new StudyImporterFactoryImpl(null).createImporter(dataset);
     }
 
@@ -177,7 +178,7 @@ public class DatasetImporterFactoryImplIT {
             );
         }
         );
-        Dataset dataset = new DatasetFactory(datasetRegistry).datasetFor("globalbioticinteractions/jsonld-template-dataset");
+        Dataset dataset = new DatasetFactoryImpl(datasetRegistry).datasetFor("globalbioticinteractions/jsonld-template-dataset");
         DatasetImporter importer = new StudyImporterFactoryImpl(null).createImporter(dataset);
         assertThat(importer, is(notNullValue()));
         assertThat(importer, is(instanceOf(DatasetImporterForJSONLD.class)));
@@ -216,7 +217,7 @@ public class DatasetImporterFactoryImplIT {
     }
 
     DatasetImporter getTemplateImporter(DatasetRegistry datasetRegistry, String repo) throws DatasetRegistryException, StudyImporterException {
-        Dataset dataset = new DatasetFactory(datasetRegistry).datasetFor(repo);
+        Dataset dataset = new DatasetFactoryImpl(datasetRegistry).datasetFor(repo);
         DatasetImporter importer = new StudyImporterFactoryImpl(null).createImporter(dataset);
         assertThat(importer, is(notNullValue()));
         assertThat(importer, is(instanceOf(DatasetImporterForTSV.class)));

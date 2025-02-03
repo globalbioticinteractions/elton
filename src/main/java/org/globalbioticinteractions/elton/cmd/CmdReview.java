@@ -29,6 +29,7 @@ import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetConstant;
 import org.globalbioticinteractions.dataset.DatasetFactory;
+import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.elton.Elton;
@@ -219,7 +220,7 @@ public class CmdReview extends CmdTabularWriterParams {
         try {
             getStderr().print("creating review [" + namespace + "]... ");
 
-            Dataset dataset = new DatasetFactory(
+            Dataset dataset = new DatasetFactoryImpl(
                     registry,
                     inputStreamFactory)
                     .datasetFor(namespace);

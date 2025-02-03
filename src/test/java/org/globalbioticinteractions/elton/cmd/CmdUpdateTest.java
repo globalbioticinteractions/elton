@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -69,8 +70,12 @@ public class CmdUpdateTest {
         String provDir = tmpDir.newFolder("prov").getAbsolutePath();
         assertUpdate(tmpWorkDir, cmd, dataDir, provDir);
 
-        String[] lines = new String(stdout.toByteArray(), StandardCharsets.UTF_8).split("\n");
-        assertThat(lines[lines.length-1], endsWith(cmd.getActivityContext().getActivity() + " ."));
+        String provLog = new String(stdout.toByteArray(), StandardCharsets.UTF_8);
+        String[] lines = provLog.split("\n");
+        assertThat(provLog, containsString("interactions.tsv"));
+        assertThat(provLog, containsString("interaction_types_mapping.tsv"));
+        assertThat(provLog, containsString("interaction_types_ignored.tsv"));
+        assertThat(lines[lines.length-1], startsWith(cmd.getActivityContext().getActivity().toString()));
         assertThat(lines[lines.length-1], startsWith(cmd.getActivityContext().getActivity().toString()));
 
     }

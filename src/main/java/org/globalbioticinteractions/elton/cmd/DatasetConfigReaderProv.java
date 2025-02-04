@@ -12,6 +12,7 @@ import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -172,7 +173,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
     }
 
     private boolean contextSupported() {
-        return "application/globi".equals(resourceFormat);
+        return Arrays.asList("application/globi", "application/dwca").contains(resourceFormat);
     }
 
     private Dataset createDataset() {

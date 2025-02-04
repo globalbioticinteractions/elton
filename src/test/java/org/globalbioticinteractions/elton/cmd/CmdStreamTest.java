@@ -467,7 +467,7 @@ public class CmdStreamTest {
     }
 
     @Test
-    public void streamSomeProvStatementsDwCA() throws IOException, URISyntaxException {
+    public void streamSomeProvStatementsDwCAWithoutGloBIJSON() throws IOException, URISyntaxException {
 
         URL resource = getClass().getResource("/ucsb-izc-slim-dwca.zip");
         assertNotNull(resource);
@@ -475,7 +475,7 @@ public class CmdStreamTest {
         IRI iri = RefNodeFactory.toIRI(resource.toURI());
 
         String provLogGeneratedByElton = "<urn:lsid:globalbioticinteractions.org:globalbioticinteractions/ucsb-izc> <http://www.w3.org/ns/prov#wasAssociatedWith> " + iri + " <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
-                iri + " <http://purl.org/dc/elements/1.1/format> \"application/dwca\" <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                iri + " <http://purl.org/dc/elements/1.1/format> \"application/globi\" <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
                 iri + " <http://purl.org/pav/hasVersion> <hash://sha256/aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
                 "<classpath:/org/globalbioticinteractions/interaction_types_mapping.csv> <http://purl.org/pav/hasVersion> <hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
                 "<classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <http://purl.org/pav/hasVersion> <hash://sha256/7dc2797003a95ac7b97be06fda48b4dc25e7a555a2839a19ad7dc7a148427e43> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +

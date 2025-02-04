@@ -173,7 +173,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
     }
 
     private boolean contextSupported() {
-        return Arrays.asList("application/globi", "application/dwca").contains(resourceFormat);
+        return Arrays.asList("application/globi").contains(resourceFormat);
     }
 
     private Dataset createDataset() {

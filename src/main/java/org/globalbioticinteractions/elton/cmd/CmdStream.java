@@ -11,6 +11,8 @@ import bio.guoda.preston.store.KeyValueStoreConfig;
 import bio.guoda.preston.store.KeyValueStoreFactoryImpl;
 import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import bio.guoda.preston.stream.ContentHashDereferencer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang.StringUtils;
@@ -23,6 +25,7 @@ import org.eol.globi.tool.NullImportLogger;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.ContentProvenance;
 import org.globalbioticinteractions.dataset.Dataset;
+import org.globalbioticinteractions.dataset.DatasetProxy;
 import org.globalbioticinteractions.elton.util.ProgressCursor;
 import org.globalbioticinteractions.elton.util.ProgressCursorFactory;
 import org.slf4j.Logger;
@@ -92,6 +95,12 @@ public class CmdStream extends CmdDefaultParams {
     )
     private String recordType = "interaction";
 
+
+    @CommandLine.Option(names = {"--config"},
+            description = "point to content id (hash) of globi.json config to apply global settings (e.g., custom interaction type mappings). Example: hash://sha256/02682fdd62a3e985dc06236662299f00ec5453c4e6f707d02efa93628f927649 for "
+    )
+    private URI configOverrideReesource = null;
+
     @Override
     public void doRun() {
 
@@ -157,17 +166,21 @@ public class CmdStream extends CmdDefaultParams {
         return !getDisableCache();
     }
 
-    private boolean handleDataset(final Dataset dataset, boolean shouldWriteHeader, Cache cache) throws IOException {
+    private boolean handleDataset(final Dataset datasetProvided, boolean shouldWriteHeader, Cache cache) throws IOException {
         boolean handled = false;
         ImportLoggerFactory loggerFactory = new ImportLoggerFactoryImpl(
                 recordType,
-                dataset.getNamespace(),
+                datasetProvided.getNamespace(),
                 Arrays.asList(ReviewCommentType.values()),
                 getStdout()
         );
         try {
+            Dataset datasetApplied = hasConfigOverride()
+                    ? applyConfigOverride(datasetProvided, cache)
+                    : datasetProvided;
+
             StreamingDatasetsHandler namespaceHandler = new StreamingDatasetsHandler(
-                    dataset,
+                    datasetApplied,
                     getDataDir(),
                     getStderr(),
                     createInputStreamFactory(),
@@ -176,14 +189,14 @@ public class CmdStream extends CmdDefaultParams {
                     getActivityContext(),
                     cache
             );
-            namespaceHandler.onNamespace(dataset.getNamespace());
+            namespaceHandler.onNamespace(datasetProvided.getNamespace());
             handled = true;
         } catch (Exception e) {
-            String msg = "failed to add dataset associated with namespace [" + dataset.getNamespace() + "]";
+            String msg = "failed to add dataset associated with namespace [" + datasetProvided.getNamespace() + "]";
             loggerFactory.createImportLogger().warn(new LogContext() {
                 @Override
                 public String toString() {
-                    return "{ \"namespace\": \"" + dataset.getNamespace() + "\" }";
+                    return "{ \"namespace\": \"" + datasetProvided.getNamespace() + "\" }";
                 }
             }, msg);
             LOG.error(msg, e);
@@ -192,6 +205,18 @@ public class CmdStream extends CmdDefaultParams {
         }
         return handled;
 
+    }
+
+    private boolean hasConfigOverride() {
+        return configOverrideReesource != null;
+    }
+
+    private Dataset applyConfigOverride(Dataset datasetProvided, Cache cache) throws IOException {
+        Dataset datasetApplied;
+        datasetApplied = new DatasetProxy(datasetProvided);
+        JsonNode config = new ObjectMapper().readTree(cache.retrieve(configOverrideReesource));
+        datasetApplied.setConfig(config);
+        return datasetApplied;
     }
 
     @Override
@@ -221,6 +246,10 @@ public class CmdStream extends CmdDefaultParams {
 
     public void setRemotes(List<URI> remotes) {
         this.remotes = remotes;
+    }
+
+    public void setConfigOverrideReesource(URI configOverrideReesource) {
+        this.configOverrideReesource = configOverrideReesource;
     }
 
     public static class ImportLoggerFactoryImpl implements ImportLoggerFactory {

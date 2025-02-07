@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -33,10 +34,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
@@ -630,6 +629,48 @@ public class CmdStreamTest {
         cmdStream.run();
 
         assertHeaderAndMore(outputStream, headerInteractions());
+    }
+
+    @Test
+    public void streamSomeInteractionsCustomNamespaceGlobalOverrideInteractionTypeMapping() throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        CmdStream cmdStream = new CmdStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+
+
+        populateCache(tmpDir);
+        populateCacheWithResource(tmpDir, "/global-globi-config.json");
+        populateCacheWithResource(tmpDir, "/global-interaction_type_mapping_default.csv");
+
+
+        cmdStream.setRecordType("interaction");
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setConfigOverrideReesource(URI.create("hash://sha256/b1a25958aa62f50ffb231fed929d053a4fbd99a9d854ffc9284b338501716685"));
+
+        ObjectNode objectNode = new ObjectMapper().createObjectNode();
+        objectNode.put("namespace", "name/space");
+        objectNode.put("format", "dwca");
+        objectNode.put("url", "hash://sha256/aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d");
+        objectNode.put("citation", "some citation");
+        ObjectNode resources = new ObjectMapper().createObjectNode();
+        resources.put("classpath:/org/globalbioticinteractions/interaction_types_mapping.csv", "hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7");
+        objectNode.set("resources", resources);
+
+
+        cmdStream.setStdin(IOUtils.toInputStream(objectNode.toString(), StandardCharsets.UTF_8));
+        cmdStream.run();
+
+        String stdout = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+        assertThat(stdout, startsWith(headerInteractions()));
+        String[] lines = stdout.split("\n");
+        assertThat(lines.length, Is.is(greaterThan(1)));
+        assertThat(lines[1], containsString("http://purl.obolibrary.org/obo/RO_0002321\tecologicallyRelatedTo"));
     }
 
     @Test

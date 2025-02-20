@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,12 +18,14 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static bio.guoda.preston.RefNodeConstants.HAS_FORMAT;
+
 public class DatasetConfigReaderProv implements DatasetConfigReader {
-    private static final String ASSOCIATED_WITH = " <http://www.w3.org/ns/prov#wasAssociatedWith> ";
-    private static final String FORMAT = " <http://purl.org/dc/elements/1.1/format> ";
-    private static final String HAS_VERSION = " <http://purl.org/pav/hasVersion> ";
+    private static final String ASSOCIATED_WITH = " " + RefNodeConstants.WAS_ASSOCIATED_WITH + " ";
+    private static final String FORMAT = " " + HAS_FORMAT + " ";
+    private static final String HAS_VERSION = " " + RefNodeConstants.HAS_VERSION + " ";
     private static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG = "urn:lsid:globalbioticinteractions.org:";
-    public static final String ENDED_AT_TIME = " <http://www.w3.org/ns/prov#endedAtTime> ";
+    public static final String ENDED_AT_TIME = " " + RefNodeConstants.ENDED_AT_TIME + " ";
     private final ResourceService resourceService;
 
     private IRI resourceActivityContext = null;

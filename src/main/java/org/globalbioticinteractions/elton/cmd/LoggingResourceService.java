@@ -2,10 +2,12 @@ package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.HashType;
 import bio.guoda.preston.Hasher;
+import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
 import bio.guoda.preston.process.StatementsEmitter;
+import bio.guoda.preston.process.StatementsEmitterAdapter;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Quad;
@@ -89,10 +91,37 @@ public class LoggingResourceService implements ResourceService {
                             hashType
                     );
                     this.archiveContentId.set(archiveContentId);
+                    StatementsEmitterAdapter emitterProxy = new StatementsEmitterAdapter() {
+                        private boolean hasLoggedArchiveAssociation = false;
+
+                        @Override
+                        public void emit(Quad quad) {
+                            quad.getGraphName()
+                                    .filter(ctx -> ctx instanceof IRI)
+                                    .map(ctx -> (IRI) ctx)
+                                    .ifPresent(context -> {
+                                        if (!hasLoggedArchiveAssociation) {
+                                            if (isVersionStatement(quad)) {
+                                                CmdUtil.stateDatasetArchiveAssociations(dataset, context)
+                                                        .forEach(activityEmitter::emit);
+                                                hasLoggedArchiveAssociation = true;
+                                            }
+                                        }
+
+                                        activityEmitter.emit(quad);
+                                    });
+
+                        }
+
+                        private boolean isVersionStatement(Quad quad) {
+                            return RefNodeConstants.HAS_VERSION.equals(quad.getPredicate());
+                        }
+
+                    };
                     ActivityUtil.emitDownloadActivity(
                             RefNodeFactory.toIRI(archiveURI),
                             archiveContentId,
-                            activityEmitter,
+                            emitterProxy,
                             Optional.of(ctx.getActivity())
                     );
                 }

@@ -4,7 +4,6 @@ import bio.guoda.preston.HashType;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
 import org.apache.commons.io.output.NullAppendable;
-import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.tool.NullImportLogger;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collections;
-import java.util.List;
 
 @CommandLine.Command(
         name = "log",
@@ -52,7 +50,6 @@ public class CmdLog extends CmdDefaultParams {
         DatasetRegistry proxy = new DatasetRegistryProxy(Collections.singletonList(registry)) {
             public Dataset datasetFor(String namespace) throws DatasetRegistryException {
                 Dataset dataset = super.datasetFor(namespace);
-                emitter.emit(CmdUtil.stateDatasetArchiveAssociations(dataset, ctx));
                 return new DatasetProxy(dataset) {
                     ResourceService service = new LoggingResourceService(dataset, hashType, ctx, emitter);
 

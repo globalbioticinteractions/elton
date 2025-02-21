@@ -15,16 +15,17 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 
 public class CmdLogTest {
@@ -50,12 +51,30 @@ public class CmdLogTest {
         assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
 
         String provenanceLog = new String(out1.toByteArray(), StandardCharsets.UTF_8);
-        assertThat(provenanceLog, containsString("application/globi"));
+        String archiveTypeValue = "application/globi";
+        String archiveVersionStatementPart = "<http://purl.org/pav/hasVersion> <hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f>";
+        assertThat(provenanceLog, containsString(archiveTypeValue));
 
-        int positionOfArchiveTypeStatement = provenanceLog.indexOf("application/globi");
-        int positionOfArchiveVersionStatement = provenanceLog.indexOf("<http://purl.org/pav/hasVersion> <hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f>");
+        String archiveTypeStatement = Arrays.stream(provenanceLog.split("\n"))
+                .filter(line -> StringUtils.contains(line, archiveTypeValue))
+                .map(StringUtils::reverse)
+                .findFirst()
+                .orElse("");
 
-        System.out.println(provenanceLog);
+        String archiveVersionStatement = Arrays.stream(provenanceLog.split("\n"))
+                .filter(line -> StringUtils.contains(line, archiveVersionStatementPart))
+                .map(StringUtils::reverse)
+                .findFirst()
+                .orElse("");
+
+        String commonSuffix = StringUtils.reverse(StringUtils.getCommonPrefix(archiveTypeStatement, archiveVersionStatement));
+
+        assertThat(commonSuffix, is(not("> .")));
+        assertThat(commonSuffix.length(), is(50));
+
+        int positionOfArchiveTypeStatement = provenanceLog.indexOf(archiveTypeValue);
+        int positionOfArchiveVersionStatement = provenanceLog.indexOf
+                (archiveVersionStatementPart);
 
         assertThat(positionOfArchiveTypeStatement, is(lessThan(positionOfArchiveVersionStatement)));
 

@@ -36,7 +36,7 @@ public class DatasetRegistryProvLogger implements DatasetRegistry {
         Dataset dataset = this.getRegistry().datasetFor(namespace);
 
 
-        List<Quad> associateDatasetArchive = CmdUtil.stateDatasetArchiveAssociations(dataset, ctx);
+        List<Quad> associateDatasetArchive = CmdUtil.stateDatasetArchiveAssociations(dataset, ctx.getActivity());
 
 
         associateDatasetArchive.forEach(getStatementListener()::on);

@@ -176,13 +176,13 @@ public class CmdUtil {
         };
     }
 
-    public static List<Quad> stateDatasetArchiveAssociations(Dataset dataset, ActivityContext ctx) {
-        Quad associate = RefNodeFactory.toStatement(ctx.getActivity(),
+    public static List<Quad> stateDatasetArchiveAssociations(Dataset dataset, IRI activity) {
+        Quad associate = RefNodeFactory.toStatement(activity,
                 RefNodeFactory.toIRI("urn:lsid:globalbioticinteractions.org:" + dataset.getNamespace()),
                 RefNodeConstants.WAS_ASSOCIATED_WITH,
                 RefNodeFactory.toIRI(dataset.getArchiveURI()));
 
-        Quad hasFormat = RefNodeFactory.toStatement(ctx.getActivity(),
+        Quad hasFormat = RefNodeFactory.toStatement(activity,
                 RefNodeFactory.toIRI(dataset.getArchiveURI()),
                 RefNodeConstants.HAS_FORMAT,
                 RefNodeFactory.toLiteral(CacheUtil.MIME_TYPE_GLOBI));

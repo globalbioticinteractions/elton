@@ -73,7 +73,7 @@ public class CmdList extends CmdOnlineParams {
                         try {
                             dataset = registry.datasetFor(namespace);
 
-                            CmdUtil.stateDatasetArchiveAssociations(dataset, getActivityContext())
+                            CmdUtil.stateDatasetArchiveAssociations(dataset, getActivityContext().getActivity())
                                     .forEach(getStatementListener()::on);
 
                             String contentHash = dataset.getOrDefault("contentHash", null);

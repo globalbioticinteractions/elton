@@ -14,14 +14,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.core.Is.is;
 
 public class CmdLogTest {
@@ -46,7 +49,17 @@ public class CmdLogTest {
 
         assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
 
-        List<String> split = toVersionStatements(out1);
+        String provenanceLog = new String(out1.toByteArray(), StandardCharsets.UTF_8);
+        assertThat(provenanceLog, containsString("application/globi"));
+
+        int positionOfArchiveTypeStatement = provenanceLog.indexOf("application/globi");
+        int positionOfArchiveVersionStatement = provenanceLog.indexOf("<http://purl.org/pav/hasVersion> <hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f>");
+
+        System.out.println(provenanceLog);
+
+        assertThat(positionOfArchiveTypeStatement, is(lessThan(positionOfArchiveVersionStatement)));
+
+        List<String> split = toVersionStatements(provenanceLog);
         assertThat(split.size(), is(3));
         assertThat(split.get(0), startsWith("<https://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip> <http://purl.org/pav/hasVersion> <hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f> "));
         assertThat(split.get(1), startsWith("<zip:hash://sha256/631d3777cf83e1abea848b59a6589c470cf0c7d0fd99682c4c104481ad9a543f!/globalbioticinteractions-template-dataset-e68f448/globi.json> <http://purl.org/pav/hasVersion> <hash://sha256/1cc8eff62af0e6bb3e7771666e2e4109f351b7dfc6fc1dc8314e5671a8eecb80> "));
@@ -76,7 +89,7 @@ public class CmdLogTest {
         assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(before));
 
 
-        List<String> split = toVersionStatements(out1);
+        List<String> split = toVersionStatements(out1.toString());
 
 
         assertThat(split.size(), is(12));
@@ -109,7 +122,7 @@ public class CmdLogTest {
 
         assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
 
-        List<String> split = toVersionStatements(out1);
+        List<String> split = toVersionStatements(out1.toString());
 
         assertThat(split.size(), is(3));
         assertThat(split.get(0), startsWith("<https://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip> <http://purl.org/pav/hasVersion> <hash://sha1/1bffa147ccca290482329e42a4f7d4c5db5f1d04> "));
@@ -135,7 +148,7 @@ public class CmdLogTest {
 
         assertThat(CmdTestUtil.numberOfDataFiles(cmd.getDataDir()), Is.is(4));
 
-        List<String> versionStatements = toVersionStatements(out1);
+        List<String> versionStatements = toVersionStatements(out1.toString());
 
         assertThat(versionStatements.size(), is(3));
         assertThat(versionStatements.get(2), startsWith("<zip:hash://md5/98ea358786947a5c3217a12a0810ddea!/globalbioticinteractions-template-dataset-e68f448/interactions.tsv> <http://purl.org/pav/hasVersion> <hash://md5/7a53de3ea4bde18126a32f2f95b56843> "));
@@ -143,8 +156,8 @@ public class CmdLogTest {
         assertThat(versionStatements.get(0), startsWith("<https://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip> <http://purl.org/pav/hasVersion> <hash://md5/98ea358786947a5c3217a12a0810ddea>"));
     }
 
-    private List<String> toVersionStatements(ByteArrayOutputStream out1) {
-        String[] split = out1.toString().split("\n");
+    private List<String> toVersionStatements(String s) {
+        String[] split = s.split("\n");
         return Stream.of(split)
                 .filter(x -> StringUtils.contains(x, RefNodeConstants.HAS_VERSION.getIRIString()))
                 .collect(Collectors.toList());

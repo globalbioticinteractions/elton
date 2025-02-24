@@ -6,6 +6,7 @@ import bio.guoda.preston.store.HashKeyUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
@@ -40,7 +41,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     private boolean contextComplete = false;
     private TreeMap<URI, IRI> contextDeps = new TreeMap<>();
     private Map<String, String> activityRelations = new TreeMap<>();
-    private boolean associatingNamespace = false;
+    private Pair<String, String> lastAddedActivityRelation;
 
     public DatasetConfigReaderProv() {
         this(new ResourceService() {
@@ -70,7 +71,11 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
             Pattern namespacePattern = Pattern.compile("<(?<activity>[^>]+)>" + WAS_INFORMED_BY + "<(?<parentActivity>[^>]+)>" + ".*");
             Matcher matcher = namespacePattern.matcher(line);
             if (matcher.matches()) {
-                activityRelations.put(matcher.group("activity"), matcher.group("parentActivity"));
+                String activity = matcher.group("activity");
+                String parentActivity = matcher.group("parentActivity");
+                lastAddedActivityRelation = org.apache.commons.lang3.tuple.Pair.of(activity, parentActivity);
+                activityRelations.put(activity, parentActivity);
+
             }
         }
 
@@ -143,7 +148,6 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
         Matcher matcher = namespacePattern.matcher(line);
         if (matcher.matches()) {
-            associatingNamespace = true;
             dataset = datasetForContextOrReset();
             String location = matcher.group("location");
             resourceLocation = RefNodeFactory.toIRI(location);
@@ -153,7 +157,6 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
             String parentActivity = activityRelations.get(activity.getIRIString());
             resourceActivityContext = parentActivity == null ? activity : RefNodeFactory.toIRI(parentActivity);
             contextComplete = false;
-            associatingNamespace = false;
         }
         return dataset;
     }
@@ -254,12 +257,13 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         resourceActivityContext = null;
         contextComplete = false;
         contextDeps.clear();
-        clearActivityRelationsUnlessAssociatingNamespace();
+        clearActivityRelations();
     }
 
-    private void clearActivityRelationsUnlessAssociatingNamespace() {
-        if (!associatingNamespace) {
-            activityRelations.clear();
+    private void clearActivityRelations() {
+        activityRelations.clear();
+        if (lastAddedActivityRelation != null) {
+            activityRelations.put(lastAddedActivityRelation.getKey(), lastAddedActivityRelation.getValue());
         }
     }
 

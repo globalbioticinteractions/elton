@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.RefNodeFactory;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.hamcrest.core.Is;
@@ -12,9 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 public class DatasetConfigReaderProvTest {
@@ -479,6 +482,22 @@ public class DatasetConfigReaderProvTest {
         assertNull(datasetConfigReaderProv.readConfig("<https://zenodo.org/records/1436853/files/globalbioticinteractions/template-dataset-0.0.3.zip> <http://purl.org/dc/elements/1.1/format> \"application/globi\" <urn:uuid:b382e573-2df0-45ee-acb3-731fe226207d> ."));
         assertNull(datasetConfigReaderProv.readConfig("<https://zenodo.org/records/1436853/files/globalbioticinteractions/template-dataset-0.0.3.zip> <http://purl.org/pav/hasVersion> <hash://sha256/5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060> <urn:uuid:b382e573-2df0-45ee-acb3-731fe226207d> ."));
         assertNotNull(datasetConfigReaderProv.readConfig("<urn:uuid:b382e573-2df0-45ee-acb3-731fe226207d> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-07T22:11:00.241Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:b382e573-2df0-45ee-acb3-731fe226207d> ."));
+    }
+
+    @Test
+    public void compositeHashDetector() {
+        assertTrue(DatasetConfigReaderProv.isCompositeHashIRI(RefNodeFactory.toIRI("zip:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/globi.json")));
+    }
+
+    @Test
+    public void plainContentHash() {
+        assertFalse(DatasetConfigReaderProv.isCompositeHashIRI(RefNodeFactory.toIRI("hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/globi.json")));
+    }
+
+
+    @Test
+    public void plainLocation() {
+        assertFalse(DatasetConfigReaderProv.isCompositeHashIRI(RefNodeFactory.toIRI("https://example.org")));
     }
 
 

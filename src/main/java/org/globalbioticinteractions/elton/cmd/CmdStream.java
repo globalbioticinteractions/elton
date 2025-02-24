@@ -130,7 +130,7 @@ public class CmdStream extends CmdDefaultParams {
 
             DatasetConfigReader jsonDatasetConfigReader = new DatasetConfigReaderJson();
 
-            DatasetConfigReader provDatasetConfigReader = new DatasetConfigReaderProv();
+            DatasetConfigReaderProv provDatasetConfigReader = new DatasetConfigReaderProv();
 
             while (lineIterator.hasNext()) {
                 String line = lineIterator.next();
@@ -138,14 +138,22 @@ public class CmdStream extends CmdDefaultParams {
                 if (dataset == null) {
                     dataset = provDatasetConfigReader.readConfig(line);
                 }
-                if (dataset != null) {
-                    if (handleDataset(dataset, shouldWriteHeader.get(), getCache(blobStore, dataset.getNamespace()))) {
-                        shouldWriteHeader.set(false);
-                    }
-                }
+                handleDataset(blobStore, shouldWriteHeader, dataset);
             }
+
+            provDatasetConfigReader.close();
+            handleDataset(blobStore, shouldWriteHeader, provDatasetConfigReader.datasetForContextOrReset());
+
         } catch (IOException ex) {
             LOG.error("failed to read from stdin", ex);
+        }
+    }
+
+    private void handleDataset(BlobStoreReadOnly blobStore, AtomicBoolean shouldWriteHeader, Dataset dataset) throws IOException {
+        if (dataset != null) {
+            if (handleDataset(dataset, shouldWriteHeader.get(), getCache(blobStore, dataset.getNamespace()))) {
+                shouldWriteHeader.set(false);
+            }
         }
     }
 

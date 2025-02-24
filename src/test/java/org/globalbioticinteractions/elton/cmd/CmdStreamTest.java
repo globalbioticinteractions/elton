@@ -179,10 +179,11 @@ public class CmdStreamTest {
 
         assertHeaderAndMore(outputStream, headerInteractions());
     }
+
     @Test
     public void streamSomeProvStatementsTemplateDataset() throws IOException {
 
-        String provLogGeneratedByElton = "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:9984d0f1-a8e9-4f49-9f9e-bbcaa48b7dea> .\n" +
+        String provLogGeneratedByEltonTrack = "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:9984d0f1-a8e9-4f49-9f9e-bbcaa48b7dea> .\n" +
                 "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent> <urn:uuid:9984d0f1-a8e9-4f49-9f9e-bbcaa48b7dea> .\n" +
                 "<https://preston.guoda.bio> <http://purl.org/dc/terms/description> \"Preston is a software program that finds, archives and provides access to biodiversity datasets.\"@en <urn:uuid:9984d0f1-a8e9-4f49-9f9e-bbcaa48b7dea> .\n" +
                 "<urn:uuid:9984d0f1-a8e9-4f49-9f9e-bbcaa48b7dea> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Activity> <urn:uuid:9984d0f1-a8e9-4f49-9f9e-bbcaa48b7dea> .\n" +
@@ -410,7 +411,7 @@ public class CmdStreamTest {
         cmdStream.setWorkDir(tmpDir.getAbsolutePath());
         cmdStream.setStdout(new PrintStream(outputStream));
         cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByElton, StandardCharsets.UTF_8));
+        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByEltonTrack, StandardCharsets.UTF_8));
 
         Collection<File> filesBefore = FileUtils.listFilesAndDirs(
                 tmpDir,
@@ -437,6 +438,245 @@ public class CmdStreamTest {
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 
         assertThat(filenames, hasItems("5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060"));
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+    }
+
+    @Test
+    public void streamProvStatementsGeneratedByEltonProv() throws IOException {
+
+        String provLogGeneratedByEltonTrack = "<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<https://globalbioticinteractions.org/elton> <http://purl.org/dc/terms/description> \"Elton helps to access, review and index existing species interaction datasets.\"@en <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Activity> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <http://purl.org/dc/terms/description> \"Tracking the origins of species interaction dataset\"@en <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <http://www.w3.org/ns/prov#startedAtTime> \"2025-02-24T19:34:09.636Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <http://www.w3.org/ns/prov#wasStartedBy> <https://globalbioticinteractions.org/elton> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<https://zenodo.org/doi/10.5281/zenodo.998263> <http://www.w3.org/ns/prov#usedBy> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<https://zenodo.org/doi/10.5281/zenodo.998263> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/dc/dcmitype/Software> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<https://zenodo.org/doi/10.5281/zenodo.998263> <http://purl.org/dc/terms/bibliographicCitation> \"Jorrit Poelen, Tobias Kuhn & Katrin Leinweber. (2017/2024). globalbioticinteractions/elton: 0.14.4-SNAPSHOT. Zenodo. https://zenodo.org/doi/10.5281/zenodo.998263\"@en <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<urn:uuid:0659a54f-b713-4f86-a917-5be166a14110> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Entity> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<urn:uuid:0659a54f-b713-4f86-a917-5be166a14110> <http://purl.org/dc/terms/description> \"A biodiversity dataset graph archive.\"@en <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> .\n" +
+                "<hash://sha256/5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<hash://sha256/5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T19:34:09.812Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> <http://www.w3.org/ns/prov#used> <https://zenodo.org/records/1436853/files/globalbioticinteractions/template-dataset-0.0.3.zip> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<urn:lsid:globalbioticinteractions.org:globalbioticinteractions/template-dataset> <http://www.w3.org/ns/prov#wasAssociatedWith> <https://zenodo.org/records/1436853/files/globalbioticinteractions/template-dataset-0.0.3.zip> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<https://zenodo.org/records/1436853/files/globalbioticinteractions/template-dataset-0.0.3.zip> <http://purl.org/dc/elements/1.1/format> \"application/globi\" <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<https://zenodo.org/records/1436853/files/globalbioticinteractions/template-dataset-0.0.3.zip> <http://purl.org/pav/hasVersion> <hash://sha256/5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060> <urn:uuid:cd8f671f-fa08-483b-a531-125641ad9c48> .\n" +
+                "<hash://sha256/1cc8eff62af0e6bb3e7771666e2e4109f351b7dfc6fc1dc8314e5671a8eecb80> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> .\n" +
+                "<hash://sha256/1cc8eff62af0e6bb3e7771666e2e4109f351b7dfc6fc1dc8314e5671a8eecb80> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> .\n" +
+                "<urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T19:34:09.818Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> .\n" +
+                "<urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> .\n" +
+                "<urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> .\n" +
+                "<urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> <http://www.w3.org/ns/prov#used> <zip:hash://sha256/5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060!/globalbioticinteractions-template-dataset-0851959/globi.json> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> .\n" +
+                "<zip:hash://sha256/5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060!/globalbioticinteractions-template-dataset-0851959/globi.json> <http://purl.org/pav/hasVersion> <hash://sha256/1cc8eff62af0e6bb3e7771666e2e4109f351b7dfc6fc1dc8314e5671a8eecb80> <urn:uuid:4573c311-66a4-42e9-8d16-0c0ba596570c> .\n" +
+                "<hash://sha256/f49f665c540214e7d00466e359821de1bc03206f8373d4974220d608ed7b98f3> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> .\n" +
+                "<hash://sha256/f49f665c540214e7d00466e359821de1bc03206f8373d4974220d608ed7b98f3> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> .\n" +
+                "<urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T19:34:09.896Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> .\n" +
+                "<urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> .\n" +
+                "<urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> .\n" +
+                "<urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> <http://www.w3.org/ns/prov#used> <classpath:/org/globalbioticinteractions/interaction_types_ignored.csv> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> .\n" +
+                "<classpath:/org/globalbioticinteractions/interaction_types_ignored.csv> <http://purl.org/pav/hasVersion> <hash://sha256/f49f665c540214e7d00466e359821de1bc03206f8373d4974220d608ed7b98f3> <urn:uuid:2aa07e09-7bda-40d9-8a13-7255bf4ee1df> .\n" +
+                "<hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> .\n" +
+                "<hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> .\n" +
+                "<urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T19:34:09.920Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> .\n" +
+                "<urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> .\n" +
+                "<urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> .\n" +
+                "<urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> <http://www.w3.org/ns/prov#used> <classpath:/org/globalbioticinteractions/interaction_types_mapping.csv> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> .\n" +
+                "<classpath:/org/globalbioticinteractions/interaction_types_mapping.csv> <http://purl.org/pav/hasVersion> <hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7> <urn:uuid:577a32ea-364c-448a-8215-3982bfa42853> .\n" +
+                "<hash://sha256/43aba7b90c686a4890aebd4a90a02d6f82259664524bdad1b22102a29fe9fa07> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> .\n" +
+                "<hash://sha256/43aba7b90c686a4890aebd4a90a02d6f82259664524bdad1b22102a29fe9fa07> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> .\n" +
+                "<urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T19:34:09.923Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> .\n" +
+                "<urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> .\n" +
+                "<urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> .\n" +
+                "<urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> <http://www.w3.org/ns/prov#used> <classpath:/org/globalbioticinteractions/interaction_types_ro_unmapped.csv> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> .\n" +
+                "<classpath:/org/globalbioticinteractions/interaction_types_ro_unmapped.csv> <http://purl.org/pav/hasVersion> <hash://sha256/43aba7b90c686a4890aebd4a90a02d6f82259664524bdad1b22102a29fe9fa07> <urn:uuid:607cf322-efde-451b-b1dc-be74c106b902> .\n" +
+                "<hash://sha256/7dc2797003a95ac7b97be06fda48b4dc25e7a555a2839a19ad7dc7a148427e43> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> .\n" +
+                "<hash://sha256/7dc2797003a95ac7b97be06fda48b4dc25e7a555a2839a19ad7dc7a148427e43> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> .\n" +
+                "<urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T19:34:09.928Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> .\n" +
+                "<urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> .\n" +
+                "<urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> .\n" +
+                "<urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> <http://www.w3.org/ns/prov#used> <classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> .\n" +
+                "<classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <http://purl.org/pav/hasVersion> <hash://sha256/7dc2797003a95ac7b97be06fda48b4dc25e7a555a2839a19ad7dc7a148427e43> <urn:uuid:d5d803f3-1984-4b54-94e8-dbc9e82c31c7> .\n" +
+                "<hash://sha256/1450b1fb1bd0bef14669804377b5824f81c7717a4e416db1da09449ef7d02cf9> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> .\n" +
+                "<hash://sha256/1450b1fb1bd0bef14669804377b5824f81c7717a4e416db1da09449ef7d02cf9> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> .\n" +
+                "<urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T19:34:09.969Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> .\n" +
+                "<urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> .\n" +
+                "<urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:60073b73-643c-41f6-8aa3-4f49d139e770> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> .\n" +
+                "<urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> <http://www.w3.org/ns/prov#used> <zip:hash://sha256/5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060!/globalbioticinteractions-template-dataset-0851959/interactions.tsv> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> .\n" +
+                "<zip:hash://sha256/5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060!/globalbioticinteractions-template-dataset-0851959/interactions.tsv> <http://purl.org/pav/hasVersion> <hash://sha256/1450b1fb1bd0bef14669804377b5824f81c7717a4e416db1da09449ef7d02cf9> <urn:uuid:86973557-442f-495a-81c3-6e461fb1eda5> .\n";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        CmdStream cmdStream = new CmdStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+
+
+        populateCacheWithResource(tmpDir, "/template-dataset-0.0.3.zip");
+
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByEltonTrack, StandardCharsets.UTF_8));
+
+        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
+        assertThat(numberOfFilesBefore, Is.is(1L));
+
+
+        cmdStream.run();
+
+        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
+
+        assertThat(numberOfFilesAfter, Is.is(1L));
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        assertThat(filenames, hasItems("5b4ee64e7384bdf3d75b1d6617edd5d82124567b4ec52b47920ea332837ff060"));
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+    }
+
+    @Test
+    public void streamProvStatementsGeneratedByEltonProvForUCSBIZC() throws IOException {
+
+        String provLogGeneratedByEltonTrack = "<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<https://globalbioticinteractions.org/elton> <http://purl.org/dc/terms/description> \"Elton helps to access, review and index existing species interaction datasets.\"@en <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Activity> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <http://purl.org/dc/terms/description> \"Tracking the origins of species interaction dataset\"@en <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <http://www.w3.org/ns/prov#startedAtTime> \"2025-02-24T20:22:51.096Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <http://www.w3.org/ns/prov#wasStartedBy> <https://globalbioticinteractions.org/elton> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<https://zenodo.org/doi/10.5281/zenodo.998263> <http://www.w3.org/ns/prov#usedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<https://zenodo.org/doi/10.5281/zenodo.998263> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/dc/dcmitype/Software> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<https://zenodo.org/doi/10.5281/zenodo.998263> <http://purl.org/dc/terms/bibliographicCitation> \"Jorrit Poelen, Tobias Kuhn & Katrin Leinweber. (2017/2024). globalbioticinteractions/elton: 0.14.4-SNAPSHOT. Zenodo. https://zenodo.org/doi/10.5281/zenodo.998263\"@en <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<urn:uuid:0659a54f-b713-4f86-a917-5be166a14110> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Entity> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<urn:uuid:0659a54f-b713-4f86-a917-5be166a14110> <http://purl.org/dc/terms/description> \"A biodiversity dataset graph archive.\"@en <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> .\n" +
+                "<hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T20:22:51.267Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> <http://www.w3.org/ns/prov#used> <https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<urn:lsid:globalbioticinteractions.org:globalbioticinteractions/ucsb-izc> <http://www.w3.org/ns/prov#wasAssociatedWith> <https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip> <http://purl.org/dc/elements/1.1/format> \"application/globi\" <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<https://github.com/globalbioticinteractions/ucsb-izc/archive/65ef047765bf2eb5ef8108371b429489bf9c2a27.zip> <http://purl.org/pav/hasVersion> <hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43> <urn:uuid:037d27ec-ae9e-440e-8c79-ffa851763e52> .\n" +
+                "<hash://sha256/14289a70968588a29f8e566053c4509e0784bded38b6ab7172569ac7ceb7cae7> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> .\n" +
+                "<hash://sha256/14289a70968588a29f8e566053c4509e0784bded38b6ab7172569ac7ceb7cae7> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> .\n" +
+                "<urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T20:22:51.271Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> .\n" +
+                "<urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> .\n" +
+                "<urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> .\n" +
+                "<urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> <http://www.w3.org/ns/prov#used> <zip:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/globi.json> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> .\n" +
+                "<zip:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/globi.json> <http://purl.org/pav/hasVersion> <hash://sha256/1a9f4d35f2511e03acf12d4c841a73b9d37964a2ecdde940130338bb07954eaa> <urn:uuid:69a8b326-ff2c-4ed3-a2d5-1d8be1a48fb4> .\n" +
+                "<hash://sha256/14289a70968588a29f8e566053c4509e0784bded38b6ab7172569ac7ceb7cae7> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> .\n" +
+                "<hash://sha256/14289a70968588a29f8e566053c4509e0784bded38b6ab7172569ac7ceb7cae7> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> .\n" +
+                "<urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T20:22:51.419Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> .\n" +
+                "<urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> .\n" +
+                "<urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> .\n" +
+                "<urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> <http://www.w3.org/ns/prov#used> <https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> .\n" +
+                "<https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip> <http://purl.org/pav/hasVersion> <hash://sha256/14289a70968588a29f8e566053c4509e0784bded38b6ab7172569ac7ceb7cae7> <urn:uuid:87e4259b-8a2b-4cd0-a944-e940f740c59d> .\n" +
+                "<hash://sha256/7fafdc19aa1899121e85f68fe05e4ca917157045e683600f203e921c7b99a426> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> .\n" +
+                "<hash://sha256/7fafdc19aa1899121e85f68fe05e4ca917157045e683600f203e921c7b99a426> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> .\n" +
+                "<urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T20:22:51.848Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> .\n" +
+                "<urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> .\n" +
+                "<urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> .\n" +
+                "<urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> <http://www.w3.org/ns/prov#used> <zip:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/interaction_types_mapping.csv> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> .\n" +
+                "<zip:hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43!/ucsb-izc-65ef047765bf2eb5ef8108371b429489bf9c2a27/interaction_types_mapping.csv> <http://purl.org/pav/hasVersion> <hash://sha256/7fafdc19aa1899121e85f68fe05e4ca917157045e683600f203e921c7b99a426> <urn:uuid:c5612b40-04e5-4656-95ee-a05510bd1a58> .\n" +
+                "<hash://sha256/f49f665c540214e7d00466e359821de1bc03206f8373d4974220d608ed7b98f3> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> .\n" +
+                "<hash://sha256/f49f665c540214e7d00466e359821de1bc03206f8373d4974220d608ed7b98f3> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> .\n" +
+                "<urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T20:22:51.858Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> .\n" +
+                "<urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> .\n" +
+                "<urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> .\n" +
+                "<urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> <http://www.w3.org/ns/prov#used> <classpath:/org/globalbioticinteractions/interaction_types_ignored.csv> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> .\n" +
+                "<classpath:/org/globalbioticinteractions/interaction_types_ignored.csv> <http://purl.org/pav/hasVersion> <hash://sha256/f49f665c540214e7d00466e359821de1bc03206f8373d4974220d608ed7b98f3> <urn:uuid:dad92001-542f-43b9-9c26-10a8ee9a4f85> .\n" +
+                "<hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> .\n" +
+                "<hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> .\n" +
+                "<urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T20:22:51.869Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> .\n" +
+                "<urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> .\n" +
+                "<urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> .\n" +
+                "<urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> <http://www.w3.org/ns/prov#used> <classpath:/org/globalbioticinteractions/interaction_types_mapping.csv> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> .\n" +
+                "<classpath:/org/globalbioticinteractions/interaction_types_mapping.csv> <http://purl.org/pav/hasVersion> <hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7> <urn:uuid:c3e1b845-f989-448b-bd97-4770ebd5987a> .\n" +
+                "<hash://sha256/43aba7b90c686a4890aebd4a90a02d6f82259664524bdad1b22102a29fe9fa07> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> .\n" +
+                "<hash://sha256/43aba7b90c686a4890aebd4a90a02d6f82259664524bdad1b22102a29fe9fa07> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> .\n" +
+                "<urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T20:22:51.872Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> .\n" +
+                "<urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> .\n" +
+                "<urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> .\n" +
+                "<urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> <http://www.w3.org/ns/prov#used> <classpath:/org/globalbioticinteractions/interaction_types_ro_unmapped.csv> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> .\n" +
+                "<classpath:/org/globalbioticinteractions/interaction_types_ro_unmapped.csv> <http://purl.org/pav/hasVersion> <hash://sha256/43aba7b90c686a4890aebd4a90a02d6f82259664524bdad1b22102a29fe9fa07> <urn:uuid:0731b190-f6f9-4a36-8729-5ef929dce2ad> .\n" +
+                "<hash://sha256/7dc2797003a95ac7b97be06fda48b4dc25e7a555a2839a19ad7dc7a148427e43> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> .\n" +
+                "<hash://sha256/7dc2797003a95ac7b97be06fda48b4dc25e7a555a2839a19ad7dc7a148427e43> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> .\n" +
+                "<urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> <http://www.w3.org/ns/prov#generatedAtTime> \"2025-02-24T20:22:51.877Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> .\n" +
+                "<urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> .\n" +
+                "<urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:6f3350e3-7f3a-4dd9-b3c3-1c160790f428> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> .\n" +
+                "<urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> <http://www.w3.org/ns/prov#used> <classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> .\n" +
+                "<classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <http://purl.org/pav/hasVersion> <hash://sha256/7dc2797003a95ac7b97be06fda48b4dc25e7a555a2839a19ad7dc7a148427e43> <urn:uuid:d8e45a4e-4665-4335-89c5-06db987aed83> .\n";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        CmdStream cmdStream = new CmdStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+
+
+        populateCacheWithResource(tmpDir, "/ucsb-izc-fat-dwca.zip");
+        populateCacheWithResource(tmpDir, "/ucsb-izc-in-globi-config.zip");
+
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByEltonTrack, StandardCharsets.UTF_8));
+
+        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
+        assertThat(numberOfFilesBefore, Is.is(2L));
+
+
+        cmdStream.run();
+
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is(""));
+
+        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
+
+        assertThat(numberOfFilesAfter, Is.is(2L));
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        String patchedDwcaContentId = "14289a70968588a29f8e566053c4509e0784bded38b6ab7172569ac7ceb7cae7";
+        String globiContentContentId = "1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43";
+        assertThat(filenames, hasItems(patchedDwcaContentId));
+        assertThat(filenames, hasItems(globiContentContentId));
 
         assertHeaderAndMore(outputStream, headerInteractions());
     }
@@ -584,8 +824,8 @@ public class CmdStreamTest {
 
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 
-        assertThat(filenames, hasItems("1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43"));
-        assertThat(filenames, hasItems("1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43"));
+        assertThat(filenames, hasItems("aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d"));
+        assertThat(filenames, hasItems("aa12991df4efe1e392b2316c50d7cf17117cab7509dcc1918cd42c726bb4e36d"));
 
         assertHeaderAndMore(outputStream, headerInteractions());
     }

@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
+import bio.guoda.preston.store.HashKeyUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
@@ -10,22 +11,25 @@ import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static bio.guoda.preston.RefNodeConstants.HAS_FORMAT;
 
-public class DatasetConfigReaderProv implements DatasetConfigReader {
+public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     private static final String ASSOCIATED_WITH = " " + RefNodeConstants.WAS_ASSOCIATED_WITH + " ";
     private static final String FORMAT = " " + HAS_FORMAT + " ";
     private static final String HAS_VERSION = " " + RefNodeConstants.HAS_VERSION + " ";
     private static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG = "urn:lsid:globalbioticinteractions.org:";
     public static final String ENDED_AT_TIME = " " + RefNodeConstants.ENDED_AT_TIME + " ";
+    public static final String WAS_INFORMED_BY = " " + RefNodeConstants.WAS_INFORMED_BY + " ";
     private final ResourceService resourceService;
 
     private IRI resourceActivityContext = null;
@@ -35,6 +39,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
     private IRI resourceVersion = null;
     private boolean contextComplete = false;
     private TreeMap<URI, IRI> contextDeps = new TreeMap<>();
+    private Map<String, String> activityRelations = new TreeMap<>();
 
     public DatasetConfigReaderProv() {
         this(new ResourceService() {
@@ -60,6 +65,12 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
             handleVersion(line);
         } else if (StringUtils.contains(line, ENDED_AT_TIME)) {
             handleEnded(line);
+        } else if (StringUtils.contains(line, WAS_INFORMED_BY)) {
+            Pattern namespacePattern = Pattern.compile("<(?<activity>[^>]+)>" + WAS_INFORMED_BY + "<(?<parentActivity>[^>]+)>" + ".*");
+            Matcher matcher = namespacePattern.matcher(line);
+            if (matcher.matches()) {
+                activityRelations.put(matcher.group("activity"), matcher.group("parentActivity"));
+            }
         }
 
         return dataset == null
@@ -82,10 +93,12 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
         if (matcher.matches()) {
             String location = matcher.group("location");
             if (contextSupported()) {
-                if (inSameActivity(matcher)) {
+                if (inSameActivityOrSharedParentActivity(matcher)) {
                     IRI version = setVersionOnMatchingLocation(matcher, location);
                     if (contextSupported()) {
-                        contextDeps.put(URI.create(location), version);
+                        if (!isCompositeHashIRI(RefNodeFactory.toIRI(location))) {
+                            contextDeps.put(URI.create(location), version);
+                        }
                     }
                 }
             } else {
@@ -93,6 +106,17 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
             }
 
         }
+    }
+
+    static boolean isCompositeHashIRI(IRI iri) {
+        boolean isCompositeHashURI = false;
+        if (HashKeyUtil.isLikelyCompositeHashURI(iri)) {
+            IRI embeddedContentHash = HashKeyUtil.extractContentHash(iri);
+            if (embeddedContentHash != null && !StringUtils.startsWith(iri.getIRIString(), embeddedContentHash.getIRIString())) {
+                isCompositeHashURI = true;
+            }
+        }
+        return isCompositeHashURI;
     }
 
     private void handleFormat(String line) {
@@ -118,12 +142,14 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
         Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
         Matcher matcher = namespacePattern.matcher(line);
         if (matcher.matches()) {
-            dataset = attemptToCreateDataset(dataset);
+            dataset = datasetForContextOrReset();
             String location = matcher.group("location");
             resourceLocation = RefNodeFactory.toIRI(location);
             resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
             resourceFormat = "application/globi";
-            resourceActivityContext = RefNodeFactory.toIRI(matcher.group("activity"));
+            IRI activity = RefNodeFactory.toIRI(matcher.group("activity"));
+            String parentActivity = activityRelations.get(activity.getIRIString());
+            resourceActivityContext = parentActivity == null ? activity : RefNodeFactory.toIRI(parentActivity);
             contextComplete = false;
         }
         return dataset;
@@ -142,6 +168,26 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
         return inSameActivity(activity);
     }
 
+    private boolean inSameActivityOrSharedParentActivity(Matcher matcher) {
+        String activity = matcher.group("activity");
+        boolean sameActivity = false;
+        if (inSameActivity(activity)) {
+            sameActivity = true;
+        } else {
+            String parentRelation = activityRelations.get(activity);
+            while (StringUtils.isNotBlank(parentRelation)
+                    && !StringUtils.equals(parentRelation, activity)) {
+                if (inSameActivity(parentRelation)) {
+                    sameActivity = true;
+                    break;
+                } else {
+                    parentRelation = activityRelations.get(parentRelation);
+                }
+            }
+        }
+        return sameActivity;
+    }
+
     private boolean inSameActivity(String activity) {
         boolean sameActivity = false;
         if (resourceActivityContext != null && StringUtils.equals(activity, resourceActivityContext.getIRIString())) {
@@ -150,7 +196,8 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
         return sameActivity;
     }
 
-    private Dataset attemptToCreateDataset(Dataset dataset) {
+    public Dataset datasetForContextOrReset() {
+        Dataset dataset = null;
         if (contextSupported()) {
             dataset = createDataset();
         } else {
@@ -204,5 +251,10 @@ public class DatasetConfigReaderProv implements DatasetConfigReader {
         resourceActivityContext = null;
         contextComplete = false;
         contextDeps.clear();
+    }
+
+    @Override
+    public void close() throws IOException {
+        contextComplete = true;
     }
 }

@@ -40,6 +40,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     private boolean contextComplete = false;
     private TreeMap<URI, IRI> contextDeps = new TreeMap<>();
     private Map<String, String> activityRelations = new TreeMap<>();
+    private boolean associatingNamespace = false;
 
     public DatasetConfigReaderProv() {
         this(new ResourceService() {
@@ -142,6 +143,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
         Matcher matcher = namespacePattern.matcher(line);
         if (matcher.matches()) {
+            associatingNamespace = true;
             dataset = datasetForContextOrReset();
             String location = matcher.group("location");
             resourceLocation = RefNodeFactory.toIRI(location);
@@ -151,6 +153,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
             String parentActivity = activityRelations.get(activity.getIRIString());
             resourceActivityContext = parentActivity == null ? activity : RefNodeFactory.toIRI(parentActivity);
             contextComplete = false;
+            associatingNamespace = false;
         }
         return dataset;
     }
@@ -251,6 +254,13 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         resourceActivityContext = null;
         contextComplete = false;
         contextDeps.clear();
+        clearActivityRelationsUnlessAssociatingNamespace();
+    }
+
+    private void clearActivityRelationsUnlessAssociatingNamespace() {
+        if (!associatingNamespace) {
+            activityRelations.clear();
+        }
     }
 
     @Override

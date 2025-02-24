@@ -9,9 +9,9 @@ import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.dataset.DatasetRegistryAccessLogger;
+import org.globalbioticinteractions.dataset.DatasetRegistryLogIntoAccessTable;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
-import org.globalbioticinteractions.dataset.DatasetRegistryProvLogger;
+import org.globalbioticinteractions.dataset.DatasetRegistryLogAsNQuads;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
@@ -70,11 +70,11 @@ public class CmdUpdate extends CmdRegistry {
 
         DatasetRegistry registryProxy = new DatasetRegistryProxy(registries);
 
-        DatasetRegistryAccessLogger accessLogger = new DatasetRegistryAccessLogger(registryProxy, getProvDir());
+        DatasetRegistry accessLogger = new DatasetRegistryLogIntoAccessTable(registryProxy, getProvDir());
 
         DatasetRegistryProxy provAndAccessLogger = new DatasetRegistryProxy(
                 Arrays.asList(
-                        new DatasetRegistryProvLogger(registryProxy, getStatementListener(), getActivityContext()),
+                        new DatasetRegistryLogAsNQuads(registryProxy, getStatementListener(), getActivityContext()),
                         accessLogger
                 )
         );

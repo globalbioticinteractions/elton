@@ -8,15 +8,15 @@ import org.globalbioticinteractions.elton.cmd.CmdUtil;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class DatasetRegistryProvLogger implements DatasetRegistry {
+public class DatasetRegistryLogAsNQuads implements DatasetRegistry {
     private final DatasetRegistry registry;
 
     private final StatementListener listener;
     private final ActivityContext ctx;
 
-    public DatasetRegistryProvLogger(DatasetRegistry registryProxy,
-                                     StatementListener listener,
-                                     ActivityContext activityContext) {
+    public DatasetRegistryLogAsNQuads(DatasetRegistry registryProxy,
+                                      StatementListener listener,
+                                      ActivityContext activityContext) {
         this.registry = registryProxy;
         this.listener = listener;
         this.ctx = activityContext;

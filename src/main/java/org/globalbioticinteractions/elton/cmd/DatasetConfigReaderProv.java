@@ -104,6 +104,10 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
                     if (contextSupported()) {
                         if (!isCompositeHashIRI(RefNodeFactory.toIRI(location))) {
                             contextDeps.put(URI.create(location), version);
+                            if (StringUtils.startsWith(location, resourceLocation.getIRIString())) {
+                                contextDeps.put(URI.create("/" + StringUtils.removeStart(location, resourceLocation.getIRIString())), version);
+                                contextDeps.put(URI.create(StringUtils.removeStart(location, resourceLocation.getIRIString())), version);
+                            }
                         }
                     }
                 }
@@ -236,7 +240,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         String resourceNamespaceString = resourceNamespace.getIRIString();
         String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
 
-        Dataset dataset = new DatasetWithResourceMapping(namespace, URI.create(resourceVersion.getIRIString()), resourceService);
+        Dataset dataset = new DatasetWithResourceMapping(namespace, URI.create(resourceVersion == null ? resourceLocation.getIRIString() : resourceVersion.getIRIString()), resourceService);
         ObjectNode config = new ObjectMapper().createObjectNode();
         ObjectNode resourceVersions = new ObjectMapper().createObjectNode();
         contextDeps.forEach((location, version) -> {

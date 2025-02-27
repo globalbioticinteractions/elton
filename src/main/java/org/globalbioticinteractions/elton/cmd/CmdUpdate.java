@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.HashType;
 import org.apache.commons.io.FileUtils;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;

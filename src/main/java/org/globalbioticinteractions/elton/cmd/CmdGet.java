@@ -6,7 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
-import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;

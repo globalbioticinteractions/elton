@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.HashType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -40,7 +41,19 @@ public class CmdUpdateTest {
 
         CmdRegistry cmd = new CmdUpdate();
         File file = tmpDir.newFolder();
-        assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath());
+        assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath(), "121a46e829f692336bb2038348eb2c174595023a8bc4ed638319d7329b7ff82a", "d639552071756cb98372f92c6f1eef2c99f4e25b469be56c24fab172fb454bd9");
+    }
+
+    @Test
+    public void updateLocalDatasetMD5() throws IOException, URISyntaxException {
+        URL localDataset = getClass().getResource("/dataset-local-test/globi.json");
+        File localWorkDir = new File(localDataset.toURI()).getParentFile();
+        File tmpWorkDir = createTmpWorkDir(localWorkDir);
+
+        CmdRegistry cmd = new CmdUpdate();
+        cmd.setHashType(HashType.md5);
+        File file = tmpDir.newFolder();
+        assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath(), "d7b14d405c11cf1c339babcdd2cd0cd1", "15debfc10818e9bdfd5ebc5643bece7d");
     }
 
     @Test
@@ -52,7 +65,7 @@ public class CmdUpdateTest {
         CmdRegistry cmd = new CmdUpdate();
         String dataDir = tmpDir.newFolder("data").getAbsolutePath();
         String provDir = tmpDir.newFolder("prov").getAbsolutePath();
-        assertUpdate(tmpWorkDir, cmd, dataDir, provDir);
+        assertUpdate(tmpWorkDir, cmd, dataDir, provDir, "121a46e829f692336bb2038348eb2c174595023a8bc4ed638319d7329b7ff82a", "d639552071756cb98372f92c6f1eef2c99f4e25b469be56c24fab172fb454bd9");
     }
 
 
@@ -68,7 +81,7 @@ public class CmdUpdateTest {
         cmd.setStdout(new PrintStream(stdout));
         String dataDir = tmpDir.newFolder("data").getAbsolutePath();
         String provDir = tmpDir.newFolder("prov").getAbsolutePath();
-        assertUpdate(tmpWorkDir, cmd, dataDir, provDir);
+        assertUpdate(tmpWorkDir, cmd, dataDir, provDir, "121a46e829f692336bb2038348eb2c174595023a8bc4ed638319d7329b7ff82a", "d639552071756cb98372f92c6f1eef2c99f4e25b469be56c24fab172fb454bd9");
 
         String provLog = new String(stdout.toByteArray(), StandardCharsets.UTF_8);
         String[] lines = provLog.split("\n");
@@ -99,10 +112,15 @@ public class CmdUpdateTest {
         file.delete();
 
         CmdRegistry cmd = new CmdUpdate();
-        assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath());
+        assertUpdate(tmpWorkDir, cmd, file.getAbsolutePath(), file.getAbsolutePath(), "121a46e829f692336bb2038348eb2c174595023a8bc4ed638319d7329b7ff82a", "d639552071756cb98372f92c6f1eef2c99f4e25b469be56c24fab172fb454bd9");
     }
 
-    private void assertUpdate(File localWorkDir, CmdRegistry cmd, String dataDir, String provDir) throws IOException {
+    private void assertUpdate(File localWorkDir,
+                              CmdRegistry cmd,
+                              String dataDir,
+                              String provDir,
+                              String expectedGlobiJsonHash,
+                              String expectedInteractionsTsvHash) throws IOException {
         cmd.setDataDir(dataDir);
         cmd.setProvDir(provDir);
         cmd.setWorkDir(localWorkDir.getAbsolutePath());
@@ -150,8 +168,8 @@ public class CmdUpdateTest {
 
         assertThat(lines[0], startsWith("local\tfile://" + localWorkDir.getAbsolutePath() + "/\t\t"));
         assertThat(lines[0], endsWith("application/globi"));
-        assertThat(lines[1], startsWith("local\tfile://" + new File(localWorkDir, "globi.json").getAbsolutePath() + "\t121a46e829f692336bb2038348eb2c174595023a8bc4ed638319d7329b7ff82a\t"));
-        assertThat(lines[2], startsWith("local\tfile://" + new File(localWorkDir, "interactions.tsv").getAbsolutePath() + "\td639552071756cb98372f92c6f1eef2c99f4e25b469be56c24fab172fb454bd9\t"));
+        assertThat(lines[1], startsWith("local\tfile://" + new File(localWorkDir, "globi.json").getAbsolutePath() + "\t" + expectedGlobiJsonHash + "\t"));
+        assertThat(lines[2], startsWith("local\tfile://" + new File(localWorkDir, "interactions.tsv").getAbsolutePath() + "\t" + expectedInteractionsTsvHash + "\t"));
     }
 
 

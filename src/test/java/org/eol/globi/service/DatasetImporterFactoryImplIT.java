@@ -1,5 +1,6 @@
 package org.eol.globi.service;
 
+import bio.guoda.preston.HashType;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.eol.globi.data.BaseDatasetImporter;
 import org.eol.globi.data.DatasetImporter;
@@ -24,7 +25,6 @@ import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.globalbioticinteractions.cache.ProvenancePathFactoryImpl;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetConstant;
-import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -32,6 +32,7 @@ import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubRemote;
 import org.globalbioticinteractions.dataset.DatasetRegistryWithCache;
 import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
+import org.globalbioticinteractions.elton.store.HashCalculatorImpl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -148,7 +149,9 @@ public class DatasetImporterFactoryImplIT {
                     new ResourceServiceLocalAndRemote(new InputStreamFactoryNoop(), folder.newFolder()),
                     new ResourceServiceLocal(new InputStreamFactoryNoop()),
                     new ContentPathFactoryDepth0(),
-                    new ProvenancePathFactoryImpl()
+                    new ProvenancePathFactoryImpl(),
+                    new HashCalculatorImpl(HashType.sha256)
+
             );
         });
         DatasetImporter importer = getTemplateImporter(datasetRegistry, "globalbioticinteractions/template-dataset");
@@ -174,7 +177,8 @@ public class DatasetImporterFactoryImplIT {
                     new ResourceServiceLocalAndRemote(new InputStreamFactoryNoop(), folder.newFolder()),
                     new ResourceServiceLocal(new InputStreamFactoryNoop()),
                     new ContentPathFactoryDepth0(),
-                    new ProvenancePathFactoryImpl()
+                    new ProvenancePathFactoryImpl(),
+                    new HashCalculatorImpl(HashType.sha256)
             );
         }
         );
@@ -199,7 +203,8 @@ public class DatasetImporterFactoryImplIT {
                             new ResourceServiceLocalAndRemote(inputStreamFactory, cacheDir),
                             new ResourceServiceLocal(inputStreamFactory),
                             new ContentPathFactoryDepth0(),
-                            new ProvenancePathFactoryImpl()
+                            new ProvenancePathFactoryImpl(),
+                            new HashCalculatorImpl(HashType.sha256)
                     );
                 });
         DatasetImporter importer = getTemplateImporter(datasetRegistry, "globalbioticinteractions/template-dataset");

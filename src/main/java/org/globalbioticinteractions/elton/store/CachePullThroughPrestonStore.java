@@ -52,7 +52,8 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                 resourceService,
                 contentPathFactory,
                 dataDir,
-                provDir
+                provDir,
+                new HashCalculatorImpl(hashType)
         );
         this.resourceService = resourceService;
         this.dereferenceListener = dereferenceListener;

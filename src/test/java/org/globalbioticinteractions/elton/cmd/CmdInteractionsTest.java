@@ -47,6 +47,21 @@ public class CmdInteractionsTest {
     }
 
     @Test
+    public void interactionsNoHeaderMD5() throws URISyntaxException, IOException {
+        ByteArrayOutputStream out1 = new ByteArrayOutputStream();
+        PrintStream out = new PrintStream(out1);
+
+        CmdInteractions cmd = new CmdInteractions();
+        String dataDir = CmdTestUtil.cacheDirTestMD5(tmpFolder);
+        cmd.setDataDir(dataDir);
+        cmd.setProvDir(dataDir);
+        cmd.setSkipHeader(true);
+        cmd.setNamespaces(Collections.singletonList("globalbioticinteractions/template-dataset"));
+        cmd.run(out);
+        assertThat(out1.toString().split("\n")[0], is("https://en.wiktionary.org/wiki/support\t\t\t\t\t\t\tLeptoconchus incycloseris\t\t\t\t\t\t\t\t\t\t\thttp://purl.obolibrary.org/obo/RO_0002444\tparasiteOf\t\t\t\t\t\t\tFungia (Cycloseris) costulata\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t10.1007/s13127-011-0039-1\thttps://doi.org/10.1007/s13127-011-0039-1\tGittenberger, A., Gittenberger, E. (2011). Cryptic, adaptive radiation of endoparasitic snails: sibling species of Leptoconchus (Gastropoda: Coralliophilidae) in corals. Org Divers Evol, 11(1), 21–41. doi:10.1007/s13127-011-0039-1\tglobalbioticinteractions/template-dataset\tJorrit H. Poelen. 2014. Species associations manually extracted from literature.\thttps://zenodo.org/record/207958/files/globalbioticinteractions/template-dataset-0.0.2.zip\t2017-09-19T17:01:39Z\t98ea358786947a5c3217a12a0810ddea\tdev"));
+    }
+
+    @Test
     public void interactionsNoHeaderSeparateProvDir() throws URISyntaxException {
         ByteArrayOutputStream out1 = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(out1);

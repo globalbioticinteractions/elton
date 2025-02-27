@@ -33,7 +33,7 @@ public class AccessLogger implements ActivityListener {
                         = new ContentProvenance(this.namespace,
                         URI.create(request.getIRIString()),
                         localPathOfResponseData,
-                        StringUtils.replace(response.getIRIString(), "hash://sha256/", ""),
+                        HashCalculatorImpl.getHexPartIfAvailable(response.getIRIString()),
                         DateUtil.nowDateString()
                 );
 

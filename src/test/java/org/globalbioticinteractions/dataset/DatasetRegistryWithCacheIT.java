@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.dataset;
 
+import bio.guoda.preston.HashType;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactoryNoop;
 import org.eol.globi.util.ResourceServiceHTTP;
@@ -8,6 +9,7 @@ import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.globalbioticinteractions.cache.ProvenancePathFactoryImpl;
+import org.globalbioticinteractions.elton.store.HashCalculatorImpl;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,7 +58,8 @@ public class DatasetRegistryWithCacheIT {
                     new ResourceServiceLocalAndRemote(new InputStreamFactoryNoop(), cacheDir),
                     new ResourceServiceLocal(new InputStreamFactoryNoop()),
                     new ContentPathFactoryDepth0(),
-                    new ProvenancePathFactoryImpl()
+                    new ProvenancePathFactoryImpl(),
+                    new HashCalculatorImpl(HashType.sha256)
             );
         });
 
@@ -80,7 +83,8 @@ public class DatasetRegistryWithCacheIT {
                         new ResourceServiceLocalAndRemote(new InputStreamFactoryNoop(), cacheDir),
                         new ResourceServiceLocal(new InputStreamFactoryNoop()),
                         new ContentPathFactoryDepth0(),
-                        new ProvenancePathFactoryImpl()
+                        new ProvenancePathFactoryImpl(),
+                        new HashCalculatorImpl(HashType.sha256)
                 )
         );
 
@@ -104,7 +108,8 @@ public class DatasetRegistryWithCacheIT {
                         new ResourceServiceLocalAndRemote(new InputStreamFactoryNoop(), cacheDir),
                         new ResourceServiceLocal(new InputStreamFactoryNoop()),
                         new ContentPathFactoryDepth0(),
-                        new ProvenancePathFactoryImpl()
+                        new ProvenancePathFactoryImpl(),
+                        new HashCalculatorImpl(HashType.sha256)
                 )
         );
 

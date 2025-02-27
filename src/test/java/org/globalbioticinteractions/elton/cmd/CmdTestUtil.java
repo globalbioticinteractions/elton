@@ -27,6 +27,14 @@ final class CmdTestUtil {
         return tmpDir.getAbsolutePath();
     }
 
+    static String cacheDirTestMD5(TemporaryFolder tmpFolder) throws URISyntaxException, IOException {
+        String name = "/dataset-cache-test-md5/globalbioticinteractions/template-dataset/access.tsv";
+        String dataStatic = cacheDirTestFor(name);
+        File tmpDir = tmpFolder.newFolder();
+        FileUtils.copyDirectory(new File(dataStatic), tmpDir);
+        return tmpDir.getAbsolutePath();
+    }
+
     static String cacheDirTestFor(String name) throws URISyntaxException {
         URL accessURL = CmdNamesTest.class.getResource(name);
         assertThat(accessURL, is(notNullValue()));

@@ -60,7 +60,8 @@ public class CmdUpdate extends CmdRegistry {
                     getActivityContext(),
                     getActivityIdFactory(),
                     resourceService,
-                    getHashType());
+                    getHashType()
+            );
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);

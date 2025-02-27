@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeConstants;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
@@ -71,7 +72,8 @@ public class CmdUtil {
             ActivityListener activityListener,
             ActivityContext ctx,
             Supplier<IRI> iriFactory,
-            DatasetRegistry datasetRegistry) {
+            DatasetRegistry datasetRegistry,
+            HashType hashType) {
 
         CacheFactory cacheFactory = createCacheFactory(
                 namespace,
@@ -82,7 +84,8 @@ public class CmdUtil {
                 provenancePathFactory,
                 activityListener,
                 ctx,
-                iriFactory
+                iriFactory,
+                hashType
         );
         return new DatasetRegistryWithCache(
                 datasetRegistry,
@@ -98,7 +101,8 @@ public class CmdUtil {
                                                   ProvenancePathFactory provenancePathFactory,
                                                   ActivityListener dereferenceListener,
                                                   ActivityContext ctx,
-                                                  Supplier<IRI> iriFactory) {
+                                                  Supplier<IRI> iriFactory,
+                                                  HashType hashType) {
         return dataset -> {
             ResourceService remote = new ResourceServiceLocalAndRemote(factory, new File(dataDir));
             ResourceService local = new ResourceServiceLocal(factory);
@@ -110,7 +114,8 @@ public class CmdUtil {
                     provDir,
                     dereferenceListener,
                     ctx,
-                    iriFactory);
+                    iriFactory,
+                    hashType);
 
             CacheLocalReadonly readOnlyCache = new CacheLocalReadonly(
                     namespace,

@@ -79,8 +79,13 @@ public class ProvUtil {
         }
     }
 
-    public static void saveGeneratedContentIfNeeded(File tmpSourceFile, IRI iri, String dataDir) throws IOException {
-        File destFile = new File(dataDir, StringUtils.replace(iri.getIRIString(), HashType.sha256.getPrefix(), ""));
+    public static void saveGeneratedContentIfNeeded(File tmpSourceFile,
+                                                    IRI iri,
+                                                    String dataDir,
+                                                    HashType hashType) throws IOException {
+        File destFile = new File(dataDir,
+                StringUtils.replace(iri.getIRIString(), hashType.getPrefix(), "")
+        );
 
         if (destFile.exists()) {
             FileUtils.delete(tmpSourceFile);

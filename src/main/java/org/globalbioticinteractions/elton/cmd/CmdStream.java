@@ -77,12 +77,6 @@ public class CmdStream extends CmdDefaultParams {
     )
     private int depth = 2;
 
-    @CommandLine.Option(
-            names = {"--hash-algorithm", "--algo", "-a"},
-            description = "Hash algorithm used to generate primary content identifiers. Supported values: ${COMPLETION-CANDIDATES}."
-    )
-    private HashType hashType = HashType.sha256;
-
     private boolean supportTarGzDiscovery = true;
 
 
@@ -120,7 +114,7 @@ public class CmdStream extends CmdDefaultParams {
                 new KeyValueStoreFactoryImpl(config)
                         .getKeyValueStore(new ValidatingKeyValueStreamContentAddressedFactory()),
                 true,
-                HashType.sha256
+                getHashType()
         );
 
         AtomicBoolean shouldWriteHeader = new AtomicBoolean(true);
@@ -242,10 +236,6 @@ public class CmdStream extends CmdDefaultParams {
 
     public int getDepth() {
         return depth;
-    }
-
-    public HashType getHashType() {
-        return hashType;
     }
 
     public boolean isSupportTarGzDiscovery() {

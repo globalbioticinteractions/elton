@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.HashType;
 import org.apache.commons.io.FileUtils;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
@@ -9,9 +10,9 @@ import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.dataset.DatasetRegistryLogIntoAccessTable;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistryLogAsNQuads;
+import org.globalbioticinteractions.dataset.DatasetRegistryLogIntoAccessTable;
 import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
 import org.globalbioticinteractions.elton.util.NamespaceHandler;
 import org.globalbioticinteractions.elton.util.NodeFactoryNull;
@@ -59,7 +60,8 @@ public class CmdUpdate extends CmdRegistry {
                     getActivityListener(),
                     getActivityContext(),
                     getActivityIdFactory(),
-                    resourceService);
+                    resourceService,
+                    getHashType());
             try {
                 DatasetRegistry registry = datasetRegistryFactory.createRegistryByName(registryName);
                 registries.add(registry);
@@ -101,7 +103,8 @@ public class CmdUpdate extends CmdRegistry {
                     getActivityListener(namespace),
                     getActivityContext(),
                     getActivityIdFactory(),
-                    registryProvenanceLogger
+                    registryProvenanceLogger,
+                    getHashType()
             );
 
             Dataset dataset =

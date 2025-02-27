@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
+import bio.guoda.preston.HashType;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
@@ -33,7 +34,8 @@ public class DatasetRegistryUtil {
                                               String provDir,
                                               ActivityListener dereferenceListener,
                                               ActivityContext ctx,
-                                              Supplier<IRI> activityIdFactory) {
+                                              Supplier<IRI> activityIdFactory,
+                                              HashType hashType) {
         return new DatasetRegistrySingleDir(
                 localArchiveDir,
                 resourceServiceRemote,
@@ -42,7 +44,8 @@ public class DatasetRegistryUtil {
                 provDir,
                 dereferenceListener,
                 ctx,
-                activityIdFactory
+                activityIdFactory,
+                hashType
         );
     }
 
@@ -98,7 +101,8 @@ public class DatasetRegistryUtil {
                                                      ProvenancePathFactory provenancePathFactory,
                                                      ActivityListener activityListener,
                                                      ActivityContext ctx,
-                                                     Supplier<IRI> activityIdFactory) {
+                                                     Supplier<IRI> activityIdFactory,
+                                                     HashType hashType) {
         File dataFolder = new File(dataDir);
         LocalPathToHashIRI localPathToHashIRI = new LocalPathToHashIRI(dataFolder);
 
@@ -118,7 +122,8 @@ public class DatasetRegistryUtil {
                 provenancePathFactory,
                 activityListener,
                 ctx,
-                activityIdFactory
+                activityIdFactory,
+                hashType
         );
     }
 
@@ -131,7 +136,8 @@ public class DatasetRegistryUtil {
                                                       ProvenancePathFactory provenancePathFactory,
                                                       ActivityListener activityListener,
                                                       ActivityContext ctx,
-                                                      Supplier<IRI> activityIdFactory) {
+                                                      Supplier<IRI> activityIdFactory,
+                                                      HashType hashType) {
         DatasetRegistry registry = forCache(
                 dataDir,
                 provDir,
@@ -148,7 +154,8 @@ public class DatasetRegistryUtil {
                     provDir,
                     activityListener,
                     ctx,
-                    activityIdFactory
+                    activityIdFactory,
+                    hashType
             );
         }
         return registry;

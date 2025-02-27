@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.HashType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -28,7 +29,6 @@ import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import org.globalbioticinteractions.dataset.CitationUtil;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetConstant;
-import org.globalbioticinteractions.dataset.DatasetFactory;
 import org.globalbioticinteractions.dataset.DatasetFactoryImpl;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
@@ -141,7 +141,8 @@ public class CmdReview extends CmdTabularWriterParams {
                         getProvDir(),
                         activityListener,
                         getActivityContext(),
-                        getActivityIdFactory()
+                        getActivityIdFactory(),
+                        getHashType()
                 );
 
                 review(DatasetRegistryUtil.NAMESPACE_LOCAL,

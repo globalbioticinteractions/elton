@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.HashType;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.rdf.api.IRI;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
@@ -40,7 +41,8 @@ public class DatasetRegistryFactoryImplTest {
                     getListener(),
                     getCtx(),
                     getActivityIdFactory(),
-                    null).createRegistryByName(supportedRegistry);
+                    null,
+                    HashType.sha256).createRegistryByName(supportedRegistry);
             registries.add(registry);
         }
         assertThat(registries.size(), Is.is(supportedRegistries.size()));

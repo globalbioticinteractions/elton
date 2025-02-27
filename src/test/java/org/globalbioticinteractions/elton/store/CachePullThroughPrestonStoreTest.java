@@ -136,7 +136,7 @@ public class CachePullThroughPrestonStoreTest {
             public IRI get() {
                 return RefNodeFactory.toIRI(UUID.randomUUID());
             }
-        }
+        }, HashType.sha256
         );
 
         File namespaceDir = new File(folder.getRoot(), "some/namespace");
@@ -211,7 +211,7 @@ public class CachePullThroughPrestonStoreTest {
                 provDir,
                 dereferenceListener,
                 ctx,
-                uuidFactory
+                uuidFactory, HashType.sha256
         );
 
         assertThat(quads.size(), Is.is(0));

@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.HashType;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.rdf.api.IRI;
@@ -42,6 +43,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
     private final ResourceService resourceService;
     private ActivityContext activityContext;
     private Supplier<IRI> iriSupplier;
+    private HashType hashType;
 
     public DatasetRegistryFactoryImpl(
             URI workDir,
@@ -51,7 +53,8 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
             ActivityListener activityListener,
             ActivityContext activityContext,
             Supplier<IRI> iriSupplier,
-            ResourceService resourceService) {
+            ResourceService resourceService,
+            HashType hashType) {
         this.workDir = workDir;
         this.inputStreamFactory = inputStreamFactory;
         this.dataDir = dataDir;
@@ -60,7 +63,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
         this.activityContext = activityContext;
         this.iriSupplier = iriSupplier;
         this.resourceService = resourceService;
-
+        this.hashType = hashType;
     }
 
     @Override
@@ -70,7 +73,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
             throw new DatasetRegistryException("failed to create registry for [" + name + "]: not supported");
         }
         try {
-            Class<?>[] paramTypes = {URI.class, ResourceService.class, ContentPathFactory.class, String.class, String.class, ActivityListener.class, ActivityContext.class, Supplier.class};
+            Class<?>[] paramTypes = {URI.class, ResourceService.class, ContentPathFactory.class, String.class, String.class, ActivityListener.class, ActivityContext.class, Supplier.class, HashType.class};
             Optional<Constructor<? extends DatasetRegistry>> constructor = constructorFor(registryClass, paramTypes);
             ResourceService resourceService = this.resourceService == null
                     ? new ResourceServiceLocalAndRemote(inputStreamFactory, new File(getWorkDir()))
@@ -90,7 +93,8 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
                         getProvDir(),
                         getActivityListener(),
                         activityContext,
-                        iriSupplier);
+                        iriSupplier,
+                        hashType);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new DatasetRegistryException("failed to create registry for [" + name + "] using [" + registryClass.getSimpleName() + "]", e);

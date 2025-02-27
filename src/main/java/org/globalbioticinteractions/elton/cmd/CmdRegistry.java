@@ -52,7 +52,7 @@ public abstract class CmdRegistry extends CmdDefaultParams {
                         new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
                 true,
-                HashType.sha256
+                getHashType()
         );
 
         return new ResourceService() {

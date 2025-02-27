@@ -46,7 +46,8 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                                         String provDir,
                                         ActivityListener dereferenceListener,
                                         ActivityContext ctx,
-                                        Supplier<IRI> iriFactory) {
+                                        Supplier<IRI> iriFactory,
+                                        HashType hashType) {
         super(namespace,
                 resourceService,
                 contentPathFactory,
@@ -68,7 +69,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
                         new ValidatingKeyValueStreamContentAddressedFactory()
                 ),
                 true,
-                HashType.sha256
+                hashType
         );
 
     }

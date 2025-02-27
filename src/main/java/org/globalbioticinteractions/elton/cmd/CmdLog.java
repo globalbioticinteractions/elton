@@ -30,11 +30,6 @@ import java.util.Collections;
 public class CmdLog extends CmdDefaultParams {
 
     public static final String DESCRIPTION = "lists provenance of original resources";
-    @CommandLine.Option(
-            names = {"--hash-algorithm", "--algo", "-a"},
-            description = "Hash algorithm used to generate primary content identifiers. Supported values: ${COMPLETION-CANDIDATES}."
-    )
-    private HashType hashType = HashType.sha256;
 
     private ActivityContext ctx = ActivityUtil.createNewActivityContext("Tracking the origins of species interaction dataset");
 
@@ -51,7 +46,9 @@ public class CmdLog extends CmdDefaultParams {
             public Dataset datasetFor(String namespace) throws DatasetRegistryException {
                 Dataset dataset = super.datasetFor(namespace);
                 return new DatasetProxy(dataset) {
-                    ResourceService service = new LoggingResourceService(dataset, hashType, ctx, emitter);
+                    ResourceService service = new LoggingResourceService(
+                            dataset, getHashType(), ctx, emitter
+                    );
 
                     public InputStream retrieve(URI resourcePath) throws IOException {
                         return service.retrieve(resourcePath);
@@ -77,10 +74,6 @@ public class CmdLog extends CmdDefaultParams {
     @Override
     public String getDescription() {
         return DESCRIPTION;
-    }
-
-    public void setHashType(HashType hashType) {
-        this.hashType = hashType;
     }
 
 }

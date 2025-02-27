@@ -80,7 +80,15 @@ abstract class CmdDefaultParams implements Runnable {
             description = "Log provenance activity (default: ${DEFAULT-VALUE})"
     )
     private boolean enableProvMode = false;
+
+    @CommandLine.Option(
+            names = {"--hash-algorithm", "--algo", "-a"},
+            description = "Hash algorithm used to generate primary content identifiers. Supported values: ${COMPLETION-CANDIDATES}."
+    )
+    private HashType hashType = HashType.sha256;
+
     private Set<String> dependencies = Collections.synchronizedSet(new TreeSet<>());
+
     private File dataSink;
 
 
@@ -306,7 +314,8 @@ abstract class CmdDefaultParams implements Runnable {
                 getProvenancePathFactory(),
                 activityListener,
                 getActivityContext(),
-                getActivityIdFactory()
+                getActivityIdFactory(),
+                getHashType()
         );
     }
 
@@ -352,8 +361,8 @@ abstract class CmdDefaultParams implements Runnable {
         File dataSink = getDataSink();
         if (getEnableProvMode() && dataSink != null) {
             try (FileInputStream fis = new FileInputStream(dataSink)) {
-                IRI iri = Hasher.calcHashIRI(fis, NullOutputStream.INSTANCE, true, HashType.sha256);
-                ProvUtil.saveGeneratedContentIfNeeded(dataSink, iri, getDataDir());
+                IRI iri = Hasher.calcHashIRI(fis, NullOutputStream.INSTANCE, true, getHashType());
+                ProvUtil.saveGeneratedContentIfNeeded(dataSink, iri, getDataDir(), HashType.sha256);
                 ProvUtil.emitDataGenerationActivity(
                         getDependencies().stream().map(RefNodeFactory::toIRI).collect(Collectors.toList()),
                         RefNodeFactory.toIRI(UUID.randomUUID()),
@@ -372,4 +381,11 @@ abstract class CmdDefaultParams implements Runnable {
         }
     }
 
+    public HashType getHashType() {
+        return hashType;
+    }
+
+    public void setHashType(HashType hashType) {
+        this.hashType = hashType;
+    }
 }

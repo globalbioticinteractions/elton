@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.util;
 
+import bio.guoda.preston.HashType;
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
@@ -26,6 +27,7 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
     private ActivityListener dereferenceListener;
     private ActivityContext ctx;
     private Supplier<IRI> activityIdFactory;
+    private HashType hashType;
 
     public DatasetRegistrySingleDir(URI localArchiveDir,
                                     ResourceService resourceService,
@@ -34,7 +36,8 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
                                     String provDir,
                                     ActivityListener dereferenceListener,
                                     ActivityContext ctx,
-                                    Supplier<IRI> activityIdFactory) {
+                                    Supplier<IRI> activityIdFactory,
+                                    HashType hashType) {
         this.localArchiveDir = localArchiveDir;
         this.resourceService = resourceService;
         this.contentPathFactory = contentPathFactory;
@@ -43,7 +46,7 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
         this.dereferenceListener = dereferenceListener;
         this.ctx = ctx;
         this.activityIdFactory = activityIdFactory;
-
+        this.hashType = hashType;
     }
 
     @Override
@@ -73,7 +76,8 @@ public class DatasetRegistrySingleDir implements DatasetRegistry {
                         provDir,
                         dereferenceListener,
                         ctx,
-                        activityIdFactory
+                        activityIdFactory,
+                        hashType
                 )
         );
     }

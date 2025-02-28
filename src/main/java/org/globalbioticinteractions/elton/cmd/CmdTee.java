@@ -1,6 +1,7 @@
 package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.HashType;
+import bio.guoda.preston.VersionUtil;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo3LevelPath;
 import bio.guoda.preston.store.KeyValueStoreLocalFileSystem;
@@ -8,6 +9,7 @@ import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.lang.StringUtils;
+import org.globalbioticinteractions.elton.store.HashCalculatorImpl;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -73,15 +75,13 @@ public class CmdTee extends CmdDefaultParams {
             String line;
 
             while ((line = reader.readLine()) != null) {
+
                 String[] hashCandidates = StringUtils.splitByWholeSeparatorPreserveAllTokens(line, "hash://");
                 Pattern iriPattern = HashType.sha256.getIRIPattern();
                 for (String hashCandidate : hashCandidates) {
-                    String candidate = StringUtils.substring("hash://" + hashCandidate, 0, HashType.sha256.getIriStringLength());
-                    Matcher matcher = iriPattern.matcher(candidate);
-
-                    if (matcher.matches()) {
-                        String filename = matcher.group("contentId");
-                        contentCopier.accept(filename);
+                    String hexPart = HashCalculatorImpl.getHexPartIfAvailable("hash://" + hashCandidate);
+                    if (!StringUtils.startsWith(hexPart, "hash://")) {
+                        contentCopier.accept(hexPart);
                     }
                 }
             }

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class HashCalculatorImpl implements HashCalculator {
     private final HashType hashType;
-    private static final Pattern HEX_PATTERN = Pattern.compile("hash://[a-z0-9]+/(?<hexPart>[a-f0-9]+)");
+    private static final Pattern HEX_PATTERN = Pattern.compile("hash://[a-z0-9]+/(?<hexPart>[a-f0-9]+).*");
 
     public HashCalculatorImpl(HashType hashType) {
         this.hashType = hashType;

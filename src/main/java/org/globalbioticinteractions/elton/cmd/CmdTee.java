@@ -76,8 +76,7 @@ public class CmdTee extends CmdDefaultParams {
 
             while ((line = reader.readLine()) != null) {
 
-                String[] hashCandidates = StringUtils.splitByWholeSeparatorPreserveAllTokens(line, "hash://");
-                Pattern iriPattern = HashType.sha256.getIRIPattern();
+                String[] hashCandidates = StringUtils.splitByWholeSeparator(line, "hash://");
                 for (String hashCandidate : hashCandidates) {
                     String hexPart = HashCalculatorImpl.getHexPartIfAvailable("hash://" + hashCandidate);
                     if (!StringUtils.startsWith(hexPart, "hash://")) {

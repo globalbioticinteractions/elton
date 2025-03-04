@@ -3,7 +3,6 @@ package org.globalbioticinteractions.elton.cmd;
 import bio.guoda.preston.DateUtil;
 import bio.guoda.preston.DerefProgressListener;
 import bio.guoda.preston.DerefState;
-import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.BlobStoreReadOnly;
@@ -13,6 +12,8 @@ import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import bio.guoda.preston.stream.ContentHashDereferencer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang.StringUtils;
@@ -42,6 +43,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.zip.GZIPInputStream;
+
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 @CommandLine.Command(
         name = "stream",
@@ -330,10 +334,25 @@ public class CmdStream extends CmdDefaultParams {
             @Override
             public InputStream retrieve(URI uri) throws IOException {
                 IRI iri = RefNodeFactory.toIRI(uri);
-                if (org.apache.commons.lang3.StringUtils.startsWith(iri.getIRIString(), "jar:")) {
+                if (startsWith(iri.getIRIString(), "jar:")) {
                     iri = RefNodeFactory.toIRI("zip:" + org.apache.commons.lang3.StringUtils.substring(iri.getIRIString(), "jar:".length()));
                 }
-                return new ContentHashDereferencer(blobStore).get(iri);
+                InputStream inputStream = new ContentHashDereferencer(blobStore).get(iri);
+                
+                return StringUtils.endsWith(iri.getIRIString(), ".gz")
+                        ? attemptDecompress(inputStream)
+                        : inputStream;
+            }
+
+            private InputStream attemptDecompress(InputStream inputStream) {
+                inputStream = IOUtils.buffer(inputStream);
+                try {
+                    String detect = CompressorStreamFactory.detect(inputStream);
+                    return StringUtils.isBlank(detect) ? inputStream : new CompressorStreamFactory()
+                            .createCompressorInputStream(inputStream);
+                } catch (CompressorException | IllegalArgumentException e) {
+                    return inputStream;
+                }
             }
         };
     }

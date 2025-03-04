@@ -181,6 +181,65 @@ public class CmdStreamTest {
     }
 
     @Test
+    public void streamSomeProvStatementsEmbeddedGzip() throws IOException {
+
+        String provLogGeneratedByElton = "<urn:lsid:globalbioticinteractions.org:globalbioticinteractions/template-dataset> <http://www.w3.org/ns/prov#wasAssociatedWith> <https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <http://purl.org/dc/elements/1.1/format> \"application/globi\" <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:uuid:41389744-0f4d-47e2-8506-76999e1b5c34> <http://www.w3.org/ns/prov#used> <https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<https://github.com/globalbioticinteractions/template-dataset/archive/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip> <http://purl.org/pav/hasVersion> <hash://sha256/9a98962ad99020a620fc4fe25dcf018baedeb98951d343e595a7ad574cad5f55> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:uuid:cce97773-a8e2-4af4-94f9-0ac2699cb28e> <http://www.w3.org/ns/prov#used> <jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/globi.json> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<jar:hash://sha256/9a98962ad99020a620fc4fe25dcf018baedeb98951d343e595a7ad574cad5f55!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/globi.json> <http://purl.org/pav/hasVersion> <hash://sha256/b766d930f8ac2793b8c87d6460071c4b5b4ec7eae21e7ab8f2f314bc49f9d523> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:uuid:c7b1a849-8230-4e34-a0d5-7b663bc87e01> <http://www.w3.org/ns/prov#used> <jar:hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/interactions.tsv.gz> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<jar:hash://sha256/9a98962ad99020a620fc4fe25dcf018baedeb98951d343e595a7ad574cad5f55!/template-dataset-b92cd44dcba945c760229a14d3b9becb2dd0c147/interactions.tsv.gz> <http://purl.org/pav/hasVersion> <hash://sha256/08fd9884360ba74747ed5ad306ff3ea2e5f7b5550d6653880b1f40579069b1b1> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:34.689Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        CmdStream cmdStream = new CmdStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+
+
+        populateCacheWithResource(tmpDir, "/b92cd44dcba945c760229a14d3b9becb2dd0c147_gzip.zip");
+
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByElton, StandardCharsets.UTF_8));
+
+        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
+        assertThat(numberOfFilesBefore, Is.is(1L));
+
+
+        cmdStream.run();
+
+        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
+
+        assertThat(numberOfFilesAfter, Is.is(1L));
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        assertThat(filenames, hasItems("9a98962ad99020a620fc4fe25dcf018baedeb98951d343e595a7ad574cad5f55"));
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+    }
+
+    @Test
     public void streamSomeProvStatementsTemplateDataset() throws IOException {
 
         String provLogGeneratedByEltonTrack = "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:9984d0f1-a8e9-4f49-9f9e-bbcaa48b7dea> .\n" +

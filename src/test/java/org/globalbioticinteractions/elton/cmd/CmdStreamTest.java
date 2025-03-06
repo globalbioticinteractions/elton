@@ -138,40 +138,7 @@ public class CmdStreamTest {
 
         CmdStream cmdStream = new CmdStream();
 
-        File tmpDir = folder.newFolder("tmpDir");
-        tmpDir.mkdirs();
-
-
-        populateCacheWithResource(tmpDir, "/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip");
-
-        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
-        cmdStream.setDataDir(tmpDir.getAbsolutePath());
-        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
-        cmdStream.setStdout(new PrintStream(outputStream));
-        cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByElton, StandardCharsets.UTF_8));
-
-        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
-                tmpDir,
-                TrueFileFilter.INSTANCE,
-                TrueFileFilter.INSTANCE
-        );
-
-        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
-        assertThat(numberOfFilesBefore, Is.is(1L));
-
-
-        cmdStream.run();
-
-        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
-                tmpDir,
-                TrueFileFilter.INSTANCE,
-                TrueFileFilter.INSTANCE
-        );
-
-        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
-
-        assertThat(numberOfFilesAfter, Is.is(1L));
+        Collection<File> filesAfter = getFiles(provLogGeneratedByElton, outputStream, errorStream, cmdStream, "/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip");
 
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 
@@ -197,11 +164,21 @@ public class CmdStreamTest {
 
         CmdStream cmdStream = new CmdStream();
 
+        Collection<File> filesAfter = getFiles(provLogGeneratedByElton, outputStream, errorStream, cmdStream, "/b92cd44dcba945c760229a14d3b9becb2dd0c147_gzip.zip");
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        assertThat(filenames, hasItems("9a98962ad99020a620fc4fe25dcf018baedeb98951d343e595a7ad574cad5f55"));
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+    }
+
+    private Collection<File> getFiles(String provLogGeneratedByElton, ByteArrayOutputStream outputStream, ByteArrayOutputStream errorStream, CmdStream cmdStream, String resource) throws IOException {
         File tmpDir = folder.newFolder("tmpDir");
         tmpDir.mkdirs();
 
 
-        populateCacheWithResource(tmpDir, "/b92cd44dcba945c760229a14d3b9becb2dd0c147_gzip.zip");
+        populateCacheWithResource(tmpDir, resource);
 
         cmdStream.setWorkDir(tmpDir.getAbsolutePath());
         cmdStream.setDataDir(tmpDir.getAbsolutePath());
@@ -231,12 +208,7 @@ public class CmdStreamTest {
         long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
 
         assertThat(numberOfFilesAfter, Is.is(1L));
-
-        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
-
-        assertThat(filenames, hasItems("9a98962ad99020a620fc4fe25dcf018baedeb98951d343e595a7ad574cad5f55"));
-
-        assertHeaderAndMore(outputStream, headerInteractions());
+        return filesAfter;
     }
 
     @Test
@@ -459,40 +431,7 @@ public class CmdStreamTest {
 
         CmdStream cmdStream = new CmdStream();
 
-        File tmpDir = folder.newFolder("tmpDir");
-        tmpDir.mkdirs();
-
-
-        populateCacheWithResource(tmpDir, "/template-dataset-0.0.3.zip");
-
-        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
-        cmdStream.setDataDir(tmpDir.getAbsolutePath());
-        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
-        cmdStream.setStdout(new PrintStream(outputStream));
-        cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByEltonTrack, StandardCharsets.UTF_8));
-
-        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
-                tmpDir,
-                TrueFileFilter.INSTANCE,
-                TrueFileFilter.INSTANCE
-        );
-
-        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
-        assertThat(numberOfFilesBefore, Is.is(1L));
-
-
-        cmdStream.run();
-
-        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
-                tmpDir,
-                TrueFileFilter.INSTANCE,
-                TrueFileFilter.INSTANCE
-        );
-
-        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
-
-        assertThat(numberOfFilesAfter, Is.is(1L));
+        Collection<File> filesAfter = getFiles(provLogGeneratedByEltonTrack, outputStream, errorStream, cmdStream, "/template-dataset-0.0.3.zip");
 
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 
@@ -572,40 +511,7 @@ public class CmdStreamTest {
 
         CmdStream cmdStream = new CmdStream();
 
-        File tmpDir = folder.newFolder("tmpDir");
-        tmpDir.mkdirs();
-
-
-        populateCacheWithResource(tmpDir, "/template-dataset-0.0.3.zip");
-
-        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
-        cmdStream.setDataDir(tmpDir.getAbsolutePath());
-        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
-        cmdStream.setStdout(new PrintStream(outputStream));
-        cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByEltonTrack, StandardCharsets.UTF_8));
-
-        Collection<File> filesBefore = FileUtils.listFilesAndDirs(
-                tmpDir,
-                TrueFileFilter.INSTANCE,
-                TrueFileFilter.INSTANCE
-        );
-
-        long numberOfFilesBefore = filesBefore.stream().filter(File::isFile).count();
-        assertThat(numberOfFilesBefore, Is.is(1L));
-
-
-        cmdStream.run();
-
-        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
-                tmpDir,
-                TrueFileFilter.INSTANCE,
-                TrueFileFilter.INSTANCE
-        );
-
-        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
-
-        assertThat(numberOfFilesAfter, Is.is(1L));
+        Collection<File> filesAfter = getFiles(provLogGeneratedByEltonTrack, outputStream, errorStream, cmdStream, "/template-dataset-0.0.3.zip");
 
         List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
 

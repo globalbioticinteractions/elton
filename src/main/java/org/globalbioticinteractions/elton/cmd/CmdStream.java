@@ -340,20 +340,10 @@ public class CmdStream extends CmdDefaultParams {
                 InputStream inputStream = new ContentHashDereferencer(blobStore).get(iri);
                 
                 return StringUtils.endsWith(iri.getIRIString(), ".gz")
-                        ? attemptDecompress(inputStream)
+                        ? new GZIPInputStream(inputStream)
                         : inputStream;
             }
 
-            private InputStream attemptDecompress(InputStream inputStream) {
-                inputStream = IOUtils.buffer(inputStream);
-                try {
-                    String detect = CompressorStreamFactory.detect(inputStream);
-                    return StringUtils.isBlank(detect) ? inputStream : new CompressorStreamFactory()
-                            .createCompressorInputStream(inputStream);
-                } catch (CompressorException | IllegalArgumentException e) {
-                    return inputStream;
-                }
-            }
         };
     }
 

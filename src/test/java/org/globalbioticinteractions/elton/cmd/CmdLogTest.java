@@ -119,7 +119,7 @@ public class CmdLogTest {
         assertThat(split.get(3), containsString("<classpath:/org/globalbioticinteractions/interaction_types_ignored.csv> <http://purl.org/pav/hasVersion> <hash://sha256/f49f665c540214e7d00466e359821de1bc03206f8373d4974220d608ed7b98f3>"));
         assertThat(split.get(4), containsString("<classpath:/org/globalbioticinteractions/interaction_types_mapping.csv> <http://purl.org/pav/hasVersion> <hash://sha256/5f1bda43f465f9c2ea2c03fbb23e2642d15d3ed26b8f14453f5c350d523b64be>"));
         assertThat(split.get(5), containsString("<classpath:/org/globalbioticinteractions/interaction_types_ro_unmapped.csv> <http://purl.org/pav/hasVersion> <hash://sha256/43aba7b90c686a4890aebd4a90a02d6f82259664524bdad1b22102a29fe9fa07>"));
-        assertThat(split.get(6), containsString("<classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <http://purl.org/pav/hasVersion> <hash://sha256/7dc2797003a95ac7b97be06fda48b4dc25e7a555a2839a19ad7dc7a148427e43>"));
+        assertThat(split.get(6), containsString("<classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <http://purl.org/pav/hasVersion> <hash://sha256/527bfc00d56d89d01b0e0450a417e7d6607b9d090b28ad77346e21e5ca444e71>"));
         assertThat(split.get(split.size() - 1), containsString("/dwca.zip> <http://purl.org/pav/hasVersion> <hash://sha256/ab4b32fc3bb81c6ec0e16f42dcc284e3725274501219f704af7022221db64abe> "));
 
     }

@@ -6,6 +6,7 @@ import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.cmd.ActivityContext;
 import bio.guoda.preston.process.ActivityUtil;
 import bio.guoda.preston.process.StatementsEmitter;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.rdf.api.IRI;
 
 import java.io.IOException;
@@ -17,11 +18,9 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DigestEmittingInputStream extends DigestInputStream {
-    final AtomicBoolean isEOF;
-    final AtomicBoolean hasLogged;
-    final URI resourceLocation;
+    private final AtomicBoolean hasLogged;
+    private final URI resourceLocation;
     private final MessageDigest md;
-    private final URI resource;
     private final ActivityContext ctx;
     private final StatementsEmitter activityEmitter;
     private final HashType hashType;
@@ -34,8 +33,6 @@ public class DigestEmittingInputStream extends DigestInputStream {
                                      HashType hashType) {
         super(retrieve, md);
         this.md = md;
-        this.resource = resource;
-        isEOF = new AtomicBoolean(false);
         hasLogged = new AtomicBoolean(false);
         resourceLocation = resource;
         this.ctx = ctx;
@@ -43,25 +40,10 @@ public class DigestEmittingInputStream extends DigestInputStream {
         this.hashType = hashType;
     }
 
-    public int read() throws IOException {
-        return setEOFIfEncountered(super.read());
-    }
-
-    public int read(byte[] var1, int var2, int var3) throws IOException {
-        return setEOFIfEncountered(super.read(var1, var2, var3));
-    }
-
-    private int setEOFIfEncountered(int read) {
-        if (read == -1) {
-            isEOF.set(true);
-        }
-        return read;
-    }
-
     public void close() throws IOException {
         this.in.close();
 
-        if (isEOF.get() && !hasLogged.get()) {
+        if (!hasLogged.get()) {
             IRI object = Hasher.toHashIRI(this.md, this.hashType);
             ActivityUtil.emitDownloadActivity(
                     RefNodeFactory.toIRI(this.resourceLocation),

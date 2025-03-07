@@ -87,6 +87,11 @@ public class CmdUpdateIT {
     }
 
     @Test
+    public void runUpdateNaturalHistoryMuseum() throws IOException {
+        assertAccessLogForNamespace("globalbioticinteractions/natural-history-museum-london-interactions-bank");
+    }
+
+    @Test
     public void runUpdateNonExistingDataProvFolders() throws IOException {
         CmdRegistry cmd = new CmdUpdate();
         File dataProvFolder = tmpDir.newFolder();

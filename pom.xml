@@ -9,7 +9,7 @@
     <description>Discover, access, and review, species interaction data</description>
 
     <properties>
-        <globi.version>0.28.1</globi.version>
+        <globi.version>0.28.2</globi.version>
         <preston.version>0.10.3</preston.version>
         <slf4j.version>1.7.30</slf4j.version>
         <picocli.version>4.6.3</picocli.version>

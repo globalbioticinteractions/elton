@@ -162,7 +162,7 @@ public class DataPackageWriter implements InteractionWriter {
                 put("stateProvince", "");
                 put("county", "");
                 put("municipality", "");
-                put("locality", loc == null ? "" : loc.getLocality());
+                put("locality", loc == null ? "" : StringUtils.defaultIfBlank(loc.getLocality(), ""));
                 put("minimumElevationInMeters", "");
                 put("maximumElevationInMeters", "");
                 put("verticalDatum", "");

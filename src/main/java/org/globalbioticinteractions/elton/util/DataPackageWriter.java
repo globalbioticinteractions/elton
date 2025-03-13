@@ -61,14 +61,14 @@ public class DataPackageWriter implements InteractionWriter {
         }
         this.events.add(toCSVRow(event));
 
-        String sourceOccurrenceId = generateBlankNode();
+        String sourceOccurrenceId = externalIdOrBlank(source);
         Map<String, String> sourceOccurrence = createOccurrence(sourceOccurrenceId, eventId, source);
         if (firstRow.get()) {
             this.occurrenceHeader = toCSVHeader(sourceOccurrence);
         }
         this.occurrence.add(toCSVRow(sourceOccurrence));
 
-        String targetOccurrenceId = generateBlankNode();
+        String targetOccurrenceId = externalIdOrBlank(target);
         Map<String, String> targetOccurrence = createOccurrence(targetOccurrenceId, eventId, target);
         this.occurrence.add(toCSVRow(targetOccurrence));
 
@@ -93,6 +93,10 @@ public class DataPackageWriter implements InteractionWriter {
         this.interactions.add(toCSVRow(interaction));
 
         firstRow.set(false);
+    }
+
+    private String externalIdOrBlank(SpecimenImpl source) {
+        return StringUtils.isBlank(source.getExternalId()) ? generateBlankNode() : source.getExternalId();
     }
 
     private String toCSVRow(Map<String, String> valueMap) {

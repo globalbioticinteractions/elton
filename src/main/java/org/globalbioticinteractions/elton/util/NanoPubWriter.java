@@ -19,6 +19,7 @@ import org.nanopub.NanopubImpl;
 import org.nanopub.NanopubUtils;
 import org.nanopub.trusty.MakeTrustyNanopub;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -181,4 +182,8 @@ public class NanoPubWriter implements InteractionWriter {
         }
     }
 
+    @Override
+    public void close() throws IOException {
+
+    }
 }

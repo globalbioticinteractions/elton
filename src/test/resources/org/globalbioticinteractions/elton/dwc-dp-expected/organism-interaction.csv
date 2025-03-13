@@ -1,0 +1,2 @@
+organismInteractionID,organismInteractionDescription,subjectOccurrenceID,subjectOrganismPart,organismInteractionType,organismInteractionTypeIRI,organismInteractionTypeVocabulary,relatedOccurrenceID,relatedOrganismPart
+https://linker.bio/.well-known/genid/4,,https://linker.bio/.well-known/genid/2,,eats,http://purl.obolibrary.org/obo/RO_0002470,,https://linker.bio/.well-known/genid/3,

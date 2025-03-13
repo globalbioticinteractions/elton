@@ -10,6 +10,7 @@ import org.globalbioticinteractions.elton.util.SpecimenImpl;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TabularWriter;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
@@ -173,5 +174,10 @@ public class WriterInteractionsTSV implements InteractionWriter, TabularWriter {
                         REFERENCE_CITATION
 
                 ), StreamUtil.datasetHeaderFields());
+    }
+
+    @Override
+    public void close() throws IOException {
+
     }
 }

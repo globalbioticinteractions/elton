@@ -9,6 +9,7 @@ import org.globalbioticinteractions.elton.util.SpecimenImpl;
 import org.globalbioticinteractions.elton.util.StreamUtil;
 import org.globalbioticinteractions.elton.util.TaxonWriter;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
@@ -42,6 +43,11 @@ public class WriterTaxonTSV implements TaxonWriter, InteractionWriter {
 
     @Override
     public void write(SpecimenImpl source, InteractType type, SpecimenImpl target, Study study, Dataset dataset) {
+
+    }
+
+    @Override
+    public void close() throws IOException {
 
     }
 }

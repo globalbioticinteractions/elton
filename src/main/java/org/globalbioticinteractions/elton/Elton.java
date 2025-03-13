@@ -10,6 +10,7 @@ import bio.guoda.preston.process.ActivityUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Quad;
+import org.globalbioticinteractions.elton.cmd.CmdDwCDataPackage;
 import org.globalbioticinteractions.elton.cmd.CmdStream;
 import org.globalbioticinteractions.elton.cmd.CmdDatasets;
 import org.globalbioticinteractions.elton.cmd.CmdGet;
@@ -46,6 +47,7 @@ import static java.lang.System.exit;
                 CmdSupportedRegistries.class,
                 CmdVersion.class,
                 CmdNanoPubs.class,
+                CmdDwCDataPackage.class,
                 CmdList.class,
                 CmdStream.class,
                 CmdUpdate.class,

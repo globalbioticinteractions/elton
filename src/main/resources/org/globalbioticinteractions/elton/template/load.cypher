@@ -45,6 +45,8 @@ LOAD CSV WITH HEADERS FROM '{{ ENDPOINT }}/indexed-names-resolved-col.csv.gz' AS
           rank: coalesce(row.providedCol2, ""),
           namespace: coalesce(row.providedCol6, "")
         })
+        WHERE
+          (row.relationName <> "NONE")
         MERGE
           (resolved:Taxon {catalog: row.resolvedCatalogName, id: row.resolvedExternalId, name: coalesce(row.resolvedExternalName, ""), rank: coalesce(row.resolvedRank, ""), authorship: coalesce(row.taxonPath, ""), commonNames: coalesce(row.commonNames, ""), externalUrl: coalesce(row.resolvedExternalUrl, ""), path: coalesce(row.resolvedPath, ""), pathNames: coalesce(row.resolvedPathIds, ""), pathAuthorships: coalesce(row.resolvedPathAuthorships, ""), pathIds: coalesce(row.resolvedPathIds, "")})
         MERGE

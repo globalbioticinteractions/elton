@@ -1,6 +1,6 @@
 // verbatim taxa
 CREATE CONSTRAINT taxonVerbatim IF NOT EXISTS FOR (t:TaxonVerbatim) REQUIRE (t.id, t.name, t.rank, t.namespace) IS UNIQUE;
-CREATE CONSTRAINT interaction IF NOT EXISTS FOR ()-[r:INTERACTS_WITH]-() REQUIRE (r.origin) IS UNIQUE;
+CREATE CONSTRAINT interaction IF NOT EXISTS FOR ()-[r:INTERACTS_WITH]-() REQUIRE (r.origin, r.namespace) IS UNIQUE;
 CREATE CONSTRAINT dataset IF NOT EXISTS FOR (d:Dataset) REQUIRE (d.citation, d.namespace) IS UNIQUE;
 CREATE CONSTRAINT study IF NOT EXISTS FOR (s:Study) REQUIRE (s.citation, s.namespace) IS UNIQUE;
 
@@ -34,7 +34,7 @@ LOAD CSV WITH HEADERS FROM '{{ ENDPOINT }}/indexed-interactions.csv.gz' AS row
         MERGE (sourceSpecimen)<-[:COLLECTED]-(study)
         MERGE (targetSpecimen)<-[:COLLECTED]-(study)
         MERGE (study)-[:IN_DATASET]->(dataset)
-        MERGE (sourceSpecimen)-[r:INTERACTS_WITH { id: row.interactionTypeId, name: row.interactionTypeName, origin: ("line:" + file() + "!/L" + linenumber()) }] -> (targetSpecimen);
+        MERGE (sourceSpecimen)-[r:INTERACTS_WITH { id: row.interactionTypeId, name: row.interactionTypeName, origin: ("line:" + file() + "!/L" + linenumber()), namespace: row.namespace }] -> (targetSpecimen);
 
 // resolved taxa
 CREATE CONSTRAINT taxon IF NOT EXISTS FOR (t:Taxon) REQUIRE (t.id, t.catalog) IS UNIQUE;

@@ -38,7 +38,7 @@ CALL (row) {
         MERGE (targetSpecimen)<-[:COLLECTED]-(study)
         MERGE (study)-[:IN_DATASET]->(dataset)
         MERGE (sourceSpecimen)-[r:INTERACTS_WITH { id: row.interactionTypeId, name: row.interactionTypeName, origin: ("line:" + file() + "!/L" + linenumber()), namespace: row.namespace }] -> (targetSpecimen)
-} IN TRANSACTIONS OF 10000 ROWS;
+} IN TRANSACTIONS OF 1000 ROWS;
 
 // resolved taxa
 CREATE CONSTRAINT taxon IF NOT EXISTS FOR (t:Taxon) REQUIRE (t.id, t.catalog) IS UNIQUE;

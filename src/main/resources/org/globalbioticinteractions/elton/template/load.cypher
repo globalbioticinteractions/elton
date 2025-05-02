@@ -1,6 +1,6 @@
 // verbatim taxa
 CREATE CONSTRAINT taxonVerbatim IF NOT EXISTS FOR (t:TaxonVerbatim) REQUIRE (t.name, t.path, t.namespace) IS UNIQUE;
-CREATE CONSTRAINT interaction IF NOT EXISTS FOR ()-[r:INTERACTS_WITH]-() REQUIRE (r.origin, r.namespace) IS UNIQUE;
+CREATE CONSTRAINT interaction IF NOT EXISTS FOR ()-[r:INTERACTS_WITH]-() REQUIRE (r.id, r.name, r.origin, r.namespace) IS UNIQUE;
 CREATE CONSTRAINT dataset IF NOT EXISTS FOR (d:Dataset) REQUIRE (d.citation, d.namespace) IS UNIQUE;
 CREATE CONSTRAINT study IF NOT EXISTS FOR (s:Study) REQUIRE (s.citation, s.namespace) IS UNIQUE;
 

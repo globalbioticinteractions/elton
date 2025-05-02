@@ -11,14 +11,14 @@ CALL (row) {
           path: coalesce(row.sourceTaxonPath, ""),
           namespace: coalesce(row.namespace, "")
         })
-        MERGE (sourceSpecimen:Specimen {
+        CREATE (sourceSpecimen:Specimen {
         })
         MERGE (targetTaxon:TaxonVerbatim {
           name: coalesce(row.targetTaxonName, ""),
           path: coalesce(row.targetTaxonPath, ""),
           namespace: coalesce(row.namespace, "")
         })
-        MERGE (targetSpecimen:Specimen {
+        CREATE (targetSpecimen:Specimen {
         })
         MERGE (study:Study {
           citation: coalesce(row.referenceCitation,""),

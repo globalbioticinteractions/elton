@@ -51,7 +51,7 @@ CALL (row) {
           (resolved:Taxon {
             catalog: row.resolvedCatalogName,
             id: row.resolvedExternalId,
-            name: coalesce(row.resolvedExternalName, ""),
+            name: coalesce(row.resolvedName, ""),
             rank: coalesce(row.resolvedRank, ""),
             authorship: coalesce(row.taxonPath, ""),
             commonNames: coalesce(row.commonNames, ""),

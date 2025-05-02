@@ -11,10 +11,14 @@ CALL (row) {
           path: coalesce(row.sourceTaxonPath, ""),
           namespace: coalesce(row.namespace, "")
         })
+        MERGE (sourceSpecimen:Specimen {
+        })
         MERGE (targetTaxon:TaxonVerbatim {
           name: coalesce(row.targetTaxonName, ""),
           path: coalesce(row.targetTaxonPath, ""),
           namespace: coalesce(row.namespace, "")
+        })
+        MERGE (targetSpecimen:Specimen {
         })
         MERGE (study:Study {
           citation: coalesce(row.referenceCitation,""),
@@ -28,8 +32,8 @@ CALL (row) {
           archiveURI: row.archiveURI,
           namespace: coalesce(row.namespace, "")
         })
-        MERGE (sourceTaxon)<-[:ORIGINALLY_DESCRIBED_AS]-(sourceSpecimen:Specimen)
-        MERGE (targetTaxon)<-[:ORIGINALLY_DESCRIBED_AS]-(targetSpecimen:Specimen)
+        MERGE (sourceTaxon)<-[:ORIGINALLY_DESCRIBED_AS]-(sourceSpecimen)
+        MERGE (targetTaxon)<-[:ORIGINALLY_DESCRIBED_AS]-(targetSpecimen)
         MERGE (sourceSpecimen)<-[:COLLECTED]-(study)
         MERGE (targetSpecimen)<-[:COLLECTED]-(study)
         MERGE (study)-[:IN_DATASET]->(dataset)

@@ -4,7 +4,7 @@
 
     <groupId>org.globalbioticinteractions</groupId>
     <artifactId>elton</artifactId>
-    <version>0.15.10-SNAPSHOT</version>
+    <version>0.15.10</version>
     <name>Elton</name>
     <description>Discover, access, and review, species interaction data</description>
 

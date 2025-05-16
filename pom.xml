@@ -4,7 +4,7 @@
 
     <groupId>org.globalbioticinteractions</groupId>
     <artifactId>elton</artifactId>
-    <version>0.15.10</version>
+    <version>0.15.11-SNAPSHOT</version>
     <name>Elton</name>
     <description>Discover, access, and review, species interaction data</description>
 
@@ -465,6 +465,78 @@
                                     <linkTarget>/usr/share/${project.artifactId}/bin/${project.artifactId}</linkTarget>
                                 </data>
                             </dataSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                        <configuration>
+                            <license>MIT (c) 2018, Jorrit Poelen</license>
+                            <distribution>Preston 2018/2025</distribution>
+                            <group>Application/Collectors</group>
+                            <packager>Jorrit Poelen</packager>
+                            <prefix>/opt/${project.artifactId}</prefix>
+                            <copyTo>${project.build.directory}/${project.artifactId}-${project.version}.rpm</copyTo>
+                            <!--<changelogFile>changelog.md</changelogFile>-->
+                            <defineStatements>
+                                <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+                            </defineStatements>
+                            <mappings>
+                                <mapping>
+                                    <directory>/opt/${project.artifactId}/lib</directory>
+                                    <directoryIncluded>true</directoryIncluded>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                </mapping>
+                                <mapping>
+                                    <directory>/opt/${project.artifactId}/lib</directory>
+                                    <directoryIncluded>false</directoryIncluded>
+                                    <filemode>644</filemode>
+                                    <directoryIncluded>false</directoryIncluded>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <dependency/>
+                                </mapping>
+                                <mapping>
+                                    <directory>/opt/${project.artifactId}/lib</directory>
+                                    <directoryIncluded>false</directoryIncluded>
+                                    <filemode>644</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>target/${project.artifactId}-${project.version}.jar</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/usr/bin</directory>
+                                    <directoryIncluded>false</directoryIncluded>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>src/main/rpm/${project.artifactId}</location>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                            </mappings>
+                            <preinstallScriptlet>
+                                <scriptFile>src/main/rpm/preinstall.sh</scriptFile>
+                                <fileEncoding>utf-8</fileEncoding>
+                                <filter>true</filter>
+                            </preinstallScriptlet>
                         </configuration>
                     </execution>
                 </executions>

@@ -480,8 +480,8 @@
                             <goal>rpm</goal>
                         </goals>
                         <configuration>
-                            <license>MIT (c) 2018, Jorrit Poelen</license>
-                            <distribution>Preston 2018/2025</distribution>
+                            <license>GPLv3</license>
+                            <distribution>Elton</distribution>
                             <group>Application/Collectors</group>
                             <packager>Jorrit Poelen</packager>
                             <prefix>/opt/${project.artifactId}</prefix>

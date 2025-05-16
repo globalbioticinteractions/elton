@@ -39,13 +39,28 @@ You can now run Elton from your commandline by typing something like ```elton ve
 
 You can also install Elton by manually downloading `elton.jar` from one of the [releases](https://github.com/globalbioticinteractions/elton/releases). To start Elton using this method, you have to execute something like ```java -jar elton.jar versions``` or any of the other documented commands.
 
-To install elton as a debian package use:
+Note that [preston.deb](https://github.com/bio-guoda/preston/releases/latest/download/preston.deb) (Debian, Ubuntu, etc) and [preston.rpm](https://github.com/bio-guoda/preston/releases/latest/download/preston.rpm) (RedHat, Fedora, etc) packages are also available.
 
-```bash
-curl -L https://github.com/globalbioticinteractions/elton/releases/latest/download/elton.deb\
- > elton.deb 
+### deb package example
+
+```console
+sudo apt update
+sudo apt upgrade
+curl -L https://github.com/globalbioticinteractions/elton/releases/latest/download/elton.deb > elton.deb
 sudo apt install ./elton.deb
 ```
+
+To remove type ```sudo apt remove elton```.
+
+
+### rpm package example
+
+```console
+curl -L https://github.com/globalbioticinteractions/elton/releases/latest/download/elton.rpm > elton.rpm
+sudo dnf install ./elton.rpm
+```
+
+To remove type ```sudo dnf remove elton```.
 
 ### Maven, Gradle, SBT
 Elton is made available through a [maven](https://maven.apache.org) repository.

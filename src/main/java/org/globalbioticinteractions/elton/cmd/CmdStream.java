@@ -12,8 +12,6 @@ import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import bio.guoda.preston.stream.ContentHashDereferencer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang.StringUtils;
@@ -95,9 +93,14 @@ public class CmdStream extends CmdDefaultParams {
 
 
     @CommandLine.Option(names = {"--config"},
-            description = "point to content id (hash) of globi.json config to apply global settings (e.g., custom interaction type mappings). Example: hash://sha256/02682fdd62a3e985dc06236662299f00ec5453c4e6f707d02efa93628f927649 for "
+                description = "point to content id (hash) of globi.json config to apply global settings (e.g., custom interaction type mappings). Example: hash://sha256/02682fdd62a3e985dc06236662299f00ec5453c4e6f707d02efa93628f927649 for:\n" +
+                        "{\n" +
+                        "  \"resources\": {\n" +
+                        "    \"interaction_types_mapping.csv\": \"hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7\"\n" +
+                        "  }\n" +
+                        "}\n"
     )
-    private URI configOverrideReesource = null;
+    private URI configOverrideResource = null;
 
     @Override
     public void doRun() {
@@ -214,13 +217,13 @@ public class CmdStream extends CmdDefaultParams {
     }
 
     private boolean hasConfigOverride() {
-        return configOverrideReesource != null;
+        return configOverrideResource != null;
     }
 
     private Dataset applyConfigOverride(Dataset datasetProvided, Cache cache) throws IOException {
         Dataset datasetApplied;
         datasetApplied = new DatasetProxy(datasetProvided);
-        JsonNode config = new ObjectMapper().readTree(cache.retrieve(configOverrideReesource));
+        JsonNode config = new ObjectMapper().readTree(cache.retrieve(configOverrideResource));
         datasetApplied.setConfig(config);
         return datasetApplied;
     }
@@ -250,8 +253,8 @@ public class CmdStream extends CmdDefaultParams {
         this.remotes = remotes;
     }
 
-    public void setConfigOverrideReesource(URI configOverrideReesource) {
-        this.configOverrideReesource = configOverrideReesource;
+    public void setConfigOverrideResource(URI configOverrideResource) {
+        this.configOverrideResource = configOverrideResource;
     }
 
     public static class ImportLoggerFactoryImpl implements ImportLoggerFactory {

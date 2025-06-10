@@ -1010,7 +1010,7 @@ public class CmdStreamTest {
         cmdStream.setDataDir(tmpDir.getAbsolutePath());
         cmdStream.setStdout(new PrintStream(outputStream));
         cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setConfigOverrideReesource(URI.create("hash://sha256/b1a25958aa62f50ffb231fed929d053a4fbd99a9d854ffc9284b338501716685"));
+        cmdStream.setConfigOverrideResource(URI.create("hash://sha256/b1a25958aa62f50ffb231fed929d053a4fbd99a9d854ffc9284b338501716685"));
 
         ObjectNode objectNode = new ObjectMapper().createObjectNode();
         objectNode.put("namespace", "name/space");

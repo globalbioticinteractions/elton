@@ -39,7 +39,14 @@ You can now run Elton from your commandline by typing something like ```elton ve
 
 You can also install Elton by manually downloading `elton.jar` from one of the [releases](https://github.com/globalbioticinteractions/elton/releases). To start Elton using this method, you have to execute something like ```java -jar elton.jar versions``` or any of the other documented commands.
 
-Note that [preston.deb](https://github.com/bio-guoda/preston/releases/latest/download/preston.deb) (Debian, Ubuntu, etc) and [preston.rpm](https://github.com/bio-guoda/preston/releases/latest/download/preston.rpm) (RedHat, Fedora, etc) packages are also available.
+Note that a [homebrew formula](https://github.com/globalbioticinteractions/homebrew-globi/blob/main/Formula/elton.rb) (Mac OS), [elton.deb](https://github.com/globalbioticinteractions/elton/releases/latest/download/elton.deb) (Debian, Ubuntu, etc) and [elton.rpm](https://github.com/globalbioticinteractions/elton/releases/latest/download/elton.rpm) (RedHat, Fedora, etc) packages are also available.
+
+### homebrew example
+A way to install Elton using [Homebrew](https://brew.sh):
+
+```
+brew install globalbioticinteractions/globi/elton
+```
 
 ### deb package example
 

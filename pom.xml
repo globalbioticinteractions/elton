@@ -234,7 +234,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.4</version>
                 <configuration>
-                    <finalName>elton-app</finalName>
+                    <finalName>${project.artifactId}-app</finalName>
                     <shadedArtifactAttached>false</shadedArtifactAttached>
                     <transformers>
                         <transformer
@@ -363,6 +363,25 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                             <includeScope>compile</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>make-bin-bundle</id>
+                        <!-- ensure that this doesn't run on travis -->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/bin.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
                 </executions>

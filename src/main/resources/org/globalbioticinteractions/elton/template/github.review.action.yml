@@ -35,8 +35,13 @@ jobs:
           name: review-report
           path: |
             README.txt
-            datasets/
-            index.*
-            indexed-*
+            HEAD
+            data.zip
+            index*
             review*
             zenodo*
+            nanopub*
+            *.svg
+            *.bib
+            *.nq
+            check-dataset.sh

@@ -1,9 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.Ostermiller.util.LabeledCSVParser;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.eol.globi.util.CSVTSVUtil;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,11 +7,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
@@ -97,24 +89,20 @@ public class CmdInitTest {
         assertThat(actualReadme, Is.is(expectedReadme));
     }
 
-    private List<String> inferColumnNamesCSV(InputStream is) throws IOException {
-        List<String> columnNames;
-        try {
-            LabeledCSVParser csvParser = new LabeledCSVParser(CSVTSVUtil.createCSVParser(is));
-            columnNames = csvParser.getLabels().length > 1
-                    ? new ArrayList<>(Arrays.asList(csvParser.getLabels()))
-                    : Collections.emptyList();
-        } catch (IOException ex) {
-            columnNames = Collections.emptyList();
-        }
-        return columnNames;
-    }
-
     @Test
     public void inferColumnNamesCSV() throws IOException {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data.csv";
         List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is, folder.newFolder());
-        List<String> columnNames = inferColumnNamesCSV(IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8));
+        List<String> columnNames = CmdInit.inferColumnNames(firstTwoLines);
+
+        assertEquals(columnNames, Arrays.asList("header1", "header2", "header3"));
+    }
+
+    @Test
+    public void inferColumnNamesCSVSemicolon() throws IOException {
+        String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/data-semicolon.csv";
+        List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is, folder.newFolder());
+        List<String> columnNames = CmdInit.inferColumnNames(firstTwoLines, ';');
 
         assertEquals(columnNames, Arrays.asList("header1", "header2", "header3"));
     }
@@ -123,7 +111,7 @@ public class CmdInitTest {
     public void inferColumnNamesCSVWithBOM() throws IOException {
         String urlString = "classpath:/org/globalbioticinteractions/elton/cmd/dataWithBOM.csv";
         List<String> firstTwoLines = CmdInit.firstTwoLines(urlString, is -> is, folder.newFolder());
-        List<String> columnNames = inferColumnNamesCSV(IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8));
+        List<String> columnNames = CmdInit.inferColumnNames(firstTwoLines);
         assertEquals(columnNames, Arrays.asList("Prey Highest", "Prey Higher", "Prey Phylum", "Prey Class", "Prey Order", "Prey Family", "Prey Genus", "Prey Species", "Prey Species Current", "Prey Species ID #", "Prey Count", "Snake Species", "Snake Subspecies", "FullSpName", "Snake Species ID #", "Snake Age Class", "Snake SVL(mm)", "Snake Sex", "Location", "Latitude", "Longitude", "Citation", "Full Citation", "Reference DOI"));
     }
 

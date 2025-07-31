@@ -125,14 +125,19 @@ public class CmdInit extends CmdDefaultParams {
         List<String> firstTwoLines = firstTwoLines(urlString, inputStreamFactory, cacheDir);
 
         String actualConfig;
-        List<String> columnNames = extractColumnNamesCSV(firstTwoLines);
-        if (columnNames.size() > 0) {
+        List<String> columnNames = inferColumnNames(firstTwoLines);
+        if (!columnNames.isEmpty()) {
             actualConfig = generateConfig(urlString, citation, columnNames, ",");
         } else {
             columnNames = inferColumnNamesTSV(firstTwoLines);
-            if (columnNames.size() > 0) {
+            if (!columnNames.isEmpty()) {
                 actualConfig = generateConfig(urlString, citation, columnNames, "\t");
             } else {
+                columnNames = inferColumnNames(firstTwoLines, ';');
+                actualConfig = generateConfig(urlString, citation, columnNames, ";");
+            }
+
+            if (columnNames.isEmpty()) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 ObjectNode node = objectMapper.createObjectNode();
                 node.put("format", "unknown");
@@ -168,8 +173,16 @@ public class CmdInit extends CmdDefaultParams {
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
     }
 
-    private static List<String> extractColumnNamesCSV(List<String> firstTwoLines) throws IOException {
-        return extractColumnNamesCSV(IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8));
+    static List<String> inferColumnNames(List<String> firstTwoLines) throws IOException {
+        return inferColumnNames(firstTwoLines, null);
+    }
+
+
+    static List<String> inferColumnNames(List<String> firstTwoLines, Character delimiter) throws IOException {
+        return inferColumnNames(
+                IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8),
+                delimiter
+        );
     }
 
     private static JsonNode generateColumns(List<String> columnNames) {
@@ -193,10 +206,18 @@ public class CmdInit extends CmdDefaultParams {
         return objectNode;
     }
 
-    private static List<String> extractColumnNamesCSV(InputStream inputStream) throws IOException {
+    private static List<String> inferColumnNames(InputStream inputStream) throws IOException {
+        return inferColumnNames(inputStream, null);
+    }
+
+
+    private static List<String> inferColumnNames(InputStream inputStream, Character delimiter) throws IOException {
         List<String> columnNames;
         try {
             LabeledCSVParser csvParser = new LabeledCSVParser(CSVTSVUtil.createCSVParser(inputStream));
+            if (delimiter != null) {
+                csvParser.changeDelimiter(delimiter);
+            }
             columnNames = csvParser.getLabels().length > 1
                     ? new ArrayList<>(Arrays.asList(csvParser.getLabels()))
                     : Collections.emptyList();

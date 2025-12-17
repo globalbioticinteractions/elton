@@ -10,7 +10,7 @@
 
     <properties>
         <globi.version>0.28.9</globi.version>
-        <preston.version>0.10.3</preston.version>
+        <preston.version>0.11.4</preston.version>
         <slf4j.version>1.7.30</slf4j.version>
         <picocli.version>4.6.3</picocli.version>
         <asciidoctor-maven-plugin.version>2.2.2</asciidoctor-maven-plugin.version>

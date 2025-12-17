@@ -100,7 +100,14 @@ public class Elton implements CommandLine.IVersionProvider {
     }
 
     public static int run(String[] args) {
-        return new CommandLine(new Elton()).execute(args);
+        CommandLine commandLine = new CommandLine(new Elton());
+        commandLine.registerConverter(IRI.class, new CommandLine.ITypeConverter<IRI>() {
+            @Override
+            public IRI convert(String value) throws Exception {
+                return RefNodeFactory.toIRI(value);
+            }
+        });
+        return commandLine.execute(args);
     }
 
 }

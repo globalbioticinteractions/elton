@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
+import static bio.guoda.preston.RefNodeConstants.BIODIVERSITY_DATASET_GRAPH;
+import static bio.guoda.preston.RefNodeConstants.BIODIVERSITY_DATASET_GRAPH_UUID_STRING;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
 @CommandLine.Command(
@@ -79,6 +81,13 @@ public class CmdStream extends CmdDefaultParams {
     )
     private int depth = 2;
 
+    @CommandLine.Option(
+            names = {"--anchor"},
+            defaultValue = "urn:uuid:" + BIODIVERSITY_DATASET_GRAPH_UUID_STRING,
+            description = "provenance anchor (aka bill of material identifier)"
+    )
+    private IRI provenanceAnchor = BIODIVERSITY_DATASET_GRAPH;
+
     private boolean supportTarGzDiscovery = true;
 
 
@@ -114,7 +123,8 @@ public class CmdStream extends CmdDefaultParams {
                 getRemotes(),
                 getHashType(),
                 getProgressListener(),
-                isSupportTarGzDiscovery()
+                isSupportTarGzDiscovery(),
+                getProvenanceAnchor()
         );
 
         BlobStoreReadOnly blobStore = new BlobStoreAppendOnly(
@@ -255,6 +265,10 @@ public class CmdStream extends CmdDefaultParams {
 
     public void setConfigOverrideResource(URI configOverrideResource) {
         this.configOverrideResource = configOverrideResource;
+    }
+
+    public IRI getProvenanceAnchor() {
+        return provenanceAnchor;
     }
 
     public static class ImportLoggerFactoryImpl implements ImportLoggerFactory {

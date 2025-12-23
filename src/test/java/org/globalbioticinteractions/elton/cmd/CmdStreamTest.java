@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -1078,15 +1077,16 @@ public class CmdStreamTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
-        runForRecordType(outputStream, errorStream, "name");
+        runForRecordType(outputStream, errorStream, "name", "hash://md5/d3b07384d113edec49eaa6238ad5ff00");
 
         assertHeaderAndMore(outputStream, headerNames());
 
         assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), startsWith(headerNames()));
     }
 
-    private void runForRecordType(ByteArrayOutputStream outputStream, ByteArrayOutputStream errorStream, String recordType) throws IOException {
+    private void runForRecordType(ByteArrayOutputStream outputStream, ByteArrayOutputStream errorStream, String recordType, String provenanceAnchor) throws IOException {
         CmdStream cmdStream = new CmdStream();
+        cmdStream.setProvenanceAnchor(RefNodeFactory.toIRI(provenanceAnchor));
 
         File tmpDir = folder.newFolder("tmpDir");
         tmpDir.mkdirs();
@@ -1113,13 +1113,37 @@ public class CmdStreamTest {
     }
 
     @Test
-    public void streamSomeReviewNotesNoData() throws IOException {
+    public void streamSomeReviewNotesNoDataWithProvenanceAnchor() throws IOException {
+        String provenanceAnchor = "hash://md5/d3b07384d113edec49eaa6238ad5ff00";
+        String expectedContentHash = provenanceAnchor;
+
+        assertReviewNote(provenanceAnchor, expectedContentHash);
+    }
+
+    @Test
+    public void streamSomeReviewNotesNoDataNoAnchor() throws IOException {
+        String provenanceAnchor = "";
+        String expectedContentHash = "";
+
+        assertReviewNote(provenanceAnchor, expectedContentHash);
+    }
+
+    private void assertReviewNote(String provenanceAnchor, String expectedContentHash) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
-        runForRecordType(outputStream, errorStream, "review");
+        runForRecordType(outputStream, errorStream, "review", provenanceAnchor);
 
         assertHeaderAndMore(outputStream, headerReviewNotes());
+
+        String review = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+        String[] reviewLines = StringUtils.split(review, "\n");
+
+        String secondReviewLine = reviewLines[2];
+        String reviewJson = StringUtils.splitByWholeSeparatorPreserveAllTokens(secondReviewLine, "\t")[14];
+
+        assertThat(new ObjectMapper().readTree(reviewJson).at("/context/contentHash").asText(),
+                Is.is(expectedContentHash));
     }
 
     private String headerNames() {

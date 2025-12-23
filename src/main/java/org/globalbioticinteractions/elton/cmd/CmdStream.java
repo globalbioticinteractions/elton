@@ -162,7 +162,8 @@ public class CmdStream extends CmdDefaultParams {
 
     private void handleDataset(BlobStoreReadOnly blobStore, AtomicBoolean shouldWriteHeader, Dataset dataset) throws IOException {
         if (dataset != null) {
-            if (handleDataset(dataset, shouldWriteHeader.get(), getCache(blobStore, dataset.getNamespace()))) {
+            Cache cache = getCache(blobStore, dataset.getNamespace(), getProvenanceAnchor() == null ? "" : getProvenanceAnchor().getIRIString());
+            if (handleDataset(dataset, shouldWriteHeader.get(), cache)) {
                 shouldWriteHeader.set(false);
             }
         }
@@ -271,6 +272,10 @@ public class CmdStream extends CmdDefaultParams {
         return provenanceAnchor;
     }
 
+    public void setProvenanceAnchor(IRI provenanceAnchor) {
+        this.provenanceAnchor = provenanceAnchor;
+    }
+
     public static class ImportLoggerFactoryImpl implements ImportLoggerFactory {
         private final String recordType;
         private final String namespace;
@@ -335,7 +340,7 @@ public class CmdStream extends CmdDefaultParams {
         }
     }
 
-    public static Cache getCache(BlobStoreReadOnly blobStore, final String namespace) {
+    public static Cache getCache(BlobStoreReadOnly blobStore, final String namespace, final String provenanceAnchor) {
         return new Cache() {
             @Override
             public ContentProvenance provenanceOf(URI resourceURI) {
@@ -343,7 +348,7 @@ public class CmdStream extends CmdDefaultParams {
                         namespace,
                         resourceURI,
                         resourceURI,
-                        null,
+                        provenanceAnchor,
                         DateUtil.now()
                 );
             }

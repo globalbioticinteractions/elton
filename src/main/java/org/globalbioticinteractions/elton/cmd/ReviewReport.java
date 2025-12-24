@@ -16,8 +16,11 @@ public class ReviewReport {
     private final String reviewId;
     private final DateFactory dateFactory;
     private final String reviewerName;
+    private final String provenanceAnchor;
 
-    ReviewReport(String namespace, List<ReviewCommentType> desiredReviewCommentTypes) {
+    ReviewReport(String namespace,
+                 List<ReviewCommentType> desiredReviewCommentTypes,
+                 String provenanceAnchor) {
         this.infoCounter = new AtomicLong(0);
         this.noteCounter = new AtomicLong(0);
         this.interactionCounter = new AtomicLong(0);
@@ -27,9 +30,18 @@ public class ReviewReport {
         this.dateFactory = () -> new Date();
         this.reviewId = UUID.randomUUID().toString();
         this.reviewerName = CmdReview.REVIEWER_DEFAULT;
+        this.provenanceAnchor = provenanceAnchor;
     }
 
-    ReviewReport(AtomicLong infoCounter, AtomicLong noteCounter, String namespace, List<ReviewCommentType> desiredReviewCommentTypes, AtomicLong lineCount, String reviewId, DateFactory dateFactory, String reviewerName, AtomicLong interactionCounter) {
+    ReviewReport(AtomicLong infoCounter,
+                 AtomicLong noteCounter,
+                 String namespace,
+                 List<ReviewCommentType> desiredReviewCommentTypes,
+                 AtomicLong lineCount,
+                 String reviewId,
+                 DateFactory dateFactory,
+                 String reviewerName,
+                 AtomicLong interactionCounter) {
         this.infoCounter = infoCounter;
         this.noteCounter = noteCounter;
         this.interactionCounter = interactionCounter;
@@ -39,6 +51,7 @@ public class ReviewReport {
         this.dateFactory = dateFactory;
         this.reviewId = reviewId;
         this.reviewerName = reviewerName;
+        this.provenanceAnchor = null;
     }
 
     public AtomicLong getInfoCounter() {
@@ -78,4 +91,7 @@ public class ReviewReport {
     }
 
 
+    public String getProvenanceAnchor() {
+        return provenanceAnchor;
+    }
 }

@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.HashType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -298,15 +297,38 @@ public class CmdReview extends CmdTabularWriterParams {
         logReviewComment(out, "reviewId", "reviewDate", "reviewer", "namespace", "reviewCommentType", "reviewComment", "archiveURI", "referenceUrl", "institutionCode", "collectionCode", "collectionId", "catalogNumber", "occurrenceId", "sourceCitation", "dataContext");
     }
 
-    private static void logWithContext(LogContext ctx, String msg, ReviewCommentType commentType, String reviewId, DateFactory dateFactory, String namespace, String reviewerName, PrintStream stdout) {
+
+    public static void log(LogContext ctx, String msg, ReviewCommentType commentType, ReviewReport report, PrintStream stdout) {
+        if (report.getDesiredReviewCommentTypes().contains(commentType)) {
+            if (ctx == null) {
+                CmdReview.log(msg, report.getNamespace(), stdout, commentType.getLabel(), report.getReviewId(), report.getDateFactory(), report.getReviewerName());
+            } else {
+                logWithContext(ctx, msg, commentType, stdout, report);
+            }
+        }
+    }
+
+    private static void logWithContext(LogContext ctx, String msg, ReviewCommentType commentType, PrintStream stdout, ReviewReport report) {
+        String reviewId1 = report.getReviewId();
+        DateFactory dateFactory1 = report.getDateFactory();
+        String namespace = report.getNamespace();
+        String reviewerName1 = report.getReviewerName();
         try {
             String contextString = ctx.toString();
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode dataContext = parseAndSortContext(contextString);
+            final ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode dataContext1 = objectMapper.readTree(contextString);
+            if (dataContext1 instanceof ObjectNode
+                    && !dataContext1.has(DatasetConstant.ARCHIVE_URI)
+                    && StringUtils.isNotBlank(report.getProvenanceAnchor())) {
+                ((ObjectNode) dataContext1).put(DatasetConstant.ARCHIVE_URI, report.getProvenanceAnchor());
+                ((ObjectNode) dataContext1).put("contentHash", report.getProvenanceAnchor());
+            }
+            JsonNode dataContext = sortIfPossible(dataContext1, objectMapper);
             ObjectNode review = mapper.createObjectNode();
-            review.put("reviewId", reviewId);
-            review.put("reviewDate", DateUtil.printDate(dateFactory.getDate()));
-            review.put("reviewerName", reviewerName);
+            review.put("reviewId", reviewId1);
+            review.put("reviewDate", DateUtil.printDate(dateFactory1.getDate()));
+            review.put("reviewerName", reviewerName1);
             review.put("reviewCommentType", commentType.getLabel());
             review.put("reviewComment", msg);
             review.put("namespace", namespace);
@@ -321,20 +343,9 @@ public class CmdReview extends CmdTabularWriterParams {
             String occurrenceId = getFindTermValueOrEmptyString(dataContext, SOURCE_OCCURRENCE_ID);
             String referenceUrl = getFindTermValueOrEmptyString(dataContext, "referenceUrl");
             String sourceCitation = getFindTermValueOrEmptyString(dataContext, DatasetImporterForTSV.STUDY_SOURCE_CITATION);
-            logReviewCommentWithReviewerInfo(stdout, reviewId, dateFactory, reviewerName, namespace, commentType.getLabel(), msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
+            logReviewCommentWithReviewerInfo(stdout, reviewId1, dateFactory1, reviewerName1, namespace, commentType.getLabel(), msg, archiveURI, referenceUrl, institutionCode, collectionCode, collectionId, catalogNumber, occurrenceId, sourceCitation, reviewJsonString);
         } catch (IOException e) {
-            CmdReview.log(e.getMessage(), namespace, stdout, ReviewCommentType.note.getLabel(), reviewId, dateFactory, reviewerName);
-        }
-    }
-
-
-    public static void log(LogContext ctx, String msg, ReviewCommentType commentType, ReviewReport report, PrintStream stdout) {
-        if (report.getDesiredReviewCommentTypes().contains(commentType)) {
-            if (ctx == null) {
-                CmdReview.log(msg, report.getNamespace(), stdout, commentType.getLabel(), report.getReviewId(), report.getDateFactory(), report.getReviewerName());
-            } else {
-                logWithContext(ctx, msg, commentType, report.getReviewId(), report.getDateFactory(), report.getNamespace(), report.getReviewerName(), stdout);
-            }
+            CmdReview.log(e.getMessage(), namespace, stdout, ReviewCommentType.note.getLabel(), reviewId1, dateFactory1, reviewerName1);
         }
     }
 
@@ -468,9 +479,7 @@ public class CmdReview extends CmdTabularWriterParams {
     }
 
 
-    static JsonNode parseAndSortContext(String content) throws IOException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode dataContext = objectMapper.readTree(content);
+    static JsonNode sortIfPossible(JsonNode dataContext, ObjectMapper objectMapper) {
         return dataContext.isObject()
                 ? sortJsonObjByPropertyNames(objectMapper, dataContext)
                 : dataContext;

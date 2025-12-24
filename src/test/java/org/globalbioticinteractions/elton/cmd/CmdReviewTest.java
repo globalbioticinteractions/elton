@@ -380,7 +380,9 @@ public class CmdReviewTest {
         review.put("reviewId", "some id");
         review.put("namespace", "some namespace");
         final String content = "{ \"zfoo\": \"bar\", \"foo\": \"bar\"}";
-        final JsonNode dataContextSorted = CmdReview.parseAndSortContext(content);
+        final ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode dataContext = objectMapper.readTree(content);
+        final JsonNode dataContextSorted = CmdReview.sortIfPossible(dataContext, objectMapper);
 
         review.set("context", dataContextSorted);
         String reviewJsonString = mapper.writeValueAsString(review.get("context"));

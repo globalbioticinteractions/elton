@@ -192,7 +192,8 @@ public class CmdStream extends CmdDefaultParams {
                 recordType,
                 datasetProvided.getNamespace(),
                 Arrays.asList(ReviewCommentType.values()),
-                getStdout()
+                getStdout(),
+                getProvenanceAnchor() == null ? null : getProvenanceAnchor().getIRIString()
         );
         try {
             Dataset datasetApplied = hasConfigOverride()
@@ -281,15 +282,18 @@ public class CmdStream extends CmdDefaultParams {
         private final String namespace;
         private final List<ReviewCommentType> desiredReviewCommentTypes;
         private final PrintStream stdout;
+        private String provenanceAnchor;
 
         public ImportLoggerFactoryImpl(String recordType,
                                        String namespace,
                                        List<ReviewCommentType> desiredReviewCommentTypes,
-                                       PrintStream stdout) {
+                                       PrintStream stdout,
+                                       String provenanceAnchor) {
             this.recordType = recordType;
             this.namespace = namespace;
             this.desiredReviewCommentTypes = desiredReviewCommentTypes;
             this.stdout = stdout;
+            this.provenanceAnchor = provenanceAnchor;
         }
 
         @Override
@@ -299,7 +303,7 @@ public class CmdStream extends CmdDefaultParams {
                 logger = new NullImportLogger();
             } else if (StringUtils.equals("review", recordType)) {
                 logger = new ReviewReportLogger(
-                        new ReviewReport(namespace, desiredReviewCommentTypes),
+                        new ReviewReport(namespace, desiredReviewCommentTypes, provenanceAnchor),
                         stdout,
                         null,
                         new ProgressCursorFactory() {

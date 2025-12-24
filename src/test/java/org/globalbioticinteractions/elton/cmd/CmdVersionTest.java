@@ -17,7 +17,7 @@ public class CmdVersionTest {
         ByteArrayOutputStream stdout = new ByteArrayOutputStream();
         cmdVersion.setVerbose(true);
         cmdVersion.run(new PrintStream(stdout));
-        assertThat(new String(stdout.toByteArray(), StandardCharsets.UTF_8), Is.is("elton@dev preston@0.11.4@4e49001ad65af30602be953079627a12f7a0809a\n"));
+        assertThat(new String(stdout.toByteArray(), StandardCharsets.UTF_8), Is.is("elton@dev preston@0.11.5@1ac9f5cfd09a558b4e9e227c54e9835037eff0b2\n"));
     }
 
     @Test

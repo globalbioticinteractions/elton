@@ -152,7 +152,7 @@ public class NanoPubWriter implements InteractionWriter {
     }
 
     private String rdfCitationSnippetFor(String citationString, String subject) {
-        String desc = StringEscapeUtils.escapeXml(citationString.replace("\n", " "));
+        String desc = StringEscapeUtils.escapeXml(StringUtils.replaceChars(citationString, "\n\r", " "));
         return "  " + subject + " dct:bibliographicCitation \"" + desc + "\" .";
     }
 

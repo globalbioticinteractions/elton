@@ -69,6 +69,55 @@ public class NanoPubWriterTest {
     }
 
     @Test
+    public void testReference() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        NanoPubWriter nanoPubWriter = new NanoPubWriter(new PrintStream(out), () -> "1");
+
+        DatasetImpl dataset = new DatasetImpl(
+                "some/namespace",
+                new ResourceServiceLocal(is -> is),
+                URI.create("some:uri")
+        );
+
+        StudyImpl study = new StudyImpl("some study");
+        study.setCitation("@article{spegazzini1912amnhnba,\r   title = {Contibuci<U+03CC>n al estudio de las {Laboulbeniomicetas} {Argentinas}},   volume = {23},   url = {http://www.museonacional.gov.co/Paginas/default.aspx},   journal = {Anales del Museo Nacional de Historia Natural de Buenos Aires},   author = {Spegazzini, Carlos},   year = {1912},   pages = {167--228},  }");
+        SpecimenImpl specimen = new SpecimenImpl(
+                dataset, study, nanoPubWriter, new TaxonImpl("Chlaenius purpuricollis Randall, 1838", "boo:123")
+        );
+        specimen.setEventDate(new Date(0));
+        LocationImpl location = new LocationImpl(12.2d, 1.2d, 2d, null);
+        location.setLocality("some locality");
+        location.setLocalityId("GEONAMES:123");
+        location.addEnvironment(new Environment() {
+            @Override
+            public String getName() {
+                return "some envo";
+            }
+
+            @Override
+            public void setExternalId(String externalId) {
+
+            }
+
+            @Override
+            public String getExternalId() {
+                return "ENVO:123";
+            }
+        });
+        specimen.caughtIn(location);
+
+        nanoPubWriter.write(specimen, InteractType.ATE, specimen, study, dataset);
+
+        assertThat(out.toString(), containsString("Chlaenius purpuricollis Randall, 1838"));
+        assertThat(out.toString(), containsString("http://www.geonames.org/123"));
+        assertThat(out.toString(), containsString("ENVO"));
+        assertThat(out.toString(), containsString("<some:uri>"));
+        assertThat(out.toString(), containsString("geo:latitude \"12.2\"^^xsd:decimal"));
+        assertThat(out.toString(), containsString("prov:atTime \"1970-01-01T00:00:00Z\"^^xsd:dateTime"));
+        assertThat(out.toString(), containsString("spegazzini1912amnhnba"));
+    }
+
+    @Test
     public void extractDatasetURIGitHub() {
         String datasetURI = NanoPubWriter.extractDatasetURI(
                 new DatasetImpl(
@@ -103,6 +152,5 @@ public class NanoPubWriterTest {
         );
         assertThat(datasetURI, is("some:namespace"));
     }
-
 
 }

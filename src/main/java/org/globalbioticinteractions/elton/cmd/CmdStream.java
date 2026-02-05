@@ -219,7 +219,7 @@ public class CmdStream extends CmdDefaultParams {
                 public String toString() {
                     return "{ \"namespace\": \"" + datasetProvided.getNamespace() + "\" }";
                 }
-            }, msg);
+            }, e.getMessage());
             LOG.error(msg, e);
         } finally {
             // FileUtils.forceDelete(new File(this.getDataDir()));

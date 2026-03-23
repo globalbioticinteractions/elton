@@ -1,0 +1,677 @@
+{
+  "offset": 0,
+  "limit": 5,
+  "total": 11,
+  "result": [
+    {
+      "created": "2019-11-20T11:07:46.255777",
+      "createdBy": 102,
+      "modified": "2026-03-08T10:14:11.194262",
+      "modifiedBy": 10,
+      "key": 1049,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 63,
+      "imported": "2026-03-08T10:14:11.798312",
+      "lastImportAttempt": "2026-03-08T10:14:11.810004",
+      "lastImportState": "finished",
+      "gbifKey": "bb5f507f-f7de-4a5a-ae7f-ad8abbe68bef",
+      "gbifPublisherKey": "37e82b90-1e21-11de-ab90-f72009d2669b",
+      "size": 3958,
+      "versionDoi": "10.48580/d397.v63",
+      "identifier": [
+        "col:1049",
+        "gbif:bb5f507f-f7de-4a5a-ae7f-ad8abbe68bef"
+      ],
+      "title": "Global Taxonomic Database of Gracillariidae",
+      "alias": "Global Gracillariidae",
+      "description": "The Gracillariidae is one of the largest families of primitive moths (Lepidoptera). Gracillariid moths are generally distributed throughout the world except Antarctica, and they are more numerous in tropical areas. Many species of Gracillariidae are serious pests of agricultural and ornamental plants. The Global Taxonomic Database of Gracillariidae currently holds information on 150 genus-group names and in total 2.427 species-group names, belonging to 111 genera.",
+      "issued": "2026-03-01",
+      "version": "2026-03-01",
+      "contact": {
+        "orcid": "0000-0001-7637-5755",
+        "given": "Jurate",
+        "family": "De Prins",
+        "email": "jurate.deprins@gmail.com",
+        "name": "De Prins J.",
+        "orcidAsUrl": "https://orcid.org/0000-0001-7637-5755"
+      },
+      "creator": [
+        {
+          "orcid": "0000-0001-7637-5755",
+          "given": "Jurate",
+          "family": "De Prins",
+          "country": "BE",
+          "email": "jurate.deprins@gmail.com",
+          "name": "De Prins J.",
+          "address": "Belgium",
+          "orcidAsUrl": "https://orcid.org/0000-0001-7637-5755",
+          "organisation": "Royal Belgian Institute of Natural Sciences"
+        },
+        {
+          "orcid": "0000-0002-4430-1425",
+          "given": "Willy",
+          "family": "De Prins",
+          "country": "BE",
+          "email": "willy.deprins@gmail.com",
+          "name": "De Prins W.",
+          "address": "Belgium",
+          "orcidAsUrl": "https://orcid.org/0000-0002-4430-1425",
+          "organisation": "Royal Belgian Institute of Natural Sciences"
+        }
+      ],
+      "editor": [
+        {
+          "orcid": "0000-0001-7637-5755",
+          "given": "Jurate",
+          "family": "De Prins",
+          "name": "De Prins J.",
+          "orcidAsUrl": "https://orcid.org/0000-0001-7637-5755"
+        },
+        {
+          "orcid": "0000-0002-4430-1425",
+          "given": "Willy",
+          "family": "De Prins",
+          "name": "De Prins W.",
+          "orcidAsUrl": "https://orcid.org/0000-0002-4430-1425"
+        }
+      ],
+      "publisher": {
+        "city": "Brussels",
+        "country": "BE",
+        "url": "http://www.biodiversity.be",
+        "note": "Host",
+        "name": "Belgian Biodiversity Platform, Belspo",
+        "address": "Brussels, Belgium",
+        "organisation": "Belgian Biodiversity Platform, Belspo"
+      },
+      "contributor": [
+        {
+          "rorid": "001805t51",
+          "city": "Tervuren",
+          "country": "BE",
+          "name": "Royal Museum for Central Africa",
+          "address": "Tervuren, Belgium",
+          "organisation": "Royal Museum for Central Africa"
+        },
+        {
+          "orcid": "0000-0002-7839-5300",
+          "given": "Andre",
+          "family": "Heughebaert",
+          "rorid": "01fapfv42",
+          "email": "a.heughebaert@biodiversity.be",
+          "note": "Data Wrangler",
+          "name": "Heughebaert A.",
+          "orcidAsUrl": "https://orcid.org/0000-0002-7839-5300",
+          "organisation": "Belgian Biodiversity Platform, Belspo"
+        }
+      ],
+      "keyword": [
+        "Checklist",
+        "Global",
+        "Moths"
+      ],
+      "geographicScope": "global",
+      "taxonomicScope": "Gracillariidae",
+      "temporalScope": "1758-2024",
+      "confidence": 5,
+      "completeness": 100,
+      "license": "cc by",
+      "url": "http://www.gracillariidae.net",
+      "logo": "https://www.gracillariidae.net/images/header.png?1651069301",
+      "source": [
+        {
+          "id": "gracillariidae.net",
+          "type": "webpage",
+          "editor": [
+            {
+              "family": "De Prins Jurate"
+            },
+            {
+              "family": "De Prins Willy"
+            }
+          ],
+          "title": "Global taxonomic database of Gracillariidae (Lepidoptera)",
+          "issued": {
+            "raw": "2006-10",
+            "date-parts": [
+              [
+                2006,
+                10
+              ]
+            ]
+          },
+          "version": "01 March 2024",
+          "citation": "<div class=\"csl-entry\">De Prins Jurate, &amp; De Prins Willy. (2006, October). <span style=\"font-style: italic\">Global taxonomic database of Gracillariidae (Lepidoptera)</span>. https://www.gracillariidae.net/</div>",
+          "URL": "https://www.gracillariidae.net/"
+        }
+      ],
+      "label": "Global Taxonomic Database of Gracillariidae (2026-03-01)",
+      "citation": "<div class=\"csl-entry\">De Prins, J., &amp; De Prins, W. (2026). <span style=\"font-style: italic\">Global Taxonomic Database of Gracillariidae</span> (J. De Prins &amp; W. De Prins, Eds.; Version 2026-03-01). Belgian Biodiversity Platform, Belspo, Brussels, Belgium. http://www.gracillariidae.net</div>",
+      "private": false
+    },
+    {
+      "created": "2019-11-20T11:07:46.255777",
+      "createdBy": 102,
+      "modified": "2026-03-09T20:24:56.272664",
+      "modifiedBy": 103,
+      "key": 1061,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 44,
+      "imported": "2026-03-09T20:24:57.268971",
+      "lastImportAttempt": "2026-03-09T20:24:57.275844",
+      "lastImportState": "finished",
+      "gbifKey": "214c3109-d37a-40f8-9c24-5b6e59915394",
+      "gbifPublisherKey": "47a779a6-a230-4edd-b787-19c3d2c80ab5",
+      "size": 27230,
+      "doi": "10.48580/d39m",
+      "versionDoi": "10.48580/d39m.v44",
+      "title": "Aphid Species File",
+      "alias": "SF Aphid",
+      "description": "Aphid Species File is a taxonomic, nomenclatural, and bibliographic database of the aphids of the world, including all extant and fossil taxa.",
+      "issued": "2026-03-09",
+      "version": "Mar 2026",
+      "contact": {
+        "orcid": "0000-0003-2639-7520",
+        "given": "Deborah",
+        "family": "Paul",
+        "rorid": "047426m28",
+        "department": "Illinois Natural History Survey",
+        "city": "Champaign",
+        "state": "IL",
+        "country": "US",
+        "email": "dlpaul@illinois.edu",
+        "name": "Paul D.",
+        "address": "Champaign, IL, United States of America",
+        "orcidAsUrl": "https://orcid.org/0000-0003-2639-7520",
+        "organisation": "University of Illinois"
+      },
+      "creator": [
+        {
+          "orcid": "0000-0001-6243-3184",
+          "given": "Colin",
+          "family": "Favret",
+          "rorid": "0161xgx34",
+          "department": "Department of Biological Sciences",
+          "city": "Montreal",
+          "country": "CA",
+          "name": "Favret C.",
+          "address": "Montreal, Canada",
+          "orcidAsUrl": "https://orcid.org/0000-0001-6243-3184",
+          "organisation": "University of Montreal"
+        }
+      ],
+      "publisher": {
+        "city": "Champaign",
+        "state": "IL",
+        "country": "US",
+        "email": "SpeciesFileGroup@listserv.illinois.edu",
+        "url": "http://software.speciesfile.org",
+        "note": "Host",
+        "name": "Species File Group",
+        "address": "Champaign, IL, United States of America",
+        "organisation": "Species File Group"
+      },
+      "contributor": [
+        {
+          "given": "David C",
+          "family": "Eades",
+          "rorid": "047426m28",
+          "department": "Illinois Natural History Survey",
+          "city": "Champaign",
+          "state": "IL",
+          "country": "US",
+          "note": "Principal Database Developer",
+          "name": "Eades D. C",
+          "address": "Champaign, IL, United States of America",
+          "organisation": "University of Illinois"
+        }
+      ],
+      "geographicScope": "Global",
+      "taxonomicScope": "Aphids and allied groups",
+      "taxonomicGroupScope": [
+        "eukaryotes",
+        "animals",
+        "arthropods",
+        "insects",
+        "hemiptera"
+      ],
+      "confidence": 4,
+      "completeness": 99,
+      "license": "cc by",
+      "feedbackUrl": "https://github.com/sfg-taxonpages/aphid/issues",
+      "logo": "https://github.com/Sp2000/colplus-repo/raw/master/logos/SF_Aphid.png",
+      "label": "Aphid Species File (Mar 2026)",
+      "citation": "<div class=\"csl-entry\">Favret, C. (2026). <span style=\"font-style: italic\">Aphid Species File</span> (Mar 2026). Species File Group, Champaign, IL, United States of America. https://doi.org/10.48580/d39m</div>",
+      "private": false
+    },
+    {
+      "created": "2019-11-20T11:07:46.255777",
+      "createdBy": 102,
+      "modified": "2026-03-09T20:21:52.582762",
+      "modifiedBy": 103,
+      "key": 1133,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 40,
+      "imported": "2026-03-09T20:21:53.622995",
+      "lastImportAttempt": "2026-03-09T20:21:53.630171",
+      "lastImportState": "finished",
+      "gbifKey": "6fb9265c-2d98-40ad-989d-7b6bf4820519",
+      "gbifPublisherKey": "47a779a6-a230-4edd-b787-19c3d2c80ab5",
+      "size": 23121,
+      "doi": "10.48580/d3d4",
+      "versionDoi": "10.48580/d3d4.v40",
+      "title": "Psocodea Species File",
+      "alias": "SF Psocodea",
+      "description": "The Psocodea Species File is a taxonomic database that includes data\nfor Psocoptera (bark lice) and Phthiraptera (parasitic lice).",
+      "issued": "2026-03-09",
+      "version": "Mar 2026",
+      "contact": {
+        "orcid": "0000-0003-0961-4554",
+        "given": "Heidi",
+        "family": "Hopkins",
+        "rorid": "047426m28",
+        "city": "Ithaca",
+        "state": "NY",
+        "country": "US",
+        "email": "cockroachdoc@gmail.com",
+        "name": "Hopkins H.",
+        "address": "Ithaca, NY, United States of America",
+        "orcidAsUrl": "https://orcid.org/0000-0003-0961-4554",
+        "organisation": "University of Illinois"
+      },
+      "creator": [
+        {
+          "orcid": "0000-0003-0961-4554",
+          "given": "Heidi",
+          "family": "Hopkins",
+          "rorid": "047426m28",
+          "city": "Ithaca",
+          "state": "NY",
+          "country": "US",
+          "note": "Author",
+          "name": "Hopkins H.",
+          "address": "Ithaca, NY, United States of America",
+          "orcidAsUrl": "https://orcid.org/0000-0003-0961-4554",
+          "organisation": "University of Illinois"
+        },
+        {
+          "given": "Kevin P",
+          "family": "Johnson",
+          "rorid": "047426m28",
+          "department": "Illinois Natural History Survey",
+          "city": "Champaign",
+          "state": "IL",
+          "country": "US",
+          "note": "Author",
+          "name": "Johnson K. P",
+          "address": "Champaign, IL, United States of America",
+          "organisation": "University of Illinois"
+        },
+        {
+          "orcid": "0000-0001-5297-7452",
+          "given": "Vincent S",
+          "family": "Smith",
+          "rorid": "039zvsn29",
+          "city": "London",
+          "country": "GB",
+          "note": "Author",
+          "name": "Smith V. S",
+          "address": "London, United Kingdom",
+          "orcidAsUrl": "https://orcid.org/0000-0001-5297-7452",
+          "organisation": "The Natural History Museum"
+        }
+      ],
+      "editor": [
+        {
+          "orcid": "0000-0003-0961-4554",
+          "given": "Heidi",
+          "family": "Hopkins",
+          "email": "cockroachdoc@gmail.com",
+          "name": "Hopkins H.",
+          "orcidAsUrl": "https://orcid.org/0000-0003-0961-4554",
+          "organisation": "Species File Group/TaxonWorks"
+        }
+      ],
+      "publisher": {
+        "rorid": "047426m28",
+        "department": "Species File Group, Illinois Natural History Survey, Prairie Research Institute",
+        "city": "Champaign",
+        "state": "IL",
+        "country": "US",
+        "email": "dlpaul@illinois.edu",
+        "url": "https://speciesfilegroup.org",
+        "name": "Species File Group, Illinois Natural History Survey, Prairie Research Institute, University of Illinois",
+        "address": "Champaign, IL, United States of America",
+        "organisation": "University of Illinois"
+      },
+      "contributor": [
+        {
+          "given": "David C",
+          "family": "Eades",
+          "rorid": "047426m28",
+          "department": "Illinois Natural History Survey",
+          "city": "Champaign",
+          "state": "IL",
+          "country": "US",
+          "note": "Principal Database Developer",
+          "name": "Eades D. C",
+          "address": "Champaign, IL, United States of America",
+          "organisation": "University of Illinois"
+        }
+      ],
+      "geographicScope": "Global",
+      "taxonomicScope": "Bark lices & parasitic lices",
+      "temporalScope": "Carboniferous (Moscovian) to the Mid-Cretaceous (Cenomanian)",
+      "taxonomicGroupScope": [
+        "eukaryotes",
+        "animals",
+        "arthropods",
+        "insects",
+        "otherinsects"
+      ],
+      "confidence": 4,
+      "completeness": 90,
+      "license": "cc by",
+      "url": "https://psocodea.speciesfile.org",
+      "feedbackUrl": "https://www.github.com/sfg-taxonpages/psocodea/issues",
+      "logo": "https://github.com/Sp2000/colplus-repo/raw/master/logos/SF_Psocodea.png",
+      "label": "Psocodea Species File (Mar 2026)",
+      "citation": "<div class=\"csl-entry\">Hopkins, H., Johnson, K. P., &amp; Smith, V. S. (2026). <span style=\"font-style: italic\">Psocodea Species File</span> (H. Hopkins, Ed.; Mar 2026). University of Illinois, Champaign, IL, United States of America. https://doi.org/10.48580/d3d4</div>",
+      "private": false
+    },
+    {
+      "created": "2019-11-20T11:07:46.255777",
+      "createdBy": 102,
+      "modified": "2026-03-09T20:26:42.300092",
+      "modifiedBy": 103,
+      "key": 1166,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 52,
+      "imported": "2026-03-09T20:26:43.428566",
+      "lastImportAttempt": "2026-03-09T20:26:43.435812",
+      "lastImportState": "finished",
+      "size": 30548,
+      "doi": "10.48580/d3f8",
+      "versionDoi": "10.48580/d3f8.v52",
+      "title": "World Entiminae Database",
+      "alias": "Entiminae",
+      "description": "Entiminae is the largest subfamily of weevils, small to medium sized phyllophagous weevils with deciduous mandibular process and mostly root-feeding larva. Initially, the checklist was built in 3i software as the database which provides information on all species, including, distributional and host plant data, and literature references. Since January 2023 the checklist migrated to the TaxonWorks software and it's now became an international collaborative project \"World Entiminae Database\".",
+      "issued": "2026-03-09",
+      "version": "Mar 2026",
+      "contact": {
+        "given": "Nikolai",
+        "family": "Yunakov",
+        "name": "Yunakov N."
+      },
+      "creator": [
+        {
+          "orcid": "0000-0002-0824-7804",
+          "given": "Nikolai",
+          "family": "Yunakov",
+          "rorid": "01xtthb56",
+          "department": "Natural History Museum, Zoology",
+          "city": "Oslo",
+          "country": "NO",
+          "email": "n.yunakov@gmail.com",
+          "name": "Yunakov N.",
+          "address": "Oslo, Norway",
+          "orcidAsUrl": "https://orcid.org/0000-0002-0824-7804",
+          "organisation": "University of Oslo"
+        },
+        {
+          "orcid": "0000-0002-0851-6883",
+          "given": "Jennifer C.",
+          "family": "Girón Duque",
+          "rorid": "0405mnx93",
+          "department": "Invertebrate Zoology Collection",
+          "city": "Lubbock",
+          "state": "TX",
+          "country": "US",
+          "email": "entiminae@gmail.com",
+          "url": "https://sites.google.com/view/jcgiron/home",
+          "name": "Girón Duque J. C.",
+          "address": "Lubbock, TX, United States of America",
+          "orcidAsUrl": "https://orcid.org/0000-0002-0851-6883",
+          "organisation": "Museum of Texas Tech University"
+        },
+        {
+          "orcid": "0000-0001-7112-421X",
+          "given": "Samuel",
+          "family": "Brown",
+          "rorid": "048r72142",
+          "city": "Auckland",
+          "country": "NZ",
+          "email": "samuel.brown@plantandfood.co.nz",
+          "name": "Brown S.",
+          "address": "Auckland, New Zealand",
+          "orcidAsUrl": "https://orcid.org/0000-0001-7112-421X",
+          "organisation": "The New Zealand Institute for Plant & Food Research Limited"
+        },
+        {
+          "orcid": "0000-0001-9865-6099",
+          "given": "M. Guadalupe",
+          "family": "del Río",
+          "rorid": "03cqe8w59",
+          "department": "Entomology Division, Museo de La Plata",
+          "city": "La Plata",
+          "state": "Buenos Aires",
+          "country": "AR",
+          "email": "gdelrio@fcnym.unlp.edu.ar",
+          "url": "www.researchgate.net/profile/Maria-Del-Rio-3",
+          "name": "del Río M. G.",
+          "address": "La Plata, Buenos Aires, Argentina",
+          "orcidAsUrl": "https://orcid.org/0000-0001-9865-6099",
+          "organisation": "Consejo Nacional de Investigaciones Científicas y Técnicas, National University of La Plata"
+        },
+        {
+          "orcid": "0000-0002-5499-7913",
+          "given": "Judy",
+          "family": "Rincón",
+          "rorid": "03cqe8w59",
+          "department": "Entomology Division, Museo de La Plata",
+          "city": "La Plata",
+          "state": "Buenos Aires",
+          "country": "AR",
+          "email": "j.andrearincon@gmail.com",
+          "name": "Rincón J.",
+          "address": "La Plata, Buenos Aires, Argentina",
+          "orcidAsUrl": "https://orcid.org/0000-0002-5499-7913",
+          "organisation": "Consejo Nacional de Investigaciones Científicas y Técnicas"
+        },
+        {
+          "orcid": "0000-0002-1150-9940",
+          "given": "Kevin",
+          "family": "Cortés-Hernández",
+          "rorid": "03efmqc40",
+          "department": "Biodiversity Knowledge Integration Center",
+          "city": "Tempe",
+          "state": "Arizona",
+          "country": "US",
+          "email": "kcortesh@asu.edu",
+          "url": "www.researchgate.net/profile/Kevin-Cortes-Hernandez",
+          "name": "Cortés-Hernández K.",
+          "address": "Tempe, Arizona, United States of America",
+          "orcidAsUrl": "https://orcid.org/0000-0002-1150-9940",
+          "organisation": "Arizona State University"
+        },
+        {
+          "orcid": "0000-0002-0980-1651",
+          "given": "Analyn",
+          "family": "Cabras",
+          "rorid": "03fqqe674",
+          "department": "Terrestrial Invertebrate Research Laboratory, URESCOM",
+          "city": "City of Mati",
+          "country": "PH",
+          "name": "Cabras A.",
+          "address": "City of Mati, Philippines",
+          "orcidAsUrl": "https://orcid.org/0000-0002-0980-1651",
+          "organisation": "Davao Oriental State University"
+        },
+        {
+          "orcid": "0000-0003-0665-2977",
+          "given": "Robert",
+          "family": "Anderson",
+          "rorid": "029ws6035",
+          "city": "Gatineau",
+          "state": "PQ",
+          "country": "CA",
+          "name": "Anderson R.",
+          "address": "Gatineau, PQ, Canada",
+          "orcidAsUrl": "https://orcid.org/0000-0003-0665-2977",
+          "organisation": "Canadian Museum of Nature"
+        }
+      ],
+      "geographicScope": "Global",
+      "taxonomicScope": "Broad-nosed weevils",
+      "confidence": 5,
+      "completeness": 90,
+      "license": "cc by",
+      "url": "http://dmitriev.speciesfile.org/3i.asp",
+      "logo": "https://api.checklistbank.org/dataset/1166/logo",
+      "label": "World Entiminae Database (Mar 2026)",
+      "citation": "<div class=\"csl-entry\">Yunakov, N., Gir&oacute;n Duque, J. C., Brown, S., del R&iacute;o, M. G., Rinc&oacute;n, J., Cort&eacute;s-Hern&aacute;ndez, K., Cabras, A., &amp; Anderson, R. (2026). <span style=\"font-style: italic\">World Entiminae Database</span> (Mar 2026). https://doi.org/10.48580/d3f8</div>",
+      "private": false
+    },
+    {
+      "created": "2019-11-20T11:07:46.255777",
+      "createdBy": 102,
+      "modified": "2026-02-16T16:17:48.08379",
+      "modifiedBy": 12,
+      "key": 1199,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 179,
+      "imported": "2025-10-31T08:01:39.152572",
+      "lastImportAttempt": "2025-10-31T08:01:39.197054",
+      "lastImportState": "finished",
+      "gbifKey": "c815ecb1-b036-4617-b545-1bb65e0339cd",
+      "gbifPublisherKey": "f4ce3c03-7b38-445e-86e6-5f6b04b649d4",
+      "size": 3020,
+      "doi": "10.48580/d3gd",
+      "versionDoi": "10.48580/d3gd.v179",
+      "title": "Catalogue of the Pterophoroidea of the World",
+      "alias": "Pterophoroidea",
+      "description": "This GSD is derived from C. Gielis (2003) Pterophoroidea & Alucitoidea (Lepidoptera) (World Catalogue of Insects, volume 4). The database has been edited for inclusion in the Catalogue of Life and updated by Donald Hobern. A current version of the dataset is presented as a web document at https://pterophoroidea.hobern.net/. Version 1.1.25.304 includes updates to reflect recent changes in taxonomy and new species.",
+      "issued": "2025-10-31",
+      "version": "1.1.25.304",
+      "contact": {
+        "orcid": "0000-0001-6492-4016",
+        "given": "Donald",
+        "family": "Hobern",
+        "rorid": "04m098c22",
+        "city": "Aranda",
+        "state": "ACT",
+        "country": "AU",
+        "email": "donald.hobern@sp2000.org",
+        "url": "https://sp2000.org/",
+        "name": "Hobern D.",
+        "address": "Aranda, ACT, Australia",
+        "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+        "organisation": "Species 2000"
+      },
+      "creator": [
+        {
+          "orcid": "0000-0001-6492-4016",
+          "given": "Donald",
+          "family": "Hobern",
+          "rorid": "04m098c22",
+          "city": "Aranda",
+          "state": "ACT",
+          "country": "AU",
+          "email": "donald.hobern@sp2000.org",
+          "url": "https://sp2000.org/",
+          "name": "Hobern D.",
+          "address": "Aranda, ACT, Australia",
+          "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+          "organisation": "Species 2000"
+        },
+        {
+          "orcid": "0000-0003-0857-1679",
+          "given": "Cees",
+          "family": "Gielis",
+          "rorid": "0566bfb96",
+          "city": "Leiden",
+          "country": "NL",
+          "url": "https://www.naturalis.nl/",
+          "name": "Gielis C.",
+          "address": "Leiden, Netherlands",
+          "orcidAsUrl": "https://orcid.org/0000-0003-0857-1679",
+          "organisation": "Naturalis Biodiversity Center"
+        }
+      ],
+      "editor": [
+        {
+          "orcid": "0000-0001-6492-4016",
+          "given": "Donald",
+          "family": "Hobern",
+          "rorid": "04m098c22",
+          "city": "Aranda",
+          "state": "ACT",
+          "country": "AU",
+          "email": "donald.hobern@sp2000.org",
+          "url": "https://sp2000.org/",
+          "name": "Hobern D.",
+          "address": "Aranda, ACT, Australia",
+          "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+          "organisation": "Species 2000"
+        }
+      ],
+      "publisher": {
+        "city": "Amsterdam",
+        "country": "NL",
+        "email": "contact@catalogueoflife.org",
+        "url": "http://www.catalogueoflife.org/",
+        "note": "Host",
+        "name": "Catalogue of Life",
+        "address": "Amsterdam, Netherlands",
+        "organisation": "Catalogue of Life"
+      },
+      "geographicScope": "global",
+      "taxonomicScope": "Pterophoroidea",
+      "temporalScope": "All taxa described to present",
+      "taxonomicGroupScope": [
+        "eukaryotes",
+        "animals",
+        "arthropods",
+        "insects",
+        "lepidoptera"
+      ],
+      "confidence": 5,
+      "completeness": 99,
+      "license": "cc0",
+      "url": "https://pterophoroidea.hobern.net",
+      "logo": "https://hobern.net/img/Deuterocopus_ritsemae.png",
+      "source": [
+        {
+          "id": "gielis-2003",
+          "type": "book",
+          "author": [
+            {
+              "family": "Cees Gielis"
+            }
+          ],
+          "title": "Pterophoroidea & Alucitoidea (Lepidoptera) (World Catalogue of Insects, volume 4)",
+          "issued": {
+            "raw": "2003",
+            "date-parts": [
+              [
+                2003
+              ]
+            ]
+          },
+          "citation": "<div class=\"csl-entry\">Cees Gielis. (2003). <span style=\"font-style: italic\">Pterophoroidea &amp; Alucitoidea (Lepidoptera) (World Catalogue of Insects, volume 4)</span>.</div>",
+          "ISBN": "87-88757-68-4"
+        }
+      ],
+      "label": "Catalogue of the Pterophoroidea of the World (1.1.25.304)",
+      "citation": "<div class=\"csl-entry\">Hobern, D., &amp; Gielis, C. (2025). <span style=\"font-style: italic\">Catalogue of the Pterophoroidea of the World</span> (D. Hobern, Ed.; 1.1.25.304). Catalogue of Life, Amsterdam, Netherlands. https://doi.org/10.48580/d3gd</div>",
+      "private": false
+    }
+  ],
+  "empty": false,
+  "last": false
+}

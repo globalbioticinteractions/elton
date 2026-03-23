@@ -1,0 +1,517 @@
+{
+  "offset": 5,
+  "limit": 5,
+  "total": 11,
+  "result": [
+    {
+      "created": "2019-11-20T11:07:46.255777",
+      "createdBy": 101,
+      "modified": "2026-03-08T10:17:18.725507",
+      "modifiedBy": 10,
+      "key": 2017,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 123,
+      "imported": "2026-03-08T10:17:21.152122",
+      "lastImportAttempt": "2026-03-08T10:17:21.167351",
+      "lastImportState": "finished",
+      "gbifKey": "65c9103f-2fbf-414b-9b0b-e47ca96c5df2",
+      "size": 64031,
+      "versionDoi": "10.48580/d4fl.v123",
+      "identifier": [
+        "col:2017",
+        "gbif:65c9103f-2fbf-414b-9b0b-e47ca96c5df2"
+      ],
+      "title": "Afromoths, online database of Afrotropical moth species (Lepidoptera)",
+      "alias": "Afromoths",
+      "description": "This dataset covers all relevant information on every Afrotropical moth species. The zoogeographic area covered can be defined as the Africa continent south of the Sahara (i.e. excl. Morocco, Algeria, Tunisia, Libya and Egypt), the islands in the Atlantic Ocean Amsterdam Island, Ascension, Cape Verde Archipelago, Inaccessible Island, St. Helena, São Tomé and Principe, Tristan da Cunha, and the islands in the Indian Ocean Comores (Anjouan, Grande Comore, Mayotte, Mohéli), Madagascar, Mascarene Islands (La Réunion, Mauritius, Rodrigues), Seychelles (Félicité, Mahé, Praslin, Silhouette, a.o.). Furthermore, also those moth species occurring in the transition zone to the Palaearctic fauna have been included, namely most of the Arabia Peninsula (Kuwait, Oman, Saudi Arabia, United Arab Emirates, Yemen with Socotra) but not Iraq, Jordan and further north. Also, some Saharan species have been included (e. g. Hoggar Mts. in Algeria, Tibesti Mts. in South Libya). Utmost care was taken that the data incorporated in the database are correct. We decline any responsibility in case of damage to soft- or hardware based on information used in this website. Persons retrieving information from this website for their own research or for applied aspects such as pest control programmes, should acknowledge the usage of data from this website in the following format  \"De Prins, J.& De Prins, W. 2011. Afromoths, online database of Afrotropical moth species (Lepidoptera). World Wide Web electronic publication (www.afromoths.net)\"",
+      "issued": "2026-03-01",
+      "version": "2026-03-01",
+      "contact": {
+        "orcid": "0000-0002-4430-1425",
+        "given": "Willy",
+        "family": "De Prins",
+        "country": "BE",
+        "email": "willy.deprins@gmail.com",
+        "name": "De Prins W.",
+        "address": "Belgium",
+        "orcidAsUrl": "https://orcid.org/0000-0002-4430-1425",
+        "organisation": "Royal Belgian Institute of Natural Sciences"
+      },
+      "creator": [
+        {
+          "orcid": "0000-0001-7637-5755",
+          "given": "Jurate",
+          "family": "De Prins",
+          "country": "BE",
+          "email": "jurate.deprins@gmail.com",
+          "name": "De Prins J.",
+          "address": "Belgium",
+          "orcidAsUrl": "https://orcid.org/0000-0001-7637-5755",
+          "organisation": "Royal Belgian Institute of Natural Sciences"
+        },
+        {
+          "orcid": "0000-0002-4430-1425",
+          "given": "Willy",
+          "family": "De Prins",
+          "country": "BE",
+          "email": "willy.deprins@gmail.com",
+          "name": "De Prins W.",
+          "address": "Belgium",
+          "orcidAsUrl": "https://orcid.org/0000-0002-4430-1425",
+          "organisation": "Royal Belgian Institute of Natural Sciences"
+        }
+      ],
+      "publisher": {
+        "city": "Brussels",
+        "country": "BE",
+        "url": "http://www.biodiversity.be",
+        "note": "Host",
+        "name": "Belgian Biodiversity Platform, Belspo",
+        "address": "Brussels, Belgium",
+        "organisation": "Belgian Biodiversity Platform, Belspo"
+      },
+      "contributor": [
+        {
+          "orcid": "0000-0002-7839-5300",
+          "given": "Andre",
+          "family": "Heughebaert",
+          "email": "a.heughebaert@biodiversity.be",
+          "note": "Data Wrangler",
+          "name": "Heughebaert A.",
+          "orcidAsUrl": "https://orcid.org/0000-0002-7839-5300",
+          "organisation": "Belgian Biodiversity Platform, Belspo"
+        }
+      ],
+      "keyword": [
+        "Checklist",
+        "Africa",
+        "Moths"
+      ],
+      "geographicScope": "subsaharian Africa",
+      "license": "cc by",
+      "url": "https://www.afromoths.net/",
+      "logo": "https://www.afromoths.net/static/lite/amBanner.jpg",
+      "source": [
+        {
+          "id": "afromoths.net",
+          "type": "webpage",
+          "editor": [
+            {
+              "family": "De Prins Jurate"
+            },
+            {
+              "family": "De Prins Willy"
+            }
+          ],
+          "title": "Afromoths, online database of Afrotropical moth species (Lepidoptera)",
+          "issued": {
+            "raw": "2006-10",
+            "date-parts": [
+              [
+                2006,
+                10
+              ]
+            ]
+          },
+          "citation": "<div class=\"csl-entry\">De Prins Jurate, &amp; De Prins Willy. (2006, October). <span style=\"font-style: italic\">Afromoths, online database of Afrotropical moth species (Lepidoptera)</span>. https://www.afromoths.net/</div>",
+          "URL": "https://www.afromoths.net/"
+        }
+      ],
+      "notes": "Formerly published as a DwC archive through GBIF: https://ipt.biodiversity.be/archive.do?r=afromoths",
+      "label": "Afromoths, online database of Afrotropical moth species (Lepidoptera) (2026-03-01)",
+      "citation": "<div class=\"csl-entry\">De Prins, J., &amp; De Prins, W. (2026). <span style=\"font-style: italic\">Afromoths, online database of Afrotropical moth species (Lepidoptera)</span> (Version 2026-03-01). Belgian Biodiversity Platform, Belspo, Brussels, Belgium. https://www.afromoths.net/</div>",
+      "private": false
+    },
+    {
+      "created": "2020-09-18T12:46:47.591354",
+      "createdBy": 102,
+      "modified": "2026-02-16T16:17:48.091778",
+      "modifiedBy": 12,
+      "key": 2207,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 83,
+      "imported": "2026-01-06T00:35:16.964108",
+      "lastImportAttempt": "2026-01-06T00:35:16.968829",
+      "lastImportState": "finished",
+      "gbifKey": "484039df-cd14-46d1-9a41-c406db8c7ced",
+      "gbifPublisherKey": "f4ce3c03-7b38-445e-86e6-5f6b04b649d4",
+      "size": 505,
+      "doi": "10.48580/d4n5",
+      "versionDoi": "10.48580/d4n5.v83",
+      "title": "Catalogue of the Alucitoidea of the World",
+      "alias": "Alucitoidea",
+      "description": "This GSD is derived from C. Gielis (2003) Pterophoroidea & Alucitoidea (Lepidoptera) (World Catalogue of Insects, volume 4). The database has been edited for inclusion in the Catalogue of Life and updated by Donald Hobern. A current version of the dataset is presented as a web document at https://alucitoidea.hobern.net/. Version 1.1.26.006 includes updates to reflect recent changes in taxonomy and new species.",
+      "issued": "2026-01-06",
+      "version": "1.1.26.006",
+      "contact": {
+        "orcid": "0000-0001-6492-4016",
+        "given": "Donald",
+        "family": "Hobern",
+        "rorid": "04m098c22",
+        "city": "Aranda",
+        "state": "ACT",
+        "country": "AU",
+        "email": "donald.hobern@sp2000.org",
+        "url": "https://sp2000.org/",
+        "name": "Hobern D.",
+        "address": "Aranda, ACT, Australia",
+        "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+        "organisation": "Species 2000"
+      },
+      "creator": [
+        {
+          "orcid": "0000-0001-6492-4016",
+          "given": "Donald",
+          "family": "Hobern",
+          "rorid": "04m098c22",
+          "city": "Aranda",
+          "state": "ACT",
+          "country": "AU",
+          "email": "donald.hobern@sp2000.org",
+          "url": "https://sp2000.org/",
+          "name": "Hobern D.",
+          "address": "Aranda, ACT, Australia",
+          "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+          "organisation": "Species 2000"
+        },
+        {
+          "orcid": "0000-0003-0857-1679",
+          "given": "Cees",
+          "family": "Gielis",
+          "rorid": "0566bfb96",
+          "city": "Leiden",
+          "country": "NL",
+          "url": "https://www.naturalis.nl/",
+          "name": "Gielis C.",
+          "address": "Leiden, Netherlands",
+          "orcidAsUrl": "https://orcid.org/0000-0003-0857-1679",
+          "organisation": "Naturalis Biodiversity Center"
+        }
+      ],
+      "editor": [
+        {
+          "orcid": "0000-0001-6492-4016",
+          "given": "Donald",
+          "family": "Hobern",
+          "rorid": "04m098c22",
+          "city": "Aranda",
+          "state": "ACT",
+          "country": "AU",
+          "email": "donald.hobern@sp2000.org",
+          "url": "https://sp2000.org/",
+          "name": "Hobern D.",
+          "address": "Aranda, ACT, Australia",
+          "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+          "organisation": "Species 2000"
+        }
+      ],
+      "publisher": {
+        "city": "Amsterdam",
+        "country": "NL",
+        "email": "contact@catalogueoflife.org",
+        "url": "http://www.catalogueoflife.org/",
+        "note": "Host",
+        "name": "Catalogue of Life",
+        "address": "Amsterdam, Netherlands",
+        "organisation": "Catalogue of Life"
+      },
+      "geographicScope": "global",
+      "taxonomicScope": "Alucitoidea",
+      "temporalScope": "All taxa described to present",
+      "taxonomicGroupScope": [
+        "eukaryotes",
+        "animals",
+        "arthropods",
+        "insects",
+        "lepidoptera"
+      ],
+      "confidence": 5,
+      "completeness": 99,
+      "license": "cc0",
+      "url": "https://alucitoidea.hobern.net",
+      "logo": "https://hobern.net/img/Alucita_hexadactyla.png",
+      "source": [
+        {
+          "id": "gielis-2003",
+          "type": "book",
+          "author": [
+            {
+              "family": "Cees Gielis"
+            }
+          ],
+          "title": "Pterophoroidea & Alucitoidea (Lepidoptera) (World Catalogue of Insects, volume 4)",
+          "issued": {
+            "raw": "2003",
+            "date-parts": [
+              [
+                2003
+              ]
+            ]
+          },
+          "citation": "<div class=\"csl-entry\">Cees Gielis. (2003). <span style=\"font-style: italic\">Pterophoroidea &amp; Alucitoidea (Lepidoptera) (World Catalogue of Insects, volume 4)</span>.</div>",
+          "ISBN": "87-88757-68-4"
+        }
+      ],
+      "label": "Catalogue of the Alucitoidea of the World (1.1.26.006)",
+      "citation": "<div class=\"csl-entry\">Hobern, D., &amp; Gielis, C. (2026). <span style=\"font-style: italic\">Catalogue of the Alucitoidea of the World</span> (D. Hobern, Ed.; 1.1.26.006). Catalogue of Life, Amsterdam, Netherlands. https://doi.org/10.48580/d4n5</div>",
+      "private": false
+    },
+    {
+      "created": "2021-06-11T20:33:36.127693",
+      "createdBy": 102,
+      "modified": "2026-03-19T19:59:16.217327",
+      "modifiedBy": 103,
+      "key": 2317,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 74,
+      "imported": "2026-03-19T19:59:21.626336",
+      "lastImportAttempt": "2026-03-19T19:59:21.649948",
+      "lastImportState": "finished",
+      "size": 128125,
+      "doi": "10.48580/d4rx",
+      "versionDoi": "10.48580/d4rx.v74",
+      "title": "3i World Auchenorrhyncha Database",
+      "alias": "3i Auchenorrhyncha",
+      "description": "The database was originally designed using 3i Interactive Keys and Taxonomic Databases software and later migrated into TaxonWorks. The database has world checklist of the hemipteran suborder Auchenorrhyncha, which covers about 48,000 valid species, as well as their synonyms and subsequent combinations. It was designed and maintained with support from several grants from National Science Foundation (USA). Besides nomenclature, the database contains illustrations, descriptions, distribution records, biological associations, literature references and tools for taxon identification.",
+      "issued": "2026-03-19",
+      "version": "Mar 2026",
+      "contact": {
+        "given": "Dmitry",
+        "family": "Dmitriev",
+        "name": "Dmitriev D."
+      },
+      "creator": [
+        {
+          "given": "D.A.",
+          "family": "Dmitriev",
+          "department": "INHS",
+          "city": "Champaign",
+          "state": "IL",
+          "country": "US",
+          "name": "Dmitriev D.A.",
+          "address": "Champaign, IL, United States of America",
+          "organisation": "University of Illinois"
+        }
+      ],
+      "editor": [
+        {
+          "given": "D.A.",
+          "family": "Dmitriev",
+          "name": "Dmitriev D.A."
+        },
+        {
+          "given": "S.",
+          "family": "McKamey",
+          "name": "McKamey S."
+        },
+        {
+          "given": "A.",
+          "family": "Sanborn",
+          "name": "Sanborn A."
+        },
+        {
+          "given": "D.M.",
+          "family": "Takiya",
+          "name": "Takiya D.M."
+        },
+        {
+          "given": "J.",
+          "family": "Zahniser",
+          "name": "Zahniser J."
+        }
+      ],
+      "publisher": {
+        "family": "TaxonWorks",
+        "name": "TaxonWorks"
+      },
+      "contributor": [
+        {
+          "department": "Illinois Natural History Survey",
+          "city": "Champaign",
+          "state": "IL",
+          "country": "US",
+          "name": "Illinois Natural History Survey, University of Illinois",
+          "address": "Champaign, IL, United States of America",
+          "organisation": "University of Illinois"
+        }
+      ],
+      "geographicScope": "Global",
+      "taxonomicScope": "Cicadas, spittle bugs, leafhoppers, treehoppers, and planthoppers",
+      "confidence": 4,
+      "completeness": 98,
+      "license": "cc0",
+      "url": "https://hoppers.speciesfile.org/",
+      "feedbackUrl": "https://github.com/sfg-taxonpages/hoppers/issues/",
+      "logo": "https://api.checklistbank.org/dataset/2317/logo",
+      "label": "3i World Auchenorrhyncha Database (Mar 2026)",
+      "citation": "<div class=\"csl-entry\">Dmitriev, D. A. (2026). <span style=\"font-style: italic\">3i World Auchenorrhyncha Database</span> (D. A. Dmitriev, S. McKamey, A. Sanborn, D. M. Takiya, &amp; J. Zahniser, Eds.; Mar 2026). https://doi.org/10.48580/d4rx</div>",
+      "private": false
+    },
+    {
+      "created": "2021-12-13T00:57:21.932481",
+      "createdBy": 117,
+      "modified": "2026-02-14T23:35:48.734039",
+      "modifiedBy": 117,
+      "key": 2362,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 217,
+      "imported": "2026-02-14T23:35:49.544366",
+      "lastImportAttempt": "2026-02-14T23:35:49.566064",
+      "lastImportState": "finished",
+      "size": 11814,
+      "doi": "10.48580/d4th",
+      "versionDoi": "10.48580/d4th.v217",
+      "title": "Catalogue of World Gelechiidae",
+      "alias": "Gelechiidae",
+      "description": "The Catalogue of World Gelechiidae derives from a summary of the Gelechiidae list developed and maintained as a Word document by Klaus Sattler at the Natural History Museum, London. This list was converted in 2021 by Donald Hobern to form this Catalogue of Life Data Package dataset. Many species previously included as Gelechiidae within the COL Checklist from the NHM Global Lepidoptera Names Index (LepIndex) are not recognised within the family by Klaus Sattler. Most of these are now considered to belong to other families within the Gelechioidea, but 40 genera and 62 species cannot yet be assigned to any other family. These have been included as \"provisionally accepted\" taxa within this dataset but are likely to be moved elsewhere in the COL Checklist in future.",
+      "issued": "2026-02-15",
+      "version": "1.1.26.046",
+      "contact": {
+        "orcid": "0000-0001-6492-4016",
+        "given": "Donald",
+        "family": "Hobern",
+        "rorid": "04m098c22",
+        "city": "Aranda",
+        "state": "ACT",
+        "country": "AU",
+        "email": "donald.hobern@sp2000.org",
+        "url": "https://sp2000.org/",
+        "name": "Hobern D.",
+        "address": "Aranda, ACT, Australia",
+        "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+        "organisation": "Species 2000"
+      },
+      "creator": [
+        {
+          "orcid": "0000-0001-6492-4016",
+          "given": "Donald",
+          "family": "Hobern",
+          "rorid": "04m098c22",
+          "city": "Aranda",
+          "state": "ACT",
+          "country": "AU",
+          "email": "donald.hobern@sp2000.org",
+          "url": "https://sp2000.org/",
+          "name": "Hobern D.",
+          "address": "Aranda, ACT, Australia",
+          "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+          "organisation": "Species 2000"
+        },
+        {
+          "orcid": "0000-0002-0085-5960",
+          "given": "Klaus",
+          "family": "Sattler",
+          "rorid": "039zvsn29",
+          "city": "London",
+          "country": "GB",
+          "url": "https://www.nhm.ac.uk/",
+          "name": "Sattler K.",
+          "address": "London, United Kingdom",
+          "orcidAsUrl": "https://orcid.org/0000-0002-0085-5960",
+          "organisation": "Natural History Museum"
+        }
+      ],
+      "editor": [
+        {
+          "orcid": "0000-0001-6492-4016",
+          "given": "Donald",
+          "family": "Hobern",
+          "rorid": "04m098c22",
+          "city": "Aranda",
+          "state": "ACT",
+          "country": "AU",
+          "email": "donald.hobern@sp2000.org",
+          "url": "https://sp2000.org/",
+          "name": "Hobern D.",
+          "address": "Aranda, ACT, Australia",
+          "orcidAsUrl": "https://orcid.org/0000-0001-6492-4016",
+          "organisation": "Species 2000"
+        },
+        {
+          "orcid": "0000-0002-9636-8242",
+          "given": "Sangmi",
+          "family": "Lee",
+          "rorid": "03efmqc40",
+          "city": "Tempe",
+          "state": "Arizona",
+          "country": "US",
+          "email": "slee281@asu.edu",
+          "name": "Lee S.",
+          "address": "Tempe, Arizona, United States of America",
+          "orcidAsUrl": "https://orcid.org/0000-0002-9636-8242",
+          "organisation": "Arizona State University"
+        }
+      ],
+      "geographicScope": "global",
+      "taxonomicScope": "Gelechiidae",
+      "temporalScope": "All taxa described to present",
+      "taxonomicGroupScope": [
+        "eukaryotes",
+        "animals",
+        "arthropods",
+        "insects",
+        "lepidoptera"
+      ],
+      "confidence": 5,
+      "completeness": 99,
+      "license": "cc0",
+      "label": "Catalogue of World Gelechiidae (1.1.26.046)",
+      "citation": "<div class=\"csl-entry\">Hobern, D., &amp; Sattler, K. (2026). <span style=\"font-style: italic\">Catalogue of World Gelechiidae</span> (D. Hobern &amp; S. Lee, Eds.; 1.1.26.046). https://doi.org/10.48580/d4th</div>",
+      "private": false
+    },
+    {
+      "created": "2022-08-19T14:00:52.712907",
+      "createdBy": 102,
+      "modified": "2026-02-16T13:30:50.32208",
+      "modifiedBy": 103,
+      "key": 124661,
+      "type": "taxonomic",
+      "origin": "external",
+      "attempt": 16,
+      "imported": "2025-04-22T14:13:10.360765",
+      "lastImportAttempt": "2025-04-22T14:13:10.40488",
+      "lastImportState": "finished",
+      "size": 64879,
+      "doi": "10.48580/d758p",
+      "title": "Universal Chalcidoidea Database curated in TaxonWorks",
+      "alias": "UCD",
+      "description": "The Universal Chalcidoidea Database (UCD) was first released as a CD-ROM in 1999, and it was first made available online in its previous version at the Natural History Museum website in 2002. As of today, the UCD contains 27968 valid species (including some subspecies) and 2295 valid genera (including some subgenera). It also includes a comprehensive list of the various generic combinations and misspellings that have been used in the literature. In all nearly 50,000 different combinations and spellings are recorded. All names are supported by a citation of the published source from where they were obtained as are all taxonomic and nomenclatural acts noted within the database. Also included are over 120,000 host/associate records (including associations with food plants of the hosts) and more than 140,000 distribution records. The latter can be used to provide regional lists of Chalcidoidea.\n\nThe UCD has its roots in a taxonomic card catalog compiled and maintained until about 1969 by the \"indexing section\" of the Department of Entomology at The Natural History Museum, London. Soon after joining the staff of the department John Noyes undertook to update and improve on this catalog and add a comprehensive bibliography of works on the superfamily. The conversion of the card catalog into an electronic database was started in August 1991. It was made publically available through the UCD website by the Natural History Museum, London, with the last data update in 2019. The database was transferred to a new platform available in TaxonWorks, which provides the API used to build this site. The new UCD curator platform has been enhanced and is now updated by multiple individuals from a number of different institutions worldwide. This public interface exposes the data using an API that assembles updated information from the curator platform.\n\nJohn Noyes was responsible for the enormous task of developing and curating the UCD up to 2019. For this we have only great admiration and thanks. A new curatorial group is now responsible for updating the database since 2019.\n\nList of Active Curators: **Roger Burks** (site designer) Newport Beach, CA, USA; **Lucian Fusu**, Al. I. Cuza University, Iasi, Romania; **D. Christopher Darling**, Royal Ontario Museum, Toronto, ON, Canada; **John Heraty**, University of California, Riverside, CA, USA; **Petr Janšta**, Charles University, Prague, Czech Republic; **Mircea-Dan Mitroiu**, Al. I. Cuza University, Iasi, Romania; **Pâmella Machado Saguiah**, Ciências Biológicas pela Universidade Federal do Espírito Santo, Brazil; **Natalie Dale-Skey**, The Museum of Natural History, London, United Kingdom; **James B. Woolley**, Texas A&M University, College Station, TX, USA\n\nTaxonWorks Development and Outreach Team: Matt Yoder, Dmitry Dmitriev, José Luis Pereira, Hernán Lucas Pereira, Deborah Paul.\n\nUCD content is licensed under a Creative Commons Attribution License.\n\nFunding by the Tate & Lyle PLC, Unilever, National Science Foundation Grant DEB-1555808, and a grant from the USDA Systematic Entomology Laboratory.",
+      "issued": "2025-04-21",
+      "version": "Apr 2025",
+      "contact": {
+        "given": "James",
+        "family": "Woolley",
+        "email": "jimwoolley@tamu.edu",
+        "name": "Woolley J."
+      },
+      "editor": [
+        {
+          "family": "UCD Community",
+          "name": "UCD Community"
+        }
+      ],
+      "geographicScope": "Global",
+      "taxonomicScope": "Chalcidoid wasps",
+      "taxonomicGroupScope": [
+        "eukaryotes",
+        "animals",
+        "arthropods",
+        "insects",
+        "hymenoptera"
+      ],
+      "confidence": 5,
+      "completeness": 99,
+      "license": "cc by",
+      "url": "https://ucd.chalcid.org",
+      "label": "Universal Chalcidoidea Database curated in TaxonWorks (Apr 2025)",
+      "citation": "<div class=\"csl-entry\">UCD Community. (2025). <span style=\"font-style: italic\">Universal Chalcidoidea Database curated in TaxonWorks</span> (Apr 2025). https://doi.org/10.48580/d758p</div>",
+      "private": false
+    }
+  ],
+  "empty": false,
+  "last": false
+}

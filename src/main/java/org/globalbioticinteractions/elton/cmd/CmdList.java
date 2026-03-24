@@ -5,13 +5,8 @@ import bio.guoda.preston.RefNodeFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
+import org.globalbioticinteractions.dataset.*;
 import org.globalbioticinteractions.elton.util.ResourceServiceRemote;
-import org.globalbioticinteractions.dataset.Dataset;
-import org.globalbioticinteractions.dataset.DatasetRegistry;
-import org.globalbioticinteractions.dataset.DatasetRegistryException;
-import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
-import org.globalbioticinteractions.dataset.DatasetRegistryProxy;
-import org.globalbioticinteractions.dataset.DatasetRegistryZenodo;
 import org.globalbioticinteractions.elton.store.AccessLogger;
 import org.globalbioticinteractions.elton.store.ActivityListener;
 import org.globalbioticinteractions.elton.util.DatasetRegistryUtil;
@@ -105,11 +100,17 @@ public class CmdList extends CmdOnlineParams {
         List<DatasetRegistry> onlineAndOffline = new ArrayList<>();
 
         List<String> registryNames = getRegistryNames();
-        if (registryNames.contains("zenodo")) {
+
+        if (registryNames.contains(CmdRegistry.ZENODO)) {
             onlineAndOffline.add(new DatasetRegistryZenodo(resourceServiceRemote));
         }
-        if (registryNames.contains("github")) {
+
+        if (registryNames.contains(CmdRegistry.GITHUB)) {
             onlineAndOffline.add(new DatasetRegistryGitHubArchive(resourceServiceRemote));
+        }
+
+        if (registryNames.contains(CmdRegistry.CHECKLIST_BANK)) {
+            onlineAndOffline.add(new DatasetRegistryChecklistBank(resourceServiceRemote));
         }
         onlineAndOffline.add(registryLocal);
         return onlineAndOffline;

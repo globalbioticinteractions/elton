@@ -1,6 +1,5 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import bio.guoda.preston.HashType;
 import bio.guoda.preston.RefNodeFactory;
 import bio.guoda.preston.store.BlobStoreAppendOnly;
 import bio.guoda.preston.store.KeyTo1LevelPath;
@@ -25,13 +24,19 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class CmdRegistry extends CmdDefaultParams {
+    public static final String ZENODO = "zenodo";
+    public static final String GITHUB = "github";
+    public static final String CHECKLIST_BANK = "checklistbank";
+
     @CommandLine.Option(names = {"--registries", "--registry"},
             description = "[registry1],[registry2],..."
     )
     private List<String> registryNames = new ArrayList<String>() {{
-        add("zenodo");
-        add("github");
-    }};
+            add(ZENODO);
+            add(GITHUB);
+            add(CHECKLIST_BANK);
+        }
+    };
 
     public void setRegistryNames(List<String> registryNames) {
         this.registryNames = registryNames;

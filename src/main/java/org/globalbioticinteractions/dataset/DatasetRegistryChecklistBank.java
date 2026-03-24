@@ -2,23 +2,23 @@ package org.globalbioticinteractions.dataset;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eol.globi.service.ResourceService;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class DatasetRegistryChecklistBank implements DatasetRegistry {
     private final ResourceService resourceService;
+    private int batchSize;
 
     public DatasetRegistryChecklistBank(ResourceService resourceService) {
         this.resourceService = resourceService;
+        this.batchSize = 50;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class DatasetRegistryChecklistBank implements DatasetRegistry {
 
     @Override
     public void findNamespaces(Consumer<String> namespaceConsumer) throws DatasetRegistryException {
-        collectDatasetIds(resourceService, namespaceConsumer);
+        collectDatasetIds(resourceService, namespaceConsumer, this.batchSize);
     }
 
 
@@ -44,22 +44,33 @@ public class DatasetRegistryChecklistBank implements DatasetRegistry {
         return null;
     }
 
-    static void collectDatasetIds(
-            ResourceService resourceService,
-            Consumer<String> datasetIdListener) throws DatasetRegistryException {
+    private static void collectDatasetIds(ResourceService resourceService, Consumer<String> datasetIdListener, int batchSize) throws DatasetRegistryException {
+        Long offset = 0L;
+        boolean mayHaveMore = true;
         try {
-            Long batchSize = 50L;
-            Long offset = 0L;
-            URI requestURI = getRegisteryPage(batchSize, offset);
-            try (InputStream retrieve = resourceService.retrieve(requestURI)) {
-                collectDatasetIds(retrieve, datasetIdListener);
+            while (mayHaveMore) {
+                URI requestURI = getRegisteryPage(batchSize, offset);
+                try (InputStream retrieve = resourceService.retrieve(requestURI)) {
+                    AtomicInteger count = new AtomicInteger();
+                    collectDatasetIds(retrieve, new Consumer<String>() {
+                        @Override
+                        public void accept(String s) {
+                            count.incrementAndGet();
+                            datasetIdListener.accept(s);
+                        }
+                    });
+                    mayHaveMore = count.get() >= batchSize;
+                    if (mayHaveMore) {
+                        offset += batchSize;
+                    }
+                }
             }
         } catch (IOException e) {
             throw new DatasetRegistryException("failed to find published github repos in zenodo", e);
         }
     }
 
-    private static URI getRegisteryPage(Long batchSize, Long offset) {
+    private static URI getRegisteryPage(int batchSize, long offset) {
         URI requestURI = URI.create("https://api.checklistbank.org/dataset?" +
                 "origin=external" +
                 "&" + "origin=project" +
@@ -92,4 +103,7 @@ public class DatasetRegistryChecklistBank implements DatasetRegistry {
         return datasets;
     }
 
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
 }

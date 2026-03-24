@@ -28,6 +28,8 @@ public class DatasetRegistryChecklistBankIT  {
         DatasetRegistryChecklistBank checklistBank
                 = new DatasetRegistryChecklistBank(resourceService);
 
+        checklistBank.setBatchSize(10);
+
         ArrayList<String> ids = new ArrayList<>();
 
         checklistBank.findNamespaces(new Consumer<String>() {

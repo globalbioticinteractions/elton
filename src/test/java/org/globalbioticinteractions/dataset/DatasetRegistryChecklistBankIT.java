@@ -32,12 +32,7 @@ public class DatasetRegistryChecklistBankIT  {
 
         ArrayList<String> ids = new ArrayList<>();
 
-        checklistBank.findNamespaces(new Consumer<String>() {
-            @Override
-            public void accept(String s) {
-                ids.add(s);
-            }
-        });
+        checklistBank.findNamespaces(ids::add);
 
         assertThat(ids.size(), greaterThan(0));
 

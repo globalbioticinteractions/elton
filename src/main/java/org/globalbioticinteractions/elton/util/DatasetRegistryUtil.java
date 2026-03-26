@@ -26,6 +26,7 @@ public class DatasetRegistryUtil {
     public static final String NAMESPACE_LOCAL = "local";
     public static final String NAMESPACE_ZENODO = "zenodo";
     public static final String NAMESPACE_GITHUB = "github";
+    public static final String NAMESPACE_CHECKLISTBANK = "checklistbank";
 
     public static DatasetRegistry forLocalDir(final URI localArchiveDir,
                                               ResourceService resourceServiceRemote,

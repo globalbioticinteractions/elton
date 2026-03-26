@@ -3,17 +3,19 @@ package org.globalbioticinteractions.dataset;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.util.InputStreamFactoryNoop;
 import org.eol.globi.util.ResourceServiceHTTP;
+import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class DatasetRegistryChecklistBankIT  {
 
@@ -38,6 +40,25 @@ public class DatasetRegistryChecklistBankIT  {
 
         assertThat(ids, hasItem("urn:lsid:checklistbank.org:dataset:1049"));
         assertThat(ids, hasItem("urn:lsid:checklistbank.org:dataset:2017"));
+    }
+    @Test
+    public void getDataset() throws IOException, DatasetRegistryException {
+        ResourceService resourceService
+                = new ResourceServiceHTTP(new InputStreamFactoryNoop(), folder.newFolder());
+
+        DatasetRegistryChecklistBank checklistBank
+                = new DatasetRegistryChecklistBank(resourceService);
+
+        checklistBank.setBatchSize(10);
+
+        String requestedNamespace = "urn:lsid:checklistbank.org:dataset:2017";
+        Dataset dataset = checklistBank.datasetFor(requestedNamespace);
+
+        assertThat(dataset, Is.is(notNullValue()));
+
+        assertThat(dataset.getArchiveURI(), Is.is(URI.create("https://api.checklistbank.org/dataset/2017/archive.zip")));
+        assertThat(dataset.getNamespace(), Is.is(requestedNamespace));
+
     }
 
 }

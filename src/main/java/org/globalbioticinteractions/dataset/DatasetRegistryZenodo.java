@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eol.globi.service.DatasetZenodo;
+import org.eol.globi.service.GitHubUtil;
 import org.eol.globi.service.ResourceService;
 import org.eol.globi.taxon.XmlUtil;
 import org.w3c.dom.Node;
@@ -82,6 +83,7 @@ public class DatasetRegistryZenodo implements DatasetRegistry {
     @Override
     public Dataset datasetFor(String namespace) throws DatasetRegistryException {
         try {
+            GitHubUtil.supportedNamespacePatternOrThrow(namespace);
             URI latestArchive
                     = getMostRecentArchiveInNamespace(namespace, getZenodoGithubArchives());
             return latestArchive == null

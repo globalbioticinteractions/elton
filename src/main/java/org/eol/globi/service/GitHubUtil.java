@@ -7,6 +7,8 @@ import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetImpl;
+import org.globalbioticinteractions.dataset.DatasetRegistryException;
+import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
 import org.globalbioticinteractions.util.GitClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,4 +131,9 @@ public class GitHubUtil {
         );
     }
 
+    public static void supportedNamespacePatternOrThrow(String namespace) throws DatasetRegistryException {
+        if (!DatasetRegistryGitHubArchive.GITHUB_REPOSITORY_PATTERN.matcher(namespace).matches()) {
+            throw new DatasetRegistryException("unsupported namespace [" + namespace + "]");
+        }
+    }
 }

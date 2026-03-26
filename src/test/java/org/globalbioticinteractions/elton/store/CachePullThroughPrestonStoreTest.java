@@ -14,6 +14,7 @@ import org.apache.commons.rdf.api.Literal;
 import org.apache.commons.rdf.api.Quad;
 import org.eol.globi.util.ResourceServiceLocal;
 import org.globalbioticinteractions.cache.Cache;
+import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
@@ -57,6 +58,15 @@ public class CachePullThroughPrestonStoreTest {
 
     @Test
     public void testPrestonStore() throws IOException, URISyntaxException {
+        pullResourceIntoStore("some/namespace");
+    }
+
+    @Test
+    public void testPrestonStoreChecklistBankNamespace() throws IOException, URISyntaxException {
+        pullResourceIntoStore("urn:lsid:checklistbank.org:dataset:2017");
+    }
+
+    private void pullResourceIntoStore(String namespace) throws IOException, URISyntaxException {
         ArrayList<Quad> quads = new ArrayList<>();
 
         String dataDir = folder.getRoot().getAbsolutePath();
@@ -67,7 +77,7 @@ public class CachePullThroughPrestonStoreTest {
                 dataDir,
                 provDir,
                 new ProvLoggerWithClock(quads::add, this.clock),
-                "some/namespace"
+                namespace
         );
 
         assertFalse(new File(folder.getRoot(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
@@ -216,7 +226,7 @@ public class CachePullThroughPrestonStoreTest {
 
         assertThat(quads.size(), Is.is(0));
 
-        File namespaceDir = new File(dataDir, namespace);
+        File namespaceDir = CacheUtil.findCacheDirForNamespace(dataDir, namespace);
         assertFalse(new File(namespaceDir, "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824").exists());
 
         URI sourceURI = getClass().getResource("hello.txt").toURI();

@@ -11,8 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DatasetRegistryChecklistBank implements DatasetRegistry {
+    public static final String URN_LSID_CHECKLISTBANK_PREFIX = "urn:lsid:checklistbank.org:dataset:";
+    public static final Pattern CHECKLISTBANK_NAMESPACE_PATTERN = Pattern.compile(URN_LSID_CHECKLISTBANK_PREFIX + "(?<datasetKey>[0-9]+)");
     private final ResourceService resourceService;
     private int batchSize;
 
@@ -41,7 +45,17 @@ public class DatasetRegistryChecklistBank implements DatasetRegistry {
 
     @Override
     public Dataset datasetFor(String namespace) throws DatasetRegistryException {
-        return null;
+        Matcher matcher = CHECKLISTBANK_NAMESPACE_PATTERN.matcher(namespace);
+        if (!matcher.matches()) {
+            throw new DatasetRegistryException("unsupported namespace: [" + namespace + "]");
+        }
+
+        String datasetKey = matcher.group("datasetKey");
+        return new DatasetImpl(
+                namespace,
+                resourceService,
+                URI.create("https://api.checklistbank.org/dataset/" + datasetKey + "/archive.zip")
+        );
     }
 
     private static void collectDatasetIds(ResourceService resourceService, Consumer<String> datasetIdListener, int batchSize) throws DatasetRegistryException {
@@ -89,7 +103,7 @@ public class DatasetRegistryChecklistBank implements DatasetRegistry {
             for (JsonNode hit : result) {
                 JsonNode datasetKey = hit.at("/key");
                 if (!datasetKey.isMissingNode()) {
-                    datasetIdentifierConsumer.accept("urn:lsid:checklistbank.org:dataset:" + datasetKey.asText());
+                    datasetIdentifierConsumer.accept(URN_LSID_CHECKLISTBANK_PREFIX + datasetKey.asText());
                 }
             }
         } catch (IOException e) {

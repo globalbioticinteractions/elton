@@ -3,6 +3,7 @@ package org.globalbioticinteractions.elton.cmd;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.globalbioticinteractions.cache.CacheUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -23,7 +24,6 @@ import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNotNull;
 
 public class CmdUpdateIT {
 
@@ -43,6 +43,11 @@ public class CmdUpdateIT {
     @Test
     public void runUpdate() throws IOException {
         assertAccessLogForNamespace("globalbioticinteractions/template-dataset");
+    }
+
+    @Test
+    public void runUpdateForChecklistBank() throws IOException {
+        assertAccessLogForNamespace("urn:lsid:checklistbank.org:dataset:2017");
     }
 
     @Test
@@ -139,9 +144,9 @@ public class CmdUpdateIT {
     }
 
     private File assertAccessLog(String namespace, File dataAndProvFolder) throws IOException {
-        File datasetDir = new File(dataAndProvFolder, namespace);
+        File datasetDir = CacheUtil.findCacheDirForNamespace(dataAndProvFolder, namespace);
         File file = new File(datasetDir,"access.tsv");
-        assertThat(file.exists(), is(true));
+        assertThat("no access.tsv file found at: " + file.getPath(), file.exists(), is(true));
         String[] lines = FileUtils.readFileToString(file, StandardCharsets.UTF_8).split("\n");
         assertTrue(lines.length > 1);
         List<String> availableHashes = new ArrayList<>();

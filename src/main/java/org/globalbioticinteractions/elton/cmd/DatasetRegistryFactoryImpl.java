@@ -9,6 +9,7 @@ import org.eol.globi.util.InputStreamFactory;
 import org.eol.globi.util.ResourceServiceLocalAndRemote;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 import org.globalbioticinteractions.cache.ContentPathFactoryDepth0;
+import org.globalbioticinteractions.dataset.DatasetRegistryChecklistBank;
 import org.globalbioticinteractions.dataset.DatasetRegistryException;
 import org.globalbioticinteractions.dataset.DatasetRegistry;
 import org.globalbioticinteractions.dataset.DatasetRegistryGitHubArchive;
@@ -32,6 +33,7 @@ public class DatasetRegistryFactoryImpl implements DatasetRegistryFactory {
         put(DatasetRegistryUtil.NAMESPACE_LOCAL, DatasetRegistrySingleDir.class);
         put(DatasetRegistryUtil.NAMESPACE_ZENODO, DatasetRegistryZenodo.class);
         put(DatasetRegistryUtil.NAMESPACE_GITHUB, DatasetRegistryGitHubArchive.class);
+        put(DatasetRegistryUtil.NAMESPACE_CHECKLISTBANK, DatasetRegistryChecklistBank.class);
     }});
 
     private final InputStreamFactory inputStreamFactory;

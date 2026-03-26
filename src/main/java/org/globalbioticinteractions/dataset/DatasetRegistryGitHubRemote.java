@@ -15,10 +15,10 @@ public class DatasetRegistryGitHubRemote extends DatasetRegistryGitHub {
         super(new ResourceServiceHTTP(factory, cacheDir));
     }
 
-
     @Override
     public Dataset datasetFor(String namespace) throws DatasetRegistryException {
         try {
+            GitHubUtil.supportedNamespacePatternOrThrow(namespace);
             String baseUrlLastCommit = GitHubUtil.getBaseUrlLastCommit(namespace, getResourceService());
             return new DatasetImpl(namespace, getResourceService(), URI.create(baseUrlLastCommit));
         } catch (URISyntaxException | IOException e) {

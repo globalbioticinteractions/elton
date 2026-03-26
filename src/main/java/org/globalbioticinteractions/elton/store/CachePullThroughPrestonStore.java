@@ -12,6 +12,7 @@ import bio.guoda.preston.store.ValidatingKeyValueStreamContentAddressedFactory;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.cache.CachePullThrough;
+import org.globalbioticinteractions.cache.CacheUtil;
 import org.globalbioticinteractions.cache.ContentPathFactory;
 
 import java.io.File;
@@ -59,7 +60,7 @@ public class CachePullThroughPrestonStore extends CachePullThrough {
         this.dereferenceListener = dereferenceListener;
         this.ctx = ctx;
         this.iriFactory = iriFactory;
-        File dataFolder = new File(dataDir, namespace);
+        File dataFolder = CacheUtil.findCacheDirForNamespace(dataDir, namespace);
 
         this.translateToHashSpace = new LocalPathToHashIRI(dataFolder);
         this.keyToPath = new KeyTo1LevelPath(dataFolder.toURI());

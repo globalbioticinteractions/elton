@@ -10,6 +10,7 @@ import org.eol.globi.data.LogUtil;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.util.CSVTSVUtil;
 import org.globalbioticinteractions.elton.Elton;
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -390,6 +392,38 @@ public class CmdReviewTest {
         assertThat(reviewJsonString, is("{\"foo\":\"bar\",\"zfoo\":\"bar\"}"));
 
 
+    }
+
+    @Test
+    public void collectNamespaces() throws IOException {
+        ArrayList<URI> localNamespaces = new ArrayList<>();
+        ArrayList<String> remoteNamespaces = new ArrayList<>();
+        CmdReview.collectNamespaces(
+                localNamespaces,
+                remoteNamespaces,
+                Arrays.asList("some/namespace"),
+                tmpDir.newFolder().toURI()
+        );
+
+        assertThat(localNamespaces.size(), Is.is(0));
+        assertThat(remoteNamespaces.size(), Is.is(1));
+        assertThat(remoteNamespaces, hasItem("some/namespace"));
+    }
+
+    @Test
+    public void collectNamespacesURN() throws IOException {
+        ArrayList<URI> localNamespaces = new ArrayList<>();
+        ArrayList<String> remoteNamespaces = new ArrayList<>();
+        CmdReview.collectNamespaces(
+                localNamespaces,
+                remoteNamespaces,
+                Arrays.asList("urn:lsid:checklistbank.org:dataset:2017"),
+                tmpDir.newFolder().toURI()
+        );
+
+        assertThat(localNamespaces.size(), Is.is(0));
+        assertThat(remoteNamespaces.size(), Is.is(1));
+        assertThat(remoteNamespaces, hasItem("urn:lsid:checklistbank.org:dataset:2017"));
     }
 
 }

@@ -98,18 +98,7 @@ public class CmdReview extends CmdTabularWriterParams {
         try {
             List<URI> localNamespaces = new ArrayList<>();
             List<String> remoteNamespaces = new ArrayList<>();
-            if (getNamespaces().isEmpty()) {
-                localNamespaces.add(getWorkDir());
-            } else {
-                for (String namespace : getNamespaces()) {
-                    URI uri = URI.create(namespace);
-                    if (uri.isAbsolute() && new File(uri).exists()) {
-                        localNamespaces.add(uri);
-                    } else {
-                        remoteNamespaces.add(namespace);
-                    }
-                }
-            }
+            collectNamespaces(localNamespaces, remoteNamespaces, getNamespaces(), getWorkDir());
 
             InputStreamFactory factory = createInputStreamFactory();
 
@@ -165,6 +154,29 @@ public class CmdReview extends CmdTabularWriterParams {
 
         } catch (StudyImporterException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    static void collectNamespaces(List<URI> localNamespaces,
+                                   List<String> remoteNamespaces,
+                                   List<String> namespaces,
+                                   URI workDir) {
+        if (namespaces.isEmpty()) {
+            localNamespaces.add(workDir);
+        } else {
+            for (String namespace : namespaces) {
+                URI uri = null;
+                try {
+                    uri = URI.create(namespace);
+                    if (uri.isAbsolute() && new File(uri).exists()) {
+                        localNamespaces.add(uri);
+                    } else {
+                        remoteNamespaces.add(namespace);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    remoteNamespaces.add(namespace);
+                }
+            }
         }
     }
 

@@ -91,7 +91,7 @@ public class CmdStreamIT {
 
         assertThat(filenames, hasItems("fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423"));
 
-        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream from [globalbioticinteractions/ucsb-izc]...done.\ndone processing [globalbioticinteractions/ucsb-izc].\n"));
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream for [globalbioticinteractions/ucsb-izc]...done.\ndone processing [globalbioticinteractions/ucsb-izc].\n"));
 
         assertHeaderAndMore(outputStream, headerInteractions());
     }

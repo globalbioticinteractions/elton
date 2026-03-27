@@ -58,8 +58,6 @@ public class CmdStreamTest {
         cmdStream.run();
 
         assertThat(new String(outputStream.toByteArray(), StandardCharsets.UTF_8), Is.is(""));
-//        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), startsWith("processing data stream from [local]..."));
-//        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), endsWith("processing data stream from [local]..."));
     }
 
     @Test

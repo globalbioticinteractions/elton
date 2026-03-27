@@ -165,7 +165,7 @@ public class CmdReview extends CmdTabularWriterParams {
             localNamespaces.add(workDir);
         } else {
             for (String namespace : namespaces) {
-                URI uri = null;
+                URI uri;
                 try {
                     uri = URI.create(namespace);
                     if (uri.isAbsolute() && new File(uri).exists()) {

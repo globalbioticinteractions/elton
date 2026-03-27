@@ -51,6 +51,16 @@ public class CmdUpdateIT {
     }
 
     @Test
+    public void runUpdateForChecklistBank265709() throws IOException {
+        assertAccessLogForNamespace("urn:lsid:checklistbank.org:dataset:265709");
+    }
+
+    @Test
+    public void runUpdateForChecklistBank2207() throws IOException {
+        assertAccessLogForNamespace("urn:lsid:checklistbank.org:dataset:2207");
+    }
+
+    @Test
     public void runUpdateWithProv() throws IOException {
         CmdRegistry cmd = new CmdUpdate();
         cmd.setEnableProvMode(true);

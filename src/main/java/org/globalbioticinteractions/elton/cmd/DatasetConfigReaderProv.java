@@ -156,10 +156,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
             String location = matcher.group("location");
             resourceLocation = RefNodeFactory.toIRI(location);
             resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
-
-            resourceFormat = StringUtils.startsWith(resourceNamespace.getIRIString(), "urn:lsid:checklistbank.org:dataset:")
-                    ? "application/coldp"
-                    : "application/globi";
+            resourceFormat = "application/globi";
 
             IRI activity = RefNodeFactory.toIRI(matcher.group("activity"));
             String parentActivity = activityRelations.get(activity.getIRIString());

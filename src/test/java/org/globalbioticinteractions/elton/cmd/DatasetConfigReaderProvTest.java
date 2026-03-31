@@ -62,7 +62,7 @@ public class DatasetConfigReaderProvTest {
     public void readDatasetEltonProvChecklistBank() {
 
         String provLogGeneratedByElton = "<urn:lsid:checklistbank.org:dataset:2017> <http://www.w3.org/ns/prov#wasAssociatedWith> <https://example.org/archive.zip> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
-                "<https://example.org/archive.zip> <http://purl.org/dc/elements/1.1/format> \"application/coldp\" <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                "<https://example.org/archive.zip> <http://purl.org/dc/elements/1.1/format> \"application/globi\" <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
                 "<urn:uuid:41389744-0f4d-47e2-8506-76999e1b5c34> <http://www.w3.org/ns/prov#used> <https://exapmle.org/archive.zip> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
                 "<https://example.org/archive.zip> <http://purl.org/pav/hasVersion> <hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
                 "<urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> <http://www.w3.org/ns/prov#endedAtTime> \"2025-01-06T18:00:34.689Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n";
@@ -83,7 +83,7 @@ public class DatasetConfigReaderProvTest {
 
         assertNotNull(dataset);
         assertThat(dataset.getNamespace(), Is.is("urn:lsid:checklistbank.org:dataset:2017"));
-        assertThat(dataset.getFormat(), Is.is("application/coldp"));
+        assertThat(dataset.getFormat(), Is.is("application/globi"));
         assertThat(dataset.getArchiveURI(), Is.is(URI.create("hash://sha256/76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44")));
         assertThat(dataset.getConfig(), Is.is(not(nullValue())));
     }

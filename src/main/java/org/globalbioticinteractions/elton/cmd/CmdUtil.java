@@ -193,14 +193,10 @@ public class CmdUtil {
                 RefNodeConstants.WAS_ASSOCIATED_WITH,
                 RefNodeFactory.toIRI(dataset.getArchiveURI()));
 
-        String mimeType = StringUtils.startsWith(dataset.getNamespace(), "urn:lsid:checklistbank.org:dataset")
-                ? "application/coldp"
-                : CacheUtil.MIME_TYPE_GLOBI;
-
         Quad hasFormat = RefNodeFactory.toStatement(activity,
                 RefNodeFactory.toIRI(dataset.getArchiveURI()),
                 RefNodeConstants.HAS_FORMAT,
-                RefNodeFactory.toLiteral(mimeType));
+                RefNodeFactory.toLiteral(CacheUtil.MIME_TYPE_GLOBI));
 
         return Arrays.asList(associate, hasFormat);
     }

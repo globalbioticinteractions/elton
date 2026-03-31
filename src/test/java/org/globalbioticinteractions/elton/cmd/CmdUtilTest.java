@@ -73,7 +73,7 @@ public class CmdUtilTest {
                                 activitiyIRI,
                                 RefNodeFactory.toIRI("https://example.org/archive.zip"),
                                 RefNodeFactory.toIRI("http://purl.org/dc/elements/1.1/format"),
-                                RefNodeFactory.toLiteral("application/coldp")
+                                RefNodeFactory.toLiteral("application/globi")
                         )
                 )
         );

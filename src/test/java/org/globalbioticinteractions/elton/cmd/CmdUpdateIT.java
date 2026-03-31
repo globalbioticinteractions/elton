@@ -122,12 +122,10 @@ public class CmdUpdateIT {
 
         String actual = new String(os.toByteArray(), StandardCharsets.UTF_8);
 
-        System.out.println(actual);
-
         assertThat(actual, startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
 
         assertThat(actual, containsString("<urn:lsid:checklistbank.org:dataset:2207>"));
-        assertThat(actual, containsString("\"application/coldp\""));
+        assertThat(actual, containsString("\"application/globi\""));
         assertThat(file.exists(), is(false));
 
         CmdTestUtil.assertEmpty(workDir);

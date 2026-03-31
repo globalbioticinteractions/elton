@@ -42,6 +42,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static org.globalbioticinteractions.elton.store.ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG;
+
 public class CmdUtil {
     private static final Logger LOG = LoggerFactory.getLogger(CmdUtil.class);
 
@@ -182,15 +184,23 @@ public class CmdUtil {
     }
 
     public static List<Quad> stateDatasetArchiveAssociations(Dataset dataset, IRI activity) {
+        String iriString = dataset.getNamespace();
+        if (!StringUtils.startsWith(dataset.getNamespace(), "urn:lsid:")) {
+            iriString = URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + dataset.getNamespace();
+        }
         Quad associate = RefNodeFactory.toStatement(activity,
-                RefNodeFactory.toIRI("urn:lsid:globalbioticinteractions.org:" + dataset.getNamespace()),
+                RefNodeFactory.toIRI(iriString),
                 RefNodeConstants.WAS_ASSOCIATED_WITH,
                 RefNodeFactory.toIRI(dataset.getArchiveURI()));
+
+        String mimeType = StringUtils.startsWith(dataset.getNamespace(), "urn:lsid:checklistbank.org:dataset")
+                ? "application/coldp"
+                : CacheUtil.MIME_TYPE_GLOBI;
 
         Quad hasFormat = RefNodeFactory.toStatement(activity,
                 RefNodeFactory.toIRI(dataset.getArchiveURI()),
                 RefNodeConstants.HAS_FORMAT,
-                RefNodeFactory.toLiteral(CacheUtil.MIME_TYPE_GLOBI));
+                RefNodeFactory.toLiteral(mimeType));
 
         return Arrays.asList(associate, hasFormat);
     }

@@ -24,6 +24,9 @@ import static bio.guoda.preston.RefNodeFactory.toIRI;
 import static bio.guoda.preston.RefNodeFactory.toStatement;
 
 public class ProvUtil {
+    public static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG
+            = "urn:lsid:globalbioticinteractions.org:";
+
     public static void emitDataGenerationActivity(
             List<IRI> dependencies,
             IRI versionSource,

@@ -11,6 +11,7 @@ import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
+import org.globalbioticinteractions.elton.store.ProvUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -28,7 +29,6 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     private static final String ASSOCIATED_WITH = " " + RefNodeConstants.WAS_ASSOCIATED_WITH + " ";
     private static final String FORMAT = " " + HAS_FORMAT + " ";
     private static final String HAS_VERSION = " " + RefNodeConstants.HAS_VERSION + " ";
-    private static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG = "urn:lsid:globalbioticinteractions.org:";
     public static final String ENDED_AT_TIME = " " + RefNodeConstants.ENDED_AT_TIME + " ";
     public static final String WAS_INFORMED_BY = " " + RefNodeConstants.WAS_INFORMED_BY + " ";
     private final ResourceService resourceService;
@@ -139,7 +139,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
                 if (resourceNamespace == null) {
                     resetContext();
                     resourceLocation = RefNodeFactory.toIRI(location);
-                    resourceNamespace = RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local");
+                    resourceNamespace = RefNodeFactory.toIRI(ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local");
                 }
             }
             resourceFormat = matcher.group("format");
@@ -149,14 +149,18 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
 
     private Dataset handleAssociation(String line, Dataset dataset) {
         // possible namespace statement
-        Pattern namespacePattern = Pattern.compile("<(?<namespace>" + URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
+        Pattern namespacePattern = Pattern.compile("<(?<namespace>" + "urn:lsid:" + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
         Matcher matcher = namespacePattern.matcher(line);
         if (matcher.matches()) {
             dataset = datasetForContextOrReset();
             String location = matcher.group("location");
             resourceLocation = RefNodeFactory.toIRI(location);
             resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
-            resourceFormat = "application/globi";
+
+            resourceFormat = StringUtils.startsWith(resourceNamespace.getIRIString(), "urn:lsid:checklistbank.org:dataset:")
+                    ? "application/coldp"
+                    : "application/globi";
+
             IRI activity = RefNodeFactory.toIRI(matcher.group("activity"));
             String parentActivity = activityRelations.get(activity.getIRIString());
             resourceActivityContext = parentActivity == null ? activity : RefNodeFactory.toIRI(parentActivity);
@@ -238,15 +242,22 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
 
     private Dataset createDataset() {
         String resourceNamespaceString = resourceNamespace.getIRIString();
-        String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
+        String namespace = StringUtils.removeStart(resourceNamespaceString, ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
 
-        Dataset dataset = new DatasetWithResourceMapping(namespace, URI.create(resourceVersion == null ? resourceLocation.getIRIString() : resourceVersion.getIRIString()), resourceService);
+        Dataset dataset = new DatasetWithResourceMapping(
+                namespace,
+                URI.create(resourceVersion == null ? resourceLocation.getIRIString() : resourceVersion.getIRIString()),
+                resourceService
+        );
         ObjectNode config = new ObjectMapper().createObjectNode();
         ObjectNode resourceVersions = new ObjectMapper().createObjectNode();
         contextDeps.forEach((location, version) -> {
             resourceVersions.put(location.toString(), version.getIRIString());
         });
         config.set("resources", resourceVersions);
+        if (!StringUtils.startsWith(resourceNamespaceString, "urn:lsid:globalbioticinteractions.org")) {
+            config.put("format", resourceFormat);
+        }
         dataset.setConfig(config);
 
         resetContext();

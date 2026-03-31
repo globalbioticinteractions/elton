@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -89,6 +90,48 @@ public class CmdUpdateIT {
         CmdTestUtil.assertEmpty(workDir);
 
         assertThat(new String(os.toByteArray(), StandardCharsets.UTF_8), startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
+
+
+        // rerun
+        cmd.run();
+        assertThat(file.exists(), is(false));
+    }
+    @Test
+    public void runUpdateWithProvChecklistBank() throws IOException {
+        CmdRegistry cmd = new CmdUpdate();
+        cmd.setEnableProvMode(true);
+        File dataAndProvFolder = tmpDir.newFolder("dataAndProv");
+        String absolutePath = dataAndProvFolder.getAbsolutePath();
+        cmd.setDataDir(absolutePath);
+        cmd.setProvDir(absolutePath);
+        cmd.setWorkDir(tmpDir.newFolder("workdir").getAbsolutePath());
+        cmd.setNamespaces(Collections.singletonList("urn:lsid:checklistbank.org:dataset:2207"));
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        cmd.setStdout(new PrintStream(os));
+
+        File workDir = new File(cmd.getWorkDir());
+        CmdTestUtil.assertEmpty(workDir);
+
+        File datasetDir1 = new File(dataAndProvFolder, "urn/lsid/checklistbank.org/dataset/2207");
+        File file = new File(datasetDir1,"access.tsv");
+
+        assertThat(file.exists(), is(false));
+
+        cmd.run();
+
+        String actual = new String(os.toByteArray(), StandardCharsets.UTF_8);
+
+        System.out.println(actual);
+
+        assertThat(actual, startsWith("<https://globalbioticinteractions.org/elton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent>"));
+
+        assertThat(actual, containsString("<urn:lsid:checklistbank.org:dataset:2207>"));
+        assertThat(actual, containsString("\"application/coldp\""));
+        assertThat(file.exists(), is(false));
+
+        CmdTestUtil.assertEmpty(workDir);
+
 
 
         // rerun

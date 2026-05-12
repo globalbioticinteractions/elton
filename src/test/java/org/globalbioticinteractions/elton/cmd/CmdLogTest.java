@@ -117,7 +117,7 @@ public class CmdLogTest {
         assertThat(split.get(1), containsString("/rss.xml> <http://purl.org/pav/hasVersion> <hash://sha256/6b3795feff24580fa482a6037a3baab3ff95ddf8f97045bb9fa17baa12240ca6> "));
         assertThat(split.get(2), containsString("/rss.xml> <http://purl.org/pav/hasVersion> <hash://sha256/6b3795feff24580fa482a6037a3baab3ff95ddf8f97045bb9fa17baa12240ca6> "));
         assertThat(split.get(3), containsString("<classpath:/org/globalbioticinteractions/interaction_types_ignored.csv> <http://purl.org/pav/hasVersion> <hash://sha256/247954e577e6db82e6179ff4b729da09514fd3a5543abbee754f41846b8fc12e>"));
-        assertThat(split.get(4), containsString("<classpath:/org/globalbioticinteractions/interaction_types_mapping.csv> <http://purl.org/pav/hasVersion> <hash://sha256/7d3397ae39062e473ff8c735c5857dc4dd68721ddc28a95e8c4ba1131043146d>"));
+        assertThat(split.get(4), containsString("<classpath:/org/globalbioticinteractions/interaction_types_mapping.csv> <http://purl.org/pav/hasVersion> <hash://sha256/c9d80b8fe3eab76bae5fc758c769f6973185952f1ca1c810d7080c3bbac8a25e>"));
         assertThat(split.get(5), containsString("<classpath:/org/globalbioticinteractions/interaction_types_ro_unmapped.csv> <http://purl.org/pav/hasVersion> <hash://sha256/43aba7b90c686a4890aebd4a90a02d6f82259664524bdad1b22102a29fe9fa07>"));
         assertThat(split.get(6), containsString("<classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <http://purl.org/pav/hasVersion> <hash://sha256/1059f0f9f9cef8a909da6960ea901e7597e2ea2e5fcde7bc4255edc980730457>"));
         assertThat(split.get(split.size() - 1), containsString("/dwca.zip> <http://purl.org/pav/hasVersion> <hash://sha256/ab4b32fc3bb81c6ec0e16f42dcc284e3725274501219f704af7022221db64abe> "));

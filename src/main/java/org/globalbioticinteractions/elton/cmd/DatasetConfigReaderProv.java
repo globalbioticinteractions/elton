@@ -18,12 +18,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static bio.guoda.preston.RefNodeConstants.HAS_FORMAT;
+import static org.globalbioticinteractions.elton.store.ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG;
 
 public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     private static final String ASSOCIATED_WITH = " " + RefNodeConstants.WAS_ASSOCIATED_WITH + " ";
@@ -31,6 +33,8 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     private static final String HAS_VERSION = " " + RefNodeConstants.HAS_VERSION + " ";
     public static final String ENDED_AT_TIME = " " + RefNodeConstants.ENDED_AT_TIME + " ";
     public static final String WAS_INFORMED_BY = " " + RefNodeConstants.WAS_INFORMED_BY + " ";
+    public static final String APPLICATION_GLOBI = "application/globi";
+    public static final List<String> SUPPORTED_CONTEXTS = Arrays.asList(APPLICATION_GLOBI);
     private final ResourceService resourceService;
 
     private IRI resourceActivityContext = null;
@@ -139,7 +143,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
                 if (resourceNamespace == null) {
                     resetContext();
                     resourceLocation = RefNodeFactory.toIRI(location);
-                    resourceNamespace = RefNodeFactory.toIRI(ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local");
+                    resourceNamespace = RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local");
                 }
             }
             resourceFormat = matcher.group("format");
@@ -156,7 +160,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
             String location = matcher.group("location");
             resourceLocation = RefNodeFactory.toIRI(location);
             resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
-            resourceFormat = "application/globi";
+            resourceFormat = APPLICATION_GLOBI;
 
             IRI activity = RefNodeFactory.toIRI(matcher.group("activity"));
             String parentActivity = activityRelations.get(activity.getIRIString());
@@ -234,12 +238,12 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     }
 
     private boolean contextSupported() {
-        return Arrays.asList("application/globi").contains(resourceFormat);
+        return SUPPORTED_CONTEXTS.contains(resourceFormat);
     }
 
     private Dataset createDataset() {
         String resourceNamespaceString = resourceNamespace.getIRIString();
-        String namespace = StringUtils.removeStart(resourceNamespaceString, ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
+        String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
 
         Dataset dataset = new DatasetWithResourceMapping(
                 namespace,
@@ -252,7 +256,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
             resourceVersions.put(location.toString(), version.getIRIString());
         });
         config.set("resources", resourceVersions);
-        if (!StringUtils.startsWith(resourceNamespaceString, "urn:lsid:globalbioticinteractions.org")) {
+        if (!StringUtils.startsWith(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG)) {
             config.put("format", resourceFormat);
         }
         dataset.setConfig(config);

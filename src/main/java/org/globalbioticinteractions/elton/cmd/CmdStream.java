@@ -162,7 +162,12 @@ public class CmdStream extends CmdDefaultParams {
 
     private void handleDataset(BlobStoreReadOnly blobStore, AtomicBoolean shouldWriteHeader, Dataset dataset) throws IOException {
         if (dataset != null) {
-            Cache cache = getCache(blobStore, dataset.getNamespace(), getProvenanceAnchor() == null ? "" : getProvenanceAnchor().getIRIString());
+            Cache cache = getCache(
+                    blobStore,
+                    dataset.getNamespace(),
+                    getProvenanceAnchor() == null ? "" : getProvenanceAnchor().getIRIString()
+            );
+
             if (handleDataset(dataset, shouldWriteHeader.get(), cache)) {
                 shouldWriteHeader.set(false);
             }

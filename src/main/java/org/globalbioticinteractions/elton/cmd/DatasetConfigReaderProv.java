@@ -11,7 +11,8 @@ import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
-import org.globalbioticinteractions.elton.store.ProvUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -28,13 +29,22 @@ import static bio.guoda.preston.RefNodeConstants.HAS_FORMAT;
 import static org.globalbioticinteractions.elton.store.ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG;
 
 public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
+    private final static Logger LOG = LoggerFactory.getLogger(DatasetConfigReaderProv.class);
     private static final String ASSOCIATED_WITH = " " + RefNodeConstants.WAS_ASSOCIATED_WITH + " ";
+    private static final Pattern NAMESPACE_PATTERN = Pattern.compile("<(?<namespace>" + "urn:lsid:" + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
     private static final String FORMAT = " " + HAS_FORMAT + " ";
+    private static final Pattern FORMAT_PATTERN = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
     private static final String HAS_VERSION = " " + RefNodeConstants.HAS_VERSION + " ";
-    public static final String ENDED_AT_TIME = " " + RefNodeConstants.ENDED_AT_TIME + " ";
-    public static final String WAS_INFORMED_BY = " " + RefNodeConstants.WAS_INFORMED_BY + " ";
+    private static final Pattern VERSION_PATTERN = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)> <(?<activity>[^>]+)> [.]");
+    private static final String ENDED_AT_TIME = " " + RefNodeConstants.ENDED_AT_TIME + " ";
+    private static final Pattern ENDED_AT_PATTERN = Pattern.compile("<(?<activity>[^>]+)>" + ENDED_AT_TIME + ".*");
+
+    private static final String WAS_INFORMED_BY = " " + RefNodeConstants.WAS_INFORMED_BY + " ";
+    private static final Pattern INFORMED_BY_PATTERN = Pattern.compile("<(?<activity>[^>]+)>" + WAS_INFORMED_BY + "<(?<parentActivity>[^>]+)>" + ".*");
+
     public static final String APPLICATION_GLOBI = "application/globi";
-    public static final List<String> SUPPORTED_CONTEXTS = Arrays.asList(APPLICATION_GLOBI);
+    public static final List<String> SUPPORTED_FORMATS = Arrays.asList(APPLICATION_GLOBI);
+
     private final ResourceService resourceService;
 
     private IRI resourceActivityContext = null;
@@ -46,6 +56,8 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     private TreeMap<URI, IRI> contextDeps = new TreeMap<>();
     private Map<String, String> activityRelations = new TreeMap<>();
     private Pair<String, String> lastAddedActivityRelation;
+    private final String resourceFormatDefault;
+    private final IRI resourceNamespaceDefault;
 
     public DatasetConfigReaderProv() {
         this(new ResourceService() {
@@ -57,7 +69,16 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     }
 
     public DatasetConfigReaderProv(ResourceService resourceService) {
+        this(resourceService, null, null);
+    }
+
+    public DatasetConfigReaderProv(ResourceService resourceService,
+                                   String resourceFormatDefault,
+                                   IRI resourceNamespaceDefault) {
         this.resourceService = resourceService;
+        this.resourceFormatDefault = resourceFormatDefault;
+        this.resourceNamespaceDefault = resourceNamespaceDefault;
+        resetContext();
     }
 
     @Override
@@ -72,12 +93,11 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         } else if (StringUtils.contains(line, ENDED_AT_TIME)) {
             handleEnded(line);
         } else if (StringUtils.contains(line, WAS_INFORMED_BY)) {
-            Pattern namespacePattern = Pattern.compile("<(?<activity>[^>]+)>" + WAS_INFORMED_BY + "<(?<parentActivity>[^>]+)>" + ".*");
-            Matcher matcher = namespacePattern.matcher(line);
+            Matcher matcher = INFORMED_BY_PATTERN.matcher(line);
             if (matcher.matches()) {
                 String activity = matcher.group("activity");
                 String parentActivity = matcher.group("parentActivity");
-                lastAddedActivityRelation = org.apache.commons.lang3.tuple.Pair.of(activity, parentActivity);
+                lastAddedActivityRelation = Pair.of(activity, parentActivity);
                 activityRelations.put(activity, parentActivity);
 
             }
@@ -89,36 +109,37 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     }
 
     private void handleEnded(String line) {
-        Pattern namespacePattern = Pattern.compile("<(?<activity>[^>]+)>" + ENDED_AT_TIME + ".*");
-        Matcher matcher = namespacePattern.matcher(line);
+        Matcher matcher = ENDED_AT_PATTERN.matcher(line);
         if (matcher.matches()) {
             contextComplete = inSameActivity(matcher);
         }
     }
 
     private void handleVersion(String line) {
-        // possible version statement
-        Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)> <(?<activity>[^>]+)> [.]");
-        Matcher matcher = namespacePattern.matcher(line);
+        Matcher matcher = VERSION_PATTERN.matcher(line);
         if (matcher.matches()) {
             String location = matcher.group("location");
-            if (contextSupported()) {
-                if (inSameActivityOrSharedParentActivity(matcher)) {
+            if (explicitContextSupported()) {
+                if (inActiveNamespaceContext(matcher)) {
                     IRI version = setVersionOnMatchingLocation(matcher, location);
-                    if (contextSupported()) {
-                        if (!isCompositeHashIRI(RefNodeFactory.toIRI(location))) {
-                            contextDeps.put(URI.create(location), version);
-                            if (StringUtils.startsWith(location, resourceLocation.getIRIString())) {
-                                contextDeps.put(URI.create("/" + StringUtils.removeStart(location, resourceLocation.getIRIString())), version);
-                                contextDeps.put(URI.create(StringUtils.removeStart(location, resourceLocation.getIRIString())), version);
-                            }
-                        }
+                    if (explicitContextSupported()) {
+                        addResourceDependencies(location, version);
                     }
                 }
             } else {
                 setVersionOnMatchingLocation(matcher, location);
             }
+        }
+    }
 
+    private void addResourceDependencies(String location, IRI version) {
+        if (!isCompositeHashIRI(RefNodeFactory.toIRI(location))) {
+            contextDeps.put(URI.create(location), version);
+            if (StringUtils.startsWith(location, resourceLocation.getIRIString())) {
+                String relativeLocation = StringUtils.removeStart(location, resourceLocation.getIRIString());
+                contextDeps.put(URI.create("/" + relativeLocation), version);
+                contextDeps.put(URI.create(relativeLocation), version);
+            }
         }
     }
 
@@ -134,40 +155,39 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     }
 
     private void handleFormat(String line) {
-        Pattern namespacePattern = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
-        Matcher matcher = namespacePattern.matcher(line);
+        Matcher matcher = FORMAT_PATTERN.matcher(line);
         if (matcher.matches()) {
             String location = matcher.group("location");
             if (resourceLocation == null
                     || !StringUtils.equals(location, resourceLocation.getIRIString())) {
-                if (resourceNamespace == null) {
+                if (getResourceNamespace() == null) {
                     resetContext();
                     resourceLocation = RefNodeFactory.toIRI(location);
                     resourceNamespace = RefNodeFactory.toIRI(URN_LSID_GLOBALBIOTICINTERACTIONS_ORG + "local");
                 }
             }
-            resourceFormat = matcher.group("format");
+            setResourceFormat(matcher.group("format"));
         }
         // possible format statement
     }
 
     private Dataset handleAssociation(String line, Dataset dataset) {
-        // possible namespace statement
-        Pattern namespacePattern = Pattern.compile("<(?<namespace>" + "urn:lsid:" + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
-        Matcher matcher = namespacePattern.matcher(line);
+        Matcher matcher = NAMESPACE_PATTERN.matcher(line);
         if (matcher.matches()) {
             dataset = datasetForContextOrReset();
-            String location = matcher.group("location");
-            resourceLocation = RefNodeFactory.toIRI(location);
-            resourceNamespace = RefNodeFactory.toIRI(matcher.group("namespace"));
-            resourceFormat = APPLICATION_GLOBI;
+            setResourceLocation(RefNodeFactory.toIRI(matcher.group("location")));
+            setResourceNamespace(RefNodeFactory.toIRI(matcher.group("namespace")));
+            setResourceFormat(APPLICATION_GLOBI);
 
-            IRI activity = RefNodeFactory.toIRI(matcher.group("activity"));
-            String parentActivity = activityRelations.get(activity.getIRIString());
-            resourceActivityContext = parentActivity == null ? activity : RefNodeFactory.toIRI(parentActivity);
-            contextComplete = false;
+            startNamespaceContext(RefNodeFactory.toIRI(matcher.group("activity")));
         }
         return dataset;
+    }
+
+    private void startNamespaceContext(IRI activity) {
+        String parentActivity = activityRelations.get(activity.getIRIString());
+        resourceActivityContext = parentActivity == null ? activity : RefNodeFactory.toIRI(parentActivity);
+        contextComplete = false;
     }
 
     private IRI setVersionOnMatchingLocation(Matcher matcher, String location) {
@@ -179,11 +199,10 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     }
 
     private boolean inSameActivity(Matcher matcher) {
-        String activity = matcher.group("activity");
-        return inSameActivity(activity);
+        return inSameActivity(matcher.group("activity"));
     }
 
-    private boolean inSameActivityOrSharedParentActivity(Matcher matcher) {
+    private boolean inActiveNamespaceContext(Matcher matcher) {
         String activity = matcher.group("activity");
         boolean sameActivity = false;
         if (inSameActivity(activity)) {
@@ -213,7 +232,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
 
     public Dataset datasetForContextOrReset() {
         Dataset dataset = null;
-        if (contextSupported()) {
+        if (explicitContextSupported()) {
             dataset = createDataset();
         } else {
             resetContext();
@@ -223,10 +242,10 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
 
     private Dataset createDatasetIfComplete(Dataset dataset) {
         if (resourceLocation != null
-                && resourceNamespace != null
-                && resourceFormat != null
+                && getResourceNamespace() != null
+                && getResourceFormat() != null
                 && resourceVersion != null) {
-            if (contextSupported()) {
+            if (explicitContextSupported()) {
                 if (contextComplete) {
                     dataset = createDataset();
                 }
@@ -237,13 +256,29 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         return dataset;
     }
 
-    private boolean contextSupported() {
-        return SUPPORTED_CONTEXTS.contains(resourceFormat);
+    private IRI getResourceNamespace() {
+        return resourceNamespace;
+    }
+
+    private void setResourceNamespace(IRI resourceNamespace) {
+        this.resourceNamespace = resourceNamespace;
+    }
+
+    private void setResourceLocation(IRI resourceLocation) {
+        this.resourceLocation = resourceLocation;
+    }
+
+    private String getResourceFormat() {
+        return resourceFormat;
+    }
+
+    private boolean explicitContextSupported() {
+        return SUPPORTED_FORMATS.contains(getResourceFormat());
     }
 
     private Dataset createDataset() {
-        String resourceNamespaceString = resourceNamespace.getIRIString();
-        String namespace = StringUtils.removeStart(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
+        String resourceNamespaceIRI = getResourceNamespace().getIRIString();
+        String namespace = StringUtils.removeStart(resourceNamespaceIRI, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG);
 
         Dataset dataset = new DatasetWithResourceMapping(
                 namespace,
@@ -256,8 +291,8 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
             resourceVersions.put(location.toString(), version.getIRIString());
         });
         config.set("resources", resourceVersions);
-        if (!StringUtils.startsWith(resourceNamespaceString, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG)) {
-            config.put("format", resourceFormat);
+        if (!StringUtils.startsWith(resourceNamespaceIRI, URN_LSID_GLOBALBIOTICINTERACTIONS_ORG)) {
+            config.put("format", getResourceFormat());
         }
         dataset.setConfig(config);
 
@@ -267,9 +302,9 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
 
     private void resetContext() {
         resourceLocation = null;
-        resourceFormat = null;
+        setResourceFormat(resourceFormatDefault);
         resourceVersion = null;
-        resourceNamespace = null;
+        setResourceNamespace(resourceNamespaceDefault);
         resourceActivityContext = null;
         contextComplete = false;
         contextDeps.clear();
@@ -286,5 +321,9 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     @Override
     public void close() throws IOException {
         contextComplete = true;
+    }
+
+    public void setResourceFormat(String resourceFormat) {
+        this.resourceFormat = resourceFormat;
     }
 }

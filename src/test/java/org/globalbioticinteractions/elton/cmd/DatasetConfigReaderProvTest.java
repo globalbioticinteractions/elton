@@ -2,6 +2,8 @@ package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.RefNodeFactory;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.hamcrest.core.Is;
@@ -172,14 +174,39 @@ public class DatasetConfigReaderProvTest {
         }
 
         assertNotNull(dataset);
+        assertThat(dataset.getFormat(), Is.is("globi"));
         assertThat(dataset.getNamespace(), Is.is("local"));
         assertThat(dataset.getArchiveURI(), Is.is(URI.create("hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423")));
         assertThat(dataset.getConfig(), Is.is(not(nullValue())));
+        ObjectNode expected = new ObjectMapper().createObjectNode();
+        expected.set("resources", new ObjectMapper().createObjectNode());
+        assertThat(dataset.getConfig().toPrettyString(), Is.is(expected.toPrettyString()));
     }
 
     @Test
-    public void readDatasetPrestonPlainProv() {
+    public void readDatasetPrestonPlainProvNoDefaults() {
+        DatasetConfigReaderProv datasetConfigReaderProv = new DatasetConfigReaderProv();
 
+        Dataset dataset = datasetFromPlainProv(datasetConfigReaderProv);
+
+        assertNull(dataset);
+    }
+
+    @Test
+    public void readDatasetPrestonPlainProvWithDefaults() {
+        DatasetConfigReaderProv datasetConfigReaderProv = new DatasetConfigReaderProv(
+                new ResourceServiceThrowingOnly(),
+                "application/globi",
+                RefNodeFactory.toIRI("urn:lsid:globalbioticinteractions.org:local")
+        );
+
+
+        Dataset dataset = datasetFromPlainProv(datasetConfigReaderProv);
+
+        assertNull(dataset);
+    }
+
+    private static Dataset datasetFromPlainProv(DatasetConfigReaderProv datasetConfigReaderProv) {
         String provLogGeneratedByElton = "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:fde6b827-42f0-44b7-b577-b2fbfc4977b2> .\n" +
                 "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Agent> <urn:uuid:fde6b827-42f0-44b7-b577-b2fbfc4977b2> .\n" +
                 "<https://preston.guoda.bio> <http://purl.org/dc/terms/description> \"Preston is a software program that finds, archives and provides access to biodiversity datasets.\"@en <urn:uuid:fde6b827-42f0-44b7-b577-b2fbfc4977b2> .\n" +
@@ -201,7 +228,6 @@ public class DatasetConfigReaderProvTest {
                 "<https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip> <http://purl.org/pav/hasVersion> <hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423> <urn:uuid:0eda1d2e-e0dd-40d1-be56-73903b5af5ff> .\n";
 
         String[] lines = provLogGeneratedByElton.split("\n");
-        DatasetConfigReaderProv datasetConfigReaderProv = new DatasetConfigReaderProv();
         Dataset dataset = null;
         for (String line : lines) {
             try {
@@ -213,8 +239,7 @@ public class DatasetConfigReaderProvTest {
                 //
             }
         }
-
-        assertNull(dataset);
+        return dataset;
     }
 
 
@@ -500,6 +525,7 @@ public class DatasetConfigReaderProvTest {
         assertThat(requested.get(0).toString(), Is.is("hash://sha256/1c7c3f5e0ef87ebbf1b7905042dfe7665087df3489d555647fb0c8527935fc43"));
 
     }
+
     @Test
     public void globiDatasetLocalDirectory() throws IOException {
         String prov = "<https://preston.guoda.bio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#SoftwareAgent> <urn:uuid:19dd8d60-0ccf-46ab-abc5-d03fdd6dec75> .\n" +
@@ -681,4 +707,10 @@ public class DatasetConfigReaderProvTest {
     }
 
 
+    private static class ResourceServiceThrowingOnly implements ResourceService {
+        @Override
+        public InputStream retrieve(URI uri) throws IOException {
+            throw new IOException("no resource service available to retrieve [" + uri + "]");
+        }
+    }
 }

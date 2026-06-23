@@ -102,12 +102,12 @@ public class CmdStream extends CmdDefaultParams {
 
 
     @CommandLine.Option(names = {"--config"},
-                description = "point to content id (hash) of globi.json config to apply global settings (e.g., custom interaction type mappings). Example: hash://sha256/02682fdd62a3e985dc06236662299f00ec5453c4e6f707d02efa93628f927649 for:\n" +
-                        "{\n" +
-                        "  \"resources\": {\n" +
-                        "    \"interaction_types_mapping.csv\": \"hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7\"\n" +
-                        "  }\n" +
-                        "}\n"
+            description = "point to content id (hash) of globi.json config to apply global settings (e.g., custom interaction type mappings). Example: hash://sha256/02682fdd62a3e985dc06236662299f00ec5453c4e6f707d02efa93628f927649 for:\n" +
+                    "{\n" +
+                    "  \"resources\": {\n" +
+                    "    \"interaction_types_mapping.csv\": \"hash://sha256/ef045408607c6fb19d6bdf8145e7ce16a0e16bc8be45acbe31da33e1db0c9ea7\"\n" +
+                    "  }\n" +
+                    "}\n"
     )
     private URI configOverrideResource = null;
 
@@ -139,21 +139,23 @@ public class CmdStream extends CmdDefaultParams {
 
             LineIterator lineIterator = IOUtils.lineIterator(getStdin(), StandardCharsets.UTF_8);
 
-            DatasetConfigReader jsonDatasetConfigReader = new DatasetConfigReaderJson();
-
-            DatasetConfigReaderProv provDatasetConfigReader = new DatasetConfigReaderProv();
+            List<DatasetConfigReader> readers = Arrays.asList(
+                    new DatasetConfigReaderJson(),
+                    new DatasetConfigReaderEltonProv()
+            );
 
             while (lineIterator.hasNext()) {
-                String line = lineIterator.next();
-                Dataset dataset = jsonDatasetConfigReader.readConfig(line);
-                if (dataset == null) {
-                    dataset = provDatasetConfigReader.readConfig(line);
+                final String line = lineIterator.next();
+                for (DatasetConfigReader reader : readers) {
+                    Dataset dataset = reader.readConfig(line);
+                    handleDataset(blobStore, shouldWriteHeader, dataset);
                 }
-                handleDataset(blobStore, shouldWriteHeader, dataset);
             }
 
-            provDatasetConfigReader.close();
-            handleDataset(blobStore, shouldWriteHeader, provDatasetConfigReader.datasetForContextOrReset());
+            for (DatasetConfigReader reader : readers) {
+                reader.close();
+                handleDataset(blobStore, shouldWriteHeader, reader.datasetForContextOrReset());
+            }
 
         } catch (IOException ex) {
             LOG.error("failed to read from stdin", ex);
@@ -176,15 +178,16 @@ public class CmdStream extends CmdDefaultParams {
 
     private DerefProgressListener getProgressListener() {
         return hideProgressIndicator()
-        ? (iri, derefState, l, l1) -> {}
-        : new DerefProgressListener() {
-    private ProgressCursor progressCursor = getProgressCursorFactory().createProgressCursor();
+                ? (iri, derefState, l, l1) -> {
+        }
+                : new DerefProgressListener() {
+            private ProgressCursor progressCursor = getProgressCursorFactory().createProgressCursor();
 
-    @Override
-    public void onProgress(IRI dataURI, DerefState derefState, long read, long total) {
-        progressCursor.increment();
-    }
-};
+            @Override
+            public void onProgress(IRI dataURI, DerefState derefState, long read, long total) {
+                progressCursor.increment();
+            }
+        };
     }
 
     private boolean isCacheEnabled() {
@@ -369,7 +372,7 @@ public class CmdStream extends CmdDefaultParams {
                     iri = RefNodeFactory.toIRI("zip:" + org.apache.commons.lang3.StringUtils.substring(iri.getIRIString(), "jar:".length()));
                 }
                 InputStream inputStream = new ContentHashDereferencer(blobStore).get(iri);
-                
+
                 return StringUtils.endsWith(iri.getIRIString(), ".gz")
                         ? new GZIPInputStream(inputStream)
                         : inputStream;

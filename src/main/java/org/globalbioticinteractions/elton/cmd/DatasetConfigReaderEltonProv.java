@@ -11,10 +11,7 @@ import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -28,8 +25,7 @@ import java.util.regex.Pattern;
 import static bio.guoda.preston.RefNodeConstants.HAS_FORMAT;
 import static org.globalbioticinteractions.elton.store.ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG;
 
-public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
-    private final static Logger LOG = LoggerFactory.getLogger(DatasetConfigReaderProv.class);
+public class DatasetConfigReaderEltonProv implements DatasetConfigReader {
     private static final String ASSOCIATED_WITH = " " + RefNodeConstants.WAS_ASSOCIATED_WITH + " ";
     private static final Pattern NAMESPACE_PATTERN = Pattern.compile("<(?<namespace>" + "urn:lsid:" + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
     private static final String FORMAT = " " + HAS_FORMAT + " ";
@@ -56,10 +52,8 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
     private TreeMap<URI, IRI> contextDeps = new TreeMap<>();
     private Map<String, String> activityRelations = new TreeMap<>();
     private Pair<String, String> lastAddedActivityRelation;
-    private final String resourceFormatDefault;
-    private final IRI resourceNamespaceDefault;
 
-    public DatasetConfigReaderProv() {
+    public DatasetConfigReaderEltonProv() {
         this(new ResourceService() {
             @Override
             public InputStream retrieve(URI uri) throws IOException {
@@ -68,16 +62,8 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         });
     }
 
-    public DatasetConfigReaderProv(ResourceService resourceService) {
-        this(resourceService, null, null);
-    }
-
-    public DatasetConfigReaderProv(ResourceService resourceService,
-                                   String resourceFormatDefault,
-                                   IRI resourceNamespaceDefault) {
+    public DatasetConfigReaderEltonProv(ResourceService resourceService) {
         this.resourceService = resourceService;
-        this.resourceFormatDefault = resourceFormatDefault;
-        this.resourceNamespaceDefault = resourceNamespaceDefault;
         resetContext();
     }
 
@@ -126,8 +112,6 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
                         addResourceDependencies(location, version);
                     }
                 }
-            } else {
-                setVersionOnMatchingLocation(matcher, location);
             }
         }
     }
@@ -230,6 +214,7 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
         return sameActivity;
     }
 
+    @Override
     public Dataset datasetForContextOrReset() {
         Dataset dataset = null;
         if (explicitContextSupported()) {
@@ -302,9 +287,9 @@ public class DatasetConfigReaderProv implements DatasetConfigReader, Closeable {
 
     private void resetContext() {
         resourceLocation = null;
-        setResourceFormat(resourceFormatDefault);
+        setResourceFormat(null);
         resourceVersion = null;
-        setResourceNamespace(resourceNamespaceDefault);
+        setResourceNamespace(null);
         resourceActivityContext = null;
         contextComplete = false;
         contextDeps.clear();

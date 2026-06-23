@@ -27,4 +27,14 @@ public class DatasetConfigReaderJson implements DatasetConfigReader {
         }
         return dataset;
     }
+
+    @Override
+    public Dataset datasetForContextOrReset() {
+        return null;
+    }
+
+    @Override
+    public void close() throws IOException {
+
+    }
 }

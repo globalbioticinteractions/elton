@@ -95,7 +95,7 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
     private Dataset createConfigForDwCA(String location, String version, String metaPath) {
         Dataset dataset;
         dataset = new DatasetWithResourceMapping(
-                version,
+                location,
                 URI.create(location),
                 resourceService
         );

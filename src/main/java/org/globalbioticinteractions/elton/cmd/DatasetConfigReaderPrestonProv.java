@@ -2,19 +2,35 @@ package org.globalbioticinteractions.elton.cmd;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
+import org.globalbioticinteractions.dataset.EMLUtil;
 import org.globalbioticinteractions.elton.store.ProvUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.regex.Matcher;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
 
+    public static final String DWCA_META_FILENAME = "meta.xml";
     private String resourceLocation;
     private String resourceFormat;
     private final ResourceService resourceService;
@@ -49,24 +65,68 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
                 if (StringUtils.equals(getResourceLocation(), location)
                         && StringUtils.equals(getResourceFormat(), "application/dwca")) {
                     String version = matcher.group("version");
+                    String metaPath = getDwCArchiveMetaPathIfAvailable(version, resourceService);
 
-                    dataset = new DatasetWithResourceMapping(
-                            location,
-                            URI.create(location),
-                            resourceService
-                    );
-                    ObjectNode config = new ObjectMapper().createObjectNode();
-                    config.put("format", "dwca");
-                    config.put("url", getResourceLocation());
-                    config.put("resources", new ObjectMapper().createObjectNode()
-                            .put(location, version)
-                            .put("/eml.xml", "zip:" + version + "!/eml.xml"));
-                    dataset.setConfig(config);
+                    if (StringUtils.isNotBlank(metaPath)) {
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        factory.setNamespaceAware(true);
+                        DocumentBuilder builder;
+                        try {
+                            builder = factory.newDocumentBuilder();
+                            Document doc = builder.parse(resourceService.retrieve(URI.create(metaPath)));
+                            if (doc != null) {
+                                String emlPath = doc.getDocumentElement().getAttribute("metadata");
+                                String emlContentPath = StringUtils.replace(metaPath, "meta.xml", StringUtils.isBlank(emlPath) ? "eml.xml" : emlPath);
+                                dataset = createConfigForDwCA(location, version, emlContentPath);
+                            }
+
+                        } catch (ParserConfigurationException | SAXException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
                 }
-
             }
         }
         return dataset;
+    }
+
+    private Dataset createConfigForDwCA(String location, String version, String metaPath) {
+        Dataset dataset;
+        dataset = new DatasetWithResourceMapping(
+                location,
+                URI.create(location),
+                resourceService
+        );
+
+
+        ObjectNode config = new ObjectMapper().createObjectNode();
+        config.put("format", "dwca");
+        config.put("url", getResourceLocation());
+        config.put("resources", new ObjectMapper().createObjectNode()
+                .put(location, version)
+                .put("/eml.xml", "zip:" + version + "!/" + metaPath));
+        dataset.setConfig(config);
+        return dataset;
+    }
+
+    public static String getDwCArchiveMetaPathIfAvailable(String contentId, ResourceService resourceService) throws IOException {
+        String metaPath = null;
+        try (InputStream retrieve = resourceService.retrieve(URI.create(contentId))) {
+            ZipInputStream zipInputStream = new ZipInputStream(retrieve);
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                if (StringUtils.equals(entry.getName(), DWCA_META_FILENAME)
+                        || StringUtils.endsWith(entry.getName(), "/" + DWCA_META_FILENAME)) {
+                    metaPath = StringUtils.isBlank(metaPath)
+                            || (StringUtils.length(entry.getName()) < StringUtils.length(metaPath))
+                            ? entry.getName()
+                            : metaPath;
+                }
+                IOUtils.copy(zipInputStream, NullOutputStream.INSTANCE);
+            }
+        }
+        return metaPath;
     }
 
     @Override

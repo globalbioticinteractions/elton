@@ -1,42 +1,60 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.io.IOUtils;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class DatasetConfigReaderPrestonProvTest  {
+public class DatasetConfigReaderPrestonProvTest {
 
     @Test
     public void readDatasetPrestonGBIFProv() {
+        assertWithMeta("foo/meta.xml", "foo/eml.xml", "meta.xml");
+    }
 
-        String provLogPrestonGBIF = getProvLogPrestonGBIF();
+    @Test
+    public void readDatasetCustomEml() {
+        assertWithMeta(
+                "foo/meta.xml",
+                "foo/eml-custom.xml",
+                "meta-custom-eml.xml"
+        );
+    }
 
-        String[] lines = provLogPrestonGBIF.split("\n");
-        DatasetConfigReaderPrestonProv reader = new DatasetConfigReaderPrestonProv(new ResourceService() {
-            @Override
-            public InputStream retrieve(URI uri) throws IOException {
-                throw new IOException("kaboom!");
-            }
-        });
-        Dataset dataset = null;
-        for (String line : lines) {
-            try {
-                dataset = reader.readConfig(line);
-                if (dataset != null) {
-                    break;
-                }
-            } catch (IOException e) {
-                //
-            }
-        }
+    @Test
+    public void readDatasetImplicitEml() {
+        assertWithMeta(
+                "foo/meta.xml",
+                "foo/eml.xml",
+                "meta-implicit-eml.xml"
+        );
+    }
+
+    @Test
+    public void readDatasetMissingMeta() {
+        assertNull(getDataset("foo/metaz.xml", "eml.xml", "meta.xml"));
+    }
+
+    @Test
+    public void readDatasetPrestonGBIFProvRootPath() {
+        assertWithMeta("meta.xml", "eml.xml", "meta.xml");
+    }
+
+    private static void assertWithMeta(String metaPath, String emlPath, String metaResourceName) {
+        Dataset dataset = getDataset(metaPath, emlPath, metaResourceName);
 
         assertNotNull(dataset);
 
@@ -55,6 +73,48 @@ public class DatasetConfigReaderPrestonProvTest  {
                         .get("https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip")
                         .asText(),
                 Is.is("hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423"));
+        assertThat(dataset.getConfig()
+                        .at("/resources")
+                        .get("/eml.xml")
+                        .asText(),
+                Is.is("zip:hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423!/" + emlPath));
+    }
+
+    private static Dataset getDataset(final String metaPath, final String emlPath, final String metaResourceName) {
+        String provLogPrestonGBIF = getProvLogPrestonGBIF();
+
+        String[] lines = provLogPrestonGBIF.split("\n");
+        DatasetConfigReaderPrestonProv reader = new DatasetConfigReaderPrestonProv(new ResourceService() {
+            @Override
+            public InputStream retrieve(URI uri) throws IOException {
+                if (URI.create("hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423").equals(uri)) {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+                        zipOutputStream.putNextEntry(new ZipEntry(metaPath));
+                        IOUtils.copy(DatasetConfigReaderPrestonProvTest.class.getResourceAsStream(metaResourceName), zipOutputStream);
+                        zipOutputStream.putNextEntry(new ZipEntry(emlPath));
+                        IOUtils.copy(DatasetConfigReaderPrestonProvTest.class.getResourceAsStream("eml-ucsb-izc.xml"), zipOutputStream);
+                    }
+                    return new ByteArrayInputStream(outputStream.toByteArray());
+                } else if (URI.create(metaPath).equals(uri)) {
+                    return DatasetConfigReaderPrestonProvTest.class.getResourceAsStream(metaResourceName);
+                } else {
+                    throw new IOException("kaboom!");
+                }
+            }
+        });
+        Dataset dataset = null;
+        for (String line : lines) {
+            try {
+                dataset = reader.readConfig(line);
+                if (dataset != null) {
+                    break;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return dataset;
     }
 
     public static String getProvLogPrestonGBIF() {

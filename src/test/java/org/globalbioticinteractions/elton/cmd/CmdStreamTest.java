@@ -145,6 +145,23 @@ public class CmdStreamTest {
 
         assertHeaderAndMore(outputStream, headerInteractions());
     }
+    @Test
+    public void streamSomeProvStatementsPrestonGBIF() throws IOException {
+
+        String provLog = DatasetConfigReaderPrestonProvTest.getProvLogPrestonGBIF();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        CmdStream cmdStream = new CmdStream();
+
+        Collection<File> filesAfter = runStreamAndGetFiles(provLog, outputStream, errorStream, cmdStream, "/b92cd44dcba945c760229a14d3b9becb2dd0c147.zip");
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        assertThat(filenames, hasItems("76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44"));
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+    }
 
     @Test
     public void streamSomeProvStatementsAnchoredForInteractionRecordType() throws IOException {
@@ -239,7 +256,7 @@ public class CmdStreamTest {
         assertHeaderAndMore(outputStream, headerInteractions());
     }
 
-    private Collection<File> runStreamAndGetFiles(String provLogGeneratedByElton, ByteArrayOutputStream outputStream, ByteArrayOutputStream errorStream, CmdStream cmdStream, String resource) throws IOException {
+    private Collection<File> runStreamAndGetFiles(String provLog, ByteArrayOutputStream outputStream, ByteArrayOutputStream errorStream, CmdStream cmdStream, String resource) throws IOException {
         File tmpDir = folder.newFolder("tmpDir");
         tmpDir.mkdirs();
 
@@ -251,7 +268,7 @@ public class CmdStreamTest {
         cmdStream.setWorkDir(tmpDir.getAbsolutePath());
         cmdStream.setStdout(new PrintStream(outputStream));
         cmdStream.setStderr(new PrintStream(errorStream));
-        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByElton, StandardCharsets.UTF_8));
+        cmdStream.setStdin(IOUtils.toInputStream(provLog, StandardCharsets.UTF_8));
 
         Collection<File> filesBefore = FileUtils.listFilesAndDirs(
                 tmpDir,

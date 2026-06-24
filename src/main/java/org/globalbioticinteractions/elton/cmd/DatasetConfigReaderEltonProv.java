@@ -11,6 +11,7 @@ import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
+import org.globalbioticinteractions.elton.store.ProvUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,16 +23,11 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static bio.guoda.preston.RefNodeConstants.HAS_FORMAT;
 import static org.globalbioticinteractions.elton.store.ProvUtil.URN_LSID_GLOBALBIOTICINTERACTIONS_ORG;
 
 public class DatasetConfigReaderEltonProv implements DatasetConfigReader {
     private static final String ASSOCIATED_WITH = " " + RefNodeConstants.WAS_ASSOCIATED_WITH + " ";
     private static final Pattern NAMESPACE_PATTERN = Pattern.compile("<(?<namespace>" + "urn:lsid:" + "[^>]+)>" + ASSOCIATED_WITH + "<(?<location>[^>]+)> <(?<activity>[^>]+)> [.]");
-    private static final String FORMAT = " " + HAS_FORMAT + " ";
-    private static final Pattern FORMAT_PATTERN = Pattern.compile("<(?<location>[^>]+)>" + FORMAT + "\"(?<format>[^\"]+)\".*");
-    private static final String HAS_VERSION = " " + RefNodeConstants.HAS_VERSION + " ";
-    private static final Pattern VERSION_PATTERN = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)> <(?<activity>[^>]+)> [.]");
     private static final String ENDED_AT_TIME = " " + RefNodeConstants.ENDED_AT_TIME + " ";
     private static final Pattern ENDED_AT_PATTERN = Pattern.compile("<(?<activity>[^>]+)>" + ENDED_AT_TIME + ".*");
 
@@ -72,9 +68,9 @@ public class DatasetConfigReaderEltonProv implements DatasetConfigReader {
         Dataset dataset = null;
         if (StringUtils.contains(line, ASSOCIATED_WITH)) {
             dataset = handleAssociation(line, dataset);
-        } else if (StringUtils.contains(line, FORMAT)) {
+        } else if (StringUtils.contains(line, ProvUtil.FORMAT)) {
             handleFormat(line);
-        } else if (StringUtils.contains(line, HAS_VERSION)) {
+        } else if (StringUtils.contains(line, ProvUtil.HAS_VERSION)) {
             handleVersion(line);
         } else if (StringUtils.contains(line, ENDED_AT_TIME)) {
             handleEnded(line);
@@ -101,8 +97,8 @@ public class DatasetConfigReaderEltonProv implements DatasetConfigReader {
         }
     }
 
-    private void handleVersion(String line) {
-        Matcher matcher = VERSION_PATTERN.matcher(line);
+    void handleVersion(String line) {
+        Matcher matcher = ProvUtil.VERSION_PATTERN.matcher(line);
         if (matcher.matches()) {
             String location = matcher.group("location");
             if (explicitContextSupported()) {
@@ -138,8 +134,8 @@ public class DatasetConfigReaderEltonProv implements DatasetConfigReader {
         return isCompositeHashURI;
     }
 
-    private void handleFormat(String line) {
-        Matcher matcher = FORMAT_PATTERN.matcher(line);
+    void handleFormat(String line) {
+        Matcher matcher = ProvUtil.FORMAT_PATTERN.matcher(line);
         if (matcher.matches()) {
             String location = matcher.group("location");
             if (resourceLocation == null
@@ -225,7 +221,7 @@ public class DatasetConfigReaderEltonProv implements DatasetConfigReader {
         return dataset;
     }
 
-    private Dataset createDatasetIfComplete(Dataset dataset) {
+    Dataset createDatasetIfComplete(Dataset dataset) {
         if (resourceLocation != null
                 && getResourceNamespace() != null
                 && getResourceFormat() != null

@@ -141,7 +141,8 @@ public class CmdStream extends CmdDefaultParams {
 
             List<DatasetConfigReader> readers = Arrays.asList(
                     new DatasetConfigReaderJson(),
-                    new DatasetConfigReaderEltonProv()
+                    new DatasetConfigReaderEltonProv(),
+                    new DatasetConfigReaderPrestonProv()
             );
 
             while (lineIterator.hasNext()) {

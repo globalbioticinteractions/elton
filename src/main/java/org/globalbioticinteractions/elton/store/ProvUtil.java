@@ -9,14 +9,17 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.rdf.api.BlankNodeOrIRI;
 import org.apache.commons.rdf.api.IRI;
 import org.apache.commons.rdf.api.Literal;
+import org.globalbioticinteractions.elton.cmd.DatasetConfigReaderEltonProv;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static bio.guoda.preston.RefNodeConstants.GENERATED_AT_TIME;
+import static bio.guoda.preston.RefNodeConstants.HAS_FORMAT;
 import static bio.guoda.preston.RefNodeConstants.HAS_VERSION;
 import static bio.guoda.preston.RefNodeConstants.IS_A;
 import static bio.guoda.preston.RefNodeConstants.WAS_GENERATED_BY;
@@ -26,6 +29,11 @@ import static bio.guoda.preston.RefNodeFactory.toStatement;
 public class ProvUtil {
     public static final String URN_LSID_GLOBALBIOTICINTERACTIONS_ORG
             = "urn:lsid:globalbioticinteractions.org:";
+
+    public static final String FORMAT = " " + HAS_FORMAT + " ";
+    public static final Pattern FORMAT_PATTERN = Pattern.compile("<(?<location>[^>]+)>" + ProvUtil.FORMAT + "\"(?<format>[^\"]+)\".*");
+    public static final String HAS_VERSION = " " + RefNodeConstants.HAS_VERSION + " ";
+    public static final Pattern VERSION_PATTERN = Pattern.compile("<(?<location>[^>]+)>" + HAS_VERSION + "<(?<version>[^>]+)> <(?<activity>[^>]+)> [.]");
 
     public static void emitDataGenerationActivity(
             List<IRI> dependencies,
@@ -70,7 +78,7 @@ public class ProvUtil {
                     dependency)
             );
         }
-        emitter.emit(toStatement(downloadActivity, versionSource, HAS_VERSION, newVersion));
+        emitter.emit(toStatement(downloadActivity, versionSource, RefNodeConstants.HAS_VERSION, newVersion));
         for (IRI dependency : dependencies) {
             if (!dependency.equals(newVersion)) {
                 emitter.emit(toStatement(

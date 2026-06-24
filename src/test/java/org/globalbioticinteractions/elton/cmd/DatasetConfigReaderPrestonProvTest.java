@@ -59,6 +59,7 @@ public class DatasetConfigReaderPrestonProvTest {
         assertNotNull(dataset);
 
         assertThat(dataset.getArchiveURI(), Is.is(URI.create("https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip")));
+        assertThat(dataset.getNamespace(), Is.is("hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423"));
         assertThat(dataset.getFormat(), Is.is("dwca"));
         assertThat(dataset.getConfig()
                         .at("/url")

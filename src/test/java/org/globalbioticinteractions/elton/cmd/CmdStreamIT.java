@@ -95,4 +95,52 @@ public class CmdStreamIT {
 
         assertHeaderAndMore(outputStream, headerInteractions());
     }
+    @Test
+    public void streamSomeProvStatementsDwCAUsingRemoteRepositoryPreston() throws IOException, URISyntaxException {
+
+        URL resource = getClass().getResource("/ucsb-izc-slim-dwca.zip");
+        assertNotNull(resource);
+
+        IRI iri = RefNodeFactory.toIRI("https://example.org/dwca.zip");
+
+        String provLogGeneratedByElton =
+                iri + " <http://purl.org/dc/elements/1.1/format> \"application/dwca\" <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n" +
+                iri + " <http://purl.org/pav/hasVersion> <hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423> <urn:uuid:16b63a6d-153b-4f16-afed-a67fa09383a7> .\n";
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        File tmpDir = folder.newFolder("tmpDir");
+        tmpDir.mkdirs();
+        CmdStream cmdStream = new CmdStream();
+
+
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setDataDir(tmpDir.getAbsolutePath());
+        cmdStream.setWorkDir(tmpDir.getAbsolutePath());
+        cmdStream.setStdout(new PrintStream(outputStream));
+        cmdStream.setStderr(new PrintStream(errorStream));
+        cmdStream.setStdin(IOUtils.toInputStream(provLogGeneratedByElton, StandardCharsets.UTF_8));
+        cmdStream.setRemotes(Arrays.asList(URI.create("https://linker.bio")));
+
+        cmdStream.run();
+
+        Collection<File> filesAfter = FileUtils.listFilesAndDirs(
+                tmpDir,
+                TrueFileFilter.INSTANCE,
+                TrueFileFilter.INSTANCE
+        );
+
+        long numberOfFilesAfter = filesAfter.stream().filter(File::isFile).count();
+
+        assertThat(numberOfFilesAfter, Is.is(1L));
+
+        List<String> filenames = filesAfter.stream().map(File::getName).collect(Collectors.toList());
+
+        assertThat(filenames, hasItems("fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423"));
+
+        assertThat(new String(errorStream.toByteArray(), StandardCharsets.UTF_8), Is.is("processing data stream for [globalbioticinteractions/ucsb-izc]...done.\ndone processing [globalbioticinteractions/ucsb-izc].\n"));
+
+        assertHeaderAndMore(outputStream, headerInteractions());
+    }
 }

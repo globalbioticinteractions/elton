@@ -20,6 +20,7 @@ import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
+import org.eol.globi.service.ResourceService;
 import org.eol.globi.tool.NullImportLogger;
 import org.globalbioticinteractions.cache.Cache;
 import org.globalbioticinteractions.cache.ContentProvenance;
@@ -142,7 +143,12 @@ public class CmdStream extends CmdDefaultParams {
             List<DatasetConfigReader> readers = Arrays.asList(
                     new DatasetConfigReaderJson(),
                     new DatasetConfigReaderEltonProv(),
-                    new DatasetConfigReaderPrestonProv()
+                    new DatasetConfigReaderPrestonProv(new ResourceService() {
+                        @Override
+                        public InputStream retrieve(URI uri) throws IOException {
+                            return new ContentHashDereferencer(blobStore).get(RefNodeFactory.toIRI(uri));
+                        }
+                    })
             );
 
             while (lineIterator.hasNext()) {

@@ -96,10 +96,10 @@ public class DatasetConfigReaderPrestonProvTest {
                         IOUtils.copy(DatasetConfigReaderPrestonProvTest.class.getResourceAsStream("eml-ucsb-izc.xml"), zipOutputStream);
                     }
                     return new ByteArrayInputStream(outputStream.toByteArray());
-                } else if (URI.create(metaPath).equals(uri)) {
+                } else if (URI.create("zip:hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423!/" + metaPath).equals(uri)) {
                     return DatasetConfigReaderPrestonProvTest.class.getResourceAsStream(metaResourceName);
                 } else {
-                    throw new IOException("kaboom!");
+                    throw new IOException("[" + uri.toString() + "] unknown");
                 }
             }
         });

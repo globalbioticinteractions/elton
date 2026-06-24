@@ -66,6 +66,7 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
                         && StringUtils.equals(getResourceFormat(), "application/dwca")) {
                     String version = matcher.group("version");
                     String metaPath = getDwCArchiveMetaPathIfAvailable(version, resourceService);
+                    String metaPathContentId = "zip:" + version + "!/" + metaPath;
 
                     if (StringUtils.isNotBlank(metaPath)) {
                         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -73,7 +74,7 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
                         DocumentBuilder builder;
                         try {
                             builder = factory.newDocumentBuilder();
-                            Document doc = builder.parse(resourceService.retrieve(URI.create(metaPath)));
+                            Document doc = builder.parse(resourceService.retrieve(URI.create(metaPathContentId)));
                             if (doc != null) {
                                 String emlPath = doc.getDocumentElement().getAttribute("metadata");
                                 String emlContentPath = StringUtils.replace(metaPath, "meta.xml", StringUtils.isBlank(emlPath) ? "eml.xml" : emlPath);

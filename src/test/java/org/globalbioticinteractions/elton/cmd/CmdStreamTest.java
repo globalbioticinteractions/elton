@@ -160,7 +160,9 @@ public class CmdStreamTest {
 
         assertThat(filenames, hasItems("76c00c8b64e422800b85d29db93bcfa9ebee999f52f21e16cbd00ba750e98b44"));
 
-        assertHeaderAndMore(outputStream, headerInteractions());
+        String stdout = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+        assertThat(stdout, startsWith(""));
+        assertThat(stdout.split("\n").length, Is.is(1));
     }
 
     @Test

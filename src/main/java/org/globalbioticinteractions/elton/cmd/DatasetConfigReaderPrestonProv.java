@@ -8,19 +8,13 @@ import org.apache.commons.lang.StringUtils;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
-import org.globalbioticinteractions.dataset.EMLUtil;
 import org.globalbioticinteractions.elton.store.ProvUtil;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -114,17 +108,19 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
     public static String getDwCArchiveMetaPathIfAvailable(String contentId, ResourceService resourceService) throws IOException {
         String metaPath = null;
         try (InputStream retrieve = resourceService.retrieve(URI.create(contentId))) {
-            ZipInputStream zipInputStream = new ZipInputStream(retrieve);
-            ZipEntry entry;
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                if (StringUtils.equals(entry.getName(), DWCA_META_FILENAME)
-                        || StringUtils.endsWith(entry.getName(), "/" + DWCA_META_FILENAME)) {
-                    metaPath = StringUtils.isBlank(metaPath)
-                            || (StringUtils.length(entry.getName()) < StringUtils.length(metaPath))
-                            ? entry.getName()
-                            : metaPath;
+            if (retrieve != null) {
+                ZipInputStream zipInputStream = new ZipInputStream(retrieve);
+                ZipEntry entry;
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    if (StringUtils.equals(entry.getName(), DWCA_META_FILENAME)
+                            || StringUtils.endsWith(entry.getName(), "/" + DWCA_META_FILENAME)) {
+                        metaPath = StringUtils.isBlank(metaPath)
+                                || (StringUtils.length(entry.getName()) < StringUtils.length(metaPath))
+                                ? entry.getName()
+                                : metaPath;
+                    }
+                    IOUtils.copy(zipInputStream, NullOutputStream.INSTANCE);
                 }
-                IOUtils.copy(zipInputStream, NullOutputStream.INSTANCE);
             }
         }
         return metaPath;

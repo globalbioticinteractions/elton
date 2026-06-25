@@ -22,7 +22,11 @@ public class DatasetConfigReaderPrestonProvTest {
 
     @Test
     public void readDatasetPrestonGBIFProv() {
-        assertWithMeta("foo/meta.xml", "foo/eml.xml", "meta.xml");
+        assertWithMeta(
+                "foo/meta.xml",
+                "foo/eml.xml",
+                "meta.xml"
+        );
     }
 
     @Test
@@ -46,6 +50,22 @@ public class DatasetConfigReaderPrestonProvTest {
     @Test
     public void readDatasetMissingMeta() {
         assertNull(getDataset("foo/metaz.xml", "eml.xml", "meta.xml"));
+    }
+
+    @Test
+    public void readDatasetBlankVersion() {
+        DatasetConfigReader reader = new DatasetConfigReaderPrestonProv(new ResourceService() {
+            @Override
+            public InputStream retrieve(URI uri) throws IOException {
+                return null;
+            }
+        });
+        String prov = "<95e9354e-9f06-4156-b69d-0279ae1f7baa> <http://www.w3.org/ns/prov#hadMember> <https://scan-bugs.org:443/portal/content/dwca/HDOA-HDOAPPC_DwC-A.zip> <urn:uuid:eecbea7b-6501-42a8-9743-5aa0ca43107a> .\n" +
+                "<https://scan-bugs.org:443/portal/content/dwca/HDOA-HDOAPPC_DwC-A.zip> <http://purl.org/dc/elements/1.1/format> \"application/dwca\" <urn:uuid:eecbea7b-6501-42a8-9743-5aa0ca43107a> .\n" +
+                "<urn:uuid:660ad15a-6682-4fc0-8711-4cff8980a308> <http://www.w3.org/ns/prov#used> <https://scan-bugs.org:443/portal/content/dwca/HDOA-HDOAPPC_DwC-A.zip> <urn:uuid:660ad15a-6682-4fc0-8711-4cff8980a308> .\n" +
+                "<https://scan-bugs.org:443/portal/content/dwca/HDOA-HDOAPPC_DwC-A.zip> <http://purl.org/pav/hasVersion> <https://deeplinker.bio/.well-known/genid/78b3688f-2791-365c-83a5-c1815d2397a4> <urn:uuid:660ad15a-6682-4fc0-8711-4cff8980a308> .\n";
+
+        assertNull(getDataset(prov, reader));
     }
 
     @Test
@@ -81,10 +101,7 @@ public class DatasetConfigReaderPrestonProvTest {
     }
 
     private static Dataset getDataset(final String metaPath, final String emlPath, final String metaResourceName) {
-        String provLogPrestonGBIF = getProvLogPrestonGBIF();
-
-        String[] lines = provLogPrestonGBIF.split("\n");
-        DatasetConfigReaderPrestonProv reader = new DatasetConfigReaderPrestonProv(new ResourceService() {
+        DatasetConfigReader reader = new DatasetConfigReaderPrestonProv(new ResourceService() {
             @Override
             public InputStream retrieve(URI uri) throws IOException {
                 if (URI.create("hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423").equals(uri)) {
@@ -103,6 +120,13 @@ public class DatasetConfigReaderPrestonProvTest {
                 }
             }
         });
+        String prov = getProvLogPrestonGBIF();
+
+        return getDataset(prov, reader);
+    }
+
+    private static Dataset getDataset(String provLogPrestonGBIF, DatasetConfigReader reader) {
+        String[] lines = provLogPrestonGBIF.split("\n");
         Dataset dataset = null;
         for (String line : lines) {
             try {

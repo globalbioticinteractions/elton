@@ -1,10 +1,12 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import bio.guoda.preston.RefNodeFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.service.ResourceService;
 import org.globalbioticinteractions.dataset.Dataset;
 import org.globalbioticinteractions.dataset.DatasetWithResourceMapping;
@@ -59,25 +61,37 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
                 if (StringUtils.equals(getResourceLocation(), location)
                         && StringUtils.equals(getResourceFormat(), "application/dwca")) {
                     String version = matcher.group("version");
-                    String metaPath = getDwCArchiveMetaPathIfAvailable(version, resourceService);
-                    String metaPathContentId = "zip:" + version + "!/" + metaPath;
-
-                    if (StringUtils.isNotBlank(metaPath)) {
-                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                        factory.setNamespaceAware(true);
-                        DocumentBuilder builder;
-                        try {
-                            builder = factory.newDocumentBuilder();
-                            Document doc = builder.parse(resourceService.retrieve(URI.create(metaPathContentId)));
-                            if (doc != null) {
-                                String emlPath = doc.getDocumentElement().getAttribute("metadata");
-                                String emlContentPath = StringUtils.replace(metaPath, "meta.xml", StringUtils.isBlank(emlPath) ? "eml.xml" : emlPath);
-                                dataset = createConfigForDwCA(location, version, emlContentPath);
+                    IRI versionIRI;
+                    try {
+                        versionIRI = RefNodeFactory.toIRI(version);
+                        if (!RefNodeFactory.isBlankOrSkolemizedBlank(versionIRI)) {
+                            String metaPath = getDwCArchiveMetaPathIfAvailable(version, resourceService);
+                            if (StringUtils.isNotBlank(metaPath)) {
+                                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                                factory.setNamespaceAware(true);
+                                DocumentBuilder builder;
+                                try {
+                                    builder = factory.newDocumentBuilder();
+                                    String metaPathContentId = "zip:" + version + "!/" + metaPath;
+                                    InputStream retrieve = resourceService.retrieve(URI.create(metaPathContentId));
+                                    if (retrieve == null) {
+                                        throw new IOException("failed to access [" + metaPathContentId + "]");
+                                    } else {
+                                        Document doc = builder.parse(retrieve);
+                                        if (doc != null) {
+                                            String emlPath = doc.getDocumentElement().getAttribute("metadata");
+                                            String emlContentPath = StringUtils.replace(metaPath, "meta.xml", StringUtils.isBlank(emlPath) ? "eml.xml" : emlPath);
+                                            dataset = createConfigForDwCA(location, version, emlContentPath);
+                                        }
+                                    }
+                                } catch (ParserConfigurationException | SAXException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
 
-                        } catch (ParserConfigurationException | SAXException e) {
-                            throw new RuntimeException(e);
                         }
+
+                    } catch (IllegalArgumentException ex) {
 
                     }
                 }

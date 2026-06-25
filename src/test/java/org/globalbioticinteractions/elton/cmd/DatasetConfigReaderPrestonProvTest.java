@@ -39,6 +39,15 @@ public class DatasetConfigReaderPrestonProvTest {
     }
 
     @Test
+    public void readDatasetMissingMetaEml() {
+        assertWithMeta(
+                "foo/meta.xml",
+                "foo/eml-custom.xml",
+                "meta-custom-eml.xml"
+        );
+    }
+
+    @Test
     public void readDatasetImplicitEml() {
         assertWithMeta(
                 "foo/meta.xml",

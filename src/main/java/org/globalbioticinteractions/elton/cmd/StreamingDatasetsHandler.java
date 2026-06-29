@@ -2,8 +2,11 @@ package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.io.IOUtils;
+import org.eol.globi.data.ImportLogger;
+import org.eol.globi.data.LogUtil;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.data.StudyImporterException;
+import org.eol.globi.domain.LogContext;
 import org.eol.globi.util.DatasetImportUtil;
 import org.eol.globi.util.InputStreamFactory;
 import org.globalbioticinteractions.cache.Cache;
@@ -88,18 +91,18 @@ class StreamingDatasetsHandler implements NamespaceHandler {
 
         NodeFactory nodeFactory = this.nodeFactorFactory.createNodeFactory();
         nodeFactory.getOrCreateDataset(datasetWithCacheAndConfig);
+        final ImportLogger importLogger = loggerFactory.createImportLogger();
         try {
             DatasetImportUtil.importDataset(
                     null,
                     datasetWithCacheAndConfig,
                     nodeFactory,
-                    loggerFactory.createImportLogger(),
+                    importLogger,
                     new File(dataDir)
             );
-        } catch (StudyImporterException ex) {
-            LOG.error("procecssing of [" + namespace + "] failed.", ex);
-            stderr.println("failed with [ " + ex.getMessage() + "].");
-            ex.printStackTrace(stderr);
+        } catch (Throwable ex) {
+            LogUtil.logError(importLogger, ex);
+            throw ex;
         }
     }
 

@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.rdf.api.IRI;
 import org.eol.globi.data.ImportLogger;
+import org.eol.globi.data.LogUtil;
 import org.eol.globi.data.NodeFactory;
 import org.eol.globi.domain.LogContext;
 import org.eol.globi.service.ResourceService;
@@ -227,17 +228,11 @@ public class CmdStream extends CmdDefaultParams {
             );
             namespaceHandler.onNamespace(datasetProvided.getNamespace());
             handled = true;
-        } catch (Exception e) {
-            String msg = "failed to add dataset associated with namespace [" + datasetProvided.getNamespace() + "]";
-            loggerFactory.createImportLogger().warn(new LogContext() {
-                @Override
-                public String toString() {
-                    return "{ \"namespace\": \"" + datasetProvided.getNamespace() + "\" }";
-                }
-            }, e.getMessage());
-            LOG.error(msg, e);
-        } finally {
-            // FileUtils.forceDelete(new File(this.getDataDir()));
+        } catch (RuntimeException | IOException e) {
+            LogUtil.logError(loggerFactory.createImportLogger(), e);
+            throw e;
+        } catch (Throwable e) {
+            LogUtil.logError(loggerFactory.createImportLogger(), e);
         }
         return handled;
 

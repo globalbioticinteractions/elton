@@ -2,6 +2,7 @@ package org.globalbioticinteractions.elton.cmd;
 
 import bio.guoda.preston.cmd.ActivityContext;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eol.globi.data.ImportLogger;
 import org.eol.globi.data.LogUtil;
 import org.eol.globi.data.NodeFactory;
@@ -59,7 +60,11 @@ class StreamingDatasetsHandler implements NamespaceHandler {
     public void onNamespace(String namespace) throws Exception {
         URI archiveURI = this.dataset.getArchiveURI();
         if (archiveURI == null && this.dataset.getConfig() != null) {
-            archiveURI = URI.create(this.dataset.getOrDefault("url", null));
+            String url = this.dataset.getOrDefault("url", null);
+            if (StringUtils.isBlank(url)) {
+                throw new StudyImporterException("no or empty archiveURI for namespace [" + namespace + "]");
+            }
+            archiveURI = URI.create(url);
         }
 
         Dataset dataset = new DatasetWithResourceMapping(

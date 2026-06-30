@@ -11,12 +11,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.regex.Matcher;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class DatasetConfigReaderPrestonProvTest {
 
@@ -185,6 +188,17 @@ public class DatasetConfigReaderPrestonProvTest {
                 "<urn:uuid:689d54b9-77da-45fb-83a2-40486f7f6cba> <http://www.w3.org/ns/prov#used> <https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip> <urn:uuid:689d54b9-77da-45fb-83a2-40486f7f6cba> .\n" +
                 "<https://ecdysis.org/content/dwca/UCSB-IZC_DwC-A.zip> <http://purl.org/pav/hasVersion> <hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423> <urn:uuid:689d54b9-77da-45fb-83a2-40486f7f6cba> .\n";
         return provLogPrestonGBIF;
+    }
+
+    @Test
+    public void testDWCAPattern() {
+        String line = "<https://scan-bugs.org:443/portal/content/dwca/HDOA-HDOAPPC_DwC-A.zip> <http://purl.org/dc/elements/1.1/format> \"application/dwca\" <urn:uuid:eecbea7b-6501-42a8-9743-5aa0ca43107a> .";
+
+        Matcher matcher = DatasetConfigReaderPrestonProv.PATTERN_DWCA_FORMAT.matcher(line);
+        assertTrue(matcher.matches());
+
+        assertThat(matcher.group("location"), is("https://scan-bugs.org:443/portal/content/dwca/HDOA-HDOAPPC_DwC-A.zip"));
+        assertThat(matcher.group("activity"), is("urn:uuid:eecbea7b-6501-42a8-9743-5aa0ca43107a"));
     }
 
 

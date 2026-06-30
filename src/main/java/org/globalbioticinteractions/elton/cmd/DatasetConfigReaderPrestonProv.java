@@ -21,14 +21,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
 
     public static final String DWCA_META_FILENAME = "meta.xml";
+    public static final Pattern PATTERN_DWCA_FORMAT = Pattern.compile("<(?<location>[^>]+)>" + ProvUtil.FORMAT + "\"application/dwca\"[ ]<(?<activity>[^>]+)> [.]$");
     private String resourceLocation;
-    private String resourceFormat;
     private final ResourceService resourceService;
 
     public DatasetConfigReaderPrestonProv() {
@@ -49,17 +50,17 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
     public Dataset readConfig(String line) throws IOException {
         Dataset dataset = null;
         if (StringUtils.contains(line, ProvUtil.FORMAT)) {
-            Matcher matcher = ProvUtil.FORMAT_PATTERN.matcher(line);
+            Matcher matcher = PATTERN_DWCA_FORMAT.matcher(line);
             if (matcher.matches()) {
                 setResourceLocation(matcher.group("location"));
-                setResourceFormat(matcher.group("format"));
             }
-        } else if (StringUtils.contains(line, ProvUtil.HAS_VERSION)) {
+        } else if (StringUtils.isNotBlank(getResourceLocation()) && StringUtils.contains(line, ProvUtil.HAS_VERSION)) {
             Matcher matcher = ProvUtil.VERSION_PATTERN.matcher(line);
             if (matcher.matches()) {
                 String location = matcher.group("location");
-                if (StringUtils.equals(getResourceLocation(), location)
-                        && StringUtils.equals(getResourceFormat(), "application/dwca")) {
+                String claimedDwCALocation = getResourceLocation();
+                resetContext();
+                if (StringUtils.equals(claimedDwCALocation, location)) {
                     String version = matcher.group("version");
                     IRI versionIRI;
                     try {
@@ -85,19 +86,25 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
                                         }
                                     }
                                 } catch (ParserConfigurationException | SAXException e) {
-                                    throw new RuntimeException(e);
+                                    resetContext();
+                                    throw new IOException("failed to process [" + metaPath + "]", e);
                                 }
                             }
 
                         }
 
                     } catch (IllegalArgumentException ex) {
-
+                        resetContext();
+                        throw new IOException("failed to process [" + line + "]", ex);
                     }
                 }
             }
         }
         return dataset;
+    }
+
+    private void resetContext() {
+        setResourceLocation(null);
     }
 
     private Dataset createConfigForDwCA(String location, String version, String metaPath) {
@@ -111,7 +118,7 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
 
         ObjectNode config = new ObjectMapper().createObjectNode();
         config.put("format", "dwca");
-        config.put("url", getResourceLocation());
+        config.put("url", location);
         config.put("resources", new ObjectMapper().createObjectNode()
                 .put(location, version)
                 .put("/eml.xml", "zip:" + version + "!/" + metaPath));
@@ -158,11 +165,4 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
         return resourceLocation;
     }
 
-    public void setResourceFormat(String resourceFormat) {
-        this.resourceFormat = resourceFormat;
-    }
-
-    public String getResourceFormat() {
-        return resourceFormat;
-    }
 }

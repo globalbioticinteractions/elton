@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 public class DatasetConfigReaderPrestonProvTest {
 
     @Test
-    public void readDatasetPrestonGBIFProv() {
+    public void readDatasetPrestonGBIFProv() throws IOException {
         assertWithMeta(
                 "foo/meta.xml",
                 "foo/eml.xml",
@@ -32,8 +32,42 @@ public class DatasetConfigReaderPrestonProvTest {
         );
     }
 
+    @Test(expected = IOException.class)
+    public void readDatasetTruncatedZIPfile() throws IOException {
+        DatasetConfigReader reader = new DatasetConfigReaderPrestonProv(new ResourceService() {
+            @Override
+            public InputStream retrieve(URI uri) throws IOException {
+                if (URI.create("hash://sha256/20c0c94c57021d187d3d0f0a8470efd60237540eae069e08dbbd71bd4366f40a").equals(uri)) {
+                    return getClass().getResourceAsStream("fmnh_seedplants_truncated.zip");
+                } else if (URI.create("zip:hash://sha256/20c0c94c57021d187d3d0f0a8470efd60237540eae069e08dbbd71bd4366f40a!/" + "foo/meta.xml").equals(uri)) {
+                    return DatasetConfigReaderPrestonProvTest.class.getResourceAsStream("meta.xml");
+                } else {
+                    throw new IOException("[" + uri.toString() + "] unknown");
+                }
+            }
+        });
+        String prov = "<https://fmipt.fieldmuseum.org/ipt/archive.do?r=fmnh_seedplants> <http://purl.org/dc/elements/1.1/format> \"application/dwca\" <urn:uuid:222aa005-6a15-45ac-955b-54b8dfd4ab7b> .\n" +
+                "<hash://sha256/20c0c94c57021d187d3d0f0a8470efd60237540eae069e08dbbd71bd4366f40a> <http://www.w3.org/ns/prov#wasGeneratedBy> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .\n" +
+                "<hash://sha256/20c0c94c57021d187d3d0f0a8470efd60237540eae069e08dbbd71bd4366f40a> <http://www.w3.org/ns/prov#qualifiedGeneration> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .\n" +
+                "<urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> <http://www.w3.org/ns/prov#generatedAtTime> \"2026-05-01T22:26:20.948Z\"^^<http://www.w3.org/2001/XMLSchema#dateTime> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .\n" +
+                "<urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Generation> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .\n" +
+                "<urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> <http://www.w3.org/ns/prov#wasInformedBy> <urn:uuid:222aa005-6a15-45ac-955b-54b8dfd4ab7b> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .\n" +
+                "<urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> <http://www.w3.org/ns/prov#used> <https://fmipt.fieldmuseum.org/ipt/archive.do?r=fmnh_seedplants> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .\n" +
+                "<https://fmipt.fieldmuseum.org/ipt/archive.do?r=fmnh_seedplants> <http://purl.org/pav/hasVersion> <hash://sha256/20c0c94c57021d187d3d0f0a8470efd60237540eae069e08dbbd71bd4366f40a> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .\n";
+
+
+        try {
+            getDataset(prov, reader);
+        } catch(IOException ex) {
+            assertThat(ex.getMessage(), is("failed to process [<https://fmipt.fieldmuseum.org/ipt/archive.do?r=fmnh_seedplants> <http://purl.org/pav/hasVersion> <hash://sha256/20c0c94c57021d187d3d0f0a8470efd60237540eae069e08dbbd71bd4366f40a> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .]"));
+            throw ex;
+        }
+
+
+    }
+
     @Test
-    public void readDatasetCustomEml() {
+    public void readDatasetCustomEml() throws IOException {
         assertWithMeta(
                 "foo/meta.xml",
                 "foo/eml-custom.xml",
@@ -42,7 +76,7 @@ public class DatasetConfigReaderPrestonProvTest {
     }
 
     @Test
-    public void readDatasetMissingMetaEml() {
+    public void readDatasetMissingMetaEml() throws IOException {
         assertWithMeta(
                 "foo/meta.xml",
                 "foo/eml-custom.xml",
@@ -51,7 +85,7 @@ public class DatasetConfigReaderPrestonProvTest {
     }
 
     @Test
-    public void readDatasetImplicitEml() {
+    public void readDatasetImplicitEml() throws IOException {
         assertWithMeta(
                 "foo/meta.xml",
                 "foo/eml.xml",
@@ -60,12 +94,12 @@ public class DatasetConfigReaderPrestonProvTest {
     }
 
     @Test
-    public void readDatasetMissingMeta() {
+    public void readDatasetMissingMeta() throws IOException {
         assertNull(getDataset("foo/metaz.xml", "eml.xml", "meta.xml"));
     }
 
     @Test
-    public void readDatasetBlankVersion() {
+    public void readDatasetBlankVersion() throws IOException {
         DatasetConfigReader reader = new DatasetConfigReaderPrestonProv(new ResourceService() {
             @Override
             public InputStream retrieve(URI uri) throws IOException {
@@ -81,11 +115,11 @@ public class DatasetConfigReaderPrestonProvTest {
     }
 
     @Test
-    public void readDatasetPrestonGBIFProvRootPath() {
+    public void readDatasetPrestonGBIFProvRootPath() throws IOException {
         assertWithMeta("meta.xml", "eml.xml", "meta.xml");
     }
 
-    private static void assertWithMeta(String metaPath, String emlPath, String metaResourceName) {
+    private static void assertWithMeta(String metaPath, String emlPath, String metaResourceName) throws IOException {
         Dataset dataset = getDataset(metaPath, emlPath, metaResourceName);
 
         assertNotNull(dataset);
@@ -112,7 +146,7 @@ public class DatasetConfigReaderPrestonProvTest {
                 Is.is("zip:hash://sha256/fba3d1a15752667412d59e984729a847bf5dc2fb995ac12eb22490933f828423!/" + emlPath));
     }
 
-    private static Dataset getDataset(final String metaPath, final String emlPath, final String metaResourceName) {
+    private static Dataset getDataset(final String metaPath, final String emlPath, final String metaResourceName) throws IOException {
         DatasetConfigReader reader = new DatasetConfigReaderPrestonProv(new ResourceService() {
             @Override
             public InputStream retrieve(URI uri) throws IOException {
@@ -137,7 +171,7 @@ public class DatasetConfigReaderPrestonProvTest {
         return getDataset(prov, reader);
     }
 
-    private static Dataset getDataset(String provLogPrestonGBIF, DatasetConfigReader reader) {
+    private static Dataset getDataset(String provLogPrestonGBIF, DatasetConfigReader reader) throws IOException {
         String[] lines = provLogPrestonGBIF.split("\n");
         Dataset dataset = null;
         for (String line : lines) {
@@ -147,7 +181,7 @@ public class DatasetConfigReaderPrestonProvTest {
                     break;
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw e;
             }
         }
         return dataset;

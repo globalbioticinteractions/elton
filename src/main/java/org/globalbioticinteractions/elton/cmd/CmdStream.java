@@ -155,8 +155,13 @@ public class CmdStream extends CmdDefaultParams {
             while (lineIterator.hasNext()) {
                 final String line = lineIterator.next();
                 for (DatasetConfigReader reader : readers) {
-                    Dataset dataset = reader.readConfig(line);
-                    handleDataset(blobStore, shouldWriteHeader, dataset);
+                    try {
+                        Dataset dataset = reader.readConfig(line);
+                        handleDataset(blobStore, shouldWriteHeader, dataset);
+                    } catch (IOException e) {
+                        LogUtil.logError(getImportLoggerFactory(null).createImportLogger(), e);
+                        throw e;
+                    }
                 }
             }
 
@@ -204,13 +209,7 @@ public class CmdStream extends CmdDefaultParams {
 
     private boolean handleDataset(final Dataset datasetProvided, boolean shouldWriteHeader, Cache cache) throws IOException {
         boolean handled = false;
-        ImportLoggerFactory loggerFactory = new ImportLoggerFactoryImpl(
-                recordType,
-                datasetProvided.getNamespace(),
-                Arrays.asList(ReviewCommentType.values()),
-                getStdout(),
-                getProvenanceAnchor() == null ? null : getProvenanceAnchor().getIRIString()
-        );
+        ImportLoggerFactory loggerFactory = getImportLoggerFactory(datasetProvided);
         try {
             Dataset datasetApplied = hasConfigOverride()
                     ? applyConfigOverride(datasetProvided, cache)
@@ -236,6 +235,18 @@ public class CmdStream extends CmdDefaultParams {
         }
         return handled;
 
+    }
+
+    private ImportLoggerFactory getImportLoggerFactory(Dataset datasetProvided) {
+        return new ImportLoggerFactoryImpl(
+                recordType,
+                datasetProvided == null
+                        ? "no/namespace"
+                        : datasetProvided.getNamespace(),
+                Arrays.asList(ReviewCommentType.values()),
+                getStdout(),
+                getProvenanceAnchor() == null ? null : getProvenanceAnchor().getIRIString()
+        );
     }
 
     private boolean hasConfigOverride() {

@@ -93,7 +93,7 @@ public class DatasetConfigReaderPrestonProv implements DatasetConfigReader {
 
                         }
 
-                    } catch (IllegalArgumentException ex) {
+                    } catch (IllegalArgumentException | IOException ex) {
                         resetContext();
                         throw new IOException("failed to process [" + line + "]", ex);
                     }

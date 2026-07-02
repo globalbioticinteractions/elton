@@ -160,7 +160,6 @@ public class CmdStream extends CmdDefaultParams {
                         handleDataset(blobStore, shouldWriteHeader, dataset);
                     } catch (IOException e) {
                         LogUtil.logError(getImportLoggerFactory(null).createImportLogger(), e);
-                        throw e;
                     }
                 }
             }
@@ -241,7 +240,7 @@ public class CmdStream extends CmdDefaultParams {
         return new ImportLoggerFactoryImpl(
                 recordType,
                 datasetProvided == null
-                        ? "no/namespace"
+                        ? "local"
                         : datasetProvided.getNamespace(),
                 Arrays.asList(ReviewCommentType.values()),
                 getStdout(),

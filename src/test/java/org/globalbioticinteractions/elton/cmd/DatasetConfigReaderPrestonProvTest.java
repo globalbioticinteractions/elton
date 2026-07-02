@@ -58,7 +58,7 @@ public class DatasetConfigReaderPrestonProvTest {
 
         try {
             getDataset(prov, reader);
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             assertThat(ex.getMessage(), is("failed to process [<https://fmipt.fieldmuseum.org/ipt/archive.do?r=fmnh_seedplants> <http://purl.org/pav/hasVersion> <hash://sha256/20c0c94c57021d187d3d0f0a8470efd60237540eae069e08dbbd71bd4366f40a> <urn:uuid:f0af8b53-6d32-44a6-bfc5-d5597618be38> .]"));
             throw ex;
         }

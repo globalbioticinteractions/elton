@@ -14,6 +14,7 @@ import org.globalbioticinteractions.dataset.Dataset;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class NodeFactoryForDataset extends NodeFactoryNull {
     private final InteractionWriter serializer;
@@ -46,6 +47,15 @@ public class NodeFactoryForDataset extends NodeFactoryNull {
         boolean containsSupportingClaim = Arrays.asList(relTypes).contains(RelTypes.SUPPORTS);
         return new SpecimenImpl(dataset, study, serializer, taxon, containsSupportingClaim);
     }
+
+    @Override
+    public Specimen createSpecimen(Study study, Taxon taxon, Consumer<Specimen> initializer, RelTypes[] types) throws NodeFactoryException {
+        boolean containsSupportingClaim = Arrays.asList(types).contains(RelTypes.SUPPORTS);
+        SpecimenImpl specimen = new SpecimenImpl(dataset, study, serializer, taxon, containsSupportingClaim);
+        initializer.accept(specimen);
+        return specimen;
+    }
+
 
     @Override
     public List<Environment> addEnvironmentToLocation(Location location, List<Term> terms) {

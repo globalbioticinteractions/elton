@@ -9,7 +9,7 @@
     <description>Discover, access, and review, species interaction data</description>
 
     <properties>
-        <globi.version>0.29.0</globi.version>
+        <globi.version>0.30.0</globi.version>
         <preston.version>0.11.5</preston.version>
         <slf4j.version>1.7.30</slf4j.version>
         <picocli.version>4.6.3</picocli.version>
@@ -152,6 +152,18 @@
                 <exclusion>
                     <groupId>org.apache.tika</groupId>
                     <artifactId>tika-parsers</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

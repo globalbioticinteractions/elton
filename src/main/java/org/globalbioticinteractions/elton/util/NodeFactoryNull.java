@@ -19,11 +19,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class NodeFactoryNull implements NodeFactory {
 
     public Location findLocation(Location location) {
         return location;
+    }
+
+    @Override
+    public void startNextBatchUpdate() {
+
     }
 
     public Season createSeason(final String seasonName) {
@@ -42,6 +48,11 @@ public class NodeFactoryNull implements NodeFactory {
 
     @Override
     public Specimen createSpecimen(Study study, Taxon taxon, RelTypes... types) throws NodeFactoryException {
+        return createSpecimen(createInteraction(study), taxon);
+    }
+
+    @Override
+    public Specimen createSpecimen(Study study, Taxon taxon, Consumer<Specimen> initializer, RelTypes[] types) throws NodeFactoryException {
         return createSpecimen(createInteraction(study), taxon);
     }
 

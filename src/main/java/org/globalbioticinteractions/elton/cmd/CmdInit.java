@@ -22,9 +22,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CommandLine.Command(
         name = "init",
@@ -60,7 +62,13 @@ public class CmdInit extends CmdDefaultParams {
                 write(generateReadme(getDataCitation(), namespace), "README.md");
                 getStderr().println(" done.");
                 getStderr().print("generating [globi.json]...");
-                write(generateConfig(getDataCitation(), is -> is, new File(getDataDir()), getDataUrls().get(0)), "globi.json");
+                write(generateConfig(
+                                getDataCitation(),
+                                is -> is,
+                                new File(getDataDir()),
+                                getDataUrls().toArray(new String[0])),
+                        "globi.json"
+                );
                 getStderr().println(" done.");
                 getStderr().print("generating [.gitignore]...");
                 InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");
@@ -127,23 +135,43 @@ public class CmdInit extends CmdDefaultParams {
     static String generateConfig(String citation,
                                  InputStreamFactory inputStreamFactory,
                                  File cacheDir,
-                                 String urlString) throws IOException {
-        List<String> firstTwoLines = firstTwoLines(urlString, inputStreamFactory, cacheDir);
-
-        TableSchema tableSchema = new TableSchemaFactory().create(urlString, citation, firstTwoLines);
+                                 String... urlStrings) throws IOException {
         String actualConfig;
-        if (tableSchema.getColumnNames() == null || tableSchema.getColumnNames().isEmpty()) {
+        List<TableSchema> tableSchemas = inferTableSchemas(
+                citation,
+                inputStreamFactory,
+                cacheDir,
+                urlStrings
+        );
+        if (tableSchemas.isEmpty()) {
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode node = objectMapper.createObjectNode();
             node.put("format", "unknown");
             node.put("citation", citation);
-            node.put("url", urlString);
+            node.put("url", urlStrings[0]);
             actualConfig = node.toString();
         } else {
-            ObjectNode tableNode = generateConfigForTable(tableSchema);
-            actualConfig = generateConfigForTables(tableNode);
+            List<ObjectNode> tables = new ArrayList<>();
+            for (TableSchema tableSchema : tableSchemas) {
+                tables.add(generateConfigForTable(tableSchema));
+            }
+            actualConfig = generateConfigForTables(tables.toArray(new ObjectNode[0]));
         }
         return actualConfig;
+    }
+
+    private static List<TableSchema> inferTableSchemas(String citation, InputStreamFactory inputStreamFactory, File cacheDir, String[] urlStrings) throws IOException {
+        List<TableSchema> tableSchemas = new ArrayList<>();
+        for (String urlString : urlStrings) {
+            List<String> firstTwoLines = firstTwoLines(urlString, inputStreamFactory, cacheDir);
+
+            TableSchema tableSchema = new TableSchemaFactory().create(urlString, citation, firstTwoLines);
+            if (tableSchema.getColumnNames() != null && !tableSchema.getColumnNames().isEmpty()) {
+                tableSchemas.add(tableSchema);
+            }
+
+        }
+        return tableSchemas;
     }
 
     private static ObjectNode generateConfigForTable(TableSchema tableSchema) throws JsonProcessingException {

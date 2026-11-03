@@ -1,0 +1,57 @@
+{
+  "@context" : [ "http://www.w3.org/ns/csvw", {
+    "@language" : "en"
+  } ],
+  "rdfs:comment" : [ "inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/" ],
+  "tables" : [ {
+    "@context" : [ "http://www.w3.org/ns/csvw", {
+      "@language" : "en"
+    } ],
+    "rdfs:comment" : [ "inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/" ],
+    "url" : "file:/home/jorrit/proj/globi/elton/target/test-classes/org/globalbioticinteractions/elton/cmd/data.csv",
+    "dcterms:bibliographicCitation" : "some citation",
+    "delimiter" : ",",
+    "headerRowCount" : 1,
+    "null" : [ "" ],
+    "tableSchema" : {
+      "columns" : [ {
+        "name" : "header1",
+        "titles" : "header1",
+        "datatype" : "string"
+      }, {
+        "name" : "header2",
+        "titles" : "header2",
+        "datatype" : "string"
+      }, {
+        "name" : "header3",
+        "titles" : "header3",
+        "datatype" : "string"
+      } ]
+    }
+  }, {
+    "@context" : [ "http://www.w3.org/ns/csvw", {
+      "@language" : "en"
+    } ],
+    "rdfs:comment" : [ "inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/" ],
+    "url" : "file:/home/jorrit/proj/globi/elton/target/test-classes/org/globalbioticinteractions/elton/cmd/data.csv",
+    "dcterms:bibliographicCitation" : "some citation",
+    "delimiter" : ",",
+    "headerRowCount" : 1,
+    "null" : [ "" ],
+    "tableSchema" : {
+      "columns" : [ {
+        "name" : "header1",
+        "titles" : "header1",
+        "datatype" : "string"
+      }, {
+        "name" : "header2",
+        "titles" : "header2",
+        "datatype" : "string"
+      }, {
+        "name" : "header3",
+        "titles" : "header3",
+        "datatype" : "string"
+      } ]
+    }
+  } ]
+}

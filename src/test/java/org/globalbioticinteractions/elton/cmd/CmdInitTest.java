@@ -1,12 +1,16 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import org.apache.commons.io.IOUtils;
+import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -71,6 +75,34 @@ public class CmdInitTest {
         assertTrue(new File(tempFile, "globi.json").exists());
         assertTrue(new File(tempFile, ".gitignore").exists());
         assertTrue(new File(tempFile, ".github/workflows/review.yml").exists());
+    }
+
+    @Test
+    public void gatherInputTwoTables() throws IOException {
+        File tempFile = folder.newFolder();
+
+        CmdInit cmdInit = new CmdInit();
+        String externalForm = getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm();
+        cmdInit.setDataUrls(Arrays.asList(externalForm, externalForm));
+        cmdInit.setDataCitation("some citation");
+        cmdInit.setWorkDir(tempFile.getAbsolutePath());
+        cmdInit.getNamespaces().add("some/namespace");
+
+        assertFalse(new File(tempFile, "README.md").exists());
+        assertFalse(new File(tempFile, "globi.json").exists());
+        assertFalse(new File(tempFile, ".gitignore").exists());
+        assertFalse(new File(tempFile, ".github/workflows/review.yml").exists());
+        cmdInit.run();
+
+        assertTrue(new File(tempFile, "README.md").exists());
+        File config = new File(tempFile, "globi.json");
+        assertTrue(config.exists());
+        assertTrue(new File(tempFile, ".gitignore").exists());
+        assertTrue(new File(tempFile, ".github/workflows/review.yml").exists());
+
+        String string = IOUtils.toString(new FileInputStream(config), StandardCharsets.UTF_8);
+        assertThat(string,
+                Matchers.is(IOUtils.toString(getClass().getResourceAsStream("globi-two-tables.json"))));
     }
 
     @Test

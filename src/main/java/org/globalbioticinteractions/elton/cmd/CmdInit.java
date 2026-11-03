@@ -33,10 +33,17 @@ import java.util.List;
 public class CmdInit extends CmdDefaultParams {
 
     public static final String DESCRIPTION = "Initialize a GloBI indexed dataset configuration";
-    @CommandLine.Option(names = {"--data-url"}, description = "data url", required = true)
-    private String dataUrl;
+    @CommandLine.Option(
+            names = {"--data-url", "--data-urls"},
+            description = "data url(s)",
+            arity = "1..*",
+            required = true)
+    private List<String> dataUrls;
 
-    @CommandLine.Option(names = {"--data-citation"}, description = "data citation", required = true)
+    @CommandLine.Option(
+            names = {"--data-citation"},
+            description = "data citation",
+            required = true)
     private String dataCitation;
 
     @Override
@@ -53,7 +60,7 @@ public class CmdInit extends CmdDefaultParams {
                 write(generateReadme(getDataCitation(), namespace), "README.md");
                 getStderr().println(" done.");
                 getStderr().print("generating [globi.json]...");
-                write(generateConfig(getDataCitation(), is -> is, new File(getDataDir()), getDataUrl()), "globi.json");
+                write(generateConfig(getDataCitation(), is -> is, new File(getDataDir()), getDataUrls().get(0)), "globi.json");
                 getStderr().println(" done.");
                 getStderr().print("generating [.gitignore]...");
                 InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");
@@ -201,12 +208,16 @@ public class CmdInit extends CmdDefaultParams {
         return new FileOutputStream(file);
     }
 
-    public void setDataUrl(String dataUrl) {
-        this.dataUrl = dataUrl;
+    public void setDataUrls(String dataUrls) {
+        setDataUrls(Arrays.asList(dataUrls));
     }
 
-    public String getDataUrl() {
-        return dataUrl;
+    public void setDataUrls(List<String> dataUrls) {
+        this.dataUrls = dataUrls;
+    }
+
+    public List<String> getDataUrls() {
+        return dataUrls;
     }
 
     public void setDataCitation(String dataCitation) {

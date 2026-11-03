@@ -23,7 +23,7 @@ public class CmdInitTest {
     @Test(expected = RuntimeException.class)
     public void throwOnNoNamespace() throws IOException {
         CmdInit cmdInit = new CmdInit();
-        cmdInit.setDataUrl(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
+        cmdInit.setDataUrls(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
         cmdInit.setDataCitation("some citation");
 
         try {
@@ -37,7 +37,7 @@ public class CmdInitTest {
     @Test(expected = RuntimeException.class)
     public void throwOnMultipleNamespaces() throws IOException {
         CmdInit cmdInit = new CmdInit();
-        cmdInit.setDataUrl(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
+        cmdInit.setDataUrls(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
         cmdInit.setDataCitation("some citation");
         cmdInit.getNamespaces().add("some/namespace1");
         cmdInit.getNamespaces().add("some/namespace2");
@@ -55,7 +55,7 @@ public class CmdInitTest {
         File tempFile = folder.newFolder();
 
         CmdInit cmdInit = new CmdInit();
-        cmdInit.setDataUrl(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
+        cmdInit.setDataUrls(getClass().getResource("/org/globalbioticinteractions/elton/cmd/data.csv").toExternalForm());
         cmdInit.setDataCitation("some citation");
         cmdInit.setWorkDir(tempFile.getAbsolutePath());
         cmdInit.getNamespaces().add("some/namespace");

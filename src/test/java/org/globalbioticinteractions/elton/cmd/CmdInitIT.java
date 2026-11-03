@@ -1,21 +1,10 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.Ostermiller.util.LabeledCSVParser;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.eol.globi.util.CSVTSVUtil;
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -31,7 +20,7 @@ public class CmdInitIT {
         FileUtils.forceMkdir(tempFile);
 
         CmdInit cmdInit = new CmdInit();
-        cmdInit.setDataUrl("https://idata.idiv.de/mmm/ShowMultimediaData/getFile/?path=Datasets%255c283%255c283_2_FoodWebDataBase_2018_12_10.csv");
+        cmdInit.setDataUrls("https://idata.idiv.de/mmm/ShowMultimediaData/getFile/?path=Datasets%255c283%255c283_2_FoodWebDataBase_2018_12_10.csv");
         cmdInit.setDataCitation("some citation");
         cmdInit.setWorkDir(tempFile.getAbsolutePath());
         cmdInit.getNamespaces().add("some/namespace");

@@ -1,7 +1,9 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RegExUtils;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.junit.Rule;
@@ -103,8 +105,16 @@ public class CmdInitTest {
 
         String configActual = IOUtils.toString(new FileInputStream(config), StandardCharsets.UTF_8);
         String configExpected = IOUtils.toString(getClass().getResourceAsStream("globi-two-tables.json"));
-        assertThat(new ObjectMapper().readTree(configActual).toPrettyString(),
-                Matchers.is(new ObjectMapper().readTree(configExpected).toPrettyString()));
+        assertThat(getNormalizedConfig(configActual),
+                Matchers.is(getNormalizedConfig(configExpected)));
+    }
+
+    private static String getNormalizedConfig(String configActual) throws JsonProcessingException {
+        return new ObjectMapper()
+                .readTree(
+                        RegExUtils.replaceAll(configActual, "[^\\\"]+elton/cmd/data.csv", "data.csv")
+                )
+                .toPrettyString();
     }
 
     @Test

@@ -127,14 +127,14 @@ public class CmdInit extends CmdDefaultParams {
         String actualConfig;
         List<String> columnNames = inferColumnNames(firstTwoLines);
         if (!columnNames.isEmpty()) {
-            actualConfig = generateConfig(urlString, citation, columnNames, ",");
+            actualConfig = generateConfig(citation, columnNames, ",", urlString);
         } else {
             columnNames = inferColumnNamesTSV(firstTwoLines);
             if (!columnNames.isEmpty()) {
-                actualConfig = generateConfig(urlString, citation, columnNames, "\t");
+                actualConfig = generateConfig(citation, columnNames, "\t", urlString);
             } else {
                 columnNames = inferColumnNames(firstTwoLines, ';');
-                actualConfig = generateConfig(urlString, citation, columnNames, ";");
+                actualConfig = generateConfig(citation, columnNames, ";", urlString);
             }
 
             if (columnNames.isEmpty()) {
@@ -149,13 +149,16 @@ public class CmdInit extends CmdDefaultParams {
         return actualConfig;
     }
 
-    private static String generateConfig(String urlString, String citation, List<String> columnNames, String delimiter) throws IOException {
+    private static String generateConfig(String citation,
+                                         List<String> columnNames,
+                                         String delimiter,
+                                         String... urlString) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         ObjectNode tableNode = mapper.createObjectNode();
         tableNode.set("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
         tableNode.set("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
-        tableNode.put("url", urlString);
+        tableNode.put("url", urlString[0]);
         tableNode.put("dcterms:bibliographicCitation", citation);
         tableNode.put("delimiter", delimiter);
         tableNode.put("headerRowCount", 1);

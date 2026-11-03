@@ -1,5 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
@@ -100,9 +101,10 @@ public class CmdInitTest {
         assertTrue(new File(tempFile, ".gitignore").exists());
         assertTrue(new File(tempFile, ".github/workflows/review.yml").exists());
 
-        String string = IOUtils.toString(new FileInputStream(config), StandardCharsets.UTF_8);
-        assertThat(string,
-                Matchers.is(IOUtils.toString(getClass().getResourceAsStream("globi-two-tables.json"))));
+        String configActual = IOUtils.toString(new FileInputStream(config), StandardCharsets.UTF_8);
+        String configExpected = IOUtils.toString(getClass().getResourceAsStream("globi-two-tables.json"));
+        assertThat(new ObjectMapper().readTree(configActual).toPrettyString(),
+                Matchers.is(new ObjectMapper().readTree(configExpected).toPrettyString()));
     }
 
     @Test

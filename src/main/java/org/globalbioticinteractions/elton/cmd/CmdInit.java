@@ -1,6 +1,6 @@
 package org.globalbioticinteractions.elton.cmd;
 
-import com.Ostermiller.util.LabeledCSVParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +53,7 @@ public class CmdInit extends CmdDefaultParams {
                 write(generateReadme(getDataCitation(), namespace), "README.md");
                 getStderr().println(" done.");
                 getStderr().print("generating [globi.json]...");
-                write(generateConfig(getDataUrl(), getDataCitation(), is -> is, new File(getDataDir())), "globi.json");
+                write(generateConfig(getDataCitation(), is -> is, new File(getDataDir()), getDataUrl()), "globi.json");
                 getStderr().println(" done.");
                 getStderr().print("generating [.gitignore]...");
                 InputStream gitIgnore = getClass().getResourceAsStream("/org/globalbioticinteractions/elton/template/default.gitignore");
@@ -118,74 +117,56 @@ public class CmdInit extends CmdDefaultParams {
         return columnNames;
     }
 
-    static String generateConfig(String urlString,
-                                 String citation,
+    static String generateConfig(String citation,
                                  InputStreamFactory inputStreamFactory,
-                                 File cacheDir) throws IOException {
+                                 File cacheDir,
+                                 String urlString) throws IOException {
         List<String> firstTwoLines = firstTwoLines(urlString, inputStreamFactory, cacheDir);
 
+        TableSchema tableSchema = new TableSchemaFactory().create(urlString, citation, firstTwoLines);
         String actualConfig;
-        List<String> columnNames = inferColumnNames(firstTwoLines);
-        if (!columnNames.isEmpty()) {
-            actualConfig = generateConfig(citation, columnNames, ",", urlString);
+        if (tableSchema.getColumnNames() == null || tableSchema.getColumnNames().isEmpty()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode node = objectMapper.createObjectNode();
+            node.put("format", "unknown");
+            node.put("citation", citation);
+            node.put("url", urlString);
+            actualConfig = node.toString();
         } else {
-            columnNames = inferColumnNamesTSV(firstTwoLines);
-            if (!columnNames.isEmpty()) {
-                actualConfig = generateConfig(citation, columnNames, "\t", urlString);
-            } else {
-                columnNames = inferColumnNames(firstTwoLines, ';');
-                actualConfig = generateConfig(citation, columnNames, ";", urlString);
-            }
-
-            if (columnNames.isEmpty()) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                ObjectNode node = objectMapper.createObjectNode();
-                node.put("format", "unknown");
-                node.put("citation", citation);
-                node.put("url", urlString);
-                actualConfig = node.toString();
-            }
+            ObjectNode tableNode = generateConfigForTable(tableSchema);
+            actualConfig = generateConfigForTables(tableNode);
         }
         return actualConfig;
     }
 
-    private static String generateConfig(String citation,
-                                         List<String> columnNames,
-                                         String delimiter,
-                                         String... urlString) throws IOException {
+    private static ObjectNode generateConfigForTable(TableSchema tableSchema) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
 
         ObjectNode tableNode = mapper.createObjectNode();
         tableNode.set("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
         tableNode.set("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
-        tableNode.put("url", urlString[0]);
-        tableNode.put("dcterms:bibliographicCitation", citation);
-        tableNode.put("delimiter", delimiter);
+        tableNode.put("url", tableSchema.getUrlString());
+        tableNode.put("dcterms:bibliographicCitation", tableSchema.getCitation());
+        tableNode.put("delimiter", tableSchema.getDelimiter());
         tableNode.put("headerRowCount", 1);
         tableNode.set("null", mapper.readTree("[\"\"]"));
-        tableNode.set("tableSchema", generateColumns(columnNames));
-
-        final ArrayNode tablesNode = mapper.createArrayNode();
-        tablesNode.add(tableNode);
-
-        ObjectNode rootNode = mapper.createObjectNode();
-        rootNode.set("@context", mapper.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
-        rootNode.set("rdfs:comment", mapper.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
-        rootNode.set("tables", tablesNode);
-
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
+        tableNode.set("tableSchema", generateColumns(tableSchema.getColumnNames()));
+        return tableNode;
     }
 
-    static List<String> inferColumnNames(List<String> firstTwoLines) throws IOException {
-        return inferColumnNames(firstTwoLines, null);
-    }
+    private static String generateConfigForTables(ObjectNode... tableNodes) throws JsonProcessingException {
+        ObjectMapper mapper2 = new ObjectMapper();
+        final ArrayNode tables = mapper2.createArrayNode();
+        for (JsonNode tableNode : tableNodes) {
+            tables.add(tableNode);
+        }
 
+        ObjectNode rootNode = mapper2.createObjectNode();
+        rootNode.set("@context", mapper2.readTree("[\"http://www.w3.org/ns/csvw\", {\"@language\": \"en\"}]"));
+        rootNode.set("rdfs:comment", mapper2.readTree("[\"inspired by https://www.w3.org/TR/2015/REC-tabular-data-model-20151217/\"]"));
+        rootNode.set("tables", tables);
 
-    static List<String> inferColumnNames(List<String> firstTwoLines, Character delimiter) throws IOException {
-        return inferColumnNames(
-                IOUtils.toInputStream(StringUtils.join(firstTwoLines, "\n"), StandardCharsets.UTF_8),
-                delimiter
-        );
+        return mapper2.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
     }
 
     private static JsonNode generateColumns(List<String> columnNames) {
@@ -208,28 +189,6 @@ public class CmdInit extends CmdDefaultParams {
         objectNode.set("columns", arrayNode);
         return objectNode;
     }
-
-    private static List<String> inferColumnNames(InputStream inputStream) throws IOException {
-        return inferColumnNames(inputStream, null);
-    }
-
-
-    private static List<String> inferColumnNames(InputStream inputStream, Character delimiter) throws IOException {
-        List<String> columnNames;
-        try {
-            LabeledCSVParser csvParser = new LabeledCSVParser(CSVTSVUtil.createCSVParser(inputStream));
-            if (delimiter != null) {
-                csvParser.changeDelimiter(delimiter);
-            }
-            columnNames = csvParser.getLabels().length > 1
-                    ? new ArrayList<>(Arrays.asList(csvParser.getLabels()))
-                    : Collections.emptyList();
-        } catch (IOException ex) {
-            columnNames = Collections.emptyList();
-        }
-        return columnNames;
-    }
-
 
     private void write(String content, String filename) throws IOException {
         IOUtils.copy(IOUtils.toInputStream(content, StandardCharsets.UTF_8),

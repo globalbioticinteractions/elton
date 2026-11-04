@@ -178,10 +178,12 @@ public class CmdLogTest {
         assertThat(prov, containsString("http://data.nhm.ac.uk/api/3/action/package_show?id=nhm-ib"));
 
 
-        assertThat(split.size(), is(9));
         assertThat(split.get(0), startsWith("<https://github.com/globalbioticinteractions/natural-history-museum-london-interactions-bank/archive/bfde02e6cc980a2ac411952c862ce97c2e99e057.zip> <http://purl.org/pav/hasVersion> <hash://sha256/b15d553f4eb91797a7ca017d315158b3f48921a4c605be422d14598c712fe88c> "));
         assertThat(split.get(1), startsWith("<zip:hash://sha256/b15d553f4eb91797a7ca017d315158b3f48921a4c605be422d14598c712fe88c!/natural-history-museum-london-interactions-bank-bfde02e6cc980a2ac411952c862ce97c2e99e057/globi.json> <http://purl.org/pav/hasVersion> <hash://sha256/1e24b00158a3f0cb2d39d37134ad8f8f3566f85d36341f2c04242c995fb6a69a> "));
         assertThat(split.get(2), startsWith("<http://data.nhm.ac.uk/api/3/action/package_show?id=nhm-ib> <http://purl.org/pav/hasVersion> <hash://sha256/001ea8478d7f3ae2d9d98e46564d56fa656ae4d1fffe2e1da9f9800fc49ca83a> "));
+        assertThat(split.get(7), startsWith("<classpath:/org/globalbioticinteractions/interaction_types_ro.csv> <http://purl.org/pav/hasVersion> <hash://sha256/"));
+        assertThat(split.get(8), startsWith("<https://data.nhm.ac.uk/dataset/82e807f0-6273-4f19-be0a-7f7558442a25/resource/f84ad9f1-bd0c-4811-8108-8dcd83f224a4/download/nhminteractionsbank.csv> <http://purl.org/pav/hasVersion> <hash://sha256/"));
+        assertThat(split.size(), is(9));
     }
 
     @Test
